@@ -800,6 +800,20 @@ function setupActivateProjectModal() {
       email: document.getElementById('activate-email').value,
       message: document.getElementById('activate-message').value
     };
+
+    // Guardar lead en Supabase
+    if (window.apiSaveLead) {
+      const summaryText = buildQuotePlainText(client);
+      await window.apiSaveLead({
+        nombre: client.name,
+        telefono: client.phone,
+        email: client.email,
+        mensaje: client.message + "\n\n--- Cotización Generada ---\n" + summaryText,
+        origen: "Cotizador Diseño Propio",
+        fecha: new Date().toISOString()
+      });
+    }
+
     const filename = await generateProjectPdf(client);
     const subject = encodeURIComponent('Activación de proyecto - Tu Parcela Lista');
     const body = encodeURIComponent(buildQuotePlainText(client) + `\n\nPDF generado en el navegador: ${filename || 'no disponible'}. Adjuntar el archivo descargado a este correo.`);
