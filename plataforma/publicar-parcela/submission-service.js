@@ -36,13 +36,13 @@ export function visualAnalysisRequestFor(draft={}){
 export function prepareLocalSubmission(draft={},options={}){
  const previous=draft.submission||{};const date=options.date||new Date();
  const submission={
-  status:'pendiente_revision',submittedAt:previous.submittedAt||date.toISOString(),
+  status:'publicado',submittedAt:previous.submittedAt||date.toISOString(),
   contactEmail:contactEmailFor(draft),temporaryCode:previous.temporaryCode||generateTemporaryCode({date,random:options.random}),
   publisherType:draft.tipoPublicador||'',commercialModel:commercialModelFor(draft),
  publicTitle:draft.titulo_publico||'',publicDescription:draft.descripcion_publica||'',
   transport:'mock-local-v1',adapterLabel:'Local · solo desarrollo',fallbackReason:options.fallbackReason||'development'
  };
- return {...draft,estado:'pendiente_revision',fecha_envio:submission.submittedAt,correo_contacto:submission.contactEmail,codigo_temporal:submission.temporaryCode,tipo_publicador:submission.publisherType,plan_modelo_comercial:submission.commercialModel,enviado:true,submission};
+ return {...draft,estado:'publicado',activo:true,fecha_envio:submission.submittedAt,correo_contacto:submission.contactEmail,codigo_temporal:submission.temporaryCode,tipo_publicador:submission.publisherType,plan_modelo_comercial:submission.commercialModel,enviado:true,submission};
 }
 
 export function createIdempotencyKey(){return randomUuid();}
@@ -54,6 +54,8 @@ function safePayload(draft){
  ['precio','montoLiquido'].forEach(key=>{if(payload[key]!=null)payload[key]=String(payload[key]).replace(/[^0-9]/g,'');});
  if(payload.superficie!=null)payload.superficie=String(payload.superficie).replace(',','.').replace(/[^0-9.]/g,'');
  payload.analisisVisual=visualAnalysisRequestFor(draft);
+ payload.autoPublish = true; // Flag for Supabase to auto-publish
+ payload.activo = true; // Auto-publish flag
  return payload;
 }
 
@@ -81,7 +83,7 @@ function isDevelopmentRuntime(options={},dependencies={}){
 }
 
 function checkpointDraft(draft,submission){
- return {...draft,estado:submission.status==='pendiente_revision'?'pendiente_revision':'borrador',fecha_envio:submission.submittedAt,correo_contacto:submission.contactEmail,codigo_temporal:submission.temporaryCode,tipo_publicador:submission.publisherType,plan_modelo_comercial:submission.commercialModel,enviado:submission.status==='pendiente_revision',submission};
+ return {...draft,estado:submission.status==='publicado'?'publicado':'borrador',activo:(submission.status==='publicado'),fecha_envio:submission.submittedAt,correo_contacto:submission.contactEmail,codigo_temporal:submission.temporaryCode,tipo_publicador:submission.publisherType,plan_modelo_comercial:submission.commercialModel,enviado:submission.status==='publicado',submission};
 }
 
 async function notifyCheckpoint(callback,draft){if(typeof callback==='function')await callback(draft);}
@@ -107,7 +109,7 @@ async function submitToSupabase(draft,options,client){
  const error=responseError(response),result=response?.data;
  if(error||!result?.ok||!result?.id||!result?.codigo_publico)throw new SubmissionError(result?.error||error?.message||'No fue posible completar la publicación.',{code:result?.code||'edge_function_failed',cause:error,recoveryDraft});
  const visualAnalysis=result.analisis_visual||{status:'not_requested'},reviewed=['accepted','edited','rejected'].includes(String(draft.analisisVisual?.reviewStatus||''));
- submission={...submission,status:visualAnalysis.status==='completed'&&visualAnalysis.suggestions&&!reviewed?'revision_ia_pendiente':'pendiente_revision',temporaryCode:result.codigo_publico,publicationId:result.id,submittedAt:result.creado_en||submission.submittedAt,completedAt:nowIso(options.date),processedPhotos:Number(result.fotos_procesadas||0),visualAnalysis};
+ submission={...submission,status:visualAnalysis.status==='completed'&&visualAnalysis.suggestions&&!reviewed?'revision_ia_pendiente':'publicado',temporaryCode:result.codigo_publico,publicationId:result.id,submittedAt:result.creado_en||submission.submittedAt,completedAt:nowIso(options.date),processedPhotos:Number(result.fotos_procesadas||0),visualAnalysis};
  recoveryDraft=checkpointDraft(draft,submission);await notifyCheckpoint(options.onCheckpoint,recoveryDraft);
  return recoveryDraft;
 }
