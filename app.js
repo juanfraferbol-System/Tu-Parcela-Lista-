@@ -447,6 +447,15 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
     if (state.activeFilters.native) list = list.filter(p => String(p.naturaleza).toLowerCase() === "si" || p.naturaleza === true);
+    if (state.activeFilters.region && state.activeFilters.region !== "all") {
+      const regionMap = {
+        "Biobío": ["Florida", "Nacimiento", "Negrete", "Yumbel"],
+        "Ñuble": ["Ñipas", "Pemuco", "Quillón"],
+        "La Araucanía": ["Caburgua"]
+      };
+      const validCommunes = regionMap[state.activeFilters.region] || [];
+      list = list.filter(p => validCommunes.map(normalizar).includes(normalizar(p.comuna)));
+    }
     if (state.activeFilters.commune && state.activeFilters.commune !== "all") {
       list = list.filter(p => normalizar(p.comuna) === normalizar(state.activeFilters.commune));
     }
@@ -2784,6 +2793,46 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCotizacionSummary();
   ensurePreviewActionButtons();
   setupEvents();
+  
+  // Location Filter Bar Logic
+  const locBar = document.querySelector(".location-filter-bar");
+  if (locBar) {
+    locBar.addEventListener("click", e => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      
+      const type = btn.dataset.filterType;
+      const val = btn.dataset.value;
+      
+      // Update UI active states
+      locBar.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      
+      // Reset other location filters
+      state.activeFilters.commune = "all";
+      state.activeFilters.region = "all";
+      
+      if (type === "region") {
+        state.activeFilters.region = val;
+      } else if (type === "commune") {
+        state.activeFilters.commune = val;
+      }
+      
+      // Trigger refresh and scroll
+      refresh();
+      const parcelasSec = document.getElementById("decision-flow") || document.getElementById("parcelas-grid") || document.getElementById("contenido-principal");
+      if (parcelasSec) {
+        const headerOffset = 140;
+        const elementPosition = parcelasSec.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({
+             top: offsetPosition,
+             behavior: "smooth"
+        });
+      }
+    });
+  }
+
   if (window.lucide) lucide.createIcons();
 });
 
