@@ -3,6 +3,6 @@
 
   global.TPL_SUPABASE_CONFIG = Object.freeze({
     url: 'https://qxavbqhyqaqalpzbhwmh.supabase.co',
-    anonKey: 'sb_publishable_gTJ1ORlyrEJId-hilhWD3g_3vn3faxE'
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA'
   });
 })(window);

@@ -52,7 +52,7 @@
 <link href="css/v2-ajustes-filtros.css" rel="stylesheet"/>
 <link href="css/v3-ux.css" rel="stylesheet"/>
 <link href="css/v3-production.css" rel="stylesheet"/>
-<link href="agente/agente.css" rel="stylesheet"/>
+<!-- <link href="agente/agente.css" rel="stylesheet"/> -->
 
 <link rel="preload" as="image" href="image/hero-huerta.webp" fetchpriority="high"/>
 <link rel="preload" as="image" href="image/hero-pareja-casa.webp" fetchpriority="high"/>
@@ -110,12 +110,12 @@
 </section>
 <section class="decision-flow" id="decision-flow">
 <div class="decision-box">
-<span class="decision-eyebrow">ELIGE TU CAMINO</span>
-<h2>¿Cómo quieres comenzar tu proyecto?</h2>
-<p class="decision-intro">Da el primer paso y entra a una experiencia diseñada según tu presupuesto.</p>
+<span class="decision-eyebrow">COMIENZA AHORA</span>
+<h2>Busca tu parcela o proyecto con casa con tu presupuesto</h2>
+<p class="decision-intro">Da el primer paso y encuentra el lugar ideal hecho a tu medida.</p>
 <div class="decision-buttons decision-buttons-clean decision-buttons-v5">
 <button class="decision-option-card decision-option-parcela" id="opt-parcela" type="button">
-<span class="decision-card-photo" aria-hidden="true"></span>
+<span class="decision-card-photo" aria-hidden="true" style="background-image: url('https://images.unsplash.com/photo-1505915570251-c116c4c3b6ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'); background-size: cover; background-position: center; opacity: 0.6; filter: brightness(0.8) contrast(1.2);"></span>
 <span class="decision-card-overlay" aria-hidden="true"></span>
 <span class="decision-card-copy">
 <span class="decision-icon" aria-hidden="true"><i data-lucide="map-pin"></i></span>
@@ -125,7 +125,7 @@
 </span>
 </button>
 <button class="decision-option-card decision-option-casa" id="opt-combo" type="button">
-<span class="decision-card-photo" aria-hidden="true"></span>
+<span class="decision-card-photo" aria-hidden="true" style="background-image: url('https://images.unsplash.com/photo-1449844908441-8829872d2607?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'); background-size: cover; background-position: center; opacity: 0.6; filter: brightness(0.8) contrast(1.2);"></span>
 <span class="decision-card-overlay" aria-hidden="true"></span>
 <span class="decision-card-copy">
 <span class="decision-icon" aria-hidden="true"><i data-lucide="house"></i></span>
@@ -467,6 +467,10 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <i data-lucide="send"></i>
               Activar Proyecto
             </button>
+<button class="btn-share-project" id="share-project-btn" type="button" style="margin-top: 10px; width: 100%; padding: 14px; border-radius: var(--radius-md); border: 2px solid var(--border-color); background: #fff; color: var(--primary); font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease;">
+<i data-lucide="share-2"></i>
+              Compartir este proyecto
+            </button>
 <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 16px; line-height: 1.4;">
               * Puedes enviar tu cotización por WhatsApp o activar el proyecto completando tus datos. Se generará un PDF de respaldo y se enviará la solicitud al equipo de Tu Parcela Lista.
             </p>
@@ -491,6 +495,10 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
       </p>
 <form class="project-activation-form" id="project-activation-form">
 <div class="activation-form-grid">
+<label>
+            RUT *
+            <input name="rut" placeholder="Ej: 12.345.678-9" required="" type="text"/>
+</label>
 <label>
             Nombre completo *
             <input name="nombre" placeholder="Ej: Juan Pérez" required="" type="text"/>
@@ -540,7 +548,7 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <div class="section-title-v2">
 <span class="kicker">Proyectos destacados</span>
 <h2>Proyectos listos para cotizar</h2>
-<p>Cinco alternativas modernas ordenadas desde la más económica a la más completa. Al pinchar una opción se carga el cotizador interno de esta misma página con parcela y casa seleccionadas.</p>
+<p>Alternativas modernas ordenadas desde la más económica a la más completa. Al pinchar una opción se carga el cotizador interno de esta misma página con parcela y casa seleccionadas.</p>
 </div>
 <div class="promos-grid-v2" id="promos-grid"></div>
 </div>
@@ -638,7 +646,9 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <script defer src="js/core/app-core.js"></script>
 
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script defer src="app.js?v=20260710-1"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="js/db-api.js"></script>
+<script defer src="app.js?v=20260714-7"></script>
 <script defer src="premium-features.js"></script>
 <script defer src="js/tpl-modals.js"></script>
 <script defer src="js/tpl-utils.js"></script>
@@ -655,7 +665,7 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 
 <script defer src="tpl-analytics.js"></script>
 <script defer src="js/site-polish.js"></script>
-<script defer src="agente/agente.js"></script>
+<!-- <script defer src="agente/agente.js"></script> -->
 
 <script>
 /* FIX v0.9.1.1: mantener catálogo de parcelas disponible desde la carga inicial. */

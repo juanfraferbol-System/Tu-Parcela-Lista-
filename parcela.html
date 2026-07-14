@@ -529,6 +529,11 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
             <i data-lucide="message-circle"></i> Preguntar por WhatsApp
           </a>
 
+          <!-- Botón Compartir -->
+          <button id="sidebar-share-btn" type="button" class="btn-share-project" style="margin-top: 10px; width: 100%; padding: 14px; border-radius: var(--radius-md); border: 2px solid var(--border-color); background: #fff; color: var(--primary); font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease;">
+            <i data-lucide="share-2"></i> Compartir parcela
+          </button>
+
           <button type="button" id="detail-visit-btn" class="btn-primary-submit btn-visit-clear">
             <i data-lucide="calendar-days"></i> Agendar visita
           </button>
@@ -713,10 +718,10 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
         
         // Lightbox
         lightbox: document.getElementById("gallery-lightbox"),
-        lightboxClose: document.getElementById("gallery-close-btn"),
-        lightboxPrev: document.getElementById("gallery-prev-btn"),
-        lightboxNext: document.getElementById("gallery-next-btn"),
-        lightboxMainImg: document.getElementById("gallery-main-img"),
+        lightboxClose: document.getElementById("lightbox-close-btn"),
+        lightboxPrev: document.getElementById("lightbox-prev-btn"),
+        lightboxNext: document.getElementById("lightbox-next-btn"),
+        lightboxMainImg: document.getElementById("lightbox-main-img"),
 
         // Menú móvil
         navToggle: document.getElementById("nav-toggle"),
@@ -865,6 +870,26 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
                           `💵 *Valor:* ${p.precio}\n\n` +
                           `¿Sigue disponible para coordinar una visita?`;
       DOM.whatsappBtn.href = `https://api.whatsapp.com/send?phone=56988508361&text=${encodeURIComponent(whatsappMsg)}`;
+
+      // Botón de compartir
+      const shareBtn = document.getElementById("sidebar-share-btn");
+      if (shareBtn) {
+        shareBtn.addEventListener("click", () => {
+          const shareUrl = window.location.href;
+          const shareText = `Te quiero enseñar esta parcela (${p.nombre}), dime qué te parece`;
+          
+          if (navigator.share) {
+            navigator.share({
+              title: `Parcela ${p.nombre} - Tu Parcela Lista`,
+              text: shareText,
+              url: shareUrl
+            }).catch(console.error);
+          } else {
+            const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
+            window.open(waUrl, '_blank');
+          }
+        });
+      }
 
       // 3. Checklist de Atributos
       const features = [

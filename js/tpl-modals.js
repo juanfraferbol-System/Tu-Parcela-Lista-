@@ -37,8 +37,6 @@
             <div class="tpl-location-panel">
               <aside class="tpl-location-side">
                 <span class="tpl-location-kicker">Ubicación de la parcela</span>
-                <h3 id="tpl-location-title">Ver ubicación</h3>
-                <p id="tpl-location-subtitle">Revisa el sector, activa tu ubicación y abre la ruta en un toque.</p>
 
                 <div class="tpl-location-info">
                   <div>

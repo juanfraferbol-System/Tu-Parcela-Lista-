@@ -69,11 +69,50 @@
       if (link.classList.contains("logo-container")) link.href = "index.html";
     });
 
-    initInfoBanner();
+    // Ya no se inyecta banner inferior
+    // initInfoBanner();
     applyIncomingFilter();
     initDeferredExtras();
     initProjectExperience();
+    initNavbarObserver();
   });
+
+  function initNavbarObserver() {
+    const navLinks = document.querySelectorAll('.nav-links a[href^="#"], .nav-links a[href^="index.html#"]');
+    if (!navLinks.length) return;
+    
+    // Marcar por defecto si estamos en una pgina como como-comprar.html
+    const currentPath = window.location.pathname.split("/").pop();
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && href === currentPath && currentPath !== '' && currentPath !== 'index.html') {
+        link.classList.add('active');
+      }
+    });
+
+    if (currentPath !== '' && currentPath !== 'index.html') return; // Solo index usa observer para anclas
+
+    const sections = Array.from(navLinks).map(link => {
+      const href = link.getAttribute("href");
+      const id = href.includes("#") ? href.substring(href.indexOf("#") + 1) : "";
+      return document.getElementById(id);
+    }).filter(Boolean);
+
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          const id = entry.target.id;
+          const activeLink = document.querySelector(`.nav-links a[href="#${id}"], .nav-links a[href="index.html#${id}"]`);
+          if (activeLink) activeLink.classList.add('active');
+        }
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+
+    sections.forEach(sec => observer.observe(sec));
+  }
 
   function initInfoBanner() {
     if (!document.querySelector("header") || /(?:admin-publicaciones|CRM)\.html/i.test(location.pathname) || document.querySelector(".tpl-info-banner")) return;

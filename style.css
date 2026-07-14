@@ -178,7 +178,8 @@ body {
   color: #00828a;
 }
 
-.nav-links a:hover::after {
+.nav-links a:hover::after,
+.nav-links a.active::after {
   width: 100%;
 }
 
@@ -4201,8 +4202,8 @@ MODOS DE VISUALIZACIÓN
 .card-image{position:relative;display:block;height:210px;overflow:hidden;color:inherit;text-decoration:none;background:#dbeafe;}
 .card-image img{width:100%;height:100%;object-fit:cover;display:block;transition:.35s ease;}
 .parcela-card:hover .card-image img{transform:scale(1.06);}
-.card-comuna,.card-price{position:absolute;z-index:2;border-radius:999px;font-weight:900;box-shadow:0 10px 25px rgba(0,0,0,.18);}
-.card-comuna{left:14px;top:14px;background:rgba(255,255,255,.94);color:#004785;padding:8px 12px;font-size:.82rem;}
+.card-comuna,.card-price{position:absolute;z-index:2;border-radius:24px;font-weight:900;box-shadow:0 10px 25px rgba(0,0,0,.18);}
+.card-comuna{left:14px;top:14px;background:#003f7a;color:#ffffff;padding:8px 14px;font-size:.9rem;}
 .card-price{right:14px;bottom:14px;background:#ffc107;color:#0f172a;padding:10px 14px;}
 .card-body{padding:20px;}
 .card-title{margin:0 0 8px;color:#004785;font-size:1.15rem;line-height:1.25;}
@@ -4611,7 +4612,7 @@ body{padding-top:82px;}
 .parcela-card:hover{transform:translateY(-4px)!important;box-shadow:0 22px 50px rgba(0,63,122,.15)!important;}
 .card-image,.card-image-link{position:relative!important;display:block!important;aspect-ratio:4/3!important;height:auto!important;overflow:hidden!important;background:#e8eef5!important;}
 .card-image img,.card-image-link img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;transition:transform .35s ease!important;}
-.card-comuna{top:10px!important;left:10px!important;right:auto!important;bottom:auto!important;background:rgba(255,255,255,.92)!important;color:#003f7a!important;padding:5px 9px!important;font-size:.73rem!important;box-shadow:0 8px 18px rgba(0,0,0,.14)!important;}
+.card-comuna{top:12px!important;left:12px!important;right:auto!important;bottom:auto!important;background:#003f7a!important;color:#ffffff!important;padding:6px 12px!important;font-size:.85rem!important;font-weight:800!important;border-radius:24px!important;box-shadow:0 8px 18px rgba(0,0,0,.14)!important;}
 .card-price{right:10px!important;bottom:10px!important;background:rgba(0,43,82,.82)!important;color:#fff!important;padding:6px 10px!important;font-size:.82rem!important;border-radius:999px!important;text-shadow:0 3px 10px rgba(0,0,0,.45)!important;box-shadow:0 8px 18px rgba(0,0,0,.18)!important;}
 .card-body{padding:13px 13px 14px!important;}
 .card-title{font-size:.96rem!important;line-height:1.25!important;margin-bottom:6px!important;color:#062f55!important;}
@@ -7988,7 +7989,7 @@ body.summary-info-open{overflow:hidden;}
 }
 .tpl-location-actions #tpl-location-directions,
 .tpl-location-actions #tpl-location-waze{
-  background:linear-gradient(135deg,#f97316,#f59e0b)!important;
+  background:linear-gradient(135deg,#00828a,#00b8c4)!important;
   color:#fff!important;
   border:0!important;
 }
@@ -11386,9 +11387,9 @@ html body.tpl-focus-combo-proposals #casas-section{
 .hero-v5-visual{position:absolute;z-index:2;top:38px;right:0;bottom:38px;width:min(45vw,760px);}
 .hero-v5-photo{position:absolute;background-position:center;background-size:cover;box-shadow:0 24px 70px rgba(16,36,58,.16);border:7px solid rgba(255,255,255,.84);}
 .hero-v5-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,63,122,.12));}
-.hero-v5-photo-main{top:0;right:0;width:76%;height:49%;border-radius:120px 0 0 120px;background-image:url('image/hero-huerta.webp');}
-.hero-v5-photo-family{top:42%;right:8%;width:68%;height:37%;border-radius:100px 18px 100px 18px;background-image:url('image/hero-ninos-pradera.webp');}
-.hero-v5-photo-landscape{right:0;bottom:0;width:48%;height:29%;border-radius:80px 0 0 80px;background-image:url('image/hero-volcan-casa.webp');}
+.hero-v5-photo-main{top:0;right:0;width:76%;height:49%;border-radius:120px 0 0 120px;background-image:url('https://images.unsplash.com/photo-1449844908441-8829872d2607?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');}
+.hero-v5-photo-family{top:42%;right:8%;width:68%;height:37%;border-radius:100px 18px 100px 18px;background-image:url('https://images.unsplash.com/photo-1605000797499-95a51c5269ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');}
+.hero-v5-photo-landscape{right:0;bottom:0;width:48%;height:29%;border-radius:80px 0 0 80px;background-image:url('https://images.unsplash.com/photo-1500048993953-d23a436266cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');}
 
 .decision-flow{padding:68px 20px!important;background:#fff!important;}
 .decision-box{max-width:1100px!important;margin:auto!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;text-align:center!important;}
@@ -11402,7 +11403,7 @@ html body.tpl-focus-combo-proposals #casas-section{
 .decision-buttons-v5 .decision-option-card:hover .decision-card-photo{transform:scale(1.04)!important;}
 .decision-buttons-v5 .decision-option-parcela .decision-card-photo{background-image:url('image/decision-parcela-personas.webp')!important;}
 .decision-buttons-v5 .decision-option-casa .decision-card-photo{background-image:url('image/decision-casa-familia.webp')!important;}
-.decision-buttons-v5 .decision-card-overlay{position:absolute!important;inset:0!important;background:linear-gradient(90deg,rgba(6,31,50,.88) 0%,rgba(6,31,50,.64) 52%,rgba(6,31,50,.15) 100%)!important;}
+.decision-buttons-v5 .decision-card-overlay{position:absolute!important;inset:0!important;background:linear-gradient(90deg,rgba(0,63,122,.55) 0%,rgba(0,130,138,.35) 100%)!important;backdrop-filter:blur(2px)!important;}
 .decision-buttons-v5 .decision-card-copy{position:relative!important;z-index:2!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-end!important;width:70%!important;height:100%!important;padding:26px!important;color:#fff!important;}
 .decision-buttons-v5 .decision-icon{display:grid!important;place-items:center!important;width:42px!important;height:42px!important;margin-bottom:auto!important;border-radius:14px!important;background:rgba(255,255,255,.92)!important;color:#006b73!important;box-shadow:none!important;font-size:0!important;}
 .decision-buttons-v5 .decision-icon svg{width:21px!important;height:21px!important;}

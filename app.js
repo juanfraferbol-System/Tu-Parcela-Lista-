@@ -352,7 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getAllParcelas() {
-    return Array.isArray(parcelas) ? parcelas : [];
+    return Array.isArray(window.SERVER_PARCELAS) ? window.SERVER_PARCELAS : (Array.isArray(parcelas) ? parcelas : []);
   }
 
   function getAllCasas() {
@@ -2211,20 +2211,45 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const fd = new FormData(DOM.activationForm);
       const cliente = {
+        rut: String(fd.get("rut") || "").trim(),
         nombre: String(fd.get("nombre") || "").trim(),
         email: String(fd.get("email") || "").trim(),
         telefono: String(fd.get("telefono") || "").trim(),
         ciudad: String(fd.get("ciudad") || "").trim(),
-        mensaje: String(fd.get("mensaje") || "").trim()
+        mensaje: String(fd.get("mensaje") || "").trim(),
+        parcela_id: state.selectedParcela.id,
+        estado: 'esperando_pago'
       };
-      if (DOM.activationStatus) DOM.activationStatus.textContent = "Generando PDF y enviando solicitud...";
-      const sent = await sendActivationRequest(cliente);
-      if (DOM.activationStatus) {
-        DOM.activationStatus.textContent = sent
-          ? "Solicitud enviada. También se descargó el PDF de respaldo. Revisa tu correo."
-          : "Se descargó el PDF y se abrió tu correo para completar el envío manual.";
+      if (DOM.activationStatus) DOM.activationStatus.textContent = "Guardando solicitud y redirigiendo a Flow...";
+      
+      try {
+        const leadRes = await window.apiSaveLead(cliente);
+        const leadId = leadRes?.data?.[0]?.id || `TPL-${Date.now()}`;
+        const amount = (parseClp(state.selectedParcela.precio) * 0.01) || 10000;
+
+        const flowRes = await fetch('/api/flow-create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount,
+            email: cliente.email,
+            subject: `Reserva Parcela ${state.selectedParcela.nombre}`,
+            leadId
+          })
+        });
+
+        const flowData = await flowRes.json();
+        
+        if (flowData.success && flowData.redirectUrl) {
+          if (DOM.activationStatus) DOM.activationStatus.textContent = "Redirigiendo a pago seguro...";
+          window.location.href = flowData.redirectUrl;
+        } else {
+          throw new Error("No se pudo generar el enlace de pago");
+        }
+      } catch (err) {
+        console.error(err);
+        if (DOM.activationStatus) DOM.activationStatus.textContent = "Error al iniciar el pago. Revisa tu conexión.";
       }
-      if (sent) setTimeout(closeActivationModal, 2200);
     });
   }
 
@@ -2617,8 +2642,32 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.lucide) lucide.createIcons();
   }
 
+  document.getElementById("share-project-btn")?.addEventListener("click", () => {
+    if (!state.selectedParcela) return;
+    const shareUrl = window.location.href.split('?')[0] + `?selectParcela=${state.selectedParcela.id}` + (state.selectedCasa ? `&selectCasa=${state.selectedCasa.id}` : '');
+    const shareText = "Te quiero enseñar esta parcela, dime qué te parece";
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Tu Parcela Lista - Proyecto',
+        text: shareText,
+        url: shareUrl
+      }).catch(console.error);
+    } else {
+      // Fallback a WhatsApp Web/App
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
+      window.open(waUrl, '_blank');
+    }
+  });
+
   function hydrateFromUrlOrStorage() {
     const params = new URLSearchParams(window.location.search);
+    
+    if (params.get("flow") === "success") {
+      showFriendlyMessage("¡Pago de reserva exitoso! Tu cotización ha sido confirmada y nos pondremos en contacto contigo.", "Reserva Confirmada");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     const preselectId = params.get("selectParcela") || localStorage.getItem("selectedParcelaId");
     const preselectCasaId = params.get("selectCasa") || localStorage.getItem("selectedCasaId");
     if (preselectId) {
@@ -2710,8 +2759,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   populateComunas();
   addMapToolbarButtons();
-  hydrateFromUrlOrStorage();
-  renderParcelas();
+  
+  if (typeof window.apiGetParcelas === 'function') {
+    window.apiGetParcelas().then(data => {
+      window.SERVER_PARCELAS = data;
+      hydrateFromUrlOrStorage();
+      renderParcelas();
+      populateComunas(); 
+    });
+  } else {
+    hydrateFromUrlOrStorage();
+    renderParcelas();
+  }
   renderCasas();
   renderFundaciones();
   renderExtras();

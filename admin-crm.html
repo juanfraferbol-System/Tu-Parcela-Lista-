@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Interno - Tu Parcela Lista</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #003f7a;
+            --primary-light: #0056a6;
+            --accent: #00b8c4;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
+        
+        .sidebar { width: 260px; background: var(--card-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-color); font-weight: 900; font-size: 1.25rem; color: var(--primary); }
+        .sidebar-menu { list-style: none; padding: 16px 0; flex: 1; }
+        .sidebar-menu li { padding: 12px 24px; cursor: pointer; color: var(--text-muted); font-weight: 600; transition: all 0.2s; }
+        .sidebar-menu li:hover, .sidebar-menu li.active { background: #f8fafc; color: var(--primary); border-right: 3px solid var(--primary); }
+        
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { height: 70px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; }
+        .topbar-title { font-weight: 800; font-size: 1.15rem; }
+        
+        .content-area { flex: 1; padding: 32px; overflow-y: auto; }
+        
+        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .card-title { font-weight: 700; font-size: 1.1rem; }
+        
+        .btn { padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn:hover { background: var(--primary-light); }
+        
+        .table-container { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { font-weight: 700; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        td { font-size: 0.95rem; }
+        tr:last-child td { border-bottom: none; }
+        
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef08a; color: #854d0e; }
+        
+        #auth-overlay { position: fixed; inset: 0; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .auth-card { background: var(--card-bg); padding: 32px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .auth-card h2 { margin-bottom: 24px; text-align: center; color: var(--primary); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+        .form-group input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; }
+        .auth-btn { width: 100%; margin-top: 8px; }
+
+        /* Kanban Styles */
+        .kanban-board { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px; min-height: 400px; }
+        .kanban-col { flex: 0 0 300px; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .kanban-col-header { padding: 12px 16px; font-weight: 700; border-bottom: 3px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        .kanban-count { background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 99px; font-size: 0.8rem; }
+        .kanban-cards { padding: 12px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .kanban-card { background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; position: relative; }
+        .kanban-card h4 { margin-bottom: 4px; font-size: 0.95rem; }
+        .kanban-card p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+        .kanban-card .time-alert { font-size: 0.75rem; color: #dc2626; font-weight: 600; display: flex; align-items: center; gap: 4px; margin-bottom: 8px; }
+        .kanban-card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; border-top: 1px solid #f1f5f9; padding-top: 8px; }
+        .kanban-btn { font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; cursor: pointer; border: none; font-weight: 600; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: #eff6ff; }
+        .btn-whatsapp { background: #25D366; color: white; }
+        .btn-mail { background: #0ea5e9; color: white; }
+        .btn-move { background: var(--border-color); color: var(--text-dark); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .modal-content { background: #fff; padding: 24px; border-radius: 12px; width: 100%; max-width: 500px; }
+    </style>
+</head>
+<body>
+    <!-- Login Overlay Básico -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2>CRM TPL Admin</h2>
+            <div class="form-group">
+                <label>Clave de Acceso</label>
+                <input type="password" id="admin-pass" placeholder="Ingresa la clave">
+            </div>
+            <button class="btn auth-btn" onclick="loginAdmin()">Ingresar</button>
+            <p id="auth-error" style="color: red; font-size: 0.85rem; margin-top: 10px; display: none; text-align: center;">Clave incorrecta</p>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            TPL CRM
+        </div>
+        <ul class="sidebar-menu">
+            <li class="active" onclick="showTab('leads')">Leads & Reservas</li>
+            <li onclick="showTab('parcelas')">Mis Parcelas</li>
+            <li onclick="showTab('constructoras')">Constructoras</li>
+            <li><a href="index.html" style="text-decoration:none; color:inherit;">Volver a la Web</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-title" id="current-tab-title">Leads & Reservas</div>
+            <div>
+                <button class="btn" style="background:#ef4444;" onclick="logout()">Salir</button>
+            </div>
+        </header>
+        
+        <div class="content-area">
+            
+            <!-- Tab Leads -->
+            <div id="tab-leads" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Últimas Cotizaciones y Reservas</h3>
+                        <button class="btn" onclick="loadLeads()">Actualizar</button>
+                    </div>
+                    <div class="kanban-board" id="kanban-board">
+                        <!-- Columna 1 -->
+                        <div class="kanban-col" data-status="esperando_pago">
+                            <div class="kanban-col-header">
+                                Reservas Nuevas
+                                <span class="kanban-count" id="count-esperando">0</span>
+                            </div>
+                            <div class="kanban-cards" id="col-esperando"></div>
+                        </div>
+
+                        <!-- Columna 2 -->
+                        <div class="kanban-col" data-status="solicitud_legal">
+                            <div class="kanban-col-header" style="border-bottom-color: var(--accent);">
+                                Solicitud Legal
+                                <span class="kanban-count" id="count-legal">0</span>
+                            </div>
+                            <div class="kanban-cards" id="col-legal"></div>
+                        </div>
+
+                        <!-- Columna 3 -->
+                        <div class="kanban-col" data-status="licitacion">
+                            <div class="kanban-col-header" style="border-bottom-color: #f59e0b;">
+                                Licitación Constructora
+                                <span class="kanban-count" id="count-licitacion">0</span>
+                            </div>
+                            <div class="kanban-cards" id="col-licitacion"></div>
+                        </div>
+
+                        <!-- Columna 4 -->
+                        <div class="kanban-col" data-status="finalizado">
+                            <div class="kanban-col-header" style="border-bottom-color: #10b981;">
+                                Finalizado / Escriturado
+                                <span class="kanban-count" id="count-finalizado">0</span>
+                            </div>
+                            <div class="kanban-cards" id="col-finalizado"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Parcelas -->
+            <div id="tab-parcelas" class="tab-content" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Inventario de Parcelas</h3>
+                        <a href="plataforma/publicar-parcela/index.html" class="btn" target="_blank">+ Nueva Parcela</a>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID / Nombre</th>
+                                    <th>Comuna</th>
+                                    <th>Precio</th>
+                                    <th>M2</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="parcelas-tbody">
+                                <tr>
+                                    <td colspan="5" style="text-align:center; padding: 20px;">Cargando parcelas...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Constructoras -->
+            <div id="tab-constructoras" class="tab-content" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Red de Constructoras</h3>
+                        <button class="btn">+ Añadir Constructora</button>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:16px;">Aquí se enviarán las notificaciones de nuevos proyectos cuando el cliente pague el estudio.</p>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Empresa</th>
+                                    <th>Contacto</th>
+                                    <th>Email</th>
+                                    <th>Estado Licitaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Constructor Demo 1</td>
+                                    <td>Juan Pérez</td>
+                                    <td>juan@demo.cl</td>
+                                    <td><span class="badge badge-success">Activo</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal Licitación -->
+    <div class="modal-overlay" id="modal-licitacion">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 12px;">Licitación de Construcción</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 16px; color: var(--text-muted);" id="licitacion-desc">
+                Iniciando licitación para la casa del cliente...
+            </p>
+            <div class="form-group">
+                <label>Correos de Constructoras (separados por coma)</label>
+                <input type="text" id="licitacion-emails" placeholder="ej: contacto@constructora.cl, ventas@otra.cl">
+            </div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn" style="flex:1;" onclick="enviarLicitacion()">Enviar Licitación</button>
+                <button class="btn btn-outline" style="flex:1;" onclick="cerrarModal('modal-licitacion')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Flujo Legal (Próximo Estado) -->
+    <div class="modal-overlay" id="modal-estado">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 12px;">Cambiar Estado</h3>
+            <div class="form-group">
+                <label>Mover a columna:</label>
+                <select id="estado-select" style="width:100%; padding:10px; border-radius:6px; border:1px solid var(--border-color);">
+                    <option value="esperando_pago">Reservas Nuevas</option>
+                    <option value="solicitud_legal">Solicitud Legal Enviada</option>
+                    <option value="licitacion">Licitación Constructora</option>
+                    <option value="finalizado">Finalizado / Escriturado</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn" style="flex:1;" onclick="guardarNuevoEstado()">Guardar</button>
+                <button class="btn btn-outline" style="flex:1;" onclick="cerrarModal('modal-estado')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/db-api.js"></script>
+    <script>
+        // Lógica súper básica de Auth para MVP (Se debe pasar a Supabase Auth en el futuro)
+        function loginAdmin() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === 'admintpl2026') {
+                sessionStorage.setItem('tpl_admin_logged', 'true');
+                document.getElementById('auth-overlay').style.display = 'none';
+                initCRM();
+            } else {
+                document.getElementById('auth-error').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('tpl_admin_logged');
+            window.location.reload();
+        }
+
+        window.onload = () => {
+            if (sessionStorage.getItem('tpl_admin_logged') === 'true') {
+                document.getElementById('auth-overlay').style.display = 'none';
+                initCRM();
+            }
+        };
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.sidebar-menu li').forEach(l => l.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabName).style.display = 'block';
+            event.currentTarget.classList.add('active');
+            document.getElementById('current-tab-title').innerText = event.currentTarget.innerText;
+        }
+
+        async function initCRM() {
+            // Cargar Parcelas
+            const parcelas = await window.apiGetParcelas();
+            const pTbody = document.getElementById('parcelas-tbody');
+            if (parcelas && parcelas.length > 0) {
+                pTbody.innerHTML = parcelas.map(p => `
+                    <tr>
+                        <td><strong>${p.nombre}</strong></td>
+                        <td>${p.comuna}</td>
+                        <td>${p.precio}</td>
+                        <td>${p.tamano} m²</td>
+                        <td><span class="badge badge-success">Publicada</span></td>
+                    </tr>
+                `).join('');
+            } else {
+                pTbody.innerHTML = '<tr><td colspan="5">No hay parcelas registradas.</td></tr>';
+            }
+            
+            // Leads (por ahora mockup hasta que se conecte)
+            loadLeads();
+        }
+
+        let leadsGlobal = [];
+        let leadActivo = null;
+
+        async function loadLeads() {
+            // Limpiar columnas
+            ['esperando_pago', 'solicitud_legal', 'licitacion', 'finalizado'].forEach(status => {
+                document.getElementById(`col-${status}`).innerHTML = '';
+                document.getElementById(`count-${status}`).innerText = '0';
+            });
+
+            const leads = await window.apiGetLeads();
+            if (!leads) return;
+            
+            leadsGlobal = leads;
+
+            const counts = {
+                esperando_pago: 0,
+                solicitud_legal: 0,
+                licitacion: 0,
+                finalizado: 0
+            };
+
+            leads.forEach(lead => {
+                // Estado por defecto
+                const status = lead.estado || 'esperando_pago';
+                if (counts[status] !== undefined) {
+                    counts[status]++;
+                    const col = document.getElementById(`col-${status}`);
+                    col.appendChild(createKanbanCard(lead));
+                }
+            });
+
+            // Actualizar contadores
+            for (const key in counts) {
+                document.getElementById(`count-${key}`).innerText = counts[key];
+            }
+        }
+
+        function createKanbanCard(lead) {
+            const div = document.createElement('div');
+            div.className = 'kanban-card';
+            
+            // Lógica de 48 horas para solicitud_legal
+            let timeAlertHtml = '';
+            let whatsappBtnHtml = '';
+            
+            if (lead.estado === 'solicitud_legal' && lead.fecha_cambio_estado) {
+                const changedDate = new Date(lead.fecha_cambio_estado);
+                const now = new Date();
+                const diffHours = (now - changedDate) / (1000 * 60 * 60);
+                
+                if (diffHours >= 48) {
+                    timeAlertHtml = `<div class="time-alert">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Sin respuesta hace +48h
+                    </div>`;
+                    
+                    const msgWa = encodeURIComponent(`Hola ${lead.nombre}, hace dos días enviamos los requerimientos para tu escritura y no hemos tenido respuesta. ¿Tienes alguna duda?`);
+                    whatsappBtnHtml = `<a href="https://wa.me/56${lead.telefono}?text=${msgWa}" target="_blank" class="kanban-btn btn-whatsapp" title="Enviar Recordatorio por WhatsApp">Recordar (WA)</a>`;
+                }
+            }
+
+            // Mailto predeterminado para carpeta legal
+            const subjectLegal = encodeURIComponent(`Solicitud Carpeta Legal - Tu Parcela Lista (${lead.parcela_id})`);
+            const bodyLegal = encodeURIComponent(`Hola ${lead.nombre},\n\nPara avanzar con la promesa de compraventa de la parcela necesitamos los siguientes documentos:\n- Copia de Cédula de Identidad por ambos lados\n- Certificado de estado civil\n- Comprobante de domicilio\n\nQuedamos atentos a tus documentos.\n\nEquipo Tu Parcela Lista`);
+            const mailtoLink = `mailto:${lead.email}?subject=${subjectLegal}&body=${bodyLegal}`;
+
+            div.innerHTML = `
+                <h4>${lead.nombre}</h4>
+                <p><strong>Parcela:</strong> ${lead.parcela_id}</p>
+                <p><strong>RUT:</strong> ${lead.rut || 'No ingresado'}</p>
+                ${timeAlertHtml}
+                <div class="kanban-card-actions">
+                    <button class="kanban-btn btn-move" onclick="abrirModalEstado('${lead.id}', '${lead.estado}')">Mover</button>
+                    <a href="${mailtoLink}" class="kanban-btn btn-mail" onclick="marcarCorreoEnviado('${lead.id}')">Pedir Docs</a>
+                    ${whatsappBtnHtml}
+                    <button class="kanban-btn btn-outline" onclick="abrirModalLicitacion('${lead.id}', '${lead.parcela_id}')">Licitar</button>
+                </div>
+            `;
+            return div;
+        }
+
+        function abrirModalEstado(id, estadoActual) {
+            leadActivo = id;
+            document.getElementById('estado-select').value = estadoActual || 'esperando_pago';
+            document.getElementById('modal-estado').style.display = 'flex';
+        }
+
+        async function guardarNuevoEstado() {
+            if (!leadActivo) return;
+            const nuevoEstado = document.getElementById('estado-select').value;
+            // Aquí idealmente usamos apiUpdateLead(id, estado, fecha_cambio)
+            // Para el MVP, usaremos la api de supabase directamente si está expuesta en db-api, 
+            // O podemos simularlo
+            const { error } = await window.supabaseClient.from('leads').update({
+                estado: nuevoEstado,
+                fecha_cambio_estado: new Date().toISOString()
+            }).eq('id', leadActivo);
+
+            if (!error) {
+                cerrarModal('modal-estado');
+                loadLeads();
+            } else {
+                alert("Error actualizando estado");
+            }
+        }
+
+        function abrirModalLicitacion(id, parcelaInfo) {
+            leadActivo = id;
+            document.getElementById('licitacion-desc').innerText = `Licitando construcción para el cliente asociado a ${parcelaInfo}.`;
+            document.getElementById('modal-licitacion').style.display = 'flex';
+        }
+
+        function enviarLicitacion() {
+            const emails = document.getElementById('licitacion-emails').value;
+            if (!emails) {
+                alert("Ingresa al menos un correo.");
+                return;
+            }
+            const leadInfo = leadsGlobal.find(l => l.id === leadActivo);
+            const subject = encodeURIComponent(`Licitación de Construcción TPL - Proyecto ${leadInfo?.parcela_id}`);
+            const body = encodeURIComponent(`Estimada Constructora,\n\nTenemos un cliente interesado en construir. Por favor envíenos su cotización base.\n\nDatos del proyecto:\nParcela: ${leadInfo?.parcela_id}`);
+            
+            // Abrir mailto múltiple
+            window.location.href = `mailto:${emails}?subject=${subject}&body=${body}`;
+            cerrarModal('modal-licitacion');
+        }
+
+        async function marcarCorreoEnviado(id) {
+            // Marcar que se envió el correo pasándolo a solicitud legal si no estaba
+            const lead = leadsGlobal.find(l => l.id === id);
+            if (lead && lead.estado !== 'solicitud_legal') {
+                await window.supabaseClient.from('leads').update({
+                    estado: 'solicitud_legal',
+                    fecha_cambio_estado: new Date().toISOString()
+                }).eq('id', id);
+                setTimeout(loadLeads, 1000);
+            }
+        }
+
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            leadActivo = null;
+        }
+    </script>
+</body>
+</html>
