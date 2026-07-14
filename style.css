@@ -11387,9 +11387,9 @@ html body.tpl-focus-combo-proposals #casas-section{
 .hero-v5-visual{position:absolute;z-index:2;top:38px;right:0;bottom:38px;width:min(45vw,760px);}
 .hero-v5-photo{position:absolute;background-position:center;background-size:cover;box-shadow:0 24px 70px rgba(16,36,58,.16);border:7px solid rgba(255,255,255,.84);}
 .hero-v5-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,63,122,.12));}
-.hero-v5-photo-main{top:0;right:0;width:76%;height:49%;border-radius:120px 0 0 120px;background-image:url('https://images.unsplash.com/photo-1449844908441-8829872d2607?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');}
-.hero-v5-photo-family{top:42%;right:8%;width:68%;height:37%;border-radius:100px 18px 100px 18px;background-image:url('https://images.unsplash.com/photo-1605000797499-95a51c5269ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');}
-.hero-v5-photo-landscape{right:0;bottom:0;width:48%;height:29%;border-radius:80px 0 0 80px;background-image:url('https://images.unsplash.com/photo-1500048993953-d23a436266cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');}
+.hero-v5-photo-main{top:0;right:0;width:76%;height:49%;border-radius:120px 0 0 120px;background-image:url('image/hero-woman-tomatoes.jpg');}
+.hero-v5-photo-family{top:42%;right:8%;width:68%;height:37%;border-radius:100px 18px 100px 18px;background-image:url('image/hero-family-field.jpg');}
+.hero-v5-photo-landscape{right:0;bottom:0;width:48%;height:29%;border-radius:80px 0 0 80px;background-image:url('image/hero-older-couple.jpg');}
 
 .decision-flow{padding:68px 20px!important;background:#fff!important;}
 .decision-box{max-width:1100px!important;margin:auto!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;text-align:center!important;}
