@@ -2,7 +2,7 @@
   'use strict';
 
   global.TPL_SUPABASE_CONFIG = Object.freeze({
-    url: 'https://xhisituwpwnvqubtcvia.supabase.co',
-    anonKey: 'sb_publishable__Wf3h6BMFaBklqEtRLwlxQ_D1O-SoOo'
+    url: 'https://qxavbqhyqaqalpzbhwmh.supabase.co',
+    anonKey: 'sb_publishable_gTJ1ORlyrEJId-hilhWD3g_3vn3faxE'
   });
 })(window);
