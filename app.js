@@ -635,11 +635,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const primaryLabel = pendingChange === "parcela" ? "Agregar parcela" : "Añadir casa";
       const primaryClass = pendingChange === "parcela" ? "btn-add-house btn-add-parcela-project" : "btn-add-house";
       card.innerHTML = `
+        <div class="card-image-wrapper" style="position:relative;">
         <a class="card-image card-image-link" href="${detailHref}" aria-label="Ver detalles de ${p.nombre}">
           <span class="card-comuna">📍 ${p.comuna || "Chile"}</span>
+          <div class="card-top-icons" style="position:absolute; top:12px; right:12px; display:flex; gap:8px; z-index:10;">
+            <button class="btn-card-icon btn-favorite" type="button" aria-label="Guardar a favoritos" style="background:rgba(240,244,248,0.9); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#4a5568; transition:all 0.2s;" onclick="event.preventDefault(); this.style.color='#e53e3e'; this.querySelector('i').setAttribute('fill', '#e53e3e');"><i data-lucide="heart" style="width:18px; height:18px;"></i></button>
+            <button class="btn-card-icon btn-share" type="button" aria-label="Compartir" data-share-url="parcela.html?id=${encodeURIComponent(p.id)}" data-share-title="${p.nombre}" style="background:rgba(240,244,248,0.9); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#4a5568; transition:all 0.2s;" onclick="event.preventDefault(); navigator.share ? navigator.share({title: this.dataset.shareTitle, url: window.location.origin + '/' + this.dataset.shareUrl}) : window.open('https://api.whatsapp.com/send?text=Te quiero enseñar esta parcela, dime que te parece: ' + encodeURIComponent(window.location.origin + '/' + this.dataset.shareUrl))"><i data-lucide="share-2" style="width:18px; height:18px;"></i></button>
+          </div>
           <img src="${img}" alt="${p.nombre}" loading="${state.recommendationActive ? "eager" : "lazy"}" fetchpriority="${state.recommendationActive ? "high" : "auto"}" decoding="async" width="800" height="600">
           ${renderParcelaFeatureChips(p, "mobile")}
         </a>
+        </div>
         <div class="card-body">
           <h3 class="card-title">${p.nombre}</h3>
           <div class="card-meta">🌳 ${Number(p.tamano || 0).toLocaleString("es-CL")} m²</div>
