@@ -1,0 +1,26 @@
+TU PARCELA LISTA — ACTUALIZACIÓN MINIMALISTA
+
+ARCHIVOS MODIFICADOS / NUEVOS
+1. index.html
+2. css/tpl-minimal.css
+
+QUÉ CAMBIA
+- Hero limpio, claro y estable sin collage de fotos de fondo.
+- Botones iniciales de Parcela y Parcela + Casa más pequeños y minimalistas.
+- Navegación más ligera.
+- Filtros, tarjetas y resultados con menos bordes, sombras y colores fuertes.
+- Mejor jerarquía tipográfica y más espacio visual.
+- Diseño responsive para escritorio y móvil.
+- No cambia IDs ni funciones JavaScript.
+- No cambia nombres de imágenes ni carpetas.
+
+INSTALACIÓN
+Copia index.html y la carpeta css dentro de tu proyecto.
+Acepta reemplazar index.html y combinar la carpeta css.
+
+DESPUÉS EJECUTA
+  git add .
+  git commit -m "Rediseño minimalista de la portada"
+  git push origin main
+
+Luego espera el despliegue de Vercel y recarga con Ctrl + Shift + R.

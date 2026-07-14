@@ -1,0 +1,47 @@
+{
+  "redirects": [
+    {
+      "source": "/publicar",
+      "destination": "/plataforma/publicar-parcela/",
+      "permanent": true
+    },
+    {
+      "source": "/publicar/",
+      "destination": "/plataforma/publicar-parcela/",
+      "permanent": true
+    },
+    {
+      "source": "/publicar-parcela.html",
+      "destination": "/plataforma/publicar-parcela/",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/CRM.html",
+      "headers": [
+        {"key": "Cache-Control", "value": "no-store, max-age=0"},
+        {"key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive"},
+        {"key": "X-Frame-Options", "value": "DENY"},
+        {"key": "Referrer-Policy", "value": "no-referrer"}
+      ]
+    },
+    {
+      "source": "/admin-publicaciones.html",
+      "headers": [
+        {"key": "Cache-Control", "value": "no-store, max-age=0"},
+        {"key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive"},
+        {"key": "Referrer-Policy", "value": "no-referrer"}
+      ]
+    },
+    {
+      "source": "/plataforma/corregir-publicacion/:path*",
+      "headers": [
+        {"key": "Cache-Control", "value": "no-store, max-age=0"},
+        {"key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive"},
+        {"key": "X-Frame-Options", "value": "DENY"},
+        {"key": "Referrer-Policy", "value": "no-referrer"}
+      ]
+    }
+  ]
+}

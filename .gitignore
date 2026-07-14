@@ -1,0 +1,25 @@
+node_modules/
+.vscode/
+
+originales/
+procesadas/
+
+.DS_Store
+Thumbs.db
+*.log
+
+dist/
+build/
+
+.env
+.env.local
+
+README_VERSION_3.zip
+README_VERSION_3.zip
+tlp v3.zip
+tlp v3.zip
+image.zip
+.vercel
+supabase/.temp/
+.env*
+!.env.example

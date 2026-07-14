@@ -1,0 +1,202 @@
+/* =========================================================
+   Tu Parcela Lista - Modern Aesthetics (Minimalist & Glassmorphism)
+========================================================= */
+:root {
+  /* Corporate Colors */
+  --tpl-primary: #003f7a; /* Corporate Blue */
+  --tpl-primary-light: #005aab;
+  --tpl-secondary: #f2be1a; /* Corporate Gold */
+  --tpl-secondary-light: #f5d154;
+  --tpl-accent: #00828a; /* Teal */
+  
+  /* Minimalist Backgrounds & Surfaces */
+  --surface-default: #ffffff;
+  --surface-subtle: #f8fafc;
+  --surface-glass: rgba(255, 255, 255, 0.85);
+  
+  /* Typography Colors - Hierarchy */
+  --text-high: #0f172a; /* Main headings */
+  --text-medium: #334155; /* Body text */
+  --text-low: #64748b; /* Subtitles, meta */
+  
+  /* Modern Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 63, 122, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 63, 122, 0.1), 0 2px 4px -1px rgba(0, 63, 122, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 63, 122, 0.1), 0 4px 6px -2px rgba(0, 63, 122, 0.05);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 63, 122, 0.08);
+  
+  /* Transitions */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 1. Global Typography Refinement */
+body {
+  color: var(--text-medium);
+  background-color: var(--surface-subtle);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-high);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* 2. Glassmorphism Navbar */
+.navbar {
+  background: var(--surface-glass) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-smooth);
+}
+
+.nav-links a {
+  color: var(--text-medium) !important;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+}
+
+.nav-links a:hover {
+  color: var(--tpl-primary) !important;
+}
+
+.nav-contact-btn {
+  background: var(--tpl-primary) !important;
+  color: white !important;
+  border-radius: 99px;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-smooth);
+}
+
+.nav-contact-btn:hover {
+  background: var(--tpl-primary-light) !important;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* 3. Cards (Parcelas & Casas) - Minimalist & Interactive */
+.parcela-card, .casa-card, .decision-option-card {
+  background: var(--surface-default) !important;
+  border: 1px solid rgba(0, 63, 122, 0.05) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-md) !important;
+  transition: var(--transition-smooth) !important;
+  overflow: hidden;
+}
+
+.parcela-card:hover, .casa-card:hover, .decision-option-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border-color: rgba(0, 63, 122, 0.15) !important;
+}
+
+.parcela-card .card-price-clean {
+  color: var(--tpl-primary) !important;
+  font-weight: 800 !important;
+}
+
+/* 4. Buttons Refinement (Clear Hierarchy) */
+/* Primary Buttons */
+.btn-whatsapp-quote, .btn-activate-project, #budget-go, .v3-map-button {
+  background: linear-gradient(135deg, var(--tpl-primary), var(--tpl-primary-light)) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 99px !important;
+  box-shadow: var(--shadow-md) !important;
+  transition: var(--transition-smooth) !important;
+  font-weight: 600 !important;
+}
+
+.btn-whatsapp-quote:hover, .btn-activate-project:hover, #budget-go:hover, .v3-map-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Secondary Buttons */
+.filter-btn, .room-filter-btn {
+  background: white !important;
+  color: var(--text-medium) !important;
+  border: 1px solid rgba(0, 63, 122, 0.1) !important;
+  border-radius: 99px !important;
+  transition: var(--transition-smooth) !important;
+}
+
+.filter-btn:hover, .room-filter-btn:hover {
+  background: var(--surface-subtle) !important;
+  border-color: var(--tpl-primary) !important;
+  color: var(--tpl-primary) !important;
+}
+
+.filter-btn.active, .room-filter-btn.active {
+  background: var(--tpl-primary) !important;
+  color: white !important;
+  border-color: var(--tpl-primary) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* 5. Minimalist Budget Section */
+.budget-box {
+  background: var(--surface-default) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--shadow-glass) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  padding: 32px !important;
+}
+
+#budget-input {
+  background: var(--surface-subtle) !important;
+  border: 1px solid rgba(0, 63, 122, 0.1) !important;
+  border-radius: 12px !important;
+  font-size: 1.2rem !important;
+  color: var(--tpl-primary) !important;
+  transition: var(--transition-smooth) !important;
+}
+
+#budget-input:focus {
+  border-color: var(--tpl-primary) !important;
+  box-shadow: 0 0 0 4px rgba(0, 63, 122, 0.1) !important;
+  outline: none !important;
+}
+
+/* 6. Section Backgrounds & Flow */
+.section-casas, .section-cotizador {
+  background-color: var(--surface-subtle);
+  border-top: 1px solid rgba(0, 63, 122, 0.05);
+}
+
+/* 7. Tags & Badges */
+.parcela-card .card-comuna, .preview-badge {
+  background: rgba(0, 63, 122, 0.06) !important;
+  color: var(--tpl-primary) !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+}
+
+/* 8. Cotizador Summary Box (Floating Glass) */
+.cotizacion-summary-card {
+  background: var(--surface-default) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--shadow-lg) !important;
+  border: 1px solid rgba(0, 63, 122, 0.08) !important;
+}
+
+.summary-total-final {
+  background: var(--surface-subtle) !important;
+  border-top: 2px dashed rgba(0, 63, 122, 0.1) !important;
+  border-radius: 0 0 20px 20px !important;
+}
+
+.total-amount {
+  color: var(--tpl-primary) !important;
+}
+
+/* 9. Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.parcela-card, .casa-card {
+  animation: fadeIn 0.5s ease-out forwards;
+}

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZBSN79D870"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZBSN79D870');
+</script>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tu Parcela Lista | Parcelas con Rol Propio y Casas Prefabricadas</title>
+<meta content="Encuentra parcelas con rol propio, agua y luz. Elige tu terreno, selecciona una casa prefabricada o cotiza una vivienda de diseño propio en Tu Parcela Lista." name="description"/>
+<meta content="parcelas chile, parcelas bio bio, parcelas quillón, parcelas florida, parcelas nacimiento, casas prefabricadas, terrenos chile, parcela con casa" name="keywords"/>
+<meta content="Tu Parcela Lista" name="author"/>
+<meta content="index,follow" name="robots"/>
+<link href="https://parcelalista.cl/" rel="canonical"/>
+<meta content="#003f7a" name="theme-color"/>
+<meta content="website" property="og:type"/>
+<meta content="es_CL" property="og:locale"/>
+<meta content="Tu Parcela Lista" property="og:site_name"/>
+<meta content="Tu Parcela Lista | Encuentra tu parcela ideal" property="og:title"/>
+<meta content="Parcelas con rol propio + casas prefabricadas. Cotiza online y encuentra tu proyecto ideal." property="og:description"/>
+<meta content="https://parcelalista.cl/" property="og:url"/>
+<meta content="https://parcelalista.cl/image/logo_compartir.png" property="og:image"/>
+<meta content="https://parcelalista.cl/image/logo_compartir.png" property="og:image:secure_url"/>
+<meta content="image/png" property="og:image:type"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Tu Parcela Lista" name="twitter:title"/>
+<meta content="Parcelas con rol propio + casas prefabricadas. Cotiza online." name="twitter:description"/>
+<meta content="https://parcelalista.cl/image/logo_compartir.png" name="twitter:image"/>
+<link href="image/favicon.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="image/favicon.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="image/favicon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/>
+
+<link href="css/v2-base.css" rel="stylesheet"/>
+<link href="css/v2-sidebar.css" rel="stylesheet"/>
+<link href="css/v2-components.css" rel="stylesheet"/>
+<link href="css/v2-responsive.css" rel="stylesheet"/>
+<link href="css/v2-ajustes-filtros.css" rel="stylesheet"/>
+<link href="css/v3-ux.css" rel="stylesheet"/>
+<link href="css/v3-production.css" rel="stylesheet"/>
+<link href="agente/agente.css" rel="stylesheet"/>
+
+<link rel="preload" as="image" href="image/hero-huerta.webp" fetchpriority="high"/>
+<link rel="preload" as="image" href="image/hero-pareja-casa.webp" fetchpriority="high"/>
+<link rel="preload" as="image" href="image/hero-ninos-pradera.webp" fetchpriority="high"/>
+<link rel="preload" as="image" href="image/hero-volcan-casa.webp" fetchpriority="high"/>
+<link href="style.css?v=20260710-5" rel="stylesheet"/>
+<link href="css/tpl-minimal.css?v=20260710-1" rel="stylesheet"/>
+<link href="css/site-polish.css?v=20260710" rel="stylesheet"/>
+<link href="css/modern-aesthetics.css" rel="stylesheet"/>
+<script defer="" src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<!-- -------------------------------------------------------------
+       Barra de Navegación (Navbar)
+       ------------------------------------------------------------- -->
+<header class="navbar">
+<div class="container navbar-inner">
+<a class="logo-container" href="index.html" aria-label="Tu Parcela Lista, inicio"><img alt="Tu Parcela Lista" class="brand-logo-img" src="image/logo-tu-parcela-lista.png"/></a>
+<nav>
+<ul class="nav-links" id="nav-links">
+<li><a href="index.html">Inicio</a></li>
+<li><a href="#parcelas-anchor">Parcelas</a></li>
+<li><a href="#casas-section">Casas</a></li>
+<li><a href="#promos">Promos</a></li>
+<li><a class="nav-link-feature" href="como-comprar.html">Cómo comprar</a></li>
+<li><a class="nav-link-publish" href="plataforma/publicar-parcela/index.html">Publicar</a></li>
+<li><a href="#quienes-somos">Quiénes Somos</a></li>
+</ul>
+</nav>
+<div style="display: flex; gap: 16px; align-items: center;">
+<a class="nav-contact-btn" href="#contacto">Contacto</a>
+<button aria-label="Abrir Menú" class="nav-toggle" id="nav-toggle">
+<i data-lucide="menu"></i>
+</button>
+</div>
+</div>
+</header>
+<main id="contenido-principal">
+<section class="hero hero-life hero-life-v5" aria-labelledby="hero-title">
+  <div class="hero-v5-visual" aria-hidden="true">
+    <div class="hero-v5-photo hero-v5-photo-main"></div>
+    <div class="hero-v5-photo hero-v5-photo-family"></div>
+    <div class="hero-v5-photo hero-v5-photo-landscape"></div>
+  </div>
+  <div class="container hero-life-content hero-v5-content">
+    <span class="hero-life-kicker">TU PARCELA LISTA</span>
+    <h1 id="hero-title">Tu proyecto de campo puede ser tu nueva etapa.</h1>
+    <p>Encuentra una parcela para vivir, invertir o construir en familia, con acompañamiento claro desde la búsqueda hasta tu proyecto final.</p>
+    <div class="hero-life-values" aria-label="Valores de Tu Parcela Lista">
+      <span><b>Vivir</b><small>Más espacio, naturaleza y tranquilidad</small></span>
+      <span><b>Invertir</b><small>Terrenos con proyección y propósito</small></span>
+      <span><b>Construir</b><small>Parcela y casa en un solo proyecto</small></span>
+    </div>
+  </div>
+</section>
+<section class="decision-flow" id="decision-flow">
+<div class="decision-box">
+<span class="decision-eyebrow">ELIGE TU CAMINO</span>
+<h2>¿Cómo quieres comenzar tu proyecto?</h2>
+<p class="decision-intro">Da el primer paso y entra a una experiencia diseñada según tu presupuesto.</p>
+<div class="decision-buttons decision-buttons-clean decision-buttons-v5">
+<button class="decision-option-card decision-option-parcela" id="opt-parcela" type="button">
+<span class="decision-card-photo" aria-hidden="true"></span>
+<span class="decision-card-overlay" aria-hidden="true"></span>
+<span class="decision-card-copy">
+<span class="decision-icon" aria-hidden="true"><i data-lucide="map-pin"></i></span>
+<strong>Solo parcela</strong>
+<span>Encuentra el terreno ideal para comenzar una nueva etapa.</span>
+<em>Explorar parcelas <b>→</b></em>
+</span>
+</button>
+<button class="decision-option-card decision-option-casa" id="opt-combo" type="button">
+<span class="decision-card-photo" aria-hidden="true"></span>
+<span class="decision-card-overlay" aria-hidden="true"></span>
+<span class="decision-card-copy">
+<span class="decision-icon" aria-hidden="true"><i data-lucide="house"></i></span>
+<strong>Parcela + casa</strong>
+<span>Diseña un proyecto completo listo para vivir.</span>
+<em>Crear proyecto <b>→</b></em>
+</span>
+</button>
+</div>
+</div>
+<div class="budget-box" id="budget-box" style="display:none;">
+<div class="budget-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+<span class="budget-kicker">PORTAL DE BÚSQUEDA</span>
+<h3 id="budget-title">¿Cuál es tu presupuesto total?</h3>
+<p id="budget-help">Te mostraremos opciones cercanas a tu presupuesto.</p>
+<input id="budget-input" inputmode="numeric" placeholder="Ej: 15.000.000" type="text"/>
+<div class="combo-fields hidden" id="combo-fields">
+<select aria-label="Cantidad de habitaciones" id="combo-room-input">
+<option value="all">Cualquier cantidad de habitaciones</option>
+<option value="1">1 habitación</option>
+<option value="2">2 habitaciones</option>
+<option value="3">3 habitaciones</option>
+<option value="4">4 habitaciones</option>
+<option value="5">5 habitaciones</option>
+<option value="6">6 habitaciones</option>
+</select>
+<input id="combo-meters-input" placeholder="Metros cuadrados deseados, ej: 72" type="number"/>
+</div>
+<button id="budget-go" type="button">
+      <span>Buscar</span>
+      <b aria-hidden="true">→</b>
+    </button>
+<p class="budget-trust">Resultados claros · Sin compromiso · Acompañamiento TPL</p>
+</div>
+</section>
+
+
+
+<!-- Cargador de búsqueda por presupuesto -->
+<section class="tpl-trust-strip" aria-label="Compromisos de Tu Parcela Lista">
+  <div class="container tpl-trust-grid">
+    <article><strong>Rol y antecedentes claros</strong><span>Te mostramos la información disponible antes de avanzar.</span></article>
+    <article><strong>Acompañamiento humano</strong><span>Resolvemos dudas y coordinamos visitas durante el proceso.</span></article>
+    <article><strong>Proyecto transparente</strong><span>Parcela, casa y costos reunidos en una sola cotización.</span></article>
+  </div>
+</section>
+
+<div class="tpl-budget-loader" id="tpl-budget-loader" hidden aria-live="polite" aria-busy="true">
+  <div class="tpl-budget-loader-card">
+    <div class="tpl-budget-spinner" aria-hidden="true"></div>
+    <span class="tpl-budget-loader-kicker">TU PARCELA LISTA</span>
+    <h3 id="tpl-budget-loader-title">Buscando las mejores opciones para ti</h3>
+    <p id="tpl-budget-loader-text">Estamos comparando precios, ubicación y características según tu presupuesto.</p>
+    <div class="tpl-budget-loader-steps" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+
+<!-- -------------------------------------------------------------
+       Sección Hero & Buscador
+       ------------------------------------------------------------- -->
+
+<!-- =======================================================
+     SECCIÓN PARCELAS
+======================================================= -->
+<section class="filter-section" id="parcelas-anchor">
+<!-- GRID / LISTA -->
+<div class="container" id="grid-view">
+<div class="parcelas-layout">
+<!-- ========================================= -->
+<!-- SIDEBAR IZQUIERDO -->
+<!-- ========================================= -->
+<aside class="parcelas-sidebar">
+<div class="sidebar-header sidebar-menu-title">
+<h3>Filtrar parcela</h3>
+</div>
+<div class="filter-buttons-wrapper" id="parcelas-filters">
+<button class="filter-btn" id="filter-gps" type="button">
+<i data-lucide="map-pin"></i>
+                        Cercanas a mí
+                    </button>
+<button class="filter-btn" id="filter-economic" type="button">
+<i data-lucide="trending-down"></i>
+                        Más económicas
+                    </button>
+<button class="filter-btn" id="filter-size" type="button">
+<i data-lucide="expand"></i>
+                        Más de 1 Hectárea
+                    </button>
+<button class="filter-btn" id="filter-payment" type="button">
+<i data-lucide="hand-coins"></i>
+                        Facilidad pago
+                    </button>
+<button class="filter-btn" id="filter-water" type="button">
+<i data-lucide="droplet"></i>
+                        Con agua
+                    </button>
+<button class="filter-btn" id="filter-river" type="button">
+<i data-lucide="zap"></i>
+                        Con Luz
+                    </button>
+<button class="filter-btn" id="filter-native" type="button">
+<i data-lucide="leaf"></i>
+                        Nativas
+                    </button>
+<div class="dropdown-container">
+<button class="filter-btn" id="filter-region-btn" type="button">
+<i data-lucide="map"></i>
+                            Comunas
+                            <i data-lucide="chevron-down"></i>
+</button>
+<div class="dropdown-menu" id="region-dropdown"></div>
+</div>
+<button class="filter-btn" id="filter-clear" style="border-color:#f87171;color:#ef4444;display:none;" type="button">
+<i data-lucide="x-circle"></i>
+                        Limpiar filtros
+
+                    </button>
+</div>
+</aside>
+<!-- ========================================= -->
+<!-- CONTENIDO TARJETAS -->
+<!-- ========================================= -->
+<div class="parcelas-content">
+<div class="parcelas-results-head v3-results-head" id="search-heading-card">
+<div class="v3-results-copy">
+<h2 id="search-title">Parcelas disponibles</h2>
+<p class="parcelas-filter-note" id="search-subtitle">Usa los filtros para encontrar la alternativa que mejor calza con tu proyecto.</p>
+</div>
+<div class="v3-results-actions">
+<span class="parcelas-count-pill" id="results-count">0 parcelas</span>
+<button class="view-btn btn-open-map v3-map-button" id="btn-map-view" type="button">
+<i data-lucide="globe-2"></i>
+<span>Ver en mapa</span>
+</button>
+</div>
+</div>
+<div class="parcelas-grid" id="parcelas-container"></div>
+</div>
+</div>
+</div>
+<!-- ========================================= -->
+<!-- MAPA -->
+<!-- ========================================= -->
+<div class="map-layout map-hidden" id="map-layout">
+<div class="map-toolbar">
+<h3>
+<i data-lucide="map"></i>
+            Mapa de Parcelas
+        </h3>
+</div>
+<div id="map-sidebar">
+<div class="map-sidebar-header">
+<h4>Parcelas visibles</h4>
+<span id="map-results">0 resultados</span>
+</div>
+<div id="map-cards"></div>
+</div>
+<div id="map-container"></div>
+<img alt="Tu Parcela Lista" class="map-brand-watermark" src="image/logo-tu-parcela-lista.png"/>
+<button class="back-to-parcelas-btn" id="back-to-parcelas" type="button">
+            Volver a parcelas
+        </button>
+</div>
+</section>
+<!-- -------------------------------------------------------------
+       Sección Casas (Desbloqueable)
+       ------------------------------------------------------------- -->
+<section class="section-casas" id="casas-section">
+<div class="container">
+<div class="combo-proposals-section" hidden="" id="combo-proposals-section">
+<div class="combo-proposals-head">
+<span class="combo-kicker">Parcela + casa</span>
+<h3>5 propuestas cercanas a tu presupuesto</h3>
+<p>Elige una alternativa para revisar fundación, fotografías y extras en el cotizador.</p>
+</div>
+<div class="combo-proposals-grid" id="combo-proposals-container"></div>
+</div>
+<div style="text-align:center;margin-bottom:48px;">
+<span style="background:rgba(0,130,138,0.1);color:var(--secondary);padding:6px 16px;border-radius:var(--radius-full);font-weight:700;font-size:0.9rem;">PASO 2</span>
+<h2 style="font-size:2.2rem;font-weight:800;color:var(--primary);margin-top:12px;">Ahora tu casa soñada</h2>
+<p style="color:var(--text-muted);max-width:500px;margin:8px auto 0;">
+        Elige el modelo que mejor calza con tu parcela y tu presupuesto.
+      </p>
+</div>
+<div class="casas-room-filter">
+<button class="room-filter-btn active" data-rooms="all">
+<i class="fa-solid fa-house"></i>
+        Todas
+    </button>
+<button class="room-filter-btn" data-rooms="1">
+<i class="fa-solid fa-bed"></i>
+        1 Hab
+    </button>
+<button class="room-filter-btn" data-rooms="2">
+<i class="fa-solid fa-bed"></i>
+        2 Hab
+    </button>
+<button class="room-filter-btn" data-rooms="3">
+<i class="fa-solid fa-bed"></i>
+        3 Hab
+    </button>
+<button class="room-filter-btn" data-rooms="4">
+<i class="fa-solid fa-bed"></i>
+        4 Hab
+    </button>
+<button class="room-filter-btn" data-rooms="6">
+<i class="fa-solid fa-building"></i>
+        +6 Hab
+    </button>
+</div>
+<!-- SOLO las casas -->
+<div class="casas-grid" id="casas-container"></div>
+<div class="own-design-callout" id="own-design-callout">
+<div class="own-design-icon">🏠</div>
+<div class="own-design-content">
+<span>¿No encontraste la casa ideal?</span>
+<h3>Construye tu casa propia desde cero</h3>
+<p>Cotiza una vivienda personalizada con madera, metalcon, terminación premium o material sólido.</p>
+</div>
+<a class="btn-own-design-index" href="cotizador.html">Ir al cotizador premium</a>
+</div>
+
+</div></section>
+<!-- -------------------------------------------------------------
+       Sección Cotizador e Integraciones (Desbloqueable)
+       ------------------------------------------------------------- -->
+<section class="section-cotizador" id="cotizador-section">
+<div class="container">
+<div style="text-align: center; margin-bottom: 56px;">
+<span style="background: rgba(0, 130, 138, 0.1); color: var(--secondary); padding: 6px 16px; border-radius: var(--radius-full); font-weight: 700; font-size: 0.9rem;">PASO 3</span>
+<h2 style="font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-top: 12px;">Estás a un paso de lograr tu sueño</h2>
+<p style="color: var(--text-muted); max-width: 500px; margin: 8px auto 0 auto;">Revisa tu proyecto completo, ajusta fundación y adicionales, y envía tu cotización por WhatsApp.</p>
+</div>
+<div class="cotizador-layout">
+<!-- Panel izquierdo: Opciones e inputs -->
+<div class="cotizador-left">
+<!-- Opciones de fundaciones -->
+<div class="options-box installation-service-box">
+<div class="installation-step-header">
+<span class="installation-step-kicker">INSTALACIÓN OPCIONAL</span>
+<h3><i data-lucide="wrench"></i> ¿Necesitas fundación y montaje?</h3>
+<div class="installation-highlight-copy">
+<strong>Tú eliges.</strong> Continúa con tu constructor o agrega uno de nuestros planes.
+</div>
+<label class="installation-service-toggle-card">
+<input type="checkbox" id="installation-service-toggle">
+<span>
+<strong>Agregar fundación y montaje</strong>
+<small>Verás alternativas y valores para la casa seleccionada.</small>
+</span>
+</label>
+<div class="installation-plan-status" id="installation-plan-status">
+Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de instalación.
+</div>
+</div>
+<h4 class="installation-plans-title" id="installation-plans-title" hidden>Elige la alternativa que mejor se ajuste</h4>
+<div class="fundaciones-grid installation-plans-grid" id="fundaciones-container" hidden>
+<!-- Planes de instalación inyectados dinámicamente por app.js -->
+</div>
+</div>
+<!-- Opciones extras automáticas / semi-obligatorias -->
+<div class="options-box" id="automaticos-box" style="display: none;">
+<h3><i data-lucide="shield-check"></i> Adicionales Automáticos</h3>
+<div class="extras-list" id="automaticos-container">
+<!-- Extras automáticos inyectados dinámicamente -->
+</div>
+</div>
+<!-- Opciones opcionales con inputs numéricos -->
+<div class="options-box deferred-extras-box" id="deferred-extras-box" hidden>
+<h3><i data-lucide="plus-circle"></i> ¿Quieres agregar extras antes de continuar?</h3>
+<p style="font-size: 0.9rem; color: var(--text-muted); margin-top: -16px; margin-bottom: 20px;">
+              Agrégalos solo si los necesitas. El total se actualiza automáticamente.
+            </p>
+<div class="extras-list" id="opcionales-container">
+<!-- Opciones extras inyectadas dinámicamente por app.js -->
+</div>
+</div>
+</div>
+<!-- Panel derecho: Resumen Fijo -->
+<div class="cotizador-right">
+<div class="cotizacion-summary-card">
+<div class="summary-project-preview">
+<div class="preview-images">
+<div class="preview-photo-box">
+<button class="preview-ficha-btn" data-project-info="parcela" type="button">Ver parcela</button>
+<img alt="Parcela seleccionada" data-project-info="parcela" id="preview-parcela-img" src="image/placeholder-parcela.jpg"/>
+<button class="summary-change-link" data-change-project="parcela" id="change-parcela" style="display:none;" type="button">Cambiar parcela</button>
+</div>
+<div class="preview-photo-box">
+<button class="preview-ficha-btn" data-project-info="casa" type="button">Ver casa</button>
+<img alt="Casa seleccionada" data-project-info="casa" id="preview-casa-img" src="image/placeholder-casa.jpg"/>
+<button class="summary-change-link" data-change-project="casa" id="change-casa" style="display:none;" type="button">Cambiar casa</button>
+</div>
+</div>
+<div class="preview-info">
+<span class="preview-badge">
+      TU PROYECTO
+    </span>
+<h3 id="preview-title">
+      Parcela + Casa
+    </h3>
+<p id="preview-location">
+      Selecciona una parcela y una casa para visualizar tu proyecto final.
+    </p>
+<div aria-live="polite" class="project-main-details" id="project-main-details">
+<div class="project-detail-card project-detail-land">
+<span class="project-detail-label" id="preview-land-type">PARCELA</span>
+<strong id="preview-land-name">Por seleccionar</strong>
+<small id="preview-land-size">Superficie por definir</small>
+</div>
+<div class="project-detail-card project-detail-house">
+<span class="project-detail-label">CASA</span>
+<strong id="preview-house-name">Por seleccionar</strong>
+<small id="preview-house-specs">Habitaciones y superficie por definir</small>
+</div>
+</div>
+</div>
+</div>
+<div class="summary-header">
+<h3><i data-lucide="receipt"></i> Resumen de Cotización</h3>
+</div>
+<table class="summary-table">
+<thead>
+<tr>
+<th>Detalle del Ítem</th>
+<th style="text-align: right;">Total</th>
+</tr>
+</thead>
+<tbody id="summary-items">
+<!-- Ítems inyectados por JS -->
+</tbody>
+</table>
+<button class="btn-whatsapp-quote pulse" id="whatsapp-btn" type="button">
+<i data-lucide="message-circle"></i> Enviar Cotización por WhatsApp
+            </button>
+<button class="btn-activate-project pulse" id="activate-project-btn" type="button">
+<i data-lucide="send"></i>
+              Activar Proyecto
+            </button>
+<p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 16px; line-height: 1.4;">
+              * Puedes enviar tu cotización por WhatsApp o activar el proyecto completando tus datos. Se generará un PDF de respaldo y se enviará la solicitud al equipo de Tu Parcela Lista.
+            </p>
+<div class="summary-total-row summary-total-final">
+<span class="total-label">Total estimado del proyecto</span>
+<span class="total-amount" id="total-amount">$0</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Modal Activar Proyecto -->
+<div aria-hidden="true" class="project-activation-modal" id="project-activation-modal">
+<div class="project-activation-backdrop" data-close-activation=""></div>
+<div aria-labelledby="project-activation-title" aria-modal="true" class="project-activation-card" role="dialog">
+<button aria-label="Cerrar formulario" class="project-activation-close" data-close-activation="" type="button">×</button>
+<span class="activation-kicker">Tu Parcela Lista</span>
+<h3 id="project-activation-title">Activa tu proyecto</h3>
+<p class="activation-intro">
+        Completa tus datos para generar tu solicitud formal. Tus datos quedarán privados para gestión interna y contacto comercial.
+      </p>
+<form class="project-activation-form" id="project-activation-form">
+<div class="activation-form-grid">
+<label>
+            Nombre completo *
+            <input name="nombre" placeholder="Ej: Juan Pérez" required="" type="text"/>
+</label>
+<label>
+            Correo electrónico *
+            <input name="email" placeholder="Ej: correo@email.com" required="" type="email"/>
+</label>
+<label>
+            Teléfono / WhatsApp *
+            <input name="telefono" placeholder="Ej: +56 9 1234 5678" required="" type="tel"/>
+</label>
+<label>
+            Comuna o ciudad
+            <input name="ciudad" placeholder="Ej: Concepción" type="text"/>
+</label>
+</div>
+<label>
+          Comentario o consulta
+          <textarea name="mensaje" placeholder="Cuéntanos cuándo quieres visitar, forma de pago o dudas del proyecto." rows="4"></textarea>
+</label>
+<label class="activation-privacy-check">
+<input required="" type="checkbox"/>
+          Acepto que mis datos sean usados de forma privada por Tu Parcela Lista para contactarme sobre esta cotización.
+        </label>
+<div class="activation-actions">
+<button class="btn-activation-submit" type="submit">
+<i data-lucide="file-check-2"></i>
+            Enviar solicitud y generar PDF
+          </button>
+<button class="btn-activation-secondary" id="download-project-pdf-btn" type="button">
+            Descargar PDF
+          </button>
+</div>
+<p aria-live="polite" class="activation-status" id="activation-status"></p>
+<p class="activation-note">
+          Nota: en sitios estáticos el envío automático de PDF por correo requiere un servicio externo. Dejé configurado FormSubmit como envío inmediato y respaldo con descarga PDF.
+        </p>
+</form>
+</div>
+</div>
+<!-- =======================================================
+       SECCIÓN PROMOS 2.0
+  ======================================================= -->
+<section class="section-promos-v2" id="promos">
+<div class="container">
+<div class="section-title-v2">
+<span class="kicker">Proyectos destacados</span>
+<h2>Proyectos listos para cotizar</h2>
+<p>Cinco alternativas modernas ordenadas desde la más económica a la más completa. Al pinchar una opción se carga el cotizador interno de esta misma página con parcela y casa seleccionadas.</p>
+</div>
+<div class="promos-grid-v2" id="promos-grid"></div>
+</div>
+</section>
+<section class="publish-owner-cta publish-owner-cta-footer" id="publica-tu-parcela">
+<div class="container publish-owner-cta-inner">
+<div class="publish-owner-copy">
+<span class="publish-eyebrow">Publica con nosotros</span>
+<h2>¿Quieres publicar tu parcela, campo o proyecto con nosotros?</h2>
+<p>En Tu Parcela Lista presentamos tu propiedad de forma clara, atractiva y ordenada para conectar con compradores reales que buscan invertir o vivir en el campo.</p>
+<div class="publish-owner-points">
+<span>Ficha premium</span>
+<span>Difusión comercial</span>
+<span>Contacto directo</span>
+</div>
+</div>
+<div class="publish-owner-actions">
+<a class="btn-publish-primary" href="plataforma/publicar-parcela/index.html">Publicar ahora</a>
+<a class="btn-publish-secondary" href="https://wa.me/56988508361?text=Hola%20Tu%20Parcela%20Lista%2C%20quiero%20publicar%20una%20parcela">Hablar por WhatsApp</a>
+</div>
+</div>
+</section>
+<!-- -------------------------------------------------------------
+       Sección Quiénes Somos / Contacto
+       ------------------------------------------------------------- -->
+<section class="tpl-faq-section" aria-labelledby="faq-title">
+  <div class="container tpl-faq-layout">
+    <div><span class="section-kicker">ANTES DE DECIDIR</span><h2 id="faq-title">Preguntas frecuentes</h2><p>Respuestas simples para avanzar con mayor seguridad.</p></div>
+    <div class="tpl-faq-list">
+      <details><summary>¿Puedo visitar una parcela antes de reservar?</summary><p>Sí. Puedes solicitar una visita o videollamada desde la ficha de cada parcela y nuestro equipo coordinará la disponibilidad.</p></details>
+      <details><summary>¿Los valores del cotizador son definitivos?</summary><p>Son una estimación orientativa. Antes de comprar se confirma disponibilidad, condiciones del terreno, transporte, instalación y antecedentes vigentes.</p></details>
+      <details><summary>¿Puedo elegir primero la parcela y después la casa?</summary><p>Sí. La barra “Tu proyecto guardado” conservará tu parcela mientras revisas modelos de casas y te llevará al cotizador cuando estés listo.</p></details>
+      <details><summary>¿Cómo guardo opciones para revisarlas después?</summary><p>Usa el corazón para favoritos o el botón de comparación de cada parcela. La selección queda guardada en este dispositivo.</p></details>
+    </div>
+  </div>
+</section>
+<section class="section-footer-info" id="quienes-somos">
+<div class="container footer-layout">
+<div class="footer-column">
+<h2>Quiénes Somos</h2>
+<p>En <strong>Tu Parcela Lista</strong> somos especialistas en ayudarte a concretar tu sueño de vivir en el campo o tener tu refugio vacacional en el sur de Chile. Ofrecemos parcelas seleccionadas que cuentan con Rol Propio inscritos en el Conservador de Bienes Raíces, factibilidad real de servicios y una excelente conectividad.</p>
+<p>Nos diferenciamos por ofrecer una solución llave en mano: desde la elección del terreno hasta el montaje final de tu casa prefabricada, garantizando precios transparentes, asesoría legal y rapidez en el proceso de compraventa.</p>
+</div>
+<div class="footer-column" id="contacto">
+<h2>Contacto e Información</h2>
+<p>¿Tienes preguntas sobre las escrituración o las visitas presenciales? Nuestro equipo está listo para responder todas tus dudas.</p>
+<ul class="contact-info-list">
+<li>
+<i data-lucide="map-pin"></i>
+<span>Oficina Central: San Pedro se la Paz, Región del Biobío, Chile</span>
+</li>
+<li>
+<i data-lucide="phone"></i>
+<span>+56988508361</span>
+</li>
+<li>
+<i data-lucide="mail"></i>
+<span>tuparcelalista@gmail.com</span>
+</li>
+<li>
+<i data-lucide="clock"></i>
+<span>Lunes a Sábado: 09:00 a 18:30 hrs</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- Modales TPL cargados desde js/tpl-modals.js -->
+
+</main>
+<footer class="main-footer">
+<div class="container footer-inner">
+<span>© 2026 Tu Parcela Lista - Todos los derechos reservados.</span>
+<span><a class="footer-link-strong" href="politica-privacidad.html">Privacidad</a> · <a class="footer-link-strong" href="terminos.html">Términos</a> · <a class="footer-link-strong" href="tecnologia.html">Tecnología e IA</a> · Desarrollado con apoyo de Inteligencia Artificial, incluyendo ChatGPT de OpenAI.</span>
+<a aria-label="Acceso privado para administración" class="footer-crm-access" href="admin-publicaciones.html" title="Administración">
+<i data-lucide="user-round-cog"></i>
+</a>
+</div>
+</footer>
+<!-- -------------------------------------------------------------
+       Archivos JavaScript (Modelos y Controlador)
+       ------------------------------------------------------------- -->
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script defer src="parcelas.js?v=20260710-1"></script>
+<script defer src="casas.js"></script>
+<script defer src="extras.js"></script>
+
+<!-- TPL Core 2.1: núcleo progresivo, compatible con app.js actual -->
+<script defer src="js/core/config.js"></script>
+<script defer src="js/core/state.js"></script>
+<script defer src="js/core/router.js"></script>
+<script defer src="js/utils/dom.js"></script>
+<script defer src="js/core/app-core.js"></script>
+
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script defer src="app.js?v=20260710-1"></script>
+<script defer src="premium-features.js"></script>
+<script defer src="js/tpl-modals.js"></script>
+<script defer src="js/tpl-utils.js"></script>
+<script defer src="js/tpl-menu.js"></script>
+<script defer src="js/tpl-cotizador-launch.js"></script>
+<script defer src="js/tpl-budget-search.js"></script>
+<script defer src="js/tpl-map-failsafe.js"></script>
+<script defer src="js/tpl-agent-cleanup.js"></script>
+<script defer src="js/tpl-professional-flow.js"></script>
+  
+
+
+
+
+<script defer src="tpl-analytics.js"></script>
+<script defer src="js/site-polish.js"></script>
+<script defer src="agente/agente.js"></script>
+
+<script>
+/* FIX v0.9.1.1: mantener catálogo de parcelas disponible desde la carga inicial. */
+(function(){
+  function revealParcelas(){
+    document.body.classList.add('tpl-guided-revealed');
+    document.body.classList.add('tpl-show-parcelas');
+    const ids=['parcelas-anchor','grid-view','parcelas-container'];
+    ids.forEach(function(id){
+      const el=document.getElementById(id);
+      if(!el) return;
+      el.style.visibility='visible';
+      el.style.opacity='1';
+      if(id==='parcelas-container') el.style.display='grid';
+      else if(id==='grid-view') el.style.display='block';
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', revealParcelas);
+  else revealParcelas();
+  document.addEventListener('click', function(e){
+    if(e.target.closest('#opt-parcela') || e.target.closest('#budget-go') || e.target.closest('a[href="#parcelas-anchor"]')){
+      revealParcelas();
+    }
+  }, true);
+})();
+</script>
+</body>
+</html>

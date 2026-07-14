@@ -1,0 +1,10 @@
+{
+  "name": "tpl-publicar-parcela-preview",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "preview": "node preview-server.mjs",
+    "test": "node module-tests.mjs && node photo-optimizer-tests.mjs && node photo-geolocation-tests.mjs && node location-picker-tests.mjs && node submission-service-tests.mjs && node visual-analysis-tests.mjs && node ../../supabase/functions/publicar-parcela/upload-logic-tests.mjs && node ../../js/crm-service-tests.mjs && node ../../supabase/functions/corregir-publicacion/correction-logic-tests.mjs && node ../../supabase/crm-security-tests.mjs"
+  }
+}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Corregir publicación | Tu Parcela Lista</title>
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <link rel="stylesheet" href="corregir-publicacion.css?v=20260713">
+</head>
+<body>
+  <main class="correction-shell">
+    <section class="correction-card" aria-labelledby="correction-title">
+      <span class="eyebrow">Corrección segura</span>
+      <h1 id="correction-title">Actualiza los campos solicitados</h1>
+      <p id="correction-intro">Validando el acceso de un solo uso…</p>
+      <form id="correction-form" hidden><div id="correction-fields"></div><aside><strong>Tus fotografías se conservarán</strong><p>No necesitas volver a subirlas. Esta corrección actualizará la misma publicación y volverá a revisión.</p></aside><button type="submit">Reenviar correcciones</button></form>
+      <div id="correction-status" role="status" aria-live="polite"></div>
+    </section>
+  </main>
+  <script src="../publicar-parcela/supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="corregir-publicacion.js"></script>
+</body>
+</html>

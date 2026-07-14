@@ -1,0 +1,22 @@
+Tu Parcela Lista - Fix botón grande Parcela
+Versión: v0.9.1-parcela-budget-fix
+
+Archivos modificados:
+- app.js
+- style.css
+- index.html (sin cambios estructurales, incluido para reemplazo seguro)
+
+Cambios:
+1. Se corrigió el flujo del botón grande "Parcela".
+2. El botón ahora fuerza modo parcela antes de buscar.
+3. El botón Buscar ahora usa listener en captura para evitar conflictos con scripts secundarios.
+4. Al ingresar presupuesto, renderiza las 5 parcelas más cercanas al presupuesto.
+5. Se mejora el scroll a la sección de resultados y reintenta si las tarjetas aún no están listas.
+6. Se agrega foco visual sobre la primera parcela encontrada.
+
+Prueba recomendada:
+1. Abrir index.html.
+2. Presionar Parcela.
+3. Ingresar 15000000 o 20000000.
+4. Presionar Buscar.
+5. Debe bajar a "Parcelas cercanas a tu presupuesto" y mostrar 5 tarjetas.

@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+
+const read=path=>readFile(new URL(path,import.meta.url),'utf8');
+const enumMigration=await read('./migrations/202607130006_preparar_estados_crm.sql');
+const schema=await read('./migrations/202607130007_crear_base_crm_moderacion.sql');
+const rpc=await read('./migrations/202607130008_crear_rpc_politicas_crm.sql');
+const aiControl=await read('./migrations/202607130009_control_admin_planes_ia.sql');
+const aiBase=await read('./migrations/202607130005_analisis_visual_planes_superiores.sql');
+const publicationEdge=await read('./functions/publicar-parcela/index.ts');
+const crm=await read('../CRM.html'),admin=await read('../admin-publicaciones.html');
+const crmJs=await read('../js/crm-admin.js'),service=await read('../js/crm-service.js');
+
+assert.match(enumMigration,/add value if not exists 'requiere_cambios'/);
+assert.match(schema,/create table public\.profiles/);assert.match(schema,/tipo in \('administrador'\)/);assert.match(schema,/activo boolean not null default false/);
+assert.match(schema,/moderacion_registros_inmutables/);assert.match(schema,/AUDIT_LOG_IMMUTABLE/);assert.match(schema,/create table public\.notificacion_cola/);
+assert.match(schema,/create table public\.publicacion_versiones/);assert.match(schema,/create table public\.publicacion_correccion_accesos/);assert.match(schema,/token_hash text not null unique/);
+assert.match(rpc,/where p\.id = auth\.uid\(\)/);assert.match(rpc,/public\.es_administrador_activo\(\)/);assert.match(rpc,/set search_path = pg_catalog/g);
+for(const name of ['crm_sesion_actual','crm_contadores_publicaciones','crm_listar_publicaciones','crm_detalle_publicacion','crm_moderar_publicacion'])assert.match(rpc,new RegExp(`grant execute on function public\\.${name}`));
+assert.doesNotMatch(rpc,/grant (?:select|insert|update|delete|all) on public\.(?:publicaciones|publicacion_fotos|moderacion_registros) to authenticated/i);
+assert.match(rpc,/grant select on storage\.objects to authenticated/);assert.match(rpc,/for select\s+to authenticated/);assert.doesNotMatch(rpc,/on storage\.objects\s+for (?:insert|update|delete)\s+to authenticated/i);
+assert.match(rpc,/CRM_APPROVAL_CONFIRMATION_REQUIRED/);assert.match(rpc,/CRM_REJECTION_CONFIRMATION_REQUIRED/);assert.match(rpc,/CRM_REVERSAL_CONFIRMATION_REQUIRED/);
+assert.match(rpc,/v_nuevo := 'aprobada'/);assert.match(rpc,/v_nuevo := 'requiere_cambios'/);assert.match(rpc,/v_nuevo := 'rechazada'/);assert.match(rpc,/v_nuevo := 'pendiente_revision'/);
+assert.match(rpc,/insert into public\.moderacion_registros/);assert.match(rpc,/estado_anterior, estado_nuevo, motivo/);assert.match(rpc,/administrador_id/);
+assert.match(rpc,/extensions\.digest\(v_token, 'sha256'\)/);assert.match(rpc,/utilizado_en = now\(\)/);assert.match(rpc,/estado = 'pendiente_revision'/);
+assert.match(aiControl,/public\.crm_exigir_administrador\(\)/);assert.match(aiControl,/coalesce\(v_plan,''\) not in \('gold','platinum'\)/);assert.match(aiControl,/public\.confirmar_plan_analisis_visual/);assert.match(aiControl,/estado = 'revocado'/);assert.match(aiControl,/a\.estado in \('pendiente_autorizacion','pendiente_analisis','procesando'\)/);
+assert.match(aiControl,/accion, administrador_id/);assert.match(aiControl,/entitlement_estado_anterior/);assert.match(aiControl,/entitlement_estado_nuevo/);assert.match(aiControl,/grant execute on function public\.crm_gestionar_plan_ia\(uuid,text,text\) to authenticated/);
+assert.doesNotMatch(aiControl,/grant execute on function public\.confirmar_plan_analisis_visual[^\n]+authenticated/);assert.match(aiControl,/revoke execute on function public\.confirmar_plan_analisis_visual\(uuid,text,text\) from service_role/);assert.match(aiControl,/plan_ia_activado/);assert.match(aiControl,/plan_ia_revocado/);
+assert.match(aiBase,/where e\.publicacion_id = p_publicacion_id and e\.estado = 'activo'/);assert.ok(publicationEdge.indexOf("if(!row?.debe_analizar)")<publicationEdge.indexOf('analyzeVisualPhotos('));assert.match(publicationEdge,/Deno\.env\.get\('OPENAI_VISUAL_MODEL'\)/);assert.match(publicationEdge,/Deno\.env\.get\('OPENAI_API_KEY'\)/);
+assert.doesNotMatch(crm,new RegExp('const\\s+(?:USER|PASS)|type="password"|tplCRM'+'Auth'));assert.match(crm,/Enviar enlace de acceso/);assert.match(admin,/location\.replace\('CRM\.html'\)/);
+assert.match(service,/createSignedUrl\(photo\.storage_path,PHOTO_URL_TTL_SECONDS\)/);assert.match(service,/PHOTO_URL_TTL_SECONDS=300/);
+assert.match(crmJs,/confirm\('Confirma que revisaste/);assert.match(crmJs,/escribe RECHAZAR/);assert.match(crmJs,/revertir_rechazo/);
+assert.match(crmJs,/Confirmar contratación y activar IA/);assert.match(crmJs,/Revocar activación de IA/);assert.match(crmJs,/No se realizó ninguna llamada a OpenAI/);
+assert.doesNotMatch(crm+crmJs+service,/service[_-]?role|SUPABASE_SECRET|postgres(?:ql)? password/i);
+console.log('OK: CRM Auth/RPC, perfiles admin activos, estados, auditoría, signed URLs y cero permisos directos de negocio.');

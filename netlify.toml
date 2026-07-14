@@ -1,0 +1,42 @@
+[build]
+publish = "."
+
+[[headers]]
+for = "/*"
+  [headers.values]
+  X-Frame-Options = "SAMEORIGIN"
+  X-Content-Type-Options = "nosniff"
+  Referrer-Policy = "strict-origin-when-cross-origin"
+  Permissions-Policy = "geolocation=(self), camera=(), microphone=(self), payment=()"
+  Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+  Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+
+[[headers]]
+for = "/*.html"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/*.css"
+  [headers.values]
+  Cache-Control = "public, max-age=604800"
+
+[[headers]]
+for = "/*.js"
+  [headers.values]
+  Cache-Control = "public, max-age=604800"
+
+[[headers]]
+for = "/image/*"
+  [headers.values]
+  Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/admin-publicaciones.html"
+  [headers.values]
+  X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+for = "/CRM.html"
+  [headers.values]
+  X-Robots-Tag = "noindex, nofollow"

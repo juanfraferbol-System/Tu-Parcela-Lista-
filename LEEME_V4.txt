@@ -1,0 +1,27 @@
+TU PARCELA LISTA — ENTREGA V4 MINIMALISTA
+
+Esta entrega NO incluye la carpeta image para evitar volver a subir un ZIP de más de 100 MB a GitHub.
+No cambia nombres de carpetas ni fotografías.
+
+Instalación:
+1. Descomprime el archivo.
+2. Copia el contenido dentro de la carpeta principal de TU PARCELA LISTA.
+3. Acepta reemplazar los archivos existentes y combinar la carpeta css.
+4. En la terminal ejecuta por separado:
+   git add index.html app.js style.css parcelas.js parcela.html parcela.css cotizador.html cotizador.css cotizador.js extras.js extradata.js css/v4-minimal.css LEEME_V4.txt
+   git commit -m "Rediseño minimalista completo y compatibilidad de imágenes"
+   git push origin main
+
+No uses git add . mientras tengas archivos ZIP grandes en la carpeta del proyecto.
+No subas image.zip, style.zip ni copias completas del proyecto al repositorio.
+
+Cambios principales:
+- Inicio más minimalista y ordenado.
+- Botones de elección compactos.
+- Hero con jerarquía visual más limpia.
+- Tarjetas de parcelas y casas uniformes en 4:3.
+- Filtros y acciones simplificados.
+- Detalle de parcela y cotizador con el mismo sistema visual.
+- Diseño responsive para escritorio, tablet y móvil.
+- Respaldo visual automático para imágenes que fallen.
+- Nueva hoja css/v4-minimal.css cargada al final para evitar conflictos.

@@ -1,0 +1,15 @@
+.env
+.env.*
+supabase/.temp/
+
+# Archivos habituales de claves y credenciales privadas.
+*.pem
+*.key
+*.p12
+*.pfx
+**/*private-key*
+**/*private_key*
+**/*service-role*
+**/*service_role*
+**/*service-account*.json
+**/credentials*.json

@@ -1,0 +1,17 @@
+{
+  "name": "tu-parcela-lista-manager",
+  "version": "1.0.0",
+  "description": "Plataforma inteligente para compra, venta y gestión de parcelas en Chile.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check main.js && node --check preload.js && node --check renderer.js"
+  },
+  "keywords": [],
+  "author": "Tu Parcela Lista",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^43.0.0"
+  }
+}

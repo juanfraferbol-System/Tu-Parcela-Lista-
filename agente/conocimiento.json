@@ -1,0 +1,391 @@
+{
+  "brand": "Tu Parcela Lista",
+  "agentName": "Asesor Tu Parcela Lista",
+  "fallbackWhatsApp": "Hola, necesito hablar con un asesor de Tu Parcela Lista.",
+  "quickReplies": [
+    "¿Cómo compro una parcela?",
+    "¿Cómo reservo?",
+    "Parcelas con facilidad de pago",
+    "Parcelas con bosque nativo",
+    "Parcelas con río o arroyo",
+    "Tengo un presupuesto",
+    "Quiero parcela + casa",
+    "Facilidad de pago",
+    "Quiero visitar terreno",
+    "Diseño de casa propia"
+  ],
+  "intents": [
+    {
+      "id": "saludo",
+      "title": "Saludo",
+      "keywords": [
+        "hola",
+        "buenas",
+        "buenos dias",
+        "buenas tardes",
+        "buenas noches",
+        "asesor",
+        "ayuda"
+      ],
+      "answer": "Hola, soy el Asesor Virtual de Tu Parcela Lista. Puedo ayudarte a buscar parcelas, calcular proyectos con casa, explicar la reserva del 1%, orientar sobre facilidad de pago, coordinar visitas y resolver dudas del proceso de compra.",
+      "actions": [
+        {
+          "label": "Ver parcelas",
+          "href": "index.html#parcelas-anchor"
+        },
+        {
+          "label": "Cómo comprar",
+          "href": "como-comprar.html"
+        }
+      ]
+    },
+    {
+      "id": "como_comprar",
+      "title": "Cómo comprar",
+      "keywords": [
+        "como comprar",
+        "comprar",
+        "proceso",
+        "etapas",
+        "pasos",
+        "tramite",
+        "escritura",
+        "compra venta",
+        "compraventa"
+      ],
+      "answer": "El proceso general es: 1) elegir la parcela usando fotos, descripción o visita/video llamada; 2) reservar con el 1% del valor para retirar la publicación; 3) reunir datos del comprador; 4) generar compromiso de compraventa o avanzar a escritura según modalidad; 5) coordinar firma, pagos y trámites; 6) acompañamiento de Tu Parcela Lista durante el proceso.",
+      "actions": [
+        {
+          "label": "Ver etapas",
+          "href": "como-comprar.html"
+        },
+        {
+          "label": "Ver parcelas",
+          "href": "index.html#parcelas-anchor"
+        }
+      ]
+    },
+    {
+      "id": "reserva",
+      "title": "Reserva",
+      "keywords": [
+        "reserva",
+        "reservar",
+        "1%",
+        "uno por ciento",
+        "apartar",
+        "sacar publicacion",
+        "bloquear parcela"
+      ],
+      "answer": "Para reservar una parcela se paga el 1% del valor de la parcela. Con esa reserva la parcela se retira de la publicación y se solicitan los datos del comprador para preparar el siguiente paso: compromiso de compraventa o escritura, según corresponda.",
+      "actions": [
+        {
+          "label": "Solicitar reserva",
+          "href": "index.html#contacto"
+        },
+        {
+          "label": "Cómo comprar",
+          "href": "como-comprar.html#reserva"
+        }
+      ]
+    },
+    {
+      "id": "visita",
+      "title": "Visita a terreno",
+      "keywords": [
+        "visita",
+        "terreno",
+        "ir a ver",
+        "ver parcela",
+        "video llamada",
+        "videollamada",
+        "video",
+        "ubicacion",
+        "mapa"
+      ],
+      "answer": "Puedes elegir una parcela revisando fotos, descripción y ubicación del sitio. Si no puedes ir a terreno, se puede coordinar una video llamada desde la parcela para mostrar accesos, entorno, vegetación y características importantes antes de reservar.",
+      "actions": [
+        {
+          "label": "Ver mapa/parcelas",
+          "href": "index.html#parcelas-anchor"
+        },
+        {
+          "label": "Contacto",
+          "href": "index.html#contacto"
+        }
+      ]
+    },
+    {
+      "id": "facilidad_pago",
+      "title": "Facilidad de pago",
+      "keywords": [
+        "facilidad",
+        "cuotas",
+        "credito",
+        "financiamiento",
+        "pie",
+        "pagar",
+        "mensual",
+        "plazo",
+        "12 cuotas"
+      ],
+      "answer": "Algunas parcelas pueden tener facilidad de pago. En esos casos se evalúa el pie, las cuotas y las condiciones particulares. Para avanzar se debe revisar la parcela específica y preparar la información del comprador para el compromiso de compraventa.",
+      "actions": [
+        {
+          "label": "Filtrar facilidad pago",
+          "href": "index.html#parcelas-anchor"
+        },
+        {
+          "label": "Consultar",
+          "href": "index.html#contacto"
+        }
+      ]
+    },
+    {
+      "id": "parcela_casa",
+      "title": "Parcela + casa",
+      "keywords": [
+        "parcela casa",
+        "parcela + casa",
+        "casa incluida",
+        "proyecto",
+        "llave en mano",
+        "cotizar proyecto",
+        "combo"
+      ],
+      "answer": "Puedes cotizar un proyecto Parcela + Casa desde el cotizador del index. El sistema selecciona parcela, modelo de casa, instalación y extras para estimar el valor total. Las casas prefabricadas se trabajan con proveedores externos, y Tu Parcela Lista acompaña el proceso como asesor y coordinador.",
+      "actions": [
+        {
+          "label": "Proyectos listos",
+          "href": "index.html#promos"
+        },
+        {
+          "label": "Cotizar",
+          "href": "index.html#casas-section"
+        }
+      ]
+    },
+    {
+      "id": "casas_prefabricadas",
+      "title": "Casas prefabricadas",
+      "keywords": [
+        "prefabricada",
+        "prefabricadas",
+        "chilehome",
+        "modelo",
+        "casa modelo",
+        "casa pre fabricada"
+      ],
+      "answer": "Las casas prefabricadas se cotizan según modelo, metros cuadrados y condiciones de instalación. En caso de compra, el pago de la casa se realiza directamente con la empresa correspondiente, como Chilehome cuando aplique, y Tu Parcela Lista apoya la coordinación del proyecto.",
+      "actions": [
+        {
+          "label": "Ver casas",
+          "href": "index.html#casas-section"
+        },
+        {
+          "label": "Diseño propio",
+          "href": "cotizador.html"
+        }
+      ]
+    },
+    {
+      "id": "diseno_propio",
+      "title": "Casa con diseño propio",
+      "keywords": [
+        "diseño propio",
+        "casa propia",
+        "personalizada",
+        "arquitecto",
+        "desde cero",
+        "cotizador premium",
+        "material",
+        "madera",
+        "metalcon",
+        "hormigon",
+        "cemento"
+      ],
+      "answer": "Si no quieres una casa prefabricada, puedes usar el cotizador de diseño propio. Ahí se estima la vivienda desde cero por sistema constructivo: madera, metalcon, premium u hormigón/cemento, considerando metros cuadrados, etapas y extras del proyecto.",
+      "actions": [
+        {
+          "label": "Abrir diseño propio",
+          "href": "cotizador.html"
+        },
+        {
+          "label": "Ver etapas",
+          "href": "como-comprar.html#casa-propia"
+        }
+      ]
+    },
+    {
+      "id": "valores_m2",
+      "title": "Valores por m²",
+      "keywords": [
+        "270",
+        "350",
+        "420",
+        "720",
+        "valor m2",
+        "precio m2",
+        "m2",
+        "metro cuadrado",
+        "madera",
+        "metalcon",
+        "cemento",
+        "hormigon"
+      ],
+      "answer": "Los valores referenciales para diseño propio son: madera desde $270.000/m², metalcon simple desde $350.000/m², madera o metalcon premium desde $420.000/m² y material cemento/hormigón desde $720.000/m². Son estimaciones que deben revisarse según terreno, diseño, accesos y especificaciones.",
+      "actions": [
+        {
+          "label": "Cotizador diseño propio",
+          "href": "cotizador.html"
+        }
+      ]
+    },
+    {
+      "id": "documentos",
+      "title": "Documentos y escritura",
+      "keywords": [
+        "documentos",
+        "rut",
+        "comprador",
+        "escritura",
+        "notaria",
+        "cbr",
+        "conservador",
+        "firma",
+        "inscripcion"
+      ],
+      "answer": "Después de reservar se solicitan los datos del comprador para preparar el documento que corresponda. Si hay facilidad de pago, normalmente se trabaja con compromiso de compraventa. Si la compra es directa, se preparan antecedentes para escritura, firma y posterior trámite en el Conservador de Bienes Raíces correspondiente.",
+      "actions": [
+        {
+          "label": "Ver proceso",
+          "href": "como-comprar.html#documentacion"
+        },
+        {
+          "label": "Contacto",
+          "href": "index.html#contacto"
+        }
+      ]
+    },
+    {
+      "id": "agua_luz",
+      "title": "Agua y luz",
+      "keywords": [
+        "agua",
+        "luz",
+        "electricidad",
+        "poste",
+        "factibilidad",
+        "servicios",
+        "pozo",
+        "empalme"
+      ],
+      "answer": "Cada parcela debe revisarse de forma individual. Algunas cuentan con agua, luz o factibilidad, y esa información aparece en la ficha de la parcela cuando está disponible. Antes de reservar conviene confirmar servicios, accesos y condiciones particulares.",
+      "actions": [
+        {
+          "label": "Ver parcelas",
+          "href": "index.html#parcelas-anchor"
+        }
+      ]
+    },
+    {
+      "id": "rol",
+      "title": "Rol propio",
+      "keywords": [
+        "rol",
+        "rol propio",
+        "regularizada",
+        "papeles",
+        "dominio",
+        "inscrita"
+      ],
+      "answer": "En Tu Parcela Lista se prioriza mostrar información clara de cada parcela, incluyendo rol, superficie, ubicación y servicios cuando estén disponibles. Antes de avanzar a reserva o escritura se deben revisar los antecedentes de la parcela específica.",
+      "actions": [
+        {
+          "label": "Ver fichas",
+          "href": "index.html#parcelas-anchor"
+        },
+        {
+          "label": "Preguntar asesor",
+          "href": "index.html#contacto"
+        }
+      ]
+    },
+    {
+      "id": "presupuesto",
+      "title": "Presupuesto",
+      "keywords": [
+        "presupuesto",
+        "tengo",
+        "millones",
+        "plata",
+        "dinero",
+        "alcanza",
+        "barato",
+        "economica",
+        "economico"
+      ],
+      "answer": "Puedes indicar tu presupuesto en el inicio del sitio para que el sistema muestre alternativas cercanas. Si buscas parcela + casa, conviene considerar terreno, casa, instalación, extras y costos del proceso. También puedo orientarte según comuna, superficie y tipo de proyecto.",
+      "actions": [
+        {
+          "label": "Ingresar presupuesto",
+          "href": "index.html#decision-flow"
+        },
+        {
+          "label": "Proyectos listos",
+          "href": "index.html#promos"
+        }
+      ]
+    },
+    {
+      "id": "ecosistema",
+      "title": "Ecosistema rural",
+      "keywords": [
+        "paisajismo",
+        "jardineria",
+        "permacultura",
+        "huerta",
+        "huertas",
+        "avicola",
+        "ganaderia",
+        "incendio",
+        "incendios",
+        "naturaleza",
+        "bosque",
+        "manejo"
+      ],
+      "answer": "La visión futura de Tu Parcela Lista es convertirse en un ecosistema de apoyo para vivir en entornos naturales: paisajismo, jardines, huertas, permacultura, avicultura, ganadería, manejo de bosque nativo, prevención de incendios y soluciones para quienes quieren habitar mejor su parcela.",
+      "actions": [
+        {
+          "label": "Conocer visión",
+          "href": "como-comprar.html#ecosistema"
+        },
+        {
+          "label": "Contacto",
+          "href": "index.html#contacto"
+        }
+      ]
+    },
+    {
+      "id": "contacto",
+      "title": "Contacto",
+      "keywords": [
+        "contacto",
+        "whatsapp",
+        "llamar",
+        "telefono",
+        "correo",
+        "asesor humano",
+        "vendedor",
+        "hablar"
+      ],
+      "answer": "Puedes dejar tus datos o escribir por WhatsApp para que un asesor de Tu Parcela Lista revise tu caso. Recomiendo indicar presupuesto, comuna de interés, si buscas solo parcela o parcela + casa, y si necesitas facilidad de pago.",
+      "actions": [
+        {
+          "label": "Ir a contacto",
+          "href": "index.html#contacto"
+        }
+      ]
+    }
+  ]
+}

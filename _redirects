@@ -1,0 +1,9 @@
+/como-comprar    /como-comprar.html   200
+/cotizador       /cotizador.html      200
+/publicar        /plataforma/publicar-parcela/ 301!
+/publicar/       /plataforma/publicar-parcela/ 301!
+/publicar-parcela.html /plataforma/publicar-parcela/ 301!
+/tecnologia      /tecnologia.html     200
+/privacidad      /politica-privacidad.html 200
+/terminos        /terminos.html 200
+/parcela/*       /parcela.html        200

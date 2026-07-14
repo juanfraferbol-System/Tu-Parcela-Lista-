@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Construye tu Casa Propia - Tu Parcela Lista</title>
+  <meta name="description" content="Cotiza online tu proyecto de parcela y casa prefabricada, revisa etapas, adicionales y recibe un resumen claro de tu inversión.">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/v2-base.css">
+  <link rel="stylesheet" href="css/v2-sidebar.css">
+  <link rel="stylesheet" href="css/v2-components.css">
+  <link rel="stylesheet" href="css/v2-responsive.css">
+  <link rel="stylesheet" href="css/v3-production.css">
+  <link rel="stylesheet" href="agente/agente.css">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="cotizador.css" />
+  <link rel="icon" type="image/png" href="image/favicon.png">
+  <link rel="apple-touch-icon" href="image/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/v4-minimal.css?v=20260710-4">
+  <link href="css/site-polish.css?v=20260710" rel="stylesheet">
+</head>
+<body>
+  <!-- Header Premium -->
+  <header class="main-header">
+    <div class="container header-container">
+      <div class="logo-group logo-group-brand">
+        <img src="image/logo-tu-parcela-lista.png" alt="Tu Parcela Lista" class="cotizador-brand-logo">
+        <h1>Tu Parcela <span>Lista</span></h1>
+      </div>
+      <a href="index.html" class="header-back-link" id="header-back-btn">
+        <i data-lucide="arrow-left"></i>
+        <span>Volver a Inicio</span>
+      </a>
+    </div>
+  </header>
+  <main class="cotizador-section" id="cotizador-page">
+    <div class="container">
+      
+      <!-- Selection Info Bar (Updated via JS) -->
+      <section class="selection-info-bar" id="selection-info-bar">
+        <div class="info-block">
+          <span class="label">Proyecto personalizado</span>
+          <span class="value">Construye tu casa propia</span>
+        </div>
+        <div class="info-block">
+          <span class="label">Diseño desde cero</span>
+          <span class="value">Casa personalizada</span>
+        </div>
+      </section>
+      <!-- Cotizador Columns -->
+      <div class="cotizador-layout">
+        
+        <!-- Left Side: Configurator Options -->
+        <section class="cotizador-left">
+          
+          <!-- Tipo de construcción -->
+          <div class="options-box">
+            <h3><i data-lucide="hammer"></i> 1. Construye tu casa propia</h3>
+            <p class="box-description">
+              Primero define el tamaño de tu proyecto y luego elige el material principal de construcción. El valor se reflejará inmediatamente en el resumen.
+            </p>
+
+            <div class="build-controls build-controls-featured" id="build-controls">
+              <div class="build-controls-copy">
+                <span class="build-kicker">Define tu proyecto</span>
+                <strong>Metros cuadrados y habitaciones</strong>
+                <small>Estos datos calculan el valor base antes de elegir extras.</small>
+              </div>
+              <label>
+                <span>Metros cuadrados</span>
+                <input type="number" id="build-m2" min="18" step="1" value="36">
+              </label>
+              <label>
+                <span>Habitaciones</span>
+                <input type="number" id="build-rooms" min="1" max="10" step="1" value="2">
+              </label>
+            </div>
+
+            <div class="material-choice-head">
+              <span>Elige el material de tu casa</span>
+              <strong>El valor del material se suma al total según los m² indicados arriba.</strong>
+            </div>
+
+            <div class="fundaciones-grid construction-grid" id="fundaciones-container">
+              <!-- Rendered via JS -->
+            </div>
+            <div class="visualizer-box">
+              <div class="visualizer-title-row">
+                <div>
+                  <h4>Visualizador arquitectónico del proyecto</h4>
+                  <p>La vista cambia según sistema constructivo, metros cuadrados y extras seleccionados.</p>
+                </div>
+                <span class="visualizer-badge">Diseño propio</span>
+              </div>
+              <div class="architecture-visualizer" id="project-visualizer"></div>
+            </div>
+          </div>
+
+          <div class="options-box construction-progress-box">
+            <h3><i data-lucide="route"></i> Etapas del proyecto</h3>
+            <p class="box-description">
+              Presiona cada etapa para ver cuánto cuesta esa parte de la obra y cuánto va acumulado hasta ese punto. Esta sección es informativa y no duplica el total final.
+            </p>
+            <div class="construction-stages-grid" id="construction-stages-grid"></div>
+          </div>
+          
+          <!-- Automatic items (Hidden if empty) -->
+          <div class="options-box" id="automaticos-box" style="display:none;">
+            <h3><i data-lucide="shield-check"></i> Adicionales Automáticos</h3>
+            <div class="extras-list" id="automaticos-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+          
+          <!-- Optional Extras Section -->
+          <div class="options-box">
+            <h3><i data-lucide="plus-circle"></i> Obras Adicionales y Opciones Extras</h3>
+            <p class="box-description">
+              Selecciona las obras y comodidades adicionales que deseas equipar en tu parcela.
+            </p>
+            <div class="extras-list" id="opcionales-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+          
+        </section>
+        
+        <!-- Right Side: Quote Summary Sticky Card -->
+        <aside class="cotizador-right sticky-sidebar">
+          <div class="cotizacion-summary-card">
+            
+            <div class="summary-header">
+              <h3><i data-lucide="receipt"></i> Resumen del Proyecto</h3>
+            </div>
+            
+            <table class="summary-table">
+              <thead>
+                <tr>
+                  <th>Ítem / Concepto</th>
+                  <th style="text-align:right;">Total</th>
+                </tr>
+              </thead>
+              <tbody id="summary-items">
+                <!-- Rows injected via JS -->
+              </tbody>
+            </table>
+            
+            <div class="summary-total-box">
+              <span class="total-label">Total Proyecto</span>
+              <span class="total-amount" id="total-amount">$0</span>
+            </div>
+            
+            <button class="btn-whatsapp-quote pulse" id="whatsapp-btn">
+              <i data-lucide="message-square"></i>
+              <span>Enviar Cotización por WhatsApp</span>
+            </button>
+
+            <button class="btn-activate-project" id="activate-project-btn" type="button">
+              <i data-lucide="rocket"></i>
+              <span>Generar proyecto en PDF</span>
+            </button>
+            <p class="project-note">Completa tus datos, descarga el PDF ordenado de tu proyecto y prepara el correo con copia para ti.</p>
+            
+            <p style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin:0; line-height:1.4;">
+              * Este cotizador corresponde a diseño propio desde cero. Los valores son referenciales y se ajustan según visita técnica, terreno y especificaciones finales.
+            </p>
+            
+          </div>
+        </aside>
+        
+      </div>
+    </div>
+  </main>
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="container footer-inner">
+      <span>© 2026 Tu Parcela Lista - Todos los derechos reservados.</span>
+      <span>Tecnología y Asistencia en Terrenos Agrícolas.</span>
+      <span><a class="footer-link-strong" href="politica-privacidad.html">Privacidad</a> · <a class="footer-link-strong" href="terminos.html">Términos</a></span>
+    </div>
+  </footer>
+
+  <div class="stage-cost-modal" id="stage-cost-modal" aria-hidden="true">
+    <div class="stage-cost-backdrop" data-close-stage-modal></div>
+    <section class="stage-cost-dialog" role="dialog" aria-modal="true" aria-labelledby="stage-cost-title">
+      <button class="stage-cost-close" type="button" data-close-stage-modal aria-label="Cerrar">×</button>
+      <span class="stage-cost-kicker">Costo referencial de etapa</span>
+      <h3 id="stage-cost-title">Etapa del proyecto</h3>
+      <p id="stage-cost-desc">Detalle de la etapa seleccionada.</p>
+      <div class="stage-cost-values">
+        <div><small>Esta etapa cuesta</small><strong id="stage-cost-current">$0</strong></div>
+        <div><small>Acumulado hasta aquí</small><strong id="stage-cost-cumulative">$0</strong></div>
+      </div>
+      <p class="stage-cost-context" id="stage-cost-context">Sistema constructivo y metros cuadrados.</p>
+      <button class="stage-cost-ok" type="button" data-close-stage-modal>Entendido</button>
+    </section>
+  </div>
+
+  <!-- Scripts -->
+  <script src="parcelas.js"></script>
+  <script src="casas.js"></script>
+  <script src="extras.js"></script>
+  <script src="extradata.js"></script>
+  <script src="cotizador.js"></script>
+  <script src="js/tpl-professional-flow.js"></script>
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+    
+    // Fallback navegación: vuelve al sitio sin borrar la selección actual.
+    document.getElementById('header-back-btn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = 'index.html';
+    });
+  </script>
+
+  <div class="modal-backdrop" id="activate-modal">
+    <div class="lead-modal">
+      <button class="modal-close" type="button" id="activate-close">×</button>
+      <h3>Activar proyecto</h3>
+      <p>Déjanos tus datos para que uno de nuestros expertos te contacte. Primero completa este formulario; luego se descargará un PDF ordenado con logo y resumen del proyecto.</p>
+      <form id="activate-form">
+        <input required id="activate-name" placeholder="Nombre completo">
+        <input required id="activate-phone" placeholder="Número de contacto">
+        <input required id="activate-email" type="email" placeholder="Correo electrónico">
+        <textarea id="activate-message" rows="3" placeholder="Comentarios o fecha ideal para ser contactado"></textarea>
+        <button class="btn-activate-project" type="submit">Descargar PDF y preparar correo</button>
+      </form>
+    </div>
+  </div>
+  <script src="tpl-analytics.js"></script>
+  <script src="agente/agente.js"></script>
+<script src="js/site-polish.js"></script>
+</body>
+</html>

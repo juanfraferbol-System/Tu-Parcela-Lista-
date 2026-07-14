@@ -1,0 +1,75 @@
+/* =========================================================
+   TPL v2 - Modales globales
+   Evita que los modales se impriman como texto bajo el footer
+   y garantiza prioridad sobre Leaflet cuando están activos.
+========================================================= */
+.tpl-info-modal,
+.tpl-location-modal,
+.project-activation-modal,
+#tpl-info-modal,
+#tpl-location-modal,
+#project-activation-modal {
+  display: none !important;
+}
+
+.tpl-info-modal.active,
+.tpl-location-modal.active,
+.project-activation-modal.active,
+.tpl-info-modal[aria-hidden="false"],
+.tpl-location-modal[aria-hidden="false"],
+.project-activation-modal[aria-hidden="false"] {
+  display: flex !important;
+}
+
+.tpl-info-modal,
+.tpl-location-modal,
+.project-activation-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.tpl-info-modal *,
+.tpl-location-modal *,
+.project-activation-modal * {
+  box-sizing: border-box;
+}
+
+.tpl-info-backdrop,
+.tpl-location-backdrop,
+.project-activation-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(2, 6, 23, 0.62) !important;
+  backdrop-filter: blur(8px);
+}
+
+.tpl-location-dialog,
+.tpl-info-dialog,
+.project-activation-card {
+  position: relative !important;
+  z-index: 2 !important;
+  pointer-events: auto !important;
+}
+
+.tpl-location-close,
+.tpl-info-close,
+.project-activation-close,
+.tpl-location-actions a,
+.tpl-location-actions button,
+.tpl-location-map-actions button {
+  position: relative;
+  z-index: 5;
+  pointer-events: auto !important;
+}
+
+.tpl-location-map-actions {
+  z-index: 1000 !important;
+  pointer-events: auto !important;
+}
+
+.tpl-location-open {
+  overflow: hidden !important;
+}

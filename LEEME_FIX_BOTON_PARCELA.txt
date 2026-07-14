@@ -1,0 +1,12 @@
+Fix botón inicial Parcela
+
+Archivos incluidos:
+- index.html
+- app.js
+- style.css
+
+Qué corrige:
+- El botón grande "Parcela" funciona desde la primera carga del index.
+- Al ingresar presupuesto muestra 5 parcelas cercanas.
+- Hace scroll automático a la sección de resultados.
+- Se agregó un refuerzo final porque el sitio carga varios scripts posteriores a app.js que podían interferir con el flujo inicial.

@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle de Terreno | Tu Parcela Lista</title>
+   <!-- ========================================= -->
+    <!-- SEO -->
+    <!-- ========================================= -->
+
+    <meta name="description"
+        content="Encuentra parcelas con Rol Propio, agua y luz. Elige tu terreno, selecciona una casa prefabricada y cotiza online en ParcelaLista.cl.">
+
+    <meta name="keywords"
+        content="parcelas chile, parcelas bio bio, parcelas quillón, parcelas florida, parcelas nacimiento, casas prefabricadas, terrenos chile">
+
+    <meta name="author" content="ParcelaLista.cl">
+    <meta name="robots" content="index,follow">
+
+    <link rel="canonical" href="https://parcelalista.cl/">
+
+    <meta name="theme-color" content="#0B5FA5">
+
+    <!-- ========================================= -->
+    <!-- OPEN GRAPH (WhatsApp - Facebook - LinkedIn) -->
+    <!-- ========================================= -->
+
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_CL">
+    <meta property="og:site_name" content="ParcelaLista.cl">
+
+    <meta property="og:title"
+        content="🏡 Encuentra tu parcela ideal | ParcelaLista.cl">
+
+    <meta property="og:description"
+        content="Parcelas con Rol Propio + Casas Prefabricadas. Cotiza online y encuentra tu proyecto ideal.">
+
+    <meta property="og:url"
+        content="https://parcelalista.cl/">
+
+    <meta property="og:image"
+        content="https://parcelalista.cl/image/logo_compartir.png">
+
+    <meta property="og:image:secure_url"
+        content="https://parcelalista.cl/image/logo_compartir.png">
+
+    <meta property="og:image:type"
+        content="image/png">
+
+    <meta property="og:image:width"
+        content="1200">
+
+    <meta property="og:image:height"
+        content="630">
+
+    <!-- ========================================= -->
+    <!-- TWITTER / X -->
+    <!-- ========================================= -->
+
+    <meta name="twitter:card"
+        content="summary_large_image">
+
+    <meta name="twitter:title"
+        content="🏡 ParcelaLista.cl">
+
+    <meta name="twitter:description"
+        content="Parcelas con Rol Propio + Casas Prefabricadas. Cotiza online.">
+
+    <meta name="twitter:image"
+        content="https://parcelalista.cl/image/logo_compartir.png">
+
+    <!-- ========================================= -->
+    <!-- FAVICON -->
+    <!-- ========================================= -->
+
+    <link rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="image/favicon.png">
+
+    <link rel="icon"
+        type="image/png"
+        sizes="16x16"
+        href="image/favicon.png">
+
+    <link rel="apple-touch-icon"
+        sizes="180x180"
+        href="image/favicon.png">
+
+    <!-- ========================================= -->
+    <!-- GOOGLE FONTS -->
+    <!-- ========================================= -->
+
+    <link rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap"
+        rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Iconos -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css?v=20260710-1">
+  <link rel="stylesheet" href="css/v2-base.css">
+  <link rel="stylesheet" href="css/v2-sidebar.css">
+  <link rel="stylesheet" href="css/v2-components.css">
+  <link rel="stylesheet" href="css/v2-responsive.css">
+
+    
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="parcela.css">
+  <link rel="stylesheet" href="css/v3-production.css">
+  <link rel="stylesheet" href="agente/agente.css">
+
+<style>
+.cotizador-parcela-helper{
+  position:fixed;
+  left:16px;
+  right:16px;
+  bottom:18px;
+  z-index:5000;
+  display:flex;
+  justify-content:center;
+  pointer-events:none;
+}
+.cotizador-parcela-helper-card{
+  position:relative;
+  width:min(620px, 100%);
+  padding:22px;
+  border-radius:24px;
+  background:linear-gradient(135deg, rgba(0,63,122,.98), rgba(0,130,138,.96));
+  color:#fff;
+  box-shadow:0 24px 60px rgba(0,43,82,.30);
+  pointer-events:auto;
+  overflow:hidden;
+}
+.cotizador-parcela-helper-card::after{
+  content:"";
+  position:absolute;
+  width:160px;
+  height:160px;
+  border-radius:50%;
+  right:-60px;
+  bottom:-80px;
+  background:rgba(242,190,26,.22);
+}
+.cotizador-parcela-helper-card span{
+  display:inline-flex;
+  padding:5px 11px;
+  border-radius:999px;
+  background:rgba(242,190,26,.22);
+  color:#fff2ba;
+  font-size:.76rem;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+}
+.cotizador-parcela-helper-card h3{
+  margin:10px 0 6px;
+  font-size:1.35rem;
+}
+.cotizador-parcela-helper-card p{
+  margin:0 0 16px;
+  color:rgba(255,255,255,.82);
+}
+.cotizador-parcela-helper-actions{
+  position:relative;
+  z-index:2;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.cotizador-parcela-helper-actions button,
+.cotizador-parcela-helper-actions a{
+  border:0;
+  border-radius:999px;
+  padding:12px 16px;
+  text-decoration:none;
+  cursor:pointer;
+  font-weight:900;
+}
+.cotizador-parcela-helper-actions button{
+  background:linear-gradient(135deg, #f2be1a, #f59e0b);
+  color:#15233a;
+}
+.cotizador-parcela-helper-actions a{
+  background:rgba(255,255,255,.13);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.20);
+}
+.cotizador-parcela-helper-close{
+  position:absolute;
+  top:10px;
+  right:12px;
+  width:34px;
+  height:34px;
+  border:0;
+  border-radius:50%;
+  background:rgba(255,255,255,.16);
+  color:#fff;
+  font-size:1.4rem;
+  cursor:pointer;
+  z-index:3;
+}
+@media(max-width:620px){
+  .cotizador-parcela-helper-card{padding:18px}
+  .cotizador-parcela-helper-actions{flex-direction:column}
+  .cotizador-parcela-helper-actions button,
+  .cotizador-parcela-helper-actions a{text-align:center;width:100%}
+}
+</style>
+
+  <link rel="stylesheet" href="css/v4-minimal.css?v=20260710-4">
+    <link href="css/site-polish.css?v=20260710" rel="stylesheet">
+</head>
+<body>
+
+
+
+  <!-- -------------------------------------------------------------
+       Barra de Navegación (Navbar)
+       ------------------------------------------------------------- -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="logo-container"><img src="image/logo-tu-parcela-lista.png" alt="Tu Parcela Lista" class="brand-logo-img"></a>
+      
+      <nav>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="como-comprar.html">Cómo comprar</a></li>
+          <li><a href="index.html#parcelas-anchor">Parcelas</a></li>
+          <li><a href="index.html#casas-section">Casas</a></li>
+          <li><a href="index.html#quienes-somos">Quiénes Somos</a></li>
+        </ul>
+      </nav>
+      
+      <div style="display: flex; gap: 16px; align-items: center;">
+<a href="index.html#contacto" class="nav-contact-btn">Contacto</a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir Menú">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor del Error (Por si la parcela no existe) -->
+  <div class="container" id="error-container" style="display: none; padding: 120px 24px; text-align: center;">
+    <div style="background: white; border-radius: var(--radius-lg); padding: 48px; border: 1px solid var(--border-color); box-shadow: var(--shadow-md); max-width: 500px; margin: 0 auto;">
+      <i data-lucide="alert-triangle" style="width: 64px; height: 64px; color: #f59e0b; margin-bottom: 24px;"></i>
+      <h2 style="color: var(--primary); font-weight: 800; font-size: 1.8rem; margin-bottom: 12px;">Terreno no encontrado</h2>
+      <p style="color: var(--text-muted); margin-bottom: 32px; line-height: 1.6;">El ID del terreno solicitado no coincide con nuestro catálogo o el enlace ha caducado.</p>
+      <a href="index.html" class="nav-contact-btn" style="display: inline-block;">Volver al Catálogo</a>
+    </div>
+  </div>
+
+  <!-- Contenedor del Detalle Dinámico -->
+  <div id="detail-content-wrapper">
+    <!-- Breadcrumbs -->
+    <div class="container">
+      <div class="breadcrumbs">
+        <a href="index.html">Inicio</a>
+        <i data-lucide="chevron-right"></i>
+        <a href="index.html#parcelas-anchor">Parcelas</a>
+        <i data-lucide="chevron-right"></i>
+        <span id="breadcrumb-active" style="font-weight: 600; color: var(--dark);">Detalle Parcela</span>
+      </div>
+    </div>
+
+    <!-- Cabecera de la ficha -->
+    <header class="container detail-header-layout">
+      <div class="detail-title">
+        <h1 id="detail-title-text">Cargando Terreno...</h1>
+        <div class="detail-location">
+          <i data-lucide="map-pin"></i>
+          <span id="detail-location-text">Comuna, Región, Chile</span>
+        </div>
+      </div>
+      <div class="detail-price-box">
+        <div class="detail-main-price" id="detail-price-text">$0</div>
+        
+      </div>
+    </header>
+
+    <!-- Bento Gallery -->
+    <section class="container">
+      <div class="bento-gallery" id="bento-gallery">
+        <div class="gallery-main" id="gallery-main-item">
+          <img src="" alt="Imagen principal de la parcela" class="gallery-img" id="gallery-main-img">
+        </div>
+        <div class="gallery-sidebar">
+          <div class="gallery-item" id="gallery-sub-item-1">
+            <img src="" alt="Detalle de la parcela" class="gallery-img" id="gallery-sub-img-1">
+          </div>
+          <div class="gallery-item" id="gallery-sub-item-2">
+            <img src="" alt="Paisaje de la parcela" class="gallery-img" id="gallery-sub-img-2">
+          </div>
+        </div>
+        <button class="gallery-btn-all" id="gallery-view-all-btn">
+          <i data-lucide="images"></i> Ver todas las fotos (<span id="gallery-count-text">0</span>)
+        </button>
+      </div>
+    </section>
+
+    <!-- Detalle / Ficha técnica de la propiedad -->
+    <main class="container listing-layout">
+      
+      <!-- Columna Izquierda (Contenidos principales) -->
+      <div class="listing-left">
+        
+        <!-- Ficha Técnica Rápida -->
+        <div class="specs-strip">
+          <div class="spec-card">
+            <i data-lucide="expand"></i>
+            <h4>Superficie</h4>
+            <p id="spec-size-text">0 m²</p>
+          </div>
+          <div class="spec-card">
+            <i data-lucide="file-text"></i>
+            <h4>Escritura</h4>
+            <p id="spec-rol-text">Rol Propio</p>
+          </div>
+          <div class="spec-card">
+            <i data-lucide="zap"></i>
+            <h4>Fact. Luz</h4>
+            <p id="spec-luz-text">Pendiente</p>
+          </div>
+          <div class="spec-card">
+            <i data-lucide="droplet"></i>
+            <h4>Fact. Agua</h4>
+            <p id="spec-agua-text">Pendiente</p>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="section-box">
+          <h2><i data-lucide="info"></i> Descripción de la Propiedad</h2>
+          <p id="detail-desc-text" style="white-space: pre-line; margin-top: 12px;">
+            Cargando descripción...
+          </p>
+        </div>
+
+        <!-- Atributos y Características Checklist -->
+        <div class="section-box">
+          <h2><i data-lucide="check-square"></i> Atributos y Conectividad</h2>
+          <div class="amenities-grid" id="amenities-container">
+            <!-- Items dinámicos inyectados por JS -->
+          </div>
+        </div>
+
+        <!-- Ubicación en Mapa -->
+        <div class="section-box">
+          <h2><i data-lucide="map"></i> Ubicación Geográfica</h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">
+            Terreno ubicado en coordenadas geográficas reales. Puedes verificar el relieve y el acceso haciendo clic para abrir las indicaciones.
+          </p>
+          
+          <div class="detail-map-card">
+            <div class="detail-map-header">
+              <div>
+                <h4>Mapa referencial de ubicación</h4>
+                <p id="coordinates-text">Lat: 0.00 | Lng: 0.00</p>
+              </div>
+              <span class="detail-map-pill">Ubicación aproximada</span>
+            </div>
+
+            <div id="detail-parcela-map" class="detail-parcela-map" aria-label="Mapa de ubicación aproximada de la parcela"></div>
+
+            <p class="detail-map-note">
+              El punto muestra una referencia de ubicación para orientar al comprador. Para llegar al terreno, usa Google Maps o Waze y confirma siempre con el asesor antes de la visita.
+            </p>
+            
+            <div class="detail-map-actions">
+              <a href="#" id="google-maps-btn" target="_blank" class="nav-contact-btn detail-map-btn detail-map-google">
+                <i data-lucide="map"></i> Ver en Google Maps
+              </a>
+              <a href="#" id="waze-btn" target="_blank" class="nav-contact-btn detail-map-btn detail-map-waze">
+                <i data-lucide="external-link"></i> Abrir en Waze
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Columna Derecha (Sidebar Fijo con Cotización y Contacto) -->
+      <aside class="listing-right">
+        <div class="sidebar-card">
+          <div class="sidebar-agent">
+            <img src="image/juan_fco_asesor.webp" alt="Asesor de Ventas" class="agent-avatar">
+            <div class="agent-info">
+              <h3>Juan Fco Fernández </h3>
+              <p>Asesor Inmobiliario</p>
+            </div>
+          </div>
+
+          <div>
+            <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;">Valor Terreno</span>
+            <div class="sidebar-price" id="sidebar-price-text">$0</div>
+          </div>
+
+          <div id="payment-simulator" class="payment-simulator" style="display:none;">
+            <h4>Simulador facilidad de pago</h4>
+            <p>Pie mínimo 50% del valor. Puedes subir el pie, no bajarlo.</p>
+            <label>Pie inicial <input type="range" id="pay-down" min="50" max="100" value="50" step="1"></label>
+            <div class="pay-row"><span id="pay-down-text"></span><strong id="pay-down-value"></strong></div>
+            <label>Cuotas <input type="number" id="pay-installments" min="1" value="12"></label>
+            <div class="pay-alert" id="pay-alert" style="display:none;"></div>
+            <div class="pay-total" id="pay-result"></div>
+          </div>
+
+          <!-- Botón de Acción Especial: Volver a cotizar con casa -->
+          <a href="#" id="sidebar-quote-project-btn" class="btn-primary-submit" style="background: var(--secondary); text-decoration: none;">
+            <i data-lucide="calculator"></i> Cotizar con Casa Prefabricada
+          </a>
+
+          <!-- Botón de WhatsApp -->
+          <a href="#" id="sidebar-whatsapp-btn" target="_blank" class="btn-whatsapp-quote" style="text-decoration: none; padding: 14px;">
+            <i data-lucide="message-circle"></i> Preguntar por WhatsApp
+          </a>
+
+          <button type="button" id="detail-visit-btn" class="btn-primary-submit btn-visit-clear">
+            <i data-lucide="calendar-days"></i> Agendar visita
+          </button>
+
+          <div style="border-top: 1px solid var(--border-color); padding-top: 24px; margin-top: 8px;">
+            <h4 style="font-weight: 700; color: var(--primary); margin-bottom: 16px; font-size: 0.95rem;">Solicitar Más Información</h4>
+            
+            <form class="contact-form" id="detail-contact-form">
+              <div class="form-group">
+                <input type="text" id="contact-name" placeholder="Tu Nombre Completo" required>
+              </div>
+              <div class="form-group">
+                <input type="email" id="contact-email" placeholder="Tu Correo Electrónico" required>
+              </div>
+              <div class="form-group">
+                <input type="tel" id="contact-phone" placeholder="Tu Teléfono (ej: +569...)" required>
+              </div>
+              <div class="form-group">
+                <textarea id="contact-message" rows="3" placeholder="Hola, me interesa este terreno y me gustaría recibir asesoría." required></textarea>
+              </div>
+              
+              <button type="submit" class="btn-primary-submit" id="contact-submit-btn">
+                <i data-lucide="send"></i> Enviar Correo
+              </button>
+            </form>
+          </div>
+        </div>
+      </aside>
+
+    </main>
+  </div>
+
+
+
+  <!-- Evaluación automática y comentarios -->
+  <section class="container parcela-trust-section" id="evaluacion-parcela">
+    <div class="rating-panel">
+      <div class="rating-copy">
+        <span class="eyebrow-rating">Evaluación de la comunidad</span>
+        <h2>¿Qué te parece esta parcela?</h2>
+        <p>La puntuación parte en 5 estrellas y los visitantes pueden aportar su evaluación para ayudar a otros interesados a comparar alternativas.</p>
+        <div class="rating-score-box">
+          <div class="rating-stars" id="rating-stars-display">★★★★★</div>
+          <strong id="rating-average-text">5,0 / 5</strong>
+          <span id="rating-count-text">Sin votos aún</span>
+        </div>
+      </div>
+      <form class="rating-form" id="rating-form">
+        <label>Puntuación</label>
+        <div class="rating-input-stars" id="rating-input-stars" aria-label="Puntuar parcela">
+          <button type="button" data-rating="1">★</button>
+          <button type="button" data-rating="2">★</button>
+          <button type="button" data-rating="3">★</button>
+          <button type="button" data-rating="4">★</button>
+          <button type="button" data-rating="5" class="active">★</button>
+        </div>
+        <input type="hidden" id="rating-value" value="5">
+        <button type="submit" class="btn-primary-submit">Guardar puntuación</button>
+      </form>
+    </div>
+
+    <div class="comments-panel">
+      <div class="comments-head">
+        <h2><i data-lucide="message-square"></i> Preguntas y comentarios</h2>
+        <p>Deja tu consulta sobre esta parcela. Para responderte, necesitamos tu nombre y un correo o teléfono.</p>
+      </div>
+      <form class="comment-form" id="comment-form">
+        <div class="comment-grid">
+          <input type="text" id="comment-name" placeholder="Nombre completo" required>
+          <input type="email" id="comment-email" placeholder="Correo electrónico">
+          <input type="tel" id="comment-phone" placeholder="Teléfono">
+        </div>
+        <textarea id="comment-message" rows="4" placeholder="Escribe tu pregunta o comentario sobre esta parcela" required></textarea>
+        <p class="privacy-note"><i data-lucide="lock"></i> Tus datos de contacto quedarán privados en nuestro sistema interno. En el sitio solo se podrá mostrar el comentario o pregunta si el equipo lo aprueba.</p>
+        <button type="submit" class="btn-primary-submit">Enviar comentario</button>
+      </form>
+      <div class="public-comments" id="public-comments"></div>
+    </div>
+  </section>
+
+  <!-- Footer Info -->
+  <section class="section-footer-info" id="quienes-somos" style="background: var(--primary);">
+    <div class="container footer-layout">
+      <div class="footer-column">
+        <h2 style="color: var(--yellow);">Quiénes Somos</h2>
+        <p>En <strong>Tu Parcela Lista</strong> somos especialistas en ayudarte a concretar tu sueño de vivir en el campo o tener tu refugio vacacional en el sur de Chile. Ofrecemos parcelas seleccionadas que cuentan con Rol Propio inscritos en el Conservador de Bienes Raíces, factibilidad real de servicios y una excelente conectividad.</p>
+      </div>
+      <div class="footer-column" id="contacto">
+        <h2 style="color: var(--yellow);">Contacto e Información</h2>
+        <ul class="contact-info-list">
+          <li>
+            <i data-lucide="map-pin"></i>
+            <span>Oficina Central: Concepción, Región del Biobío, Chile</span>
+          </li>
+          <li>
+            <i data-lucide="phone"></i>
+            <span>+56 9 88508361</span>
+          </li>
+          <li>
+            <i data-lucide="mail"></i>
+            <span>tuparcelalista@gmail.com</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="main-footer" style="background: #002244;">
+    <div class="container footer-inner">
+      <span>© 2026 Tu Parcela Lista - Todos los derechos reservados.</span>
+      <span>Diseño y tecnología de primera categoría.</span>
+      <span><a class="footer-link-strong" href="politica-privacidad.html">Privacidad</a> · <a class="footer-link-strong" href="terminos.html">Términos</a></span>
+    </div>
+  </footer>
+
+  <!-- Lightbox Modal para ver imágenes -->
+  <div class="lightbox" id="gallery-lightbox">
+    <button class="lightbox-close" id="lightbox-close-btn"><i data-lucide="x"></i></button>
+    <button class="lightbox-arrow lightbox-arrow-left" id="lightbox-prev-btn"><i data-lucide="chevron-left"></i></button>
+    <div class="lightbox-content">
+      <img alt="Ampliación de la galería" class="lightbox-img" id="lightbox-main-img">
+    </div>
+    <button class="lightbox-arrow lightbox-arrow-right" id="lightbox-next-btn"><i data-lucide="chevron-right"></i></button>
+  </div>
+
+  <!-- Carga del Modelo de datos -->
+  <script src="parcelas.js?v=20260710-1"></script>
+  <script src="tpl-analytics.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Lógica Dinámica de la Ficha -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Extraer ID del terreno de la URL
+      const params = new URLSearchParams(window.location.search);
+      const parcelaId = params.get("id");
+
+      // Buscar parcela
+      const p = parcelas.find(item => item.id === parcelaId);
+
+      const DOM = {
+        error: document.getElementById("error-container"),
+        content: document.getElementById("detail-content-wrapper"),
+        breadcrumb: document.getElementById("breadcrumb-active"),
+        title: document.getElementById("detail-title-text"),
+        location: document.getElementById("detail-location-text"),
+        price: document.getElementById("detail-price-text"),
+        
+
+
+        
+        // Bento images
+    // Bento images
+galleryMainItem: document.getElementById("gallery-main-item"),
+mainImg: document.getElementById("gallery-main-img"),
+subImg1: document.getElementById("gallery-sub-img-1"),
+subImg2: document.getElementById("gallery-sub-img-2"),
+subItem1: document.getElementById("gallery-sub-item-1"),
+subItem2: document.getElementById("gallery-sub-item-2"),
+galleryCount: document.getElementById("gallery-count-text"),
+viewAllBtn: document.getElementById("gallery-view-all-btn"),
+        
+        // Specs
+        specSize: document.getElementById("spec-size-text"),
+        specRol: document.getElementById("spec-rol-text"),
+        specLuz: document.getElementById("spec-luz-text"),
+        specAgua: document.getElementById("spec-agua-text"),
+        
+        // Descrip e info
+        desc: document.getElementById("detail-desc-text"),
+        amenities: document.getElementById("amenities-container"),
+        coordinates: document.getElementById("coordinates-text"),
+        googleMapsBtn: document.getElementById("google-maps-btn"),
+        wazeBtn: document.getElementById("waze-btn"),
+        detailMap: document.getElementById("detail-parcela-map"),
+        
+        // Sidebar
+        sidebarPrice: document.getElementById("sidebar-price-text"),
+        quoteProjectBtn: document.getElementById("sidebar-quote-project-btn"),
+        whatsappBtn: document.getElementById("sidebar-whatsapp-btn"),
+        contactForm: document.getElementById("detail-contact-form"),
+        
+        // Lightbox
+        lightbox: document.getElementById("gallery-lightbox"),
+        lightboxClose: document.getElementById("lightbox-close-btn"),
+        lightboxPrev: document.getElementById("lightbox-prev-btn"),
+        lightboxNext: document.getElementById("lightbox-next-btn"),
+        lightboxMainImg: document.getElementById("lightbox-main-img"),
+
+        // Menú móvil
+        navToggle: document.getElementById("nav-toggle"),
+        navLinks: document.getElementById("nav-links")
+      };
+
+      // Control del menú móvil: permanece cerrado hasta que el usuario lo abre.
+      if (DOM.navToggle && DOM.navLinks) {
+        DOM.navToggle.setAttribute("aria-expanded", "false");
+        DOM.navToggle.addEventListener("click", () => {
+          const isOpen = DOM.navLinks.classList.toggle("active");
+          DOM.navToggle.setAttribute("aria-expanded", String(isOpen));
+          document.body.classList.toggle("mobile-menu-open", isOpen);
+        });
+
+        DOM.navLinks.querySelectorAll("a").forEach(link => {
+          link.addEventListener("click", () => {
+            DOM.navLinks.classList.remove("active");
+            DOM.navToggle.setAttribute("aria-expanded", "false");
+            document.body.classList.remove("mobile-menu-open");
+          });
+        });
+      }
+
+      if (!p) {
+        // Mostrar contenedor de error y ocultar contenido
+        DOM.error.style.display = "block";
+        DOM.content.style.display = "none";
+        lucide.createIcons();
+        return;
+      }
+
+      // Si el usuario viene desde cotizador.html para cambiar parcela,
+      // mostramos una invitación clara para reemplazar la parcela actual y volver al cotizador.
+      const vieneDesdeCotizador = params.get("from") === "cotizador" || params.get("fromCotizador") === "1" || localStorage.getItem("tplReturnToCotizador") === "parcela" || localStorage.getItem("tplReturnToCotizadorDesign") === "1";
+      const agregarParcelaAlProyecto = () => {
+        localStorage.setItem("selectedParcelaId", p.id);
+        localStorage.setItem("selectedParcelaData", JSON.stringify(p));
+        localStorage.removeItem("tplReturnToCotizadorDesign");
+        localStorage.removeItem("tplReturnToCotizador");
+        // Volvemos al cotizador principal del index. app.js leerá localStorage y actualizará el proyecto.
+        window.location.href = "index.html#cotizador-section";
+      };
+
+      // Botón permanente sobre la foto principal para integrar ficha y cotizador.
+      const gallery = document.getElementById("bento-gallery");
+      if (gallery && !document.getElementById("detail-add-parcela-project")) {
+        gallery.insertAdjacentHTML("beforeend", `
+          <button type="button" class="detail-add-parcela-project" id="detail-add-parcela-project">
+            ➕ Agregar parcela al proyecto
+          </button>`);
+        document.getElementById("detail-add-parcela-project")?.addEventListener("click", (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          agregarParcelaAlProyecto();
+        });
+      }
+
+      if (vieneDesdeCotizador) {
+        const helper = document.createElement("div");
+        helper.className = "cotizador-parcela-helper";
+        helper.innerHTML = `
+          <div class="cotizador-parcela-helper-card">
+            <button class="cotizador-parcela-helper-close" type="button" aria-label="Cerrar">×</button>
+            <span>Estás cambiando la parcela del cotizador</span>
+            <h3>¿Quieres agregar esta parcela a tu proyecto?</h3>
+            <p>Si confirmas, esta parcela reemplazará la anterior y volverás al cotizador principal.</p>
+            <div class="cotizador-parcela-helper-actions">
+              <button type="button" id="helper-add-parcela">Sí, agregar esta parcela</button>
+              <a href="index.html#parcelas-anchor">Ver otras parcelas</a>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(helper);
+        helper.querySelector("#helper-add-parcela")?.addEventListener("click", agregarParcelaAlProyecto);
+        helper.querySelector(".cotizador-parcela-helper-close")?.addEventListener("click", () => helper.remove());
+      }
+
+      // 2. Poblar datos del DOM
+      document.title = `${p.nombre} | Detalle Terreno | Tu Parcela Lista`;
+      const canonicalUrl = `https://parcelalista.cl/parcela/${encodeURIComponent(p.id)}`;
+      const canonical = document.querySelector('link[rel="canonical"]');
+      const metaDescription = document.querySelector('meta[name="description"]');
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      const ogDescription = document.querySelector('meta[property="og:description"]');
+      const ogUrl = document.querySelector('meta[property="og:url"]');
+      const shareDescription = `${p.nombre} en ${p.comuna || "Biobío"}. Revisa precio, superficie, ubicación y opciones para agregar una casa.`;
+      if (canonical) canonical.href = canonicalUrl;
+      if (metaDescription) metaDescription.content = shareDescription;
+      if (ogTitle) ogTitle.content = `${p.nombre} | Tu Parcela Lista`;
+      if (ogDescription) ogDescription.content = shareDescription;
+      if (ogUrl) ogUrl.content = canonicalUrl;
+      DOM.breadcrumb.innerText = p.nombre;
+      DOM.title.innerText = p.nombre;
+      DOM.location.innerText = `${p.comuna || "Biobío"}, Región del Biobío, Chile`;
+      DOM.price.innerText = p.precio;
+      DOM.sidebarPrice.innerText = p.precio;
+      document.querySelector(".detail-header-layout")?.classList.add("parcela-detail-hero-upgrade");
+
+      DOM.specSize.innerText = `${p.tamano} m²`;
+      DOM.specRol.innerText = p.rol === "si" ? "Rol Propio" : "Rol en Trámite";
+      DOM.specLuz.innerText = p.luz === "si" ? "Luz Factible" : "No disponible";
+      DOM.specAgua.innerText = "Factibilidad de agua";
+      DOM.desc.innerText = p.descripcion;
+
+      // Coordenadas y Mapas
+      DOM.coordinates.innerText = `Coordenadas: Lat ${p.lat} | Lng ${p.lng}`;
+      DOM.googleMapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+      DOM.wazeBtn.href = `https://waze.com/ul?ll=${p.lat},${p.lng}&navigate=yes`;
+
+      // Mapa visible en la ficha de parcela: referencia aproximada con localidades y caminos.
+      if (DOM.detailMap && window.L && p.lat && p.lng) {
+        const lat = Number(p.lat);
+        const lng = Number(p.lng);
+        const detailMap = L.map(DOM.detailMap, {
+          scrollWheelZoom: false,
+          zoomControl: true
+        }).setView([lat, lng], 13);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap"
+        }).addTo(detailMap);
+
+        L.circle([lat, lng], {
+          radius: 650,
+          color: "#003f7a",
+          weight: 2,
+          fillColor: "#00828a",
+          fillOpacity: 0.18
+        }).addTo(detailMap);
+
+        L.marker([lat, lng]).addTo(detailMap)
+          .bindPopup(`<strong>${p.nombre}</strong><br>Ubicación aproximada`)
+          .openPopup();
+
+        setTimeout(() => detailMap.invalidateSize(), 250);
+      }
+
+      // Enlace para volver e iniciar cotización en index.html preseleccionando este terreno
+      DOM.quoteProjectBtn.href = `index.html?selectParcela=${p.id}#casas-section`;
+
+      // WhatsApp prellenado
+      const whatsappMsg = `Hola Tu Parcela Lista! Me gustaría solicitar más información de la parcela:\n\n` +
+                          `📍 *Terreno:* ${p.nombre}\n` +
+                          `🔑 *ID:* ${p.id}\n` +
+                          `💵 *Valor:* ${p.precio}\n\n` +
+                          `¿Sigue disponible para coordinar una visita?`;
+      DOM.whatsappBtn.href = `https://api.whatsapp.com/send?phone=56988508361&text=${encodeURIComponent(whatsappMsg)}`;
+
+      // 3. Checklist de Atributos
+      const features = [
+        { name: "Rol Propio CBR", active: p.rol === "si" },
+        { name: "Factibilidad de Agua", active: p.agua === "si" },
+        { name: "Factibilidad de Luz", active: p.luz === "si" },
+        { name: "Naturaleza Nativa", active: p.naturaleza === "si" },
+        { name: "Cercano a Servicios", active: p.servicios === "si" },
+        { name: "Apto para Construcción", active: true }
+      ];
+
+      DOM.amenities.innerHTML = "";
+      features.forEach(feat => {
+        const itemHtml = `
+          <div class="amenity-item ${feat.active ? "active" : "inactive"}">
+            <i data-lucide="${feat.active ? "check-circle-2" : "x-circle"}"></i>
+            <span>${feat.name}</span>
+          </div>
+        `;
+        DOM.amenities.insertAdjacentHTML("beforeend", itemHtml);
+      });
+
+      // 4. Bento Gallery e Imagenes
+      const photos = p.imagenes && p.imagenes.length > 0 ? p.imagenes : [p.imagen];
+      DOM.galleryCount.innerText = photos.length;
+      
+      // Imagen Principal
+      DOM.mainImg.src = photos[0];
+      
+      // Imagenes Sub
+      if (photos.length > 1) {
+        DOM.subImg1.src = photos[1];
+        DOM.subItem1.style.display = "block";
+      } else {
+        DOM.subItem1.style.display = "none";
+      }
+
+      if (photos.length > 2) {
+        DOM.subImg2.src = photos[2];
+        DOM.subItem2.style.display = "block";
+      } else {
+        DOM.subItem2.style.display = "none";
+      }
+
+      // Ocultar barra lateral bento si no hay fotos extras
+      if (photos.length <= 1) {
+        document.querySelector(".gallery-sidebar").style.display = "none";
+        document.getElementById("bento-gallery").style.gridTemplateColumns = "1fr";
+      }
+
+      // 5. Lightbox Interactiva para carrusel modal
+
+      
+let lightboxIndex = 0;
+
+const updateLightboxImage = () => {
+  DOM.lightboxMainImg.src = photos[lightboxIndex];
+};
+
+const openLightbox = (index) => {
+  lightboxIndex = index;
+  updateLightboxImage();
+  DOM.lightbox.classList.add("active");
+};
+
+// Abrir desde botón "ver todas"
+if (DOM.viewAllBtn) {
+  DOM.viewAllBtn.addEventListener("click", () => openLightbox(0));
+}
+
+// Abrir desde imagen principal
+if (DOM.galleryMainItem) {
+  DOM.galleryMainItem.addEventListener("click", () => openLightbox(0));
+}
+
+// Abrir desde miniaturas
+if (photos.length > 1 && DOM.subItem1) {
+  DOM.subItem1.addEventListener("click", () => openLightbox(1));
+}
+
+if (photos.length > 2 && DOM.subItem2) {
+  DOM.subItem2.addEventListener("click", () => openLightbox(2));
+}
+
+// Cerrar modal
+if (DOM.lightboxClose) {
+  DOM.lightboxClose.addEventListener("click", (e) => {
+    e.stopPropagation();
+    DOM.lightbox.classList.remove("active");
+  });
+}
+
+if (DOM.lightboxPrev) {
+  DOM.lightboxPrev.addEventListener("click", (e) => {
+    e.stopPropagation();
+    console.log("CLICK PREV");
+    lightboxIndex = lightboxIndex === 0 ? photos.length - 1 : lightboxIndex - 1;
+    updateLightboxImage();
+  });
+}
+
+if (DOM.lightboxNext) {
+  DOM.lightboxNext.addEventListener("click", (e) => {
+    e.stopPropagation();
+    console.log("CLICK NEXT");
+    lightboxIndex = lightboxIndex === photos.length - 1 ? 0 : lightboxIndex + 1;
+    updateLightboxImage();
+  });
+}
+
+// Cerrar al hacer clic fuera de la imagen
+if (DOM.lightbox) {
+  DOM.lightbox.addEventListener("click", (e) => {
+    if (e.target === DOM.lightbox) {
+      DOM.lightbox.classList.remove("active");
+    }
+  });
+}
+
+// Cerrar con tecla ESC
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    DOM.lightbox.classList.remove("active");
+  }
+});
+
+      // 6. Enviar Formulario de Contacto
+      DOM.contactForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("contact-name").value;
+        const email = document.getElementById("contact-email").value;
+        const phone = document.getElementById("contact-phone").value;
+        const message = document.getElementById("contact-message").value;
+        const subject = encodeURIComponent(`Consulta parcela ${p.nombre}`);
+        const body = encodeURIComponent(`Hola Tu Parcela Lista, solicito información.\n\nParcela: ${p.nombre}\nID: ${p.id}\nPrecio: ${p.precio}\n\nNombre: ${name}\nCorreo: ${email}\nTeléfono: ${phone}\nMensaje: ${message}`);
+        window.TPLCRM?.addLead?.({ parcelaId: p.id, parcelaNombre: p.nombre, name, email, phone, message, type:'Formulario contacto' });
+        window.location.href = `mailto:tuparcelalista@gmail.com?cc=${encodeURIComponent(email)}&subject=${subject}&body=${body}`;
+      });
+
+      function initPaymentSimulator(){
+        const box = document.getElementById("payment-simulator");
+        if (!box || !(String(p.facilidad || "").toLowerCase() === "si" || p.facilidad === true)) return;
+        box.style.display = "block";
+        const total = Number(String(p.precio || "").replace(/[^0-9]/g,"")) || 0;
+        const down = document.getElementById("pay-down");
+        const cuotas = document.getElementById("pay-installments");
+        const downText = document.getElementById("pay-down-text");
+        const downValue = document.getElementById("pay-down-value");
+        const alert = document.getElementById("pay-alert");
+        const result = document.getElementById("pay-result");
+        const fmt = n => new Intl.NumberFormat("es-CL",{style:"currency",currency:"CLP",maximumFractionDigits:0}).format(n||0);
+        function calc(){
+          const pct = Math.max(50, Number(down.value || 50));
+          down.value = pct;
+          const n = Math.max(1, Number(cuotas.value || 1));
+          cuotas.value = n;
+          const yearsExtra = n > 12 ? Math.ceil((n - 12) / 12) : 0;
+          const recargo = yearsExtra * 1000000;
+          const pie = Math.round(total * pct / 100);
+          const saldo = Math.max(0, total - pie + recargo);
+          const cuota = Math.ceil(saldo / n);
+          downText.textContent = `Pie ${pct}%`;
+          downValue.textContent = fmt(pie);
+          alert.style.display = recargo ? "block" : "none";
+          alert.textContent = recargo ? `Al superar 12 cuotas se suma ${fmt(1000000)} por año. Recargo aplicado: ${fmt(recargo)}.` : "";
+          result.innerHTML = `<span>Saldo a financiar: <b>${fmt(saldo)}</b></span><strong>${n} cuotas de ${fmt(cuota)}</strong>`;
+        }
+        down.addEventListener("input", calc); cuotas.addEventListener("input", calc); calc();
+      }
+      initPaymentSimulator();
+
+      const detailVisitBtn = document.getElementById("detail-visit-btn");
+      detailVisitBtn?.addEventListener("click", () => {
+        let modal = document.getElementById("visit-modal");
+        if (!modal) {
+          document.body.insertAdjacentHTML("beforeend", `<div id="visit-modal" class="visit-modal"><div class="visit-card"><button type="button" class="visit-close">×</button><h3>Agendar visita</h3><p>Déjanos tus datos y se abrirá un correo listo para enviar.</p><input id="visit-name" placeholder="Nombre completo"><input id="visit-phone" placeholder="Teléfono"><input id="visit-email" placeholder="Correo"><input id="visit-date" placeholder="Fecha preferida"><button id="visit-send" class="btn-primary-submit">Enviar solicitud</button></div></div>`);
+          modal = document.getElementById("visit-modal");
+          modal.querySelector(".visit-close").addEventListener("click",()=>modal.classList.remove("show"));
+          modal.querySelector("#visit-send").addEventListener("click",()=>{
+            const name = document.getElementById("visit-name").value; if(!name.trim()) return;
+            const phone = document.getElementById("visit-phone").value;
+            const email = document.getElementById("visit-email").value;
+            const date = document.getElementById("visit-date").value;
+            const subject = encodeURIComponent(`Agendar visita parcela ${p.nombre}`);
+            const body = encodeURIComponent(`Hola, quiero agendar una visita.\n\nParcela: ${p.nombre}\nComuna: ${p.comuna || ""}\nPrecio: ${p.precio}\n\nNombre: ${name}\nTeléfono: ${phone}\nCorreo: ${email}\nFecha preferida: ${date}`);
+            window.TPLCRM?.addLead?.({ parcelaId: p.id, parcelaNombre: p.nombre, name, email, phone, message:`Fecha preferida: ${date}`, type:'Agendar visita', visitaFecha: date });
+            window.location.href = `mailto:tuparcelalista@gmail.com?cc=${encodeURIComponent(email)}&subject=${subject}&body=${body}`;
+          });
+        }
+        modal.classList.add("show");
+      });
+
+
+
+      function initRatingAndComments(){
+        const parcelaIdActual = String(p.id);
+        const starsDisplay = document.getElementById('rating-stars-display');
+        const avgText = document.getElementById('rating-average-text');
+        const countText = document.getElementById('rating-count-text');
+        const ratingValue = document.getElementById('rating-value');
+        const starButtons = [...document.querySelectorAll('#rating-input-stars button')];
+        const publicComments = document.getElementById('public-comments');
+        const formatAvg = n => Number(n || 5).toLocaleString('es-CL', { minimumFractionDigits:1, maximumFractionDigits:1 });
+        function paintInput(value){
+          starButtons.forEach(btn => btn.classList.toggle('active', Number(btn.dataset.rating) <= value));
+        }
+        function refresh(){
+          const summary = window.TPLCRM?.ratingSummary(parcelaIdActual) || { avg:5, count:0 };
+          const rounded = Math.round(summary.avg);
+          if(starsDisplay) starsDisplay.textContent = '★★★★★'.slice(0, rounded) + '☆☆☆☆☆'.slice(0, 5-rounded);
+          if(avgText) avgText.textContent = `${formatAvg(summary.avg)} / 5`;
+          if(countText) countText.textContent = summary.count ? `${summary.count} evaluación(es)` : 'Sin votos aún';
+          const data = window.TPLCRM?.read?.() || {};
+          const approved = (data.comments || []).filter(c => c.parcelaId === parcelaIdActual && c.status === 'Aprobado').slice(0, 6);
+          if(publicComments) {
+            publicComments.innerHTML = approved.length ? approved.map(c => `<article><strong>${c.name}</strong><p>${c.message}</p></article>`).join('') : '<p class="empty-comments">Aún no hay comentarios públicos aprobados para esta parcela.</p>';
+          }
+        }
+        starButtons.forEach(btn => btn.addEventListener('click', () => {
+          const value = Number(btn.dataset.rating || 5);
+          ratingValue.value = value;
+          paintInput(value);
+        }));
+        document.getElementById('rating-form')?.addEventListener('submit', e => {
+          e.preventDefault();
+          window.TPLCRM?.rate?.(parcelaIdActual, Number(ratingValue.value || 5));
+          refresh();
+          alert('Gracias por evaluar esta parcela.');
+        });
+        document.getElementById('comment-form')?.addEventListener('submit', e => {
+          e.preventDefault();
+          const name = document.getElementById('comment-name').value.trim();
+          const email = document.getElementById('comment-email').value.trim();
+          const phone = document.getElementById('comment-phone').value.trim();
+          const message = document.getElementById('comment-message').value.trim();
+          if(!name || !message || (!email && !phone)) { alert('Debes ingresar tu nombre y al menos correo o teléfono.'); return; }
+          window.TPLCRM?.addComment?.({ parcelaId: parcelaIdActual, parcelaNombre:p.nombre, name, email, phone, message });
+          window.TPLCRM?.addLead?.({ parcelaId: parcelaIdActual, parcelaNombre:p.nombre, name, email, phone, message, type:'Comentario / pregunta' });
+          e.target.reset();
+          alert('Comentario recibido. Tus datos quedarán privados en el sistema interno.');
+          refresh();
+        });
+        paintInput(5);
+        refresh();
+      }
+      initRatingAndComments();
+
+      // Crear Iconos
+      lucide.createIcons();
+    });
+  </script>
+  <script src="agente/agente.js"></script>
+<script src="js/site-polish.js"></script>
+</body>
+</html>

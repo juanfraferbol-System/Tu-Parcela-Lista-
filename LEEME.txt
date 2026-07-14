@@ -1,0 +1,11 @@
+CORRECCION COMPATIBILIDAD DE IMAGENES - TU PARCELA LISTA
+
+1. Copia estos archivos sobre los archivos de tu proyecto, conservando las carpetas.
+2. No se cambiaron los nombres de tus carpetas existentes.
+3. Se corrigieron rutas sensibles a mayusculas/minusculas, se agregaron imagenes de respaldo y se normalizaron dos nombres problemáticos de Innova.
+4. Se agrego versionado de cache a style.css, app.js y parcelas.js.
+5. Luego ejecuta:
+   git add .
+   git commit -m "Corregir imagenes y compatibilidad entre navegadores"
+   git push origin main
+6. Espera el despliegue y recarga con Ctrl + Shift + R.

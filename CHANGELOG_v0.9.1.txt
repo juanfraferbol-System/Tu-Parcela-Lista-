@@ -1,0 +1,36 @@
+Tu Parcela Lista - v0.9.1 Estabilidad
+
+Archivos modificados:
+- app.js
+- style.css
+- parcela.html
+- parcela.css
+
+Cambios principales:
+1. Corrección del flujo de presupuesto del botón Parcela.
+   - Muestra 5 alternativas cercanas.
+   - Fuerza vista de lista.
+   - Cierra mapa si estaba abierto.
+   - Hace scroll después del render.
+
+2. Flujo Cambiar Parcela.
+   - Al cambiar parcela, las tarjetas muestran Agregar parcela.
+   - Al agregar, se actualiza el proyecto y vuelve al cotizador.
+   - Más detalles abre parcela.html con retorno al proyecto.
+
+3. Flujo Cambiar Casa.
+   - Al cambiar casa, las tarjetas muestran Agregar esta casa.
+   - Al seleccionar, vuelve al cotizador con el proyecto actualizado.
+
+4. Integración parcela.html.
+   - Botón Agregar parcela al proyecto sobre la galería.
+   - Si viene desde cotizador o modo cambio, vuelve al cotizador del index.
+
+5. Barra persistente del proyecto.
+   - Muestra parcela, casa y total estimado.
+   - Permite cambiar parcela/casa desde cualquier punto del index.
+
+6. Mejoras visuales.
+   - Resalte al primer resultado.
+   - Estados seleccionados más claros.
+   - Botones verdes de agregar.

@@ -1,0 +1,2 @@
+Fix: Buscar parcelas por presupuesto ahora abre y renderiza independiente del flujo Con Casa.
+Reemplazar index.html, app.js y style.css.

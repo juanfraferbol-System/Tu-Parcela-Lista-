@@ -1,0 +1,55 @@
+/* Tu Parcela Lista v4 — sistema visual minimalista */
+:root{
+  --tpl-ink:#102033;
+  --tpl-muted:#667085;
+  --tpl-line:#e7ebef;
+  --tpl-surface:#ffffff;
+  --tpl-soft:#f6f8f9;
+  --tpl-brand:#075f63;
+  --tpl-brand-2:#0b7f83;
+  --tpl-accent:#d7a900;
+  --tpl-radius:18px;
+  --tpl-shadow:0 12px 32px rgba(16,32,51,.08);
+}
+html{background:var(--tpl-soft)}
+body{background:var(--tpl-soft);color:var(--tpl-ink);font-family:Outfit,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.container{max-width:1240px;padding-inline:clamp(18px,3vw,34px)}
+.navbar{height:72px;background:rgba(255,255,255,.94);border-bottom:1px solid var(--tpl-line);box-shadow:none;backdrop-filter:blur(18px)}
+.brand-logo-img{max-height:48px;width:auto}
+.nav-links{gap:22px}.nav-links a{font-size:.92rem;font-weight:600;color:#344054}.nav-links a::after{display:none}.nav-links a:hover{color:var(--tpl-brand)}
+.nav-contact-btn{border-radius:999px;padding:10px 18px;background:var(--tpl-ink);box-shadow:none;font-size:.9rem}.nav-contact-btn:hover{background:var(--tpl-brand);transform:none;color:#fff}
+
+.hero-life{min-height:520px;padding:0;display:grid;align-items:end;background:#183a3b;overflow:hidden}
+.hero-life-collage{position:absolute;inset:0;display:grid;grid-template-columns:1.35fr .8fr .8fr;grid-template-rows:1fr 1fr;gap:3px;opacity:.92}
+.hero-life-panel{filter:saturate(.82) contrast(.96);background-position:center;background-size:cover}
+.hero-life-panel-1{grid-row:1/3}.hero-life-panel-4{grid-column:2/4}
+.hero-life-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,25,27,.88) 0%,rgba(6,25,27,.58) 46%,rgba(6,25,27,.15) 100%),linear-gradient(0deg,rgba(6,25,27,.7),transparent 60%)}
+.hero-life-content{position:relative;z-index:2;width:100%;padding-top:120px;padding-bottom:64px;text-align:left}
+.hero-life-kicker{display:inline-block;margin-bottom:14px;font-size:.72rem;letter-spacing:.18em;font-weight:800;color:#dfeeed}
+.hero-life h1{max-width:820px;margin:0;font-size:clamp(2.35rem,5vw,4.7rem);line-height:1.02;letter-spacing:-.045em;font-weight:700;color:#fff;text-shadow:none}
+.hero-life-content>p{max-width:650px;margin:22px 0 0;font-size:clamp(1rem,1.6vw,1.18rem);line-height:1.65;color:rgba(255,255,255,.82)}
+.hero-life-values{margin-top:32px;display:flex;gap:10px;flex-wrap:wrap}.hero-life-values span{min-width:155px;padding:11px 15px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px)}.hero-life-values b{font-size:.88rem;color:#fff}.hero-life-values small{display:none}
+
+.decision-flow{padding:42px 0 18px;background:var(--tpl-soft)}
+.decision-box{max-width:1040px;margin:auto;padding:0 22px;text-align:left;background:transparent;box-shadow:none;border:0}
+.decision-eyebrow{font-size:.7rem;letter-spacing:.16em;color:var(--tpl-brand);font-weight:800}.decision-box h2{margin:8px 0 5px;font-size:clamp(1.6rem,3vw,2.4rem);letter-spacing:-.03em;color:var(--tpl-ink)}.decision-intro{margin:0 0 22px;color:var(--tpl-muted)}
+.decision-buttons-clean{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.decision-option-card{min-height:0!important;padding:20px 22px!important;border-radius:var(--tpl-radius)!important;border:1px solid var(--tpl-line)!important;background:var(--tpl-surface)!important;color:var(--tpl-ink)!important;box-shadow:none!important;display:grid!important;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;text-align:left;overflow:hidden;transition:.2s ease}
+.decision-option-card:hover{transform:translateY(-2px)!important;border-color:#c7d5d5!important;box-shadow:var(--tpl-shadow)!important}.decision-card-glow{display:none}.decision-step{order:3;font-size:.75rem!important;color:#98a2b3!important;position:static!important}.decision-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#edf5f4;font-size:1.25rem}.decision-card-copy{display:grid;gap:4px}.decision-card-copy strong{font-size:1.12rem!important;color:var(--tpl-ink)!important}.decision-card-copy>span{font-size:.88rem!important;color:var(--tpl-muted)!important;line-height:1.35}.decision-card-copy em{font-size:.78rem!important;color:var(--tpl-brand)!important;font-style:normal;font-weight:700}
+
+.budget-box{max-width:760px;margin:18px auto 0;padding:22px;border:1px solid var(--tpl-line);border-radius:var(--tpl-radius);background:#fff;box-shadow:none}.budget-box input{border:1px solid #d8dee5;border-radius:12px}.budget-box button{border-radius:12px;background:var(--tpl-brand);box-shadow:none}
+.filter-section{margin-top:24px}.filter-card{background:#fff!important;border:1px solid var(--tpl-line)!important;border-radius:var(--tpl-radius)!important;box-shadow:none!important;padding:22px!important}.filter-card::before,.filter-card::after{display:none!important}.filter-card h2{font-family:Outfit,sans-serif!important;font-size:1.15rem!important;color:var(--tpl-ink)!important;margin-bottom:16px!important}.filter-btn{background:#fff!important;color:#475467!important;border:1px solid var(--tpl-line)!important;border-radius:999px!important;padding:9px 14px!important;box-shadow:none!important;font-size:.86rem!important}.filter-btn:hover,.filter-btn.active{background:#edf5f4!important;color:var(--tpl-brand)!important;border-color:#b9d1cf!important;transform:none!important}
+.section-title{margin:48px 0 22px;border:0;padding:0}.section-title h3{font-size:clamp(1.45rem,2.4vw,2rem);font-weight:700;letter-spacing:-.025em;color:var(--tpl-ink)}#results-count{background:#fff;border:1px solid var(--tpl-line);color:var(--tpl-muted);font-weight:600}
+.parcelas-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:22px!important}.parcela-card,.property-card{border:1px solid var(--tpl-line)!important;border-radius:var(--tpl-radius)!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important;transition:.2s ease!important}.parcela-card:hover,.property-card:hover{transform:translateY(-3px)!important;box-shadow:var(--tpl-shadow)!important;border-color:#d6dde3!important}.card-gallery-container{aspect-ratio:4/3;height:auto!important;background:#eef1f3}.card-gallery-container img{width:100%;height:100%;object-fit:cover}.card-body{padding:18px!important}.card-title{font-size:1.08rem!important;font-weight:700!important;color:var(--tpl-ink)!important}.card-price{font-size:1.35rem!important;color:var(--tpl-ink)!important}.card-description{color:var(--tpl-muted)!important;line-height:1.5!important}.card-actions{gap:9px!important}.btn-secondary-link,.btn-select-plot{border-radius:11px!important;padding:11px 13px!important;box-shadow:none!important}.btn-select-plot{background:var(--tpl-ink)!important}.btn-select-plot:hover{background:var(--tpl-brand)!important;transform:none!important}
+.section-casas{padding:76px 0;background:#f2f5f5!important}.casas-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.casa-card{border-radius:var(--tpl-radius)!important;border:1px solid var(--tpl-line)!important;box-shadow:none!important}.casa-card:hover{transform:translateY(-3px)!important;box-shadow:var(--tpl-shadow)!important}.casa-thumb{height:auto!important;aspect-ratio:4/3}.casa-body{padding:18px!important}.casa-title{font-size:1.08rem!important}.casa-price{background:none!important;padding:0!important;color:var(--tpl-ink)!important;font-size:1.25rem!important}
+
+/* Mapa, promociones y cotizador */
+.map-layout,.promo-card,.ready-project-card,.options-box,.selection-info-bar,.cotizacion-summary-card,.section-box,.sidebar-card,.rating-panel,.comments-panel{border:1px solid var(--tpl-line)!important;border-radius:var(--tpl-radius)!important;box-shadow:none!important;background:#fff!important}.promo-card:hover,.ready-project-card:hover{transform:translateY(-3px);box-shadow:var(--tpl-shadow)!important}.sticky-sidebar{top:88px}.summary-total-box{background:#edf5f4!important;border-left-color:var(--tpl-brand)!important}.btn-whatsapp-quote{border-radius:12px!important;box-shadow:none!important}.btn-activate-project{border-radius:12px!important;background:var(--tpl-ink)!important;box-shadow:none!important}.options-box{padding:clamp(20px,3vw,30px)!important}.fundacion-card-premium,.extra-card-premium{border-radius:14px!important;box-shadow:none!important}.main-footer{background:#12212c!important}
+
+/* Detalle de parcela */
+.detail-header-layout{padding-top:30px}.detail-title h1{letter-spacing:-.03em}.bento-gallery{border-radius:var(--tpl-radius);box-shadow:none;border:1px solid var(--tpl-line)}.spec-card{border-radius:14px;box-shadow:none}.gallery-btn-all{border-radius:999px;box-shadow:0 8px 20px rgba(16,32,51,.12)}
+
+img{max-width:100%}img[data-image-error="true"]{object-fit:cover;background:#eef1f3}
+@media(max-width:980px){.parcelas-grid,.casas-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.hero-life-collage{grid-template-columns:1fr 1fr}.hero-life-panel-1{grid-column:1/3;grid-row:1}.hero-life-panel-4{display:none}.hero-life{min-height:500px}.nav-links{gap:14px}}
+@media(max-width:720px){.navbar{height:64px}.brand-logo-img{max-height:40px}.nav-contact-btn{display:none}.hero-life{min-height:500px}.hero-life-content{padding-top:100px;padding-bottom:44px}.hero-life-overlay{background:linear-gradient(0deg,rgba(6,25,27,.92),rgba(6,25,27,.35))}.hero-life h1{font-size:clamp(2rem,10vw,3.15rem)}.hero-life-values{gap:7px}.hero-life-values span{min-width:0;padding:8px 11px}.decision-flow{padding-top:30px}.decision-buttons-clean{grid-template-columns:1fr}.decision-option-card{padding:17px!important;grid-template-columns:auto 1fr}.decision-step{display:none}.parcelas-grid,.casas-grid{grid-template-columns:1fr!important}.filter-card{padding:17px!important}.section-title{align-items:flex-start}.card-gallery-container{aspect-ratio:4/3}.bento-gallery{grid-template-columns:1fr;grid-template-rows:280px}.gallery-sidebar{display:none}.listing-layout{grid-template-columns:1fr!important}.specs-strip{grid-template-columns:repeat(2,1fr)!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Moderación TPL</title>
+  <meta name="description" content="Panel administrativo privado de Tu Parcela Lista.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="css/crm-admin.css?v=20260713">
+</head>
+<body>
+  <section class="auth-screen" id="auth-screen">
+    <form class="auth-card" id="auth-form">
+      <span class="eyebrow">Acceso privado</span>
+      <h1>Moderación Tu Parcela Lista</h1>
+      <p>Recibirás un enlace de acceso en el correo asociado a un perfil administrador activo.</p>
+      <label>Correo administrativo<input type="email" id="admin-email" autocomplete="email" required></label>
+      <button type="submit" class="primary">Enviar enlace de acceso</button>
+      <div id="auth-status" class="status" role="status" aria-live="polite"></div>
+    </form>
+  </section>
+
+  <main id="crm-app" class="crm-app" hidden>
+    <header class="crm-header">
+      <div><span class="eyebrow">CRM Fase 1</span><h1>Bandeja de moderación</h1><p id="admin-identity"></p></div>
+      <button type="button" class="secondary" id="logout">Cerrar sesión</button>
+    </header>
+
+    <section class="metrics" aria-label="Resumen de publicaciones">
+      <button type="button" data-state="pendiente_revision"><strong id="count-pending">0</strong><span>Pendientes</span></button>
+      <button type="button" data-state="requiere_cambios"><strong id="count-changes">0</strong><span>Requieren corrección</span></button>
+      <button type="button" data-state="aprobada"><strong id="count-approved">0</strong><span>Aprobadas</span></button>
+      <button type="button" data-state="rechazada"><strong id="count-rejected">0</strong><span>Rechazadas</span></button>
+    </section>
+
+    <form id="filters" class="filters" aria-label="Filtros de publicaciones">
+      <label>Estado<select name="estado"><option value="">Todos</option><option value="pendiente_revision">Pendientes</option><option value="requiere_cambios">Requieren corrección</option><option value="aprobada">Aprobadas</option><option value="rechazada">Rechazadas</option></select></label>
+      <label>Desde<input type="date" name="desde"></label><label>Hasta<input type="date" name="hasta"></label>
+      <label>Corredor<input name="corredor" placeholder="Nombre o corredora"></label>
+      <label>Comuna<input name="comuna" placeholder="Ej.: Florida"></label>
+      <label>Plan<select name="plan"><option value="">Todos</option><option>inicio</option><option>profesional</option><option>gold</option><option>platinum</option></select></label>
+      <div><button class="primary" type="submit">Aplicar filtros</button><button class="secondary" type="reset">Limpiar</button></div>
+    </form>
+
+    <div id="crm-status" class="status" role="status" aria-live="polite"></div>
+    <section class="crm-layout">
+      <div class="inbox-card"><div class="table-scroll"><table><thead><tr><th>Código</th><th>Corredor</th><th>Propiedad</th><th>Comuna</th><th>Fecha</th><th>Plan</th><th>Estado</th></tr></thead><tbody id="inbox-body"></tbody></table></div></div>
+      <article id="publication-detail" class="detail-card" aria-live="polite"><div class="empty-detail"><h2>Selecciona una publicación</h2><p>Aquí aparecerán los datos privados, fotografías e historial.</p></div></article>
+    </section>
+    <aside class="mail-note"><strong>Notificaciones por correo pendientes de configuración</strong><p>Las decisiones se agregan a una cola privada. No se marca ningún correo como enviado hasta conectar un proveedor.</p></aside>
+  </main>
+
+  <dialog id="correction-dialog"><form id="correction-form" method="dialog"><div class="dialog-heading"><h2>Solicitar correcciones</h2><button type="button" data-close aria-label="Cerrar">×</button></div><label>Motivo obligatorio<textarea name="reason" required minlength="3"></textarea></label><fieldset><legend>Campos que debe corregir</legend><div id="correction-fields" class="checkbox-grid"></div></fieldset><label>Mensaje personalizado<textarea name="message"></textarea></label><div class="dialog-actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="primary">Generar acceso seguro</button></div><div class="status" data-status role="status"></div></form></dialog>
+  <dialog id="reject-dialog"><form id="reject-form" method="dialog"><div class="dialog-heading"><h2>Rechazar definitivamente</h2><button type="button" data-close aria-label="Cerrar">×</button></div><label>Categoría<select name="category" required><option value="">Selecciona</option><option>Información falsa o inconsistente</option><option>Publicación duplicada</option><option>Incumplimiento de condiciones</option><option>Contenido no apto</option><option>Otro motivo administrativo</option></select></label><label>Motivo obligatorio<textarea name="reason" required minlength="3"></textarea></label><label>Mensaje personalizado<textarea name="message"></textarea></label><p class="danger-note">La publicación y su historial se conservarán, pero no aparecerá en el catálogo.</p><div class="dialog-actions"><button type="button" class="secondary" data-close>Cancelar</button><button type="submit" class="danger">Continuar con rechazo</button></div><div class="status" data-status role="status"></div></form></dialog>
+  <dialog id="correction-link-dialog"><div class="dialog-heading"><h2>Acceso de corrección creado</h2><button type="button" data-close aria-label="Cerrar">×</button></div><p>El enlace vence en 7 días y solo puede utilizarse una vez. Compártelo por un canal seguro mientras el proveedor de correo esté pendiente.</p><label>Enlace de un solo uso<input id="correction-link" readonly></label><button type="button" class="primary" id="copy-correction-link">Copiar enlace</button><div class="status" id="copy-status" role="status"></div></dialog>
+
+  <script src="plataforma/publicar-parcela/supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script type="module" src="js/crm-admin.js"></script>
+</body>
+</html>
