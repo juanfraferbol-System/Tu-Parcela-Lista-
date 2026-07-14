@@ -301,3 +301,74 @@ if (urlParams.get('flow') === 'success' && urlParams.get('plan')) {
     saveButton.click();
   }, 1000);
 }
+
+
+// ==========================================
+// INYECCIÓN DE LÓGICA IA Y UX
+// ==========================================
+import { simulateAIEnrichment } from './description-generator.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btnAI = document.getElementById('btn-magic-ai');
+  if (btnAI) {
+    btnAI.addEventListener('click', async () => {
+      const planElegido = document.querySelector('input[name="planCorredor"]:checked')?.value;
+      const isCorredor = document.querySelector('input[name="tipoPublicador"][value="corredor"]').checked;
+      
+      // Permitir si es Gold, Platinum, o si pagó el upsell de $7.990 (hasAIPower)
+      const isPremiumPlan = isCorredor && (planElegido === 'gold' || planElegido === 'platinum');
+      
+      if (!isPremiumPlan && !window.hasAIPower && isCorredor) {
+        alert('Esta función es exclusiva de los planes Gold/Platinum o el ticket de $7.990. Simula el pago dándole a "Publicar Parcela" con el plan Inicio para probarlo.');
+        return;
+      }
+      
+      btnAI.textContent = 'Analizando fotos...';
+      btnAI.disabled = true;
+      
+      // Construir data básica de lo ingresado para mandarla a la IA
+      const form = document.getElementById('publication-form');
+      const data = {
+        superficie: form.elements.superficieMinima?.value || '',
+        comuna: document.getElementById('comuna-display')?.textContent || '',
+      };
+      
+      try {
+        const result = await simulateAIEnrichment(data, true);
+        const descArea = document.getElementById('descripcion-publica');
+        if (descArea) {
+          descArea.value = result.enrichedDescription;
+          descArea.style.border = "2px solid #4f46e5";
+          descArea.style.backgroundColor = "rgba(99,102,241,0.05)";
+        }
+        
+        // Simular que encontró la ubicación
+        if (window.confirm('La IA detectó una posible ubicación de la parcela basándose en el análisis visual. ¿Deseas aplicar las coordenadas recomendadas?')) {
+           const mapInp = document.getElementById('link-google-maps');
+           if(mapInp) mapInp.value = 'https://maps.google.com/?q=' + result.suggestedCoordinates.latitude + ',' + result.suggestedCoordinates.longitude;
+        }
+        
+      } catch(e) {
+        console.error(e);
+      } finally {
+        btnAI.textContent = '✨ Enriquecido con IA';
+        btnAI.style.background = '#10b981';
+      }
+    });
+  }
+  
+  // Simulación Visual de Sugerencia de Foto de Portada
+  const dropZone = document.getElementById('photo-drop-zone');
+  const aiBadge = document.getElementById('ai-photo-suggestion');
+  if (dropZone && aiBadge) {
+    const observer = new MutationObserver(() => {
+      // Si hay fotos, mostrar el badge simulando análisis
+      if (dropZone.querySelectorAll('.photo-thumbnail').length > 0) {
+        aiBadge.style.display = 'block';
+      } else {
+        aiBadge.style.display = 'none';
+      }
+    });
+    observer.observe(dropZone, { childList: true });
+  }
+});

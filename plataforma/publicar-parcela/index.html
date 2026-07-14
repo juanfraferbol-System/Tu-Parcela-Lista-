@@ -1152,5 +1152,27 @@
     <footer>© 2026 Tu Parcela Lista · Vista previa local</footer>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="publicar-parcela.js"></script>
-  </body>
+  
+<div class="modal-overlay" id="upsell-modal" style="display:none; z-index:9999;">
+  <div class="modal-content" style="max-width:500px; text-align:center; padding:40px 30px;">
+    <div style="font-size:3rem; margin-bottom:10px;">🚀</div>
+    <h3 style="color:#003f7a; margin-bottom:10px; font-size:1.5rem;">¡Has alcanzado tu límite!</h3>
+    <p style="color:#64748b; margin-bottom:30px;">El Plan Inicio permite solo 1 anuncio activo. Para publicar esta parcela, puedes pasarte al <strong>Plan Profesional ($47.000)</strong> o activar este anuncio individualmente:</p>
+    
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <button class="primary-action" id="btn-upsell-ai" style="background:linear-gradient(135deg, #10b981, #059669); color:white; padding:16px; border:none; border-radius:12px; font-weight:bold; font-size:1.1rem; cursor:pointer; box-shadow:0 4px 15px rgba(16,185,129,0.3);">
+        Activar nuevo anuncio + IA ✨ ($7.990)
+        <span style="display:block; font-size:0.8rem; font-weight:normal; opacity:0.9;">Incluye mejora automática de textos y fotos</span>
+      </button>
+      
+      <button class="secondary-action" id="btn-upsell-basic" style="background:#f1f5f9; color:#334155; padding:16px; border:1px solid #cbd5e1; border-radius:12px; font-weight:bold; font-size:1rem; cursor:pointer;">
+        Activar nuevo anuncio ($5.990)
+      </button>
+      
+      <button id="btn-upsell-close" style="background:none; border:none; color:#94a3b8; text-decoration:underline; cursor:pointer; margin-top:10px;">Volver y revisar planes completos</button>
+    </div>
+  </div>
+</div>
+
+</body>
 </html>

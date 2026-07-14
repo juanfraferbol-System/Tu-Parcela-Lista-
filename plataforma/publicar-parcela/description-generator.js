@@ -19,3 +19,31 @@ export function shouldConfirmDescriptionRegeneration({modified=false,current='',
 
 // Contrato local preparado para sustituir esta implementación por una fuente remota.
 export const descriptionProvider={id:'local-rules-v1',generate:generatePublicDescription};
+
+
+// ==========================================
+// SIMULADOR DE INTELIGENCIA ARTIFICIAL
+// ==========================================
+export async function simulateAIEnrichment(data, withPremiumFeatures = false) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      let description = `Descubre tu próximo refugio natural. Esta hermosa parcela de ${data.superficie || '5000'} m² te recibe con un entorno inigualable, ideal para quienes buscan paz y conexión con la naturaleza.`;
+      
+      if (data.naturaleza && data.naturaleza.length > 0) {
+        description += ` Destaca por su imponente ${data.naturaleza.join(' y ')}, creando un ecosistema perfecto para tu proyecto de vida.`;
+      }
+      
+      if (withPremiumFeatures) {
+        description += `\n\n🌟 **Potencial de Inversión (IA):** Esta zona en ${data.comuna || 'el sur'} presenta una alta plusvalía proyectada. Sus características la hacen ideal para construir la casa de tus sueños o cabañas de descanso.`;
+      }
+      
+      const suggestedLat = -39.283 + (Math.random() * 0.1);
+      const suggestedLng = -71.933 + (Math.random() * 0.1);
+      
+      resolve({
+        enrichedDescription: description,
+        suggestedCoordinates: { latitude: suggestedLat, longitude: suggestedLng }
+      });
+    }, 1500); // Simulando delay de red
+  });
+}
