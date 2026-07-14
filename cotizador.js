@@ -451,6 +451,12 @@ function calculateTotal() {
       total += valor * qty;
     }
   });
+
+  // Upsells IA y ParcelaTur
+  document.querySelectorAll('.extra-check-upsell:checked').forEach(chk => {
+    total += Number(chk.dataset.price) || 0;
+  });
+
   return total;
 }
 /**
@@ -543,9 +549,43 @@ function updateSummary() {
       `);
     }
   });
+
+  // Upsells IA y ParcelaTur render
+  document.querySelectorAll('.extra-check-upsell:checked').forEach(chk => {
+    const upsellName = chk.dataset.name;
+    const upsellPrice = Number(chk.dataset.price) || 0;
+    if (upsellPrice > 0) {
+       tbody.insertAdjacentHTML('beforeend', `
+         <tr>
+           <td>
+             <div class="summary-item-name" style="color:#4f46e5;"><i data-lucide="sparkles" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"></i> ${upsellName}</div>
+             <div style="font-size:0.75rem;color:var(--text-muted);">Servicio Digital</div>
+           </td>
+           <td class="summary-item-value" style="color:#4f46e5;">${formatCurrency(upsellPrice)}</td>
+         </tr>`);
+    } else {
+       tbody.insertAdjacentHTML('beforeend', `
+         <tr>
+           <td>
+             <div class="summary-item-name" style="color:#059669;"><i data-lucide="key" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"></i> ${upsellName}</div>
+             <div style="font-size:0.75rem;color:var(--text-muted);">Servicio Administrativo</div>
+           </td>
+           <td class="summary-item-value" style="color:#059669;">Gratis</td>
+         </tr>`);
+    }
+  });
+
+  if (window.lucide) window.lucide.createIcons();
+
   // Calculate final total project cost
   const total = calculateTotal();
   totalSpan.textContent = formatCurrency(total);
+  
+  // Guardamos resumen global para API
+  window.activeUpsells = Array.from(document.querySelectorAll('.extra-check-upsell:checked')).map(chk => ({
+    nombre: chk.dataset.name,
+    valor: Number(chk.dataset.price) || 0
+  }));
 }
 /**
  * Initialize Cotizador Page setup.
@@ -596,6 +636,23 @@ function initCotizador() {
   renderProjectVisualizer();
   // 3. Initial Summary Table
   updateSummary();
+
+  // 3.5. Upsell Checkbox Listeners
+  document.querySelectorAll('.extra-check-upsell').forEach(chk => {
+     chk.addEventListener('change', () => {
+         // Lógica combo
+         if (chk.id === 'upsell-ai-combo' && chk.checked) {
+            const el1 = document.getElementById('upsell-ai-foto');
+            const el2 = document.getElementById('upsell-ai-video');
+            if(el1) el1.checked = false;
+            if(el2) el2.checked = false;
+         } else if ((chk.id === 'upsell-ai-foto' || chk.id === 'upsell-ai-video') && chk.checked) {
+            const combo = document.getElementById('upsell-ai-combo');
+            if(combo) combo.checked = false;
+         }
+         updateSummary();
+     });
+  });
   document.addEventListener('click', (event) => {
     if (event.target.closest('[data-close-stage-modal]')) closeStageCostModal();
   });
