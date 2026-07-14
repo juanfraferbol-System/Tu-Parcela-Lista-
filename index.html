@@ -287,33 +287,28 @@
 </div>
 <div class="v3-results-actions">
 <span class="parcelas-count-pill" id="results-count">0 parcelas</span>
+
+<div class="v3-view-switchers" style="display:inline-flex; gap:6px; margin-right:12px; vertical-align:middle;">
+  <button class="view-btn view-switcher active" data-view="grid" title="Vista Amplia"><i data-lucide="layout-grid"></i></button>
+  <button class="view-btn view-switcher" data-view="compact" title="Vista Compacta"><i data-lucide="grid-3x3"></i></button>
+  <button class="view-btn view-switcher" data-view="list" title="Vista de Lista"><i data-lucide="list"></i></button>
+</div>
 <button class="view-btn btn-open-map v3-map-button" id="btn-map-view" type="button">
 <i data-lucide="globe-2"></i>
 <span>Ver en mapa</span>
 </button>
 </div>
 </div>
+<div class="map-layout map-hidden" id="map-layout">
+  <div id="map-container"></div>
+  <img alt="Tu Parcela Lista" class="map-brand-watermark" src="image/logo-tu-parcela-lista.png"/>
+</div>
 <div class="parcelas-grid" id="parcelas-container"></div>
 </div>
 </div>
 </div>
 <!-- ========================================= -->
-<!-- MAPA -->
-<!-- ========================================= -->
-<div class="map-layout map-hidden" id="map-layout">
-<div class="map-toolbar">
-<h3>
-<i data-lucide="map"></i>
-            Mapa de Parcelas
-        </h3>
-</div>
-<div id="map-sidebar">
-<div class="map-sidebar-header">
-<h4>Parcelas visibles</h4>
-<span id="map-results">0 resultados</span>
-</div>
-<div id="map-cards"></div>
-</div>
+
 <div id="map-container"></div>
 <img alt="Tu Parcela Lista" class="map-brand-watermark" src="image/logo-tu-parcela-lista.png"/>
 <button class="back-to-parcelas-btn" id="back-to-parcelas" type="button">

@@ -646,6 +646,7 @@ document.addEventListener("DOMContentLoaded", () => {
       card.innerHTML = `
         <div class="card-image-wrapper" style="position:relative;">
         <a class="card-image card-image-link" href="${detailHref}" aria-label="Ver detalles de ${p.nombre}">
+          ${window.TasadorInteligente && window.TasadorInteligente.isOpportunity(getAllParcelas(), p) ? `<div class="badge-opportunity" style="position:absolute; top:12px; left:12px; background:linear-gradient(135deg, #f59e0b, #d97706); color:white; padding:4px 10px; border-radius:12px; font-size:0.75rem; font-weight:800; z-index:10; box-shadow:0 4px 12px rgba(245,158,11,0.4);"><i data-lucide="flame" style="width:12px;height:12px;margin-right:4px;vertical-align:-2px;"></i> Oportunidad de Inversión</div>` : ''}
           <span class="card-comuna">📍 ${p.comuna || "Chile"}</span>
           <div class="card-top-icons" style="position:absolute; top:12px; right:12px; display:flex; gap:8px; z-index:10;">
             <button class="btn-card-icon btn-favorite" type="button" aria-label="Guardar a favoritos" style="background:rgba(240,244,248,0.9); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#4a5568; transition:all 0.2s;" onclick="event.preventDefault(); this.style.color='#e53e3e'; this.querySelector('i').setAttribute('fill', '#e53e3e');"><i data-lucide="heart" style="width:18px; height:18px;"></i></button>
@@ -1693,19 +1694,22 @@ document.addEventListener("DOMContentLoaded", () => {
   function openMap(focusId = null) {
     state.viewMode = "map";
     DOM.mapLayout?.classList.remove("map-hidden");
-    DOM.mapLayout?.classList.add("map-visible");
-    if (DOM.parcelasContainer) DOM.parcelasContainer.style.display = "none";
+    if (DOM.btnMapView) {
+      DOM.btnMapView.innerHTML = '<i data-lucide="map"></i><span>Ocultar mapa</span>';
+      if(window.lucide) window.lucide.createIcons();
+    }
     renderMapa(focusId);
-    setTimeout(() => { map?.invalidateSize(); if (focusId) renderMapa(focusId); scrollTo(DOM.mapLayout); }, 80);
+    setTimeout(() => { map?.invalidateSize(); if (focusId) renderMapa(focusId); }, 80);
+  }, 80);
   }
 
   function closeMap() {
     state.viewMode = "grid";
     DOM.mapLayout?.classList.add("map-hidden");
-    DOM.mapLayout?.classList.remove("map-visible");
-    if (DOM.parcelasContainer) DOM.parcelasContainer.style.display = "grid";
-    renderParcelas();
-    scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor);
+    if (DOM.btnMapView) {
+      DOM.btnMapView.innerHTML = '<i data-lucide="globe-2"></i><span>Ver en mapa</span>';
+      if(window.lucide) window.lucide.createIcons();
+    }
   }
 
   function populateComunas() {
@@ -2147,7 +2151,14 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor), 80);
     });
 
-    DOM.btnMapView?.addEventListener("click", () => { window.__mapShowAllParcelas = false; openMap(); });
+    DOM.btnMapView?.addEventListener("click", () => {
+      window.__mapShowAllParcelas = false;
+      if (DOM.mapLayout?.classList.contains("map-hidden")) {
+        openMap();
+      } else {
+        closeMap();
+      }
+    });
     DOM.backToParcelas?.addEventListener("click", () => {
       closeMap();
     });
@@ -2833,7 +2844,37 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (window.lucide) lucide.createIcons();
+  
+  // View Switchers
+  const switchers = document.querySelectorAll('.view-switcher');
+  switchers.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const view = e.currentTarget.dataset.view;
+      switchers.forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      
+      const grid = document.getElementById('parcelas-container');
+      if (grid) {
+        grid.className = 'parcelas-grid view-' + view;
+      }
+    });
+  });
+
+  // Hover Grid -> Map
+  document.addEventListener('mouseover', e => {
+    const card = e.target.closest('.card-parcela-v5');
+    if (card && window.mapMarkers && !DOM.mapLayout?.classList.contains('map-hidden')) {
+      const id = card.dataset.id;
+      if (window.mapMarkers[id]) {
+        window.mapMarkers[id].openPopup();
+      }
+    }
+  });
+
+  // Store markers in renderMapa
+  window.mapMarkers = {};
+
+if (window.lucide) lucide.createIcons();
 });
 
 

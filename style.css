@@ -11853,3 +11853,117 @@ html body #decision-flow .decision-buttons-v5 .decision-card-glow {
     justify-content: center;
   }
 }
+
+/* --- MAPA INTEGRADO Y MINIMALISTA --- */
+.map-layout {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.05);
+  display: block !important;
+  transition: all 0.3s ease;
+}
+.map-layout.map-hidden {
+  display: none !important;
+}
+#map-container {
+  width: 100% !important;
+  height: 480px !important;
+  min-height: 480px !important;
+  border-radius: 20px !important;
+}
+.map-brand-watermark {
+  bottom: 20px !important;
+  right: 20px !important;
+}
+
+/* --- SELECTOR DE VISTAS --- */
+.v3-view-switchers .view-switcher {
+  background: white;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.v3-view-switchers .view-switcher.active, .v3-view-switchers .view-switcher:hover {
+  background: #003f7a;
+  color: white;
+  border-color: #003f7a;
+}
+.v3-view-switchers .view-switcher svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Vista Compacta */
+.parcelas-grid.view-compact {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: 16px !important;
+}
+.parcelas-grid.view-compact .card-parcela-v5 .card-image-wrapper {
+  height: 140px;
+}
+.parcelas-grid.view-compact .card-parcela-v5 h3 {
+  font-size: 1rem;
+}
+.parcelas-grid.view-compact .card-features-v5 {
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.parcelas-grid.view-compact .card-features-v5 span {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+}
+
+/* Vista de Lista */
+.parcelas-grid.view-list {
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+}
+.parcelas-grid.view-list .card-parcela-v5 {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch;
+}
+.parcelas-grid.view-list .card-image-wrapper {
+  width: 260px;
+  height: auto;
+  min-height: 100%;
+}
+.parcelas-grid.view-list .card-body-v5 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.parcelas-grid.view-list .card-actions-v5 {
+  width: 240px;
+  border-top: none;
+  border-left: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+@media (max-width: 768px) {
+  .parcelas-grid.view-list .card-parcela-v5 {
+    flex-direction: column !important;
+  }
+  .parcelas-grid.view-list .card-image-wrapper {
+    width: 100%;
+    height: 200px;
+  }
+  .parcelas-grid.view-list .card-actions-v5 {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #e2e8f0;
+  }
+}

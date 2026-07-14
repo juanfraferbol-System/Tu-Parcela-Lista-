@@ -179,11 +179,12 @@
                                     <th>Precio</th>
                                     <th>M2</th>
                                     <th>Estado</th>
+                                    <th>Análisis (Tasador)</th>
                                 </tr>
                             </thead>
                             <tbody id="parcelas-tbody">
                                 <tr>
-                                    <td colspan="5" style="text-align:center; padding: 20px;">Cargando parcelas...</td>
+                                    <td colspan="6" style="text-align:center; padding: 20px;">Cargando parcelas...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -304,17 +305,55 @@
             const parcelas = await window.apiGetParcelas();
             const pTbody = document.getElementById('parcelas-tbody');
             if (parcelas && parcelas.length > 0) {
-                pTbody.innerHTML = parcelas.map(p => `
+                
+                pTbody.innerHTML = parcelas.map(p => {
+                    let avg = 0;
+                    let price = parseInt(String(p.precio).replace(/[^0-9]/g, '')) || 0;
+                    let stats = {visitasTotales:0, tiempoPromedio:'-'};
+                    
+                    if (window.TasadorInteligente) {
+                        avg = window.TasadorInteligente.getCommuneAverage(parcelas, p.comuna);
+                        stats = window.TasadorInteligente.getMockVisits(p.id);
+                    }
+                    
+                    let tasadorBadge = '';
+                    let tasadorAction = '';
+                    
+                    if (avg > 0 && price > 0) {
+                        if (price <= avg * 0.85) {
+                            tasadorBadge = '<span class="badge" style="background:#d97706; color:white;">🔥 Oportunidad</span>';
+                        } else if (price > avg * 1.1) {
+                            tasadorBadge = '<span class="badge" style="background:#e53e3e; color:white;">⚠️ Sobreprecio</span>';
+                            tasadorAction = `<button class="kanban-btn btn-outline" style="font-size:0.7rem; padding:4px; margin-top:4px;" onclick="alert('Mensaje preparado para dueño:\\n\\nEstimado dueño, su parcela está un ${Math.round(((price/avg)-1)*100)}% por sobre el promedio de ${p.comuna}. Sugerimos un ajuste a ${Math.round(avg).toLocaleString('es-CL')} para acelerar su venta considerando sus ${stats.visitasTotales} visitas recientes.')">Avisar a Dueño</button>`;
+                        } else {
+                            tasadorBadge = '<span class="badge" style="background:#10b981; color:white;">En Precio Mercado</span>';
+                        }
+                    } else {
+                        tasadorBadge = '<span style="color:#94a3b8; font-size:0.8rem;">Sin datos para tasar</span>';
+                    }
+                    
+                    const tasadorHtml = `
+                        <div style="font-size: 0.8rem; line-height:1.2;">
+                            ${tasadorBadge}<br>
+                            <span style="color:#64748b; font-size:0.75rem; display:inline-block; margin-top:4px;">👀 ${stats.visitasTotales} vistas | ⏱ ${stats.tiempoPromedio}</span>
+                            <br>${tasadorAction}
+                        </div>
+                    `;
+                    
+                    return `
                     <tr>
                         <td><strong>${p.nombre}</strong></td>
                         <td>${p.comuna}</td>
                         <td>${p.precio}</td>
                         <td>${p.tamano} m²</td>
                         <td><span class="badge badge-success">Publicada</span></td>
+                        <td>${tasadorHtml}</td>
                     </tr>
-                `).join('');
+                    `;
+                }).join('');
+
             } else {
-                pTbody.innerHTML = '<tr><td colspan="5">No hay parcelas registradas.</td></tr>';
+                pTbody.innerHTML = '<tr><td colspan="6">No hay parcelas registradas.</td></tr>';
             }
             
             // Leads (por ahora mockup hasta que se conecte)

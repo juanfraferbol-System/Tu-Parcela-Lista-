@@ -62,3 +62,46 @@ async function apiSaveLead(leadData) {
 
 window.apiGetParcelas = apiGetParcelas;
 window.apiSaveLead = apiSaveLead;
+
+
+// ==========================================
+// TASADOR INTELIGENTE E INVERSIÓN
+// ==========================================
+window.TasadorInteligente = {
+  getCommuneAverage: function(parcelas, comuna) {
+    if (!parcelas || !comuna) return 0;
+    const filtered = parcelas.filter(p => p.comuna === comuna);
+    if(filtered.length === 0) return 0;
+    let total = 0;
+    filtered.forEach(p => {
+      let price = p.precio;
+      if (typeof price === 'string') {
+        price = parseInt(price.replace(/[^0-9]/g, ''), 10);
+      }
+      total += (price || 0);
+    });
+    return total / filtered.length;
+  },
+  isOpportunity: function(parcelas, parcela) {
+    if (!parcelas || !parcela) return false;
+    const avg = this.getCommuneAverage(parcelas, parcela.comuna);
+    if(avg === 0) return false;
+    
+    let price = parcela.precio;
+    if (typeof price === 'string') {
+      price = parseInt(price.replace(/[^0-9]/g, ''), 10);
+    }
+    
+    // Es oportunidad si el precio es <= 85% del promedio
+    return price > 0 && price <= (avg * 0.85);
+  },
+  getMockVisits: function(parcelaId) {
+    // Simulador de visitas para el CRM basado en el ID
+    const seed = String(parcelaId).split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+    return {
+      visitasTotales: (seed * 13) % 450 + 50,
+      visitasMes: (seed * 7) % 80 + 10,
+      tiempoPromedio: ((seed * 3) % 4 + 1) + ' min'
+    };
+  }
+};

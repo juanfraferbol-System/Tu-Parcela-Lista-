@@ -914,6 +914,22 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
 
       // 4. Bento Gallery e Imagenes
       const photos = p.imagenes && p.imagenes.length > 0 ? p.imagenes : [p.imagen];
+
+      // Inyectar Tasador Inversión Badge
+      if (window.TasadorInteligente && window.parcelas) {
+        if (window.TasadorInteligente.isOpportunity(window.parcelas, p)) {
+          const gallery = document.getElementById("bento-gallery");
+          if (gallery && !document.getElementById("badge-opportunity-detail")) {
+            const badge = document.createElement('div');
+            badge.id = "badge-opportunity-detail";
+            badge.innerHTML = '<i data-lucide="flame" style="width:16px;height:16px;margin-right:6px;vertical-align:-3px;"></i> Oportunidad de Inversión';
+            badge.style.cssText = "position:absolute; top:20px; left:20px; background:linear-gradient(135deg, #f59e0b, #d97706); color:white; padding:8px 16px; border-radius:14px; font-size:0.9rem; font-weight:800; z-index:20; box-shadow:0 6px 16px rgba(245,158,11,0.4); pointer-events:none;";
+            gallery.style.position = "relative";
+            gallery.appendChild(badge);
+          }
+        }
+      }
+
       DOM.galleryCount.innerText = photos.length;
       
       // Imagen Principal
