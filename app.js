@@ -449,15 +449,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (state.activeFilters.native) list = list.filter(p => String(p.naturaleza).toLowerCase() === "si" || p.naturaleza === true);
     if (state.activeFilters.region && state.activeFilters.region !== "all") {
       const regionMap = {
-        "Biobío": ["Florida", "Nacimiento", "Negrete", "Yumbel"],
-        "Ñuble": ["Ñipas", "Pemuco", "Quillón"],
-        "La Araucanía": ["Caburgua"]
+        "biobio": ["florida", "nacimiento", "negrete", "yumbel"],
+        "nuble": ["nipas", "pemuco", "quillon"],
+        "araucania": ["caburgua"]
       };
       const validCommunes = regionMap[state.activeFilters.region] || [];
-      list = list.filter(p => validCommunes.map(normalizar).includes(normalizar(p.comuna)));
+      list = list.filter(p => validCommunes.includes(normalizar(p.comuna)));
     }
     if (state.activeFilters.commune && state.activeFilters.commune !== "all") {
-      list = list.filter(p => normalizar(p.comuna) === normalizar(state.activeFilters.commune));
+      list = list.filter(p => normalizar(p.comuna) === state.activeFilters.commune);
     }
     if (state.activeFilters.gps && state.userCoords) {
       list = list
@@ -626,6 +626,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const visibleList = list.slice(0, state.parcelasRenderLimit || 15);
     DOM.parcelasContainer.innerHTML = "";
     DOM.parcelasContainer.className = "parcelas-grid";
+    DOM.parcelasContainer.style.display = "grid";
     if (DOM.resultsCount) DOM.resultsCount.textContent = `${list.length} parcelas encontradas`;
     updateSearchHeading(list);
 
