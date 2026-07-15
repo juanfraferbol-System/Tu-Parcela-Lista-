@@ -43,7 +43,7 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
-<link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/><link href="css/styles.min.css?v=20260715-4" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/><link href="css/styles.min.css?v=20260715-7" rel="stylesheet"/>
 
 <link href="css/v2-base.css" rel="stylesheet"/>
 <link href="css/v2-sidebar.css" rel="stylesheet"/>
@@ -78,7 +78,6 @@
 <li><a href="index.html">Inicio</a></li>
 <li><a href="#parcelas-anchor">Parcelas</a></li>
 <li><a href="#casas-section">Casas</a></li>
-<li><a href="#promos">Promos</a></li>
 <li><a class="nav-link-feature" href="como-comprar.html">Cómo comprar</a></li>
 <li><a class="nav-link-publish" href="plataforma/publicar-parcela/index.html">Publicar</a></li>
 <li><a href="#quienes-somos">Quiénes Somos</a></li>
@@ -123,23 +122,19 @@
   </div>
 </div>
 <main id="contenido-principal">
-<section class="hero hero-life hero-life-v5" aria-labelledby="hero-title" style="display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative;">
-    <div class="hero-visual-container hero-visual-left" aria-hidden="true" style="position: absolute; left: 0; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 20px; opacity: 0.8;">
-      <div class="hero-bubble-photo" style="background-image: url('image/banner-pareja.jpg'); background-size: cover; background-position: center;"></div>
-      <div class="hero-bubble-photo" style="background-image: url('image/banner-invernadero.jpg'); background-size: cover; background-position: center;"></div>
-      <div class="hero-bubble-photo" style="background-image: url('image/banner-leyendo.jpg'); background-size: cover; background-position: center;"></div>
-    </div>
-    <div class="container hero-life-content hero-v5-content" style="position: relative; z-index: 10; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); padding: 40px; border-radius: 24px;">
+<section class="hero hero-life-masonry" aria-labelledby="hero-title">
+  <div class="hero-bubble b-left-large" style="background-image: url('image/banner-pareja.jpg');"></div>
+  <div class="hero-bubble b-left-small" style="background-image: url('image/banner-leyendo.jpg');"></div>
+  <div class="hero-bubble b-left-oval" style="background-image: url('image/banner-invernadero.jpg');"></div>
+  <div class="hero-bubble b-right-oval" style="background-image: url('image/banner-inversion.jpg');"></div>
+  <div class="hero-bubble b-right-large" style="background-image: url('image/banner-tranquilidad.jpg');"></div>
+  <div class="hero-bubble b-right-small" style="background-image: url('image/banner-espacio.jpg');"></div>
+  <div class="container hero-masonry-content">
       <span class="hero-life-kicker">TU PARCELA LISTA</span>
       <h1 id="hero-title">Un gran espacio para tu próximo proyecto</h1>
       <p>Parcelas para vivir, invertir o construir en familia, Tú Parcela Lista te acompaña en todas las etapas.</p>
-    </div>
-    <div class="hero-visual-container hero-visual-right" aria-hidden="true" style="position: absolute; right: 0; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 20px; opacity: 0.8;">
-      <div class="hero-bubble-photo" style="background-image: url('image/banner-tranquilidad.jpg'); background-size: cover; background-position: center;"></div>
-      <div class="hero-bubble-photo" style="background-image: url('image/banner-inversion.jpg'); background-size: cover; background-position: center;"></div>
-      <div class="hero-bubble-photo" style="background-image: url('image/banner-espacio.jpg'); background-size: cover; background-position: center;"></div>
-    </div>
-  </section>
+  </div>
+</section>
 
 
 <section class="decision-flow" id="decision-flow" style="position: relative; z-index: 10; padding: 20px 0;">
@@ -578,37 +573,7 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 </form>
 </div>
 </div>
-<!-- =======================================================
-       SECCIÓN PROMOS 2.0
-  ======================================================= -->
-<section class="section-promos-v2" id="promos">
-<div class="container">
-<div class="section-title-v2">
-<span class="kicker">Proyectos destacados</span>
-<h2>Proyectos listos para cotizar</h2>
-<p>Alternativas modernas ordenadas desde la más económica a la más completa. Al pinchar una opción se carga el cotizador interno de esta misma página con parcela y casa seleccionadas.</p>
-</div>
-<div class="promos-grid-v2" id="promos-grid"></div>
-</div>
-</section>
-<section class="publish-owner-cta publish-owner-cta-footer" id="publica-tu-parcela">
-<div class="container publish-owner-cta-inner">
-<div class="publish-owner-copy">
-<span class="publish-eyebrow">Publica con nosotros</span>
-<h2>¿Quieres publicar tu parcela, campo o proyecto con nosotros?</h2>
-<p>En Tu Parcela Lista presentamos tu propiedad de forma clara, atractiva y ordenada para conectar con compradores reales que buscan invertir o vivir en el campo.</p>
-<div class="publish-owner-points">
-<span>Ficha premium</span>
-<span>Difusión comercial</span>
-<span>Contacto directo</span>
-</div>
-</div>
-<div class="publish-owner-actions">
-<a class="btn-publish-primary" href="plataforma/publicar-parcela/index.html">Publicar ahora</a>
-<a class="btn-publish-secondary" href="https://wa.me/56988508361?text=Hola%20Tu%20Parcela%20Lista%2C%20quiero%20publicar%20una%20parcela">Hablar por WhatsApp</a>
-</div>
-</div>
-</section>
+
 <!-- -------------------------------------------------------------
        Sección Quiénes Somos / Contacto
        ------------------------------------------------------------- -->
@@ -686,7 +651,7 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="js/db-api.js"></script>
-<script defer src="app.js?v=20260715-4"></script>
+<script defer src="app.js?v=20260715-7"></script>
 <script defer src="premium-features.js"></script>
 <script defer src="js/tpl-modals.js"></script>
 <script defer src="js/tpl-utils.js"></script>
