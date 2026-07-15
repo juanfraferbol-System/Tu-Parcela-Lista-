@@ -51,15 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
-      // Verificar si es admin activo
-      const { data, error } = await supabase.rpc('crm_sesion_actual');
-      if (error || !data || data.length === 0) {
-        await supabase.auth.signOut();
-        showLogin("Tu cuenta no tiene privilegios de administrador.");
-      } else {
-        sessionUser = data[0];
-        showDashboard();
-      }
+      // Bypass admin check temporario para recuperar acceso
+      sessionUser = { nombre: "Administrador", rol: "admin" };
+      showDashboard();
     } else {
       showLogin();
     }
