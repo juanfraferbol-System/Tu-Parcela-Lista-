@@ -43,7 +43,7 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
-<link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/>\n<link href="css/styles.min.css" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/><link href="css/styles.min.css" rel="stylesheet"/>
 
 <link href="css/v2-base.css" rel="stylesheet"/>
 <link href="css/v2-sidebar.css" rel="stylesheet"/>
@@ -94,7 +94,7 @@
 </header>
 <div class="location-filter-bar">
   <div class="container loc-bar-container">
-    <button class="loc-global-btn active" data-filter-type="all"><img src="https://flagcdn.com/h24/cl.png" height="14" alt="Chile" style="vertical-align: middle; margin-right: 4px;"> Todo Chile</button>
+    <button class="loc-global-btn active" data-filter-type="all">Chile</button>
     <div class="loc-divider"></div>
     
     <div class="loc-region-group">
@@ -123,26 +123,29 @@
   </div>
 </div>
 <main id="contenido-principal">
-<section class="hero hero-life hero-life-v5" aria-labelledby="hero-title">
-  <div class="hero-v5-visual" aria-hidden="true">
-    <div class="hero-v5-photo hero-v5-photo-main" style="background-image: url('image/banner-tranquilidad.jpg'); background-size: cover; background-position: center;"></div>
-      <div class="hero-v5-photo hero-v5-photo-family" style="background-image: url('image/banner-inversion.jpg'); background-size: cover; background-position: center;"></div>
-      <div class="hero-v5-photo hero-v5-photo-landscape" style="background-image: url('image/banner-espacio.jpg'); background-size: cover; background-position: center;"></div>
-  </div>
-  <div class="container hero-life-content hero-v5-content">
-    <span class="hero-life-kicker">TU PARCELA LISTA</span>
-    <h1 id="hero-title">Encuentra un gran espacio para tus proyectos</h1>
-    <p>Encuentra una parcela para vivir, invertir o construir en familia, con acompañamiento claro desde la búsqueda hasta tu proyecto final.</p>
-    
-  </div>
-
-</section>
+<section class="hero hero-life hero-life-v5" aria-labelledby="hero-title" style="display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative;">
+    <div class="hero-v5-visual hero-v5-visual-left" aria-hidden="true" style="position: absolute; left: 0; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 20px; opacity: 0.8;">
+      <div class="hero-v5-photo" style="background-image: url('image/banner-pareja.jpg'); background-size: cover; background-position: center;"></div>
+      <div class="hero-v5-photo" style="background-image: url('image/banner-invernadero.jpg'); background-size: cover; background-position: center;"></div>
+      <div class="hero-v5-photo" style="background-image: url('image/banner-leyendo.jpg'); background-size: cover; background-position: center;"></div>
+    </div>
+    <div class="container hero-life-content hero-v5-content" style="position: relative; z-index: 10; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); padding: 40px; border-radius: 24px;">
+      <span class="hero-life-kicker">TU PARCELA LISTA</span>
+      <h1 id="hero-title">Un gran espacio para tu próximo proyecto</h1>
+      <p>Parcelas para vivir, invertir o construir en familia, Tú Parcela Lista te acompaña en todas las etapas.</p>
+    </div>
+    <div class="hero-v5-visual hero-v5-visual-right" aria-hidden="true" style="position: absolute; right: 0; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 20px; opacity: 0.8;">
+      <div class="hero-v5-photo" style="background-image: url('image/banner-tranquilidad.jpg'); background-size: cover; background-position: center;"></div>
+      <div class="hero-v5-photo" style="background-image: url('image/banner-inversion.jpg'); background-size: cover; background-position: center;"></div>
+      <div class="hero-v5-photo" style="background-image: url('image/banner-espacio.jpg'); background-size: cover; background-position: center;"></div>
+    </div>
+  </section>
 
 
 <section class="decision-flow" id="decision-flow" style="position: relative; z-index: 10; padding: 20px 0;">
 <div class="decision-box">
 <span class="decision-eyebrow">COMIENZA AHORA</span>
-<h2 style="margin-bottom: 40px;">Parcelas y proyectos ajustados a tu bolsillo</h2>
+<h2 style="margin-bottom: 40px;">Búsqueda según tu presupuesto </h2>
 <p class="decision-intro">Da el primer paso y encuentra el lugar ideal hecho a tu medida.</p>
 <div class="decision-buttons decision-buttons-clean decision-buttons-v5" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; position: relative; z-index: 15;">
   <button class="tpl-decision-card" id="opt-parcela" type="button" style="padding: 0; border: none; border-radius: 20px; text-align: left; background: url('image/btn_parcela_person.jpg') center/cover no-repeat !important; background-color: #0c2b2e !important; box-shadow: 0 15px 35px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; display: flex; align-items: flex-end; min-height: 240px; cursor: pointer;; z-index: 20;">
@@ -272,7 +275,7 @@
 </div>
 <button class="filter-btn" id="filter-clear" style="border-color:#f87171;color:#ef4444;display:none;" type="button">
 <i data-lucide="x-circle"></i>
-                        Limpiar filtros
+                        Todas
 
                     </button>
 </div>

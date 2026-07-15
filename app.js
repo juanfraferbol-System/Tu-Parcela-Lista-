@@ -1620,18 +1620,15 @@ document.addEventListener("DOMContentLoaded", () => {
     list.forEach(p => {
       bounds.push([p.lat, p.lng]);
       const img = getParcelaCardImage(p);
-      const popupHtml = `
-        <div class="map-popup-card map-popup-premium">
-          ${img ? `<img src="${img}" alt="${p.nombre}" loading="${state.recommendationActive ? "eager" : "lazy"}" fetchpriority="${state.recommendationActive ? "high" : "auto"}" decoding="async" width="800" height="600">` : ""}
-          <span class="map-popup-price">${p.precio || "Consultar"}</span>
-          <strong>${p.nombre}</strong>
-          <small>${p.comuna || "Chile"} · ${Number(p.tamano || 0).toLocaleString("es-CL")} m²</small>
-              ${getDistanceBadge(p)}
-          <div class="map-popup-actions">
-            <a class="popup-detail" href="parcela.html?id=${encodeURIComponent(p.id)}">Más detalles</a>
-            <button class="popup-select" type="button" onclick="window.tplSelectMapParcela && window.tplSelectMapParcela('${String(p.id).replace(/'/g, "\'")}')">Sumar casa</button>
-          </div>
-        </div>`;
+      const popupHtml = `<div class="tpl-map-popup-clean" style="padding: 10px; font-family: Outfit, sans-serif; text-align: center; min-width: 180px;">
+              <img src="${img}" alt="${p.nombre}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">
+              <h3 style="margin: 0 0 4px; font-size: 1rem; color: #111; font-weight: 600;">${p.nombre}</h3>
+              <strong style="color: #007185; font-size: 1.15rem; display: block; margin-bottom: 12px;">${money(p.precio)}</strong>
+              <div style="display: flex; gap: 8px; align-items: stretch;">
+                <a href="parcela.html?id=${encodeURIComponent(p.id)}" style="flex: 1; padding: 10px 0; background: transparent; color: #111; text-decoration: none; border-radius: 6px; font-size: 0.85rem; font-weight: 500; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center;">Detalles</a>
+                <button type="button" onclick="window.tplSelectMapParcela && window.tplSelectMapParcela('${String(p.id).replace(/'/g, "\'")}')" style="flex: 1; padding: 10px 0; background: #FFD814; color: #111; border: 1px solid #FCD200; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; justify-content: center;">Seleccionar</button>
+              </div>
+            </div>`;
       const marker = L.marker([p.lat, p.lng], window.tplMapMarkerIcon ? { icon: window.tplMapMarkerIcon(img, focusId === p.id) } : undefined)
         .bindPopup(popupHtml);
       if (markerClusterLayer) markerClusterLayer.addLayer(marker);
