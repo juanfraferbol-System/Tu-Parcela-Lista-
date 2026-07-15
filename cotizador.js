@@ -237,16 +237,16 @@ function getDefaultExtraQty(extra, parcela, casa) {
  * Render selected parcel and house details in the top selection info bar.
  */
 function renderSelectionInfoBar(parcela, casa) {
-  const container = document.getElementById('selection-info-bar');
-  if (!container) return;
-
-  const parcelaName = parcela ? (parcela.nombre || `Parcela ${parcela.id}`) : 'Ninguna parcela seleccionada';
-  const parcelaSub = parcela ? `${parcela.comuna || ''} • ${parcela.tamano || parcela.superficie || '5.000'} m²` : 'Puedes cotizar tu casa y luego agregar parcela';
-  const parcelaPrice = parcela ? formatCurrency(parsePriceString(parcela.precio)) : '-';
-  const parcelaImg = parcela ? (parcela.imagen || parcela.imagenes?.[0] || 'image/placeholder-parcela.jpg') : 'image/placeholder-parcela.jpg';
-  const parcelaLink = parcela ? `parcela.html?id=${encodeURIComponent(parcela.id)}&fromCotizador=1` : 'index.html#parcelas-anchor';
-
-  const construction = getSelectedConstruction();
+    const container = document.getElementById('selection-info-bar');
+    if (!container) return;
+  
+    const parcelaName = parcela ? (parcela.nombre || `Parcela ${parcela.id}`) : 'Seleccionar Parcela';
+    const parcelaSub = parcela ? `${parcela.comuna || ''} • ${parcela.tamano || parcela.superficie || '5.000'} m²` : 'Haz clic aquí para elegir un terreno';
+    const parcelaPrice = parcela ? formatCurrency(parsePriceString(parcela.precio)) : 'Ir al catálogo';
+    const parcelaImg = parcela ? (parcela.imagen || parcela.imagenes?.[0] || 'image/placeholder-parcela.jpg') : 'image/placeholder-parcela.jpg';
+    const parcelaLink = parcela ? `parcela.html?id=${encodeURIComponent(parcela.id)}&fromCotizador=1` : 'index.html?return_to_cotizador=1#parcelas-anchor';
+  
+    const construction = getSelectedConstruction();
   const m2 = getBuildM2(casa);
   const rooms = getBuildRooms(casa);
   const casaPrice = formatCurrency(m2 * construction.valor);
