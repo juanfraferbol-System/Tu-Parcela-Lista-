@@ -3020,9 +3020,8 @@ document.addEventListener('DOMContentLoaded', () => {
             casa_id: 'PROMPT: ' + prompt,
             presupuesto_estimado: 2990
           })
-        }).then(() => {
-          alert('Simulación: Pago completado.\n\nEl Prompt dinámico generado para tu Video IA es:\n\n' + prompt + '\n\nEl equipo ya puede verlo en el CRM.');
-          btnAi.innerHTML = '<i data-lucide="check"></i> Video Solicitado';
+                }).then(() => {
+          window.location.href = 'https://www.flow.cl/btn.php?token=b690b8a295495a95b1d4770e58bb8f169ded2f14';
         }).catch(() => {
           alert('Error de conexión.');
           btnAi.innerHTML = oldHtml;
