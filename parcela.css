@@ -6,9 +6,9 @@
 
 :root {
   /* Colores Corporativos (Logo) */
-  --primary: #003f7a;         /* Azul profundo corporativo */
+  --primary: #0c2b2e;         /* Azul profundo corporativo */
   --primary-rgb: 0, 63, 122;
-  --secondary: #00828a;       /* Teal/Verde azulado */
+  --secondary: #1a5e63;       /* Teal/Verde azulado */
   --secondary-rgb: 0, 130, 138;
   --yellow: #f2be1a;          /* Amarillo Oro */
   --yellow-hover: #dbaa12;
@@ -532,7 +532,7 @@ body {
 .diseno-propio-card h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.35rem;
-  color: #00828a;
+  color: #1a5e63;
   font-weight: 800;
 }
 .diseno-propio-card p {
@@ -547,7 +547,7 @@ body {
   justify-content: center;
   gap: 0.6rem;
   padding: 0.9rem 2.25rem;
-  background: linear-gradient(135deg, #00828a, #10b981);
+  background: linear-gradient(135deg, #1a5e63, #10b981);
   color: #ffffff;
   border: none;
   border-radius: 50px;
@@ -901,7 +901,7 @@ body{background:#f6f9fc;}
 @media(max-width:768px){.parcela-container,.property-container,.detalle-container{padding-left:14px;padding-right:14px}.gallery-main img,.main-image img,.parcela-gallery img{border-radius:18px}}
 
 /* Mejora visual ficha parcela */
-.parcela-detail-hero-upgrade{background:linear-gradient(135deg,#003f7a,#00828a)!important;color:#fff!important;border-radius:30px;padding:30px;margin-top:18px;box-shadow:0 24px 65px rgba(0,63,122,.24);}
+.parcela-detail-hero-upgrade{background:linear-gradient(135deg,#0c2b2e,#1a5e63)!important;color:#fff!important;border-radius:30px;padding:30px;margin-top:18px;box-shadow:0 24px 65px rgba(0,63,122,.24);}
 .parcela-detail-hero-upgrade h1,.parcela-detail-hero-upgrade .detail-location,.parcela-detail-hero-upgrade .detail-main-price,.parcela-detail-hero-upgrade .detail-uf-estimate{color:#fff!important;}
 .parcela-detail-hero-upgrade .detail-price-box{background:rgba(255,255,255,.12)!important;border:1px solid rgba(255,255,255,.25)!important;backdrop-filter:blur(8px);}
 .sidebar-card{box-shadow:0 24px 65px rgba(0,63,122,.14)!important;border-radius:26px!important;}
@@ -919,7 +919,7 @@ body{background:#f6f9fc;}
 /* Mejoras visita y simulador facilidad de pago */
 .btn-visit-clear{background:#ffc107!important;color:#17324a!important;box-shadow:0 14px 28px rgba(255,193,7,.25)!important;border:1px solid rgba(255,255,255,.45)!important;}
 .payment-simulator{border:1px solid rgba(0,130,138,.18);background:linear-gradient(180deg,#f8fcff,#fff);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 12px 28px rgba(15,23,42,.07)}
-.payment-simulator h4{margin:0 0 6px;color:#003f7a;font-size:1rem}.payment-simulator p{margin:0 0 12px;color:#64748b;font-size:.86rem}.payment-simulator label{display:grid;gap:6px;margin:10px 0;color:#17324a;font-weight:800;font-size:.88rem}.payment-simulator input[type=number]{border:1px solid #dbe4ee;border-radius:12px;padding:10px;font-weight:900}.pay-row{display:flex;justify-content:space-between;background:#eef9fa;border-radius:14px;padding:10px;margin:8px 0}.pay-alert{background:#fff7d6;color:#8a5a00;border-radius:14px;padding:10px;font-size:.84rem;font-weight:800;margin:8px 0}.pay-total{display:grid;gap:4px;background:#003f7a;color:#fff;border-radius:16px;padding:12px;margin-top:10px}.pay-total strong{font-size:1.06rem}.visit-modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;place-items:center;z-index:9999;padding:16px}.visit-modal.show{display:grid}.visit-card{width:min(430px,100%);background:#fff;border-radius:24px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.25);position:relative}.visit-close{position:absolute;right:14px;top:12px;border:0;background:#eef2f7;border-radius:50%;width:34px;height:34px;font-size:22px;cursor:pointer}.visit-card h3{margin:0 0 6px;color:#003f7a}.visit-card p{margin:0 0 16px;color:#64748b}.visit-card input{width:100%;border:1px solid #dbe4ee;border-radius:14px;padding:13px;margin:6px 0;font-weight:700}
+.payment-simulator h4{margin:0 0 6px;color:#0c2b2e;font-size:1rem}.payment-simulator p{margin:0 0 12px;color:#64748b;font-size:.86rem}.payment-simulator label{display:grid;gap:6px;margin:10px 0;color:#17324a;font-weight:800;font-size:.88rem}.payment-simulator input[type=number]{border:1px solid #dbe4ee;border-radius:12px;padding:10px;font-weight:900}.pay-row{display:flex;justify-content:space-between;background:#eef9fa;border-radius:14px;padding:10px;margin:8px 0}.pay-alert{background:#fff7d6;color:#8a5a00;border-radius:14px;padding:10px;font-size:.84rem;font-weight:800;margin:8px 0}.pay-total{display:grid;gap:4px;background:#0c2b2e;color:#fff;border-radius:16px;padding:12px;margin-top:10px}.pay-total strong{font-size:1.06rem}.visit-modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;place-items:center;z-index:9999;padding:16px}.visit-modal.show{display:grid}.visit-card{width:min(430px,100%);background:#fff;border-radius:24px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.25);position:relative}.visit-close{position:absolute;right:14px;top:12px;border:0;background:#eef2f7;border-radius:50%;width:34px;height:34px;font-size:22px;cursor:pointer}.visit-card h3{margin:0 0 6px;color:#0c2b2e}.visit-card p{margin:0 0 16px;color:#64748b}.visit-card input{width:100%;border:1px solid #dbe4ee;border-radius:14px;padding:13px;margin:6px 0;font-weight:700}
 
 
 /* =====================================================
@@ -947,7 +947,7 @@ body{background:#f6f9fc;}
 }
 .detail-map-header h4{
   margin:0 0 4px;
-  color:var(--primary,#003f7a);
+  color:var(--primary,#0c2b2e);
   font-size:1.12rem;
   font-weight:900;
 }
@@ -993,7 +993,7 @@ body{background:#f6f9fc;}
   align-items:center!important;
   gap:8px!important;
 }
-.detail-map-google{background:linear-gradient(135deg,#003f7a,#00828a)!important;}
+.detail-map-google{background:linear-gradient(135deg,#0c2b2e,#1a5e63)!important;}
 .detail-map-waze{background:linear-gradient(135deg,#13a8df,#33ccff)!important;}
 @media(max-width:640px){
   .detail-map-card{padding:14px;border-radius:20px;}

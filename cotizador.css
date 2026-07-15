@@ -1,6 +1,6 @@
 :root {
   /* Corporate Colors */
-  --primary: #00828a;          /* Deep Teal/Blue-Green */
+  --primary: #1a5e63;          /* Deep Teal/Blue-Green */
   --primary-light: #e0f2f1;    /* Very soft primary background */
   --primary-hover: #005f64;
   --secondary: #10b981;        /* Emerald Green (nature, success) */
@@ -508,7 +508,7 @@ footer.main-footer {
 /* ===== Ajustes v4 cotizador: marca y PDF ===== */
 .logo-group-brand{display:flex;align-items:center;gap:14px;}
 .cotizador-brand-logo{height:58px;width:auto;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,71,133,.18));}
-.btn-activate-project{background:linear-gradient(135deg,#004785,#00828a)!important;color:#fff!important;box-shadow:0 18px 36px rgba(0,71,133,.24)!important;}
+.btn-activate-project{background:linear-gradient(135deg,#004785,#1a5e63)!important;color:#fff!important;box-shadow:0 18px 36px rgba(0,71,133,.24)!important;}
 .project-note{font-size:.86rem;color:#526376;line-height:1.35;margin-top:10px;font-weight:700;}
 .lead-modal form input,.lead-modal form textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3ed;border-radius:14px;padding:12px 14px;margin-bottom:10px;font:inherit;}
 .lead-modal h3{color:#004785;font-size:1.45rem;}
@@ -517,17 +517,17 @@ footer.main-footer {
 /* =====================================================
    TU PARCELA LISTA 2.0 - COTIZADOR DISEÑO PROPIO
 ===================================================== */
-.custom-designer-box{border:2px solid rgba(242,190,26,.45)!important;background:linear-gradient(180deg,#fffdf5,#fff)!important}.custom-designer-head{display:flex;align-items:center;justify-content:space-between;gap:18px}.btn-own-design{border:0;border-radius:999px;background:linear-gradient(135deg,#f2be1a,#ffd85a);color:#102a43;font-weight:950;padding:14px 20px;cursor:pointer;box-shadow:0 12px 30px rgba(242,190,26,.25)}.custom-designer-panel{display:none;margin-top:22px}.custom-designer-panel.active{display:block}.custom-grid-inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0}.custom-grid-inputs label{display:grid;gap:8px;font-weight:800;color:#0f2740}.custom-grid-inputs input,.custom-grid-inputs select{border:1px solid #dbe4ee;border-radius:16px;padding:12px 14px;font-weight:800;background:#fff}.choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0 22px}.choice-card{border:1px solid #dbe4ee;border-radius:20px;padding:14px;background:#fff;cursor:pointer;display:grid;gap:6px}.choice-card:has(input:checked){border-color:#00828a;box-shadow:0 0 0 3px rgba(0,130,138,.12);background:#f2fbfb}.choice-card input{accent-color:#00828a}.choice-card strong{color:#003f7a}.choice-card span{font-weight:900;color:#00828a}.choice-card small{color:#64748b;line-height:1.35}.custom-live-total{display:flex;justify-content:space-between;align-items:center;background:#003f7a;color:#fff;border-radius:22px;padding:18px 20px;font-weight:900}.custom-live-total strong{font-size:1.45rem;color:#f2be1a}@media(max-width:900px){.custom-designer-head,.custom-grid-inputs,.choice-grid{grid-template-columns:1fr;display:grid}.custom-designer-head{align-items:stretch}}
+.custom-designer-box{border:2px solid rgba(242,190,26,.45)!important;background:linear-gradient(180deg,#fffdf5,#fff)!important}.custom-designer-head{display:flex;align-items:center;justify-content:space-between;gap:18px}.btn-own-design{border:0;border-radius:999px;background:linear-gradient(135deg,#f2be1a,#ffd85a);color:#102a43;font-weight:950;padding:14px 20px;cursor:pointer;box-shadow:0 12px 30px rgba(242,190,26,.25)}.custom-designer-panel{display:none;margin-top:22px}.custom-designer-panel.active{display:block}.custom-grid-inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0}.custom-grid-inputs label{display:grid;gap:8px;font-weight:800;color:#0f2740}.custom-grid-inputs input,.custom-grid-inputs select{border:1px solid #dbe4ee;border-radius:16px;padding:12px 14px;font-weight:800;background:#fff}.choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0 22px}.choice-card{border:1px solid #dbe4ee;border-radius:20px;padding:14px;background:#fff;cursor:pointer;display:grid;gap:6px}.choice-card:has(input:checked){border-color:#1a5e63;box-shadow:0 0 0 3px rgba(0,130,138,.12);background:#f2fbfb}.choice-card input{accent-color:#1a5e63}.choice-card strong{color:#0c2b2e}.choice-card span{font-weight:900;color:#1a5e63}.choice-card small{color:#64748b;line-height:1.35}.custom-live-total{display:flex;justify-content:space-between;align-items:center;background:#0c2b2e;color:#fff;border-radius:22px;padding:18px 20px;font-weight:900}.custom-live-total strong{font-size:1.45rem;color:#f2be1a}@media(max-width:900px){.custom-designer-head,.custom-grid-inputs,.choice-grid{grid-template-columns:1fr;display:grid}.custom-designer-head{align-items:stretch}}
 
 
 /* Cotizador: flujo construcción + m² + habitaciones */
 .construction-grid .fundacion-card-premium{min-height:122px;}
 .build-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px;}
 .build-controls label{display:flex;flex-direction:column;gap:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:14px;}
-.build-controls span{font-weight:900;color:#003f7a;font-size:.92rem;}
+.build-controls span{font-weight:900;color:#0c2b2e;font-size:.92rem;}
 .build-controls input{border:1px solid #dbe4ee;border-radius:14px;padding:13px 14px;font-size:1.1rem;font-weight:900;color:#0f2740;}
 .progress-images{margin-top:18px;background:#fffdf4;border:1px solid rgba(242,190,26,.35);border-radius:20px;padding:14px;}
-.progress-images h4{margin:0 0 12px;color:#003f7a;font-size:1rem;}
+.progress-images h4{margin:0 0 12px;color:#0c2b2e;font-size:1rem;}
 .progress-images-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
 .progress-images-grid img{width:100%;height:145px;object-fit:cover;border-radius:16px;box-shadow:0 10px 24px rgba(15,23,42,.12);}
 @media(max-width:760px){.build-controls,.progress-images-grid{grid-template-columns:1fr}.progress-images-grid img{height:180px}}
@@ -544,7 +544,7 @@ footer.main-footer {
   box-shadow:0 18px 42px rgba(15,23,42,.08);
 }
 .visualizer-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px;}
-.visualizer-title-row h4{margin:0;color:#003f7a;font-size:1.1rem;font-weight:900;}
+.visualizer-title-row h4{margin:0;color:#0c2b2e;font-size:1.1rem;font-weight:900;}
 .visualizer-title-row p{margin:4px 0 0;color:#64748b;font-size:.86rem;line-height:1.35;}
 .visualizer-badge{white-space:nowrap;background:rgba(242,190,26,.18);border:1px solid rgba(242,190,26,.45);color:#7a5300;border-radius:999px;padding:8px 12px;font-weight:900;font-size:.78rem;}
 .architecture-visualizer{position:relative;min-height:390px;border-radius:24px;overflow:hidden;background:linear-gradient(#9ed7ff 0 42%,#77ba62 42% 100%);isolation:isolate;box-shadow:inset 0 0 0 1px rgba(255,255,255,.65);}
@@ -567,17 +567,17 @@ footer.main-footer {
 .visual-deck{position:absolute;left:18%;right:18%;bottom:4px;height:20px;background:repeating-linear-gradient(90deg,#ad7a3c 0 16px,#93642e 17px 30px);border-radius:4px;display:none}.has-terrace .visual-deck{display:block;animation:popIn .35s ease both}
 .visual-pool{position:absolute;right:8%;bottom:35px;width:120px;height:46px;border-radius:50%;background:radial-gradient(circle,#9df4ff,#168bbb);border:8px solid rgba(255,255,255,.78);box-shadow:0 15px 20px rgba(0,0,0,.18);display:none}.has-pool .visual-pool{display:block;animation:popIn .35s ease both}
 .visual-fence{position:absolute;left:0;right:0;bottom:42px;height:34px;background:repeating-linear-gradient(90deg,rgba(102,61,25,.92) 0 8px,transparent 8px 26px);display:none;opacity:.85}.has-fence .visual-fence{display:block}
-.visual-terrace,.visual-quincho,.visual-parking,.visual-storage,.visual-landscape,.paint-roller,.light-bulb{position:absolute;display:none;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.9);border:1px solid rgba(0,63,122,.16);box-shadow:0 12px 26px rgba(15,23,42,.18);color:#003f7a;z-index:8}.visual-terrace{left:26%;bottom:40px;width:42px;height:42px}.visual-quincho{left:8%;bottom:92px;width:48px;height:48px;color:#b45309}.visual-parking{right:14%;bottom:88px;width:50px;height:50px}.visual-storage{left:12%;bottom:44px;width:48px;height:48px}.visual-landscape{right:29%;bottom:32px;width:46px;height:46px;color:#15803d}.paint-roller{right:-18px;top:68px;width:46px;height:46px;color:#be123c}.light-bulb{left:-18px;top:68px;width:46px;height:46px;color:#d97706}
+.visual-terrace,.visual-quincho,.visual-parking,.visual-storage,.visual-landscape,.paint-roller,.light-bulb{position:absolute;display:none;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.9);border:1px solid rgba(0,63,122,.16);box-shadow:0 12px 26px rgba(15,23,42,.18);color:#0c2b2e;z-index:8}.visual-terrace{left:26%;bottom:40px;width:42px;height:42px}.visual-quincho{left:8%;bottom:92px;width:48px;height:48px;color:#b45309}.visual-parking{right:14%;bottom:88px;width:50px;height:50px}.visual-storage{left:12%;bottom:44px;width:48px;height:48px}.visual-landscape{right:29%;bottom:32px;width:46px;height:46px;color:#15803d}.paint-roller{right:-18px;top:68px;width:46px;height:46px;color:#be123c}.light-bulb{left:-18px;top:68px;width:46px;height:46px;color:#d97706}
 .has-terrace .visual-terrace,.has-quincho .visual-quincho,.has-parking .visual-parking,.has-storage .visual-storage,.has-landscape .visual-landscape,.has-paint .paint-roller,.has-light .light-bulb{display:flex;animation:popIn .35s ease both}.has-paint .visual-body{box-shadow:inset 0 0 0 999px rgba(255,255,255,.18)}.has-light .window{box-shadow:0 0 18px #fde68a;background:#fff4b3}
 @keyframes popIn{from{transform:scale(.65);opacity:0}to{transform:scale(1);opacity:1}}
 .visual-info-card{position:absolute;left:18px;top:18px;z-index:10;display:flex;flex-direction:column;gap:3px;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.7);border-radius:18px;padding:12px 14px;box-shadow:0 14px 32px rgba(15,23,42,.12)}
-.visual-info-card strong{color:#003f7a;font-size:.98rem}.visual-info-card span{color:#0f172a;font-weight:800;font-size:.83rem}.visual-info-card small{color:#64748b;font-size:.76rem}
+.visual-info-card strong{color:#0c2b2e;font-size:.98rem}.visual-info-card span{color:#0f172a;font-weight:800;font-size:.83rem}.visual-info-card small{color:#64748b;font-size:.76rem}
 .visual-tags{position:absolute;left:18px;right:18px;bottom:18px;z-index:12;display:flex;flex-wrap:wrap;gap:8px}.visual-tags span{display:inline-flex;align-items:center;gap:6px;background:rgba(0,63,122,.86);color:white;border-radius:999px;padding:8px 10px;font-size:.76rem;font-weight:800;backdrop-filter:blur(8px)}.visual-tags svg{width:15px;height:15px}
 .construction-progress-box{background:linear-gradient(180deg,#fff,#f8fbfd)}
 .construction-stages-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
 .stage-card{position:relative;overflow:hidden;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:14px;min-height:150px;box-shadow:0 10px 24px rgba(15,23,42,.06);transition:transform .2s ease,border-color .2s ease;}
-.stage-card:hover{transform:translateY(-3px);border-color:rgba(0,130,138,.45)}.stage-card.done{background:linear-gradient(180deg,#ffffff,#f0fdf4)}.stage-card.active{border-color:#00828a;box-shadow:0 16px 34px rgba(0,130,138,.14)}
-.stage-number{position:absolute;right:12px;top:10px;font-weight:1000;color:#cbd5e1;font-size:1.2rem}.stage-icon{width:38px;height:38px;border-radius:14px;background:#edf7f7;color:#00828a;display:flex;align-items:center;justify-content:center;margin-bottom:10px}.stage-icon svg{width:20px;height:20px}.stage-card h4{margin:0 0 6px;color:#0f2740;font-size:.9rem;line-height:1.15}.stage-card p{margin:0;color:#64748b;font-size:.75rem;line-height:1.28}.stage-bar{position:absolute;left:14px;right:14px;bottom:12px;height:6px;background:#edf2f7;border-radius:999px;overflow:hidden}.stage-bar span{display:block;height:100%;background:linear-gradient(90deg,#00828a,#5fa723);border-radius:inherit;transition:width .35s ease}
+.stage-card:hover{transform:translateY(-3px);border-color:rgba(0,130,138,.45)}.stage-card.done{background:linear-gradient(180deg,#ffffff,#f0fdf4)}.stage-card.active{border-color:#1a5e63;box-shadow:0 16px 34px rgba(0,130,138,.14)}
+.stage-number{position:absolute;right:12px;top:10px;font-weight:1000;color:#cbd5e1;font-size:1.2rem}.stage-icon{width:38px;height:38px;border-radius:14px;background:#edf7f7;color:#1a5e63;display:flex;align-items:center;justify-content:center;margin-bottom:10px}.stage-icon svg{width:20px;height:20px}.stage-card h4{margin:0 0 6px;color:#0f2740;font-size:.9rem;line-height:1.15}.stage-card p{margin:0;color:#64748b;font-size:.75rem;line-height:1.28}.stage-bar{position:absolute;left:14px;right:14px;bottom:12px;height:6px;background:#edf2f7;border-radius:999px;overflow:hidden}.stage-bar span{display:block;height:100%;background:linear-gradient(90deg,#1a5e63,#5fa723);border-radius:inherit;transition:width .35s ease}
 @media(max-width:980px){.architecture-visualizer{min-height:360px}.construction-stages-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.house-large .visual-house{width:305px}.visual-pool{right:4%;width:92px}}
 @media(max-width:620px){.visualizer-title-row{flex-direction:column}.architecture-visualizer{min-height:345px}.visual-house,.house-small .visual-house,.house-medium .visual-house,.house-large .visual-house{width:225px;height:142px;bottom:76px}.visual-body{height:88px}.visual-roof{height:58px}.visual-info-card{left:12px;right:12px;top:12px}.visual-tags{left:12px;right:12px;bottom:12px}.construction-stages-grid{grid-template-columns:1fr}.stage-card{min-height:132px}.build-controls{grid-template-columns:1fr!important}}
 
@@ -641,11 +641,11 @@ footer.main-footer {
    Cotizador diseño propio: visualizador premium + popup etapas
 ========================================================= */
 .visualizer-box{background:linear-gradient(180deg,#ffffff,#f7fcff);border:1px solid rgba(0,130,138,.12);border-radius:24px;padding:18px;margin-top:20px;box-shadow:0 16px 34px rgba(0,130,138,.08);}
-.visualizer-title-row h4{font-size:1.15rem;color:#003f7a;margin:0 0 4px;font-weight:900;}.visualizer-title-row p{margin:0;color:#64748b}.visualizer-badge{background:linear-gradient(135deg,#003f7a,#00828a);color:#fff;border-radius:999px;padding:8px 12px;font-weight:900;font-size:.78rem;}
+.visualizer-title-row h4{font-size:1.15rem;color:#0c2b2e;margin:0 0 4px;font-weight:900;}.visualizer-title-row p{margin:0;color:#64748b}.visualizer-badge{background:linear-gradient(135deg,#0c2b2e,#1a5e63);color:#fff;border-radius:999px;padding:8px 12px;font-weight:900;font-size:.78rem;}
 .architecture-visualizer{min-height:430px!important;background:linear-gradient(180deg,#bfe8ff 0 40%,#dff7d1 40% 100%)!important;border:1px solid rgba(255,255,255,.7);box-shadow:inset 0 0 0 1px rgba(255,255,255,.65),0 18px 45px rgba(0,63,122,.12)!important;}
-.visual-house{filter:drop-shadow(0 20px 20px rgba(15,23,42,.16));}.visual-body{background:linear-gradient(180deg,#fffaf0,#e8f2f7)!important;border:1px solid rgba(0,63,122,.12);}.visual-roof{background:linear-gradient(135deg,#003f7a,#006fa8)!important;}.madera_economica .visual-body{background:linear-gradient(180deg,#f7d8aa,#c98d52)!important}.metalcon_simple .visual-body{background:linear-gradient(180deg,#eef4f7,#cbd5e1)!important}.premium_madera_metalcon .visual-body{background:linear-gradient(180deg,#fef3c7,#e8f2f7)!important}.cemento .visual-body{background:linear-gradient(180deg,#f1f5f9,#cbd5e1)!important}.visual-info-card{border:1px solid rgba(0,130,138,.14)!important;box-shadow:0 12px 28px rgba(0,63,122,.10)!important;}
-.stage-card.stage-button{cursor:pointer!important;}.stage-card.stage-button small{color:#00828a!important}.stage-card .stage-bar span{background:linear-gradient(90deg,#f97316,#f2be1a,#00828a)!important}.stage-card.selected{background:#fff!important;}
-.stage-cost-modal{position:fixed;inset:0;z-index:6000;display:none;align-items:center;justify-content:center;padding:20px;}.stage-cost-modal.active{display:flex}.stage-cost-backdrop{position:absolute;inset:0;background:rgba(2,8,23,.62);backdrop-filter:blur(10px)}.stage-cost-dialog{position:relative;width:min(520px,94vw);background:#fff;border-radius:28px;padding:28px;box-shadow:0 28px 80px rgba(2,8,23,.34);border:1px solid rgba(255,255,255,.45)}.stage-cost-close{position:absolute;right:14px;top:12px;width:40px;height:40px;border:0;border-radius:999px;background:#0f172a;color:#fff;font-size:1.5rem;cursor:pointer}.stage-cost-kicker{display:inline-flex;padding:7px 12px;border-radius:999px;background:#fff4d6;color:#9a5a00;font-weight:900;text-transform:uppercase;font-size:.72rem;letter-spacing:.08em}.stage-cost-dialog h3{margin:12px 0 8px;color:#003f7a;font-size:1.75rem;line-height:1.05}.stage-cost-dialog p{color:#64748b;line-height:1.55}.stage-cost-values{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.stage-cost-values div{padding:16px;border-radius:18px;background:linear-gradient(180deg,#f8fbff,#edf7ff);border:1px solid rgba(0,63,122,.08)}.stage-cost-values small{display:block;color:#64748b;text-transform:uppercase;font-size:.68rem;font-weight:900;letter-spacing:.07em;margin-bottom:5px}.stage-cost-values strong{display:block;color:#0f172a;font-size:1.35rem}.stage-cost-context{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:16px;padding:12px;color:#166534!important;font-weight:700}.stage-cost-ok{width:100%;border:0;border-radius:999px;padding:14px 16px;background:linear-gradient(135deg,#003f7a,#00828a);color:#fff;font-weight:900;cursor:pointer;margin-top:8px}@media(max-width:640px){.stage-cost-values{grid-template-columns:1fr}.architecture-visualizer{min-height:400px!important}.stage-cost-dialog{padding:22px}.stage-cost-dialog h3{font-size:1.45rem}}
+.visual-house{filter:drop-shadow(0 20px 20px rgba(15,23,42,.16));}.visual-body{background:linear-gradient(180deg,#fffaf0,#e8f2f7)!important;border:1px solid rgba(0,63,122,.12);}.visual-roof{background:linear-gradient(135deg,#0c2b2e,#006fa8)!important;}.madera_economica .visual-body{background:linear-gradient(180deg,#f7d8aa,#c98d52)!important}.metalcon_simple .visual-body{background:linear-gradient(180deg,#eef4f7,#cbd5e1)!important}.premium_madera_metalcon .visual-body{background:linear-gradient(180deg,#fef3c7,#e8f2f7)!important}.cemento .visual-body{background:linear-gradient(180deg,#f1f5f9,#cbd5e1)!important}.visual-info-card{border:1px solid rgba(0,130,138,.14)!important;box-shadow:0 12px 28px rgba(0,63,122,.10)!important;}
+.stage-card.stage-button{cursor:pointer!important;}.stage-card.stage-button small{color:#1a5e63!important}.stage-card .stage-bar span{background:linear-gradient(90deg,#f97316,#f2be1a,#1a5e63)!important}.stage-card.selected{background:#fff!important;}
+.stage-cost-modal{position:fixed;inset:0;z-index:6000;display:none;align-items:center;justify-content:center;padding:20px;}.stage-cost-modal.active{display:flex}.stage-cost-backdrop{position:absolute;inset:0;background:rgba(2,8,23,.62);backdrop-filter:blur(10px)}.stage-cost-dialog{position:relative;width:min(520px,94vw);background:#fff;border-radius:28px;padding:28px;box-shadow:0 28px 80px rgba(2,8,23,.34);border:1px solid rgba(255,255,255,.45)}.stage-cost-close{position:absolute;right:14px;top:12px;width:40px;height:40px;border:0;border-radius:999px;background:#0f172a;color:#fff;font-size:1.5rem;cursor:pointer}.stage-cost-kicker{display:inline-flex;padding:7px 12px;border-radius:999px;background:#fff4d6;color:#9a5a00;font-weight:900;text-transform:uppercase;font-size:.72rem;letter-spacing:.08em}.stage-cost-dialog h3{margin:12px 0 8px;color:#0c2b2e;font-size:1.75rem;line-height:1.05}.stage-cost-dialog p{color:#64748b;line-height:1.55}.stage-cost-values{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.stage-cost-values div{padding:16px;border-radius:18px;background:linear-gradient(180deg,#f8fbff,#edf7ff);border:1px solid rgba(0,63,122,.08)}.stage-cost-values small{display:block;color:#64748b;text-transform:uppercase;font-size:.68rem;font-weight:900;letter-spacing:.07em;margin-bottom:5px}.stage-cost-values strong{display:block;color:#0f172a;font-size:1.35rem}.stage-cost-context{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:16px;padding:12px;color:#166534!important;font-weight:700}.stage-cost-ok{width:100%;border:0;border-radius:999px;padding:14px 16px;background:linear-gradient(135deg,#0c2b2e,#1a5e63);color:#fff;font-weight:900;cursor:pointer;margin-top:8px}@media(max-width:640px){.stage-cost-values{grid-template-columns:1fr}.architecture-visualizer{min-height:400px!important}.stage-cost-dialog{padding:22px}.stage-cost-dialog h3{font-size:1.45rem}}
 
 
 /* =========================================================
@@ -718,7 +718,7 @@ footer.main-footer {
   width:100%;
   border:1px solid rgba(255,255,255,.32);
   background:rgba(255,255,255,.96);
-  color:#003f7a;
+  color:#0c2b2e;
   border-radius:16px;
   padding:14px 16px;
   outline:none;
@@ -735,7 +735,7 @@ footer.main-footer {
   padding: 2px 2px 0;
 }
 .material-choice-head span{
-  color:#003f7a;
+  color:#0c2b2e;
   font-size:1.15rem;
   font-weight:900;
 }
@@ -800,7 +800,7 @@ footer.main-footer {
   margin-top:6px;
   padding:6px 12px;
   border-radius:999px;
-  color:#003f7a;
+  color:#0c2b2e;
   background:rgba(242,190,26,.18);
   font-size:1rem;
 }
@@ -856,7 +856,7 @@ footer.main-footer {
 
 
 /* TPL v2.2.5 cotizador diseño propio - pulido visual */
-.build-controls-featured,.material-choice-head,.visualizer-box,.construction-progress-box{border:1px solid rgba(0,130,138,.16);box-shadow:0 14px 32px rgba(0,63,122,.07)}.summary-total-box{background:linear-gradient(135deg,rgba(0,130,138,.12),rgba(16,185,129,.10))}.btn-activate-project{background:linear-gradient(135deg,#003f7a,#00828a);color:#fff;border:none;border-radius:16px;padding:14px 16px;font-weight:900;cursor:pointer}
+.build-controls-featured,.material-choice-head,.visualizer-box,.construction-progress-box{border:1px solid rgba(0,130,138,.16);box-shadow:0 14px 32px rgba(0,63,122,.07)}.summary-total-box{background:linear-gradient(135deg,rgba(0,130,138,.12),rgba(16,185,129,.10))}.btn-activate-project{background:linear-gradient(135deg,#0c2b2e,#1a5e63);color:#fff;border:none;border-radius:16px;padding:14px 16px;font-weight:900;cursor:pointer}
    TPL v2.2.6 - Experiencia profesional y tarjetas presupuesto
 ========================================================= */
 .combo-fields {
@@ -918,7 +918,7 @@ footer.main-footer {
 .budget-result-card .card-title {
   font-size: 1.08rem !important;
   font-weight: 900 !important;
-  color: #002b52 !important;
+  color: #071a1c !important;
   line-height: 1.25 !important;
   margin: 0 !important;
 }
@@ -948,7 +948,7 @@ footer.main-footer {
   box-shadow: 0 12px 28px rgba(15,23,42,.06);
 }
 .executor-panel-head h3 {
-  color: #002b52;
+  color: #071a1c;
   margin: 4px 0 6px;
   font-size: 1.15rem;
   font-weight: 900;
@@ -966,7 +966,7 @@ footer.main-footer {
   padding: 5px 10px;
   border-radius: 999px;
   background: rgba(0,130,138,.12);
-  color: #006a72;
+  color: #154a4e;
   font-size: .74rem;
   font-weight: 900;
   letter-spacing: .4px;
@@ -992,7 +992,7 @@ footer.main-footer {
   box-shadow: 0 16px 30px rgba(0,63,122,.10);
 }
 .executor-card.selected {
-  border-color: #00a6b2;
+  border-color: #21777d;
   outline: 2px solid rgba(0,166,178,.15);
   background: linear-gradient(180deg, #ecfdff, #ffffff);
 }
@@ -1006,10 +1006,10 @@ footer.main-footer {
   font-size: .72rem;
   margin-bottom: 8px;
 }
-.executor-card strong { display:block; color:#002b52; font-weight:900; }
-.executor-card small { display:block; color:#00828a; font-weight:800; margin:2px 0 7px; }
+.executor-card strong { display:block; color:#071a1c; font-weight:900; }
+.executor-card small { display:block; color:#1a5e63; font-weight:800; margin:2px 0 7px; }
 .executor-card p { margin:0 0 10px; color:#64748b; font-size:.84rem; line-height:1.45; }
-.executor-adjust { font-weight:900; color:#002b52; }
+.executor-adjust { font-weight:900; color:#071a1c; }
 .executor-adjust.discount { color:#16a34a; }
 .executor-adjust.premium { color:#d97706; }
 .executor-total-box {
@@ -1024,7 +1024,7 @@ footer.main-footer {
   background: rgba(0,63,122,.06);
 }
 .executor-total-box small { display:block; color:#64748b; font-size:.7rem; font-weight:800; text-transform:uppercase; }
-.executor-total-box strong { display:block; color:#002b52; font-size:.9rem; font-weight:900; }
+.executor-total-box strong { display:block; color:#071a1c; font-size:.9rem; font-weight:900; }
 
 .tpl-professional-modal {
   position: fixed;
@@ -1068,7 +1068,7 @@ footer.main-footer {
 }
 .tpl-modal-dialog h3 {
   margin: 12px 0 8px;
-  color: #002b52;
+  color: #071a1c;
   font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 900;
 }
@@ -1077,7 +1077,7 @@ footer.main-footer {
   padding: 14px 16px;
   border-radius: 18px;
   background: linear-gradient(135deg, rgba(0,130,138,.10), rgba(242,190,26,.12));
-  color: #002b52;
+  color: #071a1c;
   font-weight: 900;
   margin-bottom: 16px;
 }
@@ -1086,7 +1086,7 @@ footer.main-footer {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
-.tpl-form-grid label { display:flex; flex-direction:column; gap:6px; color:#002b52; font-weight:900; }
+.tpl-form-grid label { display:flex; flex-direction:column; gap:6px; color:#071a1c; font-weight:900; }
 .tpl-form-grid input,
 .tpl-form-grid textarea {
   width: 100%;
@@ -1108,9 +1108,9 @@ footer.main-footer {
 .tpl-ficha-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin-bottom:16px; }
 .tpl-ficha-grid div { background:#f8fafc; border:1px solid rgba(15,23,42,.08); border-radius:16px; padding:12px; }
 .tpl-ficha-grid small { display:block; color:#64748b; font-size:.72rem; font-weight:900; text-transform:uppercase; }
-.tpl-ficha-grid strong { display:block; color:#002b52; font-weight:900; }
+.tpl-ficha-grid strong { display:block; color:#071a1c; font-weight:900; }
 .tpl-ficha-info p { color:#475569; line-height:1.7; }
-.tpl-ficha-map { display:inline-flex; text-decoration:none; margin-top:12px; padding:12px 16px; border-radius:999px; color:#fff; background:linear-gradient(135deg,#003f7a,#00828a); font-weight:900; }
+.tpl-ficha-map { display:inline-flex; text-decoration:none; margin-top:12px; padding:12px 16px; border-radius:999px; color:#fff; background:linear-gradient(135deg,#0c2b2e,#1a5e63); font-weight:900; }
 
 @media (max-width: 720px) {
   .combo-fields,
