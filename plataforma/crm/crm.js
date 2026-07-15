@@ -297,3 +297,195 @@ document.addEventListener("DOMContentLoaded", () => {
   // Iniciar
   checkAuth();
 });
+
+
+// --- NAVEGACIÓN CRM ---
+const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+const dashboardSections = document.querySelectorAll('.dashboard-section');
+
+navItems.forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    // Quitar active de todos los links
+    navItems.forEach(nav => nav.classList.remove('active'));
+    item.classList.add('active');
+    
+    // Ocultar todas las secciones
+    dashboardSections.forEach(sec => sec.style.display = 'none');
+    
+    // Mostrar la sección correspondiente
+    const targetId = item.getAttribute('data-target');
+    const targetSection = document.getElementById(targetId);
+    if (targetSection) {
+      targetSection.style.display = 'block';
+    }
+
+    // Actualizar el título de la barra superior
+    const topbarTitle = document.getElementById('topbar-title');
+    if (topbarTitle) {
+      if (targetId === 'view-solicitudes') topbarTitle.textContent = 'Moderación de Publicaciones';
+      if (targetId === 'view-cotizaciones') topbarTitle.textContent = 'Cotizaciones y Smart Match';
+      if (targetId === 'view-contratistas') topbarTitle.textContent = 'Gestión de Contratistas';
+    }
+  });
+});
+
+
+// ============================================================================
+// MODULO CONTRATISTAS Y SMART MATCH
+// ============================================================================
+
+// Elementos DOM Nuevos
+const domContratistas = {
+  tableBody: document.getElementById("table-body-contratistas"),
+  filterEstado: document.getElementById("filter-estado-contratista"),
+  btnRefresh: document.getElementById("btn-refresh-contratistas"),
+};
+
+const domCotizaciones = {
+  tableBody: document.getElementById("table-body-cotizaciones"),
+  filterEstado: document.getElementById("filter-estado-cotizacion"),
+  btnRefresh: document.getElementById("btn-refresh-cotizaciones"),
+};
+
+let contratistasCache = [];
+let cotizacionesCache = [];
+
+// Cargar Contratistas
+async function loadContratistas() {
+  if (!domContratistas.tableBody) return;
+  domContratistas.tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Cargando contratistas...</td></tr>';
+  
+  const { data, error } = await window.supabase.from('contratistas').select('*').order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error("Error al cargar contratistas:", error);
+    domContratistas.tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red;">Error al cargar.</td></tr>';
+    return;
+  }
+  
+  contratistasCache = data;
+  renderContratistas();
+}
+
+function renderContratistas() {
+  if (!domContratistas.tableBody) return;
+  domContratistas.tableBody.innerHTML = '';
+  
+  const filter = domContratistas.filterEstado ? domContratistas.filterEstado.value : '';
+  const filtered = filter ? contratistasCache.filter(c => c.estado === filter) : contratistasCache;
+  
+  if (filtered.length === 0) {
+    domContratistas.tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay contratistas.</td></tr>';
+    return;
+  }
+  
+  filtered.forEach(c => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${c.nombre || 'Sin nombre'}</strong></td>
+      <td>${c.ubicacion_base || '-'}</td>
+      <td>${c.actividad_especialidad || '-'}</td>
+      <td>${c.telefono || '-'}</td>
+      <td>${c.estrellas_calificacion ? c.estrellas_calificacion + ' ★' : '-'}</td>
+      <td><span class="preview-badge" style="background:${c.estado === 'Activo' ? '#dcfce7' : '#f1f5f9'}; color:${c.estado === 'Activo' ? '#166534' : '#475569'};">${c.estado || 'Inactivo'}</span></td>
+      <td>
+        <button class="btn-primary-submit" style="padding: 6px 12px; font-size:0.8rem;" onclick="window.open('https://wa.me/${c.telefono}', '_blank')"><i data-lucide="message-circle" style="width:14px;"></i> Chat</button>
+      </td>
+    `;
+    domContratistas.tableBody.appendChild(tr);
+  });
+  if(window.lucide) window.lucide.createIcons();
+}
+
+// Cargar Cotizaciones y Smart Match
+async function loadCotizaciones() {
+  if (!domCotizaciones.tableBody) return;
+  domCotizaciones.tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Cargando cotizaciones...</td></tr>';
+  
+  const { data, error } = await window.supabase.from('cotizaciones_proyectos').select('*').order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error("Error al cargar cotizaciones:", error);
+    domCotizaciones.tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Error al cargar.</td></tr>';
+    return;
+  }
+  
+  // Si no tenemos contratistas cargados aún, los necesitamos para el Smart Match
+  if (contratistasCache.length === 0) {
+    const res = await window.supabase.from('contratistas').select('*').eq('estado', 'Activo');
+    if (!res.error) contratistasCache = res.data;
+  }
+  
+  cotizacionesCache = data;
+  renderCotizaciones();
+}
+
+function renderCotizaciones() {
+  if (!domCotizaciones.tableBody) return;
+  domCotizaciones.tableBody.innerHTML = '';
+  
+  const filter = domCotizaciones.filterEstado ? domCotizaciones.filterEstado.value : '';
+  const filtered = filter ? cotizacionesCache.filter(c => c.estado === filter) : cotizacionesCache;
+  
+  if (filtered.length === 0) {
+    domCotizaciones.tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay cotizaciones.</td></tr>';
+    return;
+  }
+  
+  filtered.forEach(c => {
+    // Calcular Smart Match (lógica básica)
+    let mejoresMatch = [...contratistasCache];
+    
+    // 1. Filtrar por cercanía (muy básico)
+    if (c.parcela_comuna) {
+      const comuna = c.parcela_comuna.toLowerCase();
+      mejoresMatch.forEach(cont => {
+        let score = 0;
+        if (cont.ubicacion_base && cont.ubicacion_base.toLowerCase().includes(comuna)) score += 50;
+        if (cont.estrellas_calificacion) score += (cont.estrellas_calificacion * 5); // Hasta 25 ptos
+        cont._tempScore = score;
+      });
+      mejoresMatch.sort((a,b) => (b._tempScore || 0) - (a._tempScore || 0));
+    }
+    
+    const topMatch = mejoresMatch.length > 0 ? mejoresMatch[0] : null;
+    const matchHtml = topMatch 
+      ? `<div style="font-size:0.8rem; background:#f0fdf4; padding:8px; border-radius:8px; border:1px solid #bbf7d0;">
+          <strong>Sugerido: ${topMatch.nombre}</strong><br>
+          <span style="color:#166534">${topMatch.ubicacion_base || 'Sin zona'} • ${topMatch.estrellas_calificacion || 0}★</span><br>
+          <button onclick="window.open('https://wa.me/${topMatch.telefono}?text=Hola ${encodeURIComponent(topMatch.nombre)}, tengo un proyecto en ${encodeURIComponent(c.parcela_comuna)} que podría interesarte.', '_blank')" style="margin-top:4px; padding:4px 8px; font-size:0.75rem; background:#25D366; color:#fff; border:none; border-radius:4px; cursor:pointer;">Contactar</button>
+         </div>`
+      : '<span style="color:#94a3b8; font-size:0.8rem;">Sin sugerencias</span>';
+
+    const fecha = new Date(c.created_at).toLocaleDateString();
+    
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${fecha}</td>
+      <td><strong>${c.cliente_nombre || 'Anónimo'}</strong><br><small>${c.cliente_telefono || ''}</small></td>
+      <td>ID: ${c.parcela_id || '-'}<br><small>${c.parcela_comuna || ''}</small></td>
+      <td>${c.requiere_instalacion ? '<span style="color:#10b981; font-weight:bold;">Sí</span>' : 'No'}</td>
+      <td><span class="preview-badge">${c.estado || 'Nueva'}</span></td>
+      <td>${matchHtml}</td>
+    `;
+    domCotizaciones.tableBody.appendChild(tr);
+  });
+  if(window.lucide) window.lucide.createIcons();
+}
+
+// Event Listeners para recargar
+if (domContratistas.btnRefresh) domContratistas.btnRefresh.addEventListener('click', loadContratistas);
+if (domContratistas.filterEstado) domContratistas.filterEstado.addEventListener('change', renderContratistas);
+if (domCotizaciones.btnRefresh) domCotizaciones.btnRefresh.addEventListener('click', loadCotizaciones);
+if (domCotizaciones.filterEstado) domCotizaciones.filterEstado.addEventListener('change', renderCotizaciones);
+
+// Interceptar la navegación para cargar datos la primera vez
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    const targetId = item.getAttribute('data-target');
+    if (targetId === 'view-contratistas' && contratistasCache.length === 0) loadContratistas();
+    if (targetId === 'view-cotizaciones' && cotizacionesCache.length === 0) loadCotizaciones();
+  });
+});

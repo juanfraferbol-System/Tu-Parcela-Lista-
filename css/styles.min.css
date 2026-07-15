@@ -539,3 +539,57 @@ h1, h2, h3, .buy-kicker, .publish-eyebrow {
 /* Responsive */
 @media (max-width: 1400px) { .b-left-large { left: -20px; top: -20px; } .b-left-oval { left: 40px; bottom: 10px; } .b-left-small { display: none; } .b-right-large { right: -30px; bottom: -30px; } .b-right-oval { right: 50px; top: 10px; } .b-right-small { display: none; } }
 @media (max-width: 1000px) { .hero-bubble { display: none !important; } .hero-life-masonry { background: url('image/banner-tranquilidad.jpg') center/cover no-repeat; min-height: 60vh; } .hero-masonry-content { background: rgba(255,255,255,0.92); } }
+
+/* --- Minimalist Locations and Filters --- */
+.location-filter-bar {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+  padding: 4px 0 !important;
+  margin-top: 10px !important;
+}
+.loc-global-btn, .loc-region-title, .loc-commune-btn {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 4px 8px !important;
+  color: var(--text-medium) !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease !important;
+}
+.loc-global-btn:hover, .loc-region-title:hover, .loc-commune-btn:hover {
+  color: var(--tpl-primary) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.loc-global-btn.active, .loc-region-title.active, .loc-commune-btn.active {
+  color: var(--tpl-primary) !important;
+  font-weight: 700 !important;
+  border-bottom: 2px solid var(--tpl-primary) !important;
+  background: transparent !important;
+}
+
+/* Minimalist Filters */
+.filter-btn {
+  background: transparent !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #64748b !important;
+  padding: 6px 16px !important;
+  font-size: 0.85rem !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font-weight: 500 !important;
+}
+.filter-btn:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+.filter-btn.active {
+  background: transparent !important;
+  border-color: var(--tpl-primary) !important;
+  color: var(--tpl-primary) !important;
+  font-weight: 700 !important;
+}

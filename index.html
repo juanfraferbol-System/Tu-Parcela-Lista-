@@ -43,7 +43,7 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
-<link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/><link href="css/styles.min.css?v=20260715-8" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/><link href="css/styles.min.css?v=20260715-4" rel="stylesheet"/>
 
 <link href="css/v2-base.css" rel="stylesheet"/>
 <link href="css/v2-sidebar.css" rel="stylesheet"/>
@@ -78,6 +78,7 @@
 <li><a href="index.html">Inicio</a></li>
 <li><a href="#parcelas-anchor">Parcelas</a></li>
 <li><a href="#casas-section">Casas</a></li>
+<li><a href="#mejores-alternativas" style="color:var(--tpl-primary); font-weight:800;">🔥 Mejores Alternativas</a></li>
 <li><a class="nav-link-feature" href="como-comprar.html">Cómo comprar</a></li>
 <li><a class="nav-link-publish" href="plataforma/publicar-parcela/index.html">Publicar</a></li>
 <li><a href="#quienes-somos">Quiénes Somos</a></li>
@@ -387,9 +388,12 @@
 <!-- -------------------------------------------------------------
        Sección Cotizador e Integraciones (Desbloqueable)
        ------------------------------------------------------------- -->
-<section class="section-cotizador" id="cotizador-section">
-<div class="container">
-<div style="text-align: center; margin-bottom: 56px;">
+<section class="section-cotizador" id="cotizador-section" style="display: none;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 56px;">
+      <h2 style="font-family: Outfit, sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--text-high); letter-spacing: -1px; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 12px;">
+        <i data-lucide="calculator" style="color: var(--tpl-primary); width: 32px; height: 32px;"></i> Cotizador de Proyectos
+      </h2>
 <span style="background: rgba(0, 130, 138, 0.1); color: var(--secondary); padding: 6px 16px; border-radius: var(--radius-full); font-weight: 700; font-size: 0.9rem;">PASO 3</span>
 <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-top: 12px;">Estás a un paso de lograr tu sueño</h2>
 <p style="color: var(--text-muted); max-width: 500px; margin: 8px auto 0 auto;">Revisa tu proyecto completo, ajusta fundación y adicionales, y envía tu cotización por WhatsApp.</p>
@@ -588,6 +592,25 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
     </div>
   </div>
 </section>
+<!-- Mejores Alternativas (Algoritmo Dinámico) -->
+<section class="section-padding" id="mejores-alternativas" style="background: linear-gradient(180deg, var(--surface-subtle) 0%, #fff 100%); border-top: 1px solid rgba(0,63,122,0.05);">
+  <div class="container">
+    <div class="section-header text-center" style="margin-bottom:48px;">
+      <span class="eyebrow" style="background:var(--tpl-accent); color:#fff; padding:6px 16px; border-radius:99px; font-weight:900; letter-spacing:1px; display:inline-block; margin-bottom:12px;"><i data-lucide="flame" style="width:16px; height:16px; vertical-align:-3px; margin-right:4px;"></i> TOP OPCIONES</span>
+      <h2 style="font-size:2.8rem; font-weight:800; color:var(--tpl-primary); margin-bottom:16px;">Las Mejores Alternativas del Día</h2>
+      <p style="font-size:1.15rem; color:var(--text-medium); max-width:600px; margin:0 auto;">Nuestro sistema inteligente ha analizado factores como cercanía a ciudades, conectividad, tamaño y precio para ofrecerte las 3 opciones más destacadas en este momento.</p>
+    </div>
+
+    <div class="grid-3" id="mejores-alternativas-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:24px;">
+      <!-- Se rellena por app.js -->
+      <div style="text-align:center; padding:40px; grid-column:1/-1;">
+        <i data-lucide="loader-2" class="spin" style="width:32px;height:32px;color:var(--tpl-primary);"></i>
+        <p style="margin-top:12px; color:var(--text-medium); font-weight:600;">Calculando las mejores opciones...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section-footer-info" id="quienes-somos">
 <div class="container footer-layout">
 <div class="footer-column">
@@ -651,7 +674,7 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="js/db-api.js"></script>
-<script defer src="app.js?v=20260715-7"></script>
+<script defer src="app.js?v=20260715-4"></script>
 <script defer src="premium-features.js"></script>
 <script defer src="js/tpl-modals.js"></script>
 <script defer src="js/tpl-utils.js"></script>
@@ -695,5 +718,6 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
   }, true);
 })();
 </script>
+<script src="alternativas.js" defer></script>
 </body>
 </html>

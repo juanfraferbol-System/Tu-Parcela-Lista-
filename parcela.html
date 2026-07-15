@@ -530,9 +530,7 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
           </a>
 
           <!-- Botón Compartir -->
-          <button id="sidebar-share-btn" type="button" class="btn-share-project" style="margin-top: 10px; width: 100%; padding: 14px; border-radius: var(--radius-md); border: 2px solid var(--border-color); background: #fff; color: var(--primary); font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease;">
-            <i data-lucide="share-2"></i> Compartir parcela
-          </button>
+
 
           <button type="button" id="detail-visit-btn" class="btn-primary-submit btn-visit-clear">
             <i data-lucide="calendar-days"></i> Agendar visita
@@ -780,7 +778,42 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
         });
       }
 
-      if (vieneDesdeCotizador) {
+      // Inyectar Botones Guardar y Compartir en la foto principal
+      const galleryMain = document.getElementById("gallery-main-item");
+      if (galleryMain && !document.getElementById("main-photo-actions")) {
+        galleryMain.style.position = "relative";
+        galleryMain.insertAdjacentHTML("beforeend", `
+          <div id="main-photo-actions" style="position:absolute; top:20px; right:20px; display:flex; gap:12px; z-index:30;">
+            <button type="button" class="btn-card-icon" id="detail-favorite-btn" aria-label="Guardar a favoritos" style="background:rgba(255,255,255,0.95); border:none; border-radius:50%; width:48px; height:48px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#ef4444; box-shadow:0 8px 24px rgba(0,0,0,0.15); transition:transform 0.25s, box-shadow 0.25s;">
+              <i data-lucide="heart" style="width:24px; height:24px; fill:currentColor;"></i>
+            </button>
+            <button type="button" class="btn-card-icon" id="detail-share-btn" aria-label="Compartir" style="background:linear-gradient(135deg, #25D366, #128C7E); border:none; border-radius:50%; width:48px; height:48px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#ffffff; box-shadow:0 8px 24px rgba(37,211,102,0.4); transition:transform 0.25s, box-shadow 0.25s;">
+              <i data-lucide="share-2" style="width:24px; height:24px;"></i>
+            </button>
+          </div>`);
+          
+        document.getElementById("detail-favorite-btn").addEventListener("click", (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          agregarParcelaAlProyecto();
+        });
+        
+        document.getElementById("detail-share-btn").addEventListener("click", (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          const shareUrl = window.location.href;
+          const shareText = `Te quiero enseñar esta parcela (${p.nombre}), dime qué te parece`;
+          if (navigator.share) {
+            navigator.share({ text: shareText, url: shareUrl });
+          } else {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`);
+          }
+        });
+        
+        if(window.lucide) window.lucide.createIcons();
+      }
+
+      function showHelperWidget() {\n        if(document.querySelector('.cotizador-parcela-helper')) return;
         const helper = document.createElement("div");
         helper.className = "cotizador-parcela-helper";
         helper.innerHTML = `
@@ -871,25 +904,6 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
                           `¿Sigue disponible para coordinar una visita?`;
       DOM.whatsappBtn.href = `https://api.whatsapp.com/send?phone=56988508361&text=${encodeURIComponent(whatsappMsg)}`;
 
-      // Botón de compartir
-      const shareBtn = document.getElementById("sidebar-share-btn");
-      if (shareBtn) {
-        shareBtn.addEventListener("click", () => {
-          const shareUrl = window.location.href;
-          const shareText = `Te quiero enseñar esta parcela (${p.nombre}), dime qué te parece`;
-          
-          if (navigator.share) {
-            navigator.share({
-              title: `Parcela ${p.nombre} - Tu Parcela Lista`,
-              text: shareText,
-              url: shareUrl
-            }).catch(console.error);
-          } else {
-            const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
-            window.open(waUrl, '_blank');
-          }
-        });
-      }
 
       // 3. Checklist de Atributos
       const features = [

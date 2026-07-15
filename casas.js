@@ -3,6 +3,7 @@ const casas = [
 
   {
     id: "aura18",
+    empresa: "ChileHome",
     nombre: "Casa prefabricada 18m²",
     metros: 18,
     habitaciones: 1,
@@ -16,9 +17,25 @@ const casas = [
     descripcion_breve: "Modelo full viene con estructura madera, techumbre,piso forros int y ext, puertas y ventanas.",
     tiempo: "20 días"
   },
+  {
+    id: "aura24",
+    empresa: "ChileHome",
+    nombre: "Casa prefabricada 24m²",
+    metros: 24,
+    habitaciones: 2,
+    banos: 1,
+    valorCasa: 3350000,
+    foto: "image/casas/pre_fabricadas/36mts2/pequenas/18_cabana_foto_render.webp",
+    imagenes: [
+      "image/casas/pre_fabricadas/36mts2/pequenas/18_cabana_foto.webp",
+      "image/casas/pre_fabricadas/36mts2/pequenas/18_cabana_plano.webp"
+    ],
+    descripcion_breve: "Modelo full viene con estructura madera, techumbre,piso forros int y ext, puertas y ventanas.",
+    tiempo: "20 días"
+  },
 
   {
-    id: "aura36",
+    id: "aura36",\n    empresa: "ChileHome",
     nombre: "Casa prefabricada 36m²",
     metros: 36,
     habitaciones: 2,
@@ -34,7 +51,7 @@ const casas = [
   },
 
 {
-    id: "aura42",
+    id: "aura42",\n    empresa: "ChileHome",
     nombre: "Casa prefabricada 42m²",
     metros: 42,
     habitaciones: 3,
@@ -50,7 +67,7 @@ const casas = [
   },
 
   {
-    id: "aura48",
+    id: "aura48",\n    empresa: "ChileHome",
     nombre: "Casa prefabricada 48m²",
     metros: 48,
     habitaciones: 3,
@@ -65,12 +82,12 @@ const casas = [
   },
 
     {
-    id: "aura54",
+    id: "aura54",\n    empresa: "ChileHome",
     nombre: "Casa prefabricada 48m²",
     metros: 54,
     habitaciones: 3,
     banos: 1,
-    valorCasa: 6400000,
+    valorCasa: 6750000,
     foto: "image/casas/pre_fabricadas/36mts2/medianas/54_6caida_agua_render.webp",
     imagenes: [
       "image/casas/pre_fabricadas/36mts2/medianas/54_6caida_agua_render.webp",
@@ -81,7 +98,7 @@ const casas = [
     tiempo: "25 días"
   },
   {
-    id: "aura72",
+    id: "aura72",\n    empresa: "ChileHome",
     nombre: "Casa prefabricada 72m²",
     metros: 72,
     habitaciones: 3,
@@ -98,7 +115,7 @@ const casas = [
 
   
 {
-    id:"aura84_1",
+    id: "aura84_1",\n    empresa: "ChileHome",
     nombre:"Casa prefabricada 82mts2,",
     metros:84,
     habitaciones:4,
@@ -117,7 +134,7 @@ const casas = [
 },
 
 {
-    id:"aura84_2",
+    id: "aura84_2",\n    empresa: "ChileHome",
     nombre:"Casa prefabricada 84mts2 de 6 aguas,",
     metros:84,
     habitaciones:4,
@@ -135,7 +152,7 @@ const casas = [
 },
 
 {
-    id:"aura108",
+    id: "aura108",\n    empresa: "ChileHome",
     nombre:"Casa prefabricada 108mts2 de 6 aguas,",
     metros:108,
     habitaciones:6,
@@ -154,12 +171,12 @@ const casas = [
 },
 
 {
-    id:"aura120",
+    id: "aura120",\n    empresa: "ChileHome",
     nombre:"Casa prefabricada 120mts2 de 6 aguas,",
     metros:120,
     habitaciones:6,
     banos:2,
-    valorCasa:14600000,
+    valorCasa:14700000,
     foto:"image/casas/pre_fabricadas/36mts2/grandes/108_6caida_agua_render.webp",
 
       imagenes: [
@@ -172,7 +189,7 @@ const casas = [
 },
 
 {
-   id:"Innova18",
+   id: "Innova18",\n    empresa: "Innova",
     nombre:"Casa Moderna madera full 18mts2,",
     metros:18,
     habitaciones:1,
@@ -193,7 +210,7 @@ const casas = [
 
     {
 
-   id:"Innova54",
+   id: "Innova54",\n    empresa: "Innova",
     nombre:"Casa Moderna completa full 54mts2,",
     metros:54,
     habitaciones:3,
@@ -212,7 +229,7 @@ const casas = [
 
   {
 
-   id:"Nogal72",
+   id: "Nogal72",\n    empresa: "Los Nogales",
     nombre:"Casa Moderna completa full 72mts2,",
     metros:72,
     habitaciones:3,

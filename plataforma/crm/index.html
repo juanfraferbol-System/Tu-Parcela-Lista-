@@ -49,7 +49,9 @@
     <aside class="sidebar">
       <div class="sidebar-brand">TPL Admin</div>
       <nav class="sidebar-nav">
-        <a href="#" class="active"><i data-lucide="inbox"></i> Solicitudes</a>
+        <a href="#" class="nav-item active" data-target="view-solicitudes"><i data-lucide="inbox"></i> Publicaciones</a>
+        <a href="#" class="nav-item" data-target="view-cotizaciones"><i data-lucide="briefcase"></i> Cotizaciones / Proyectos</a>
+        <a href="#" class="nav-item" data-target="view-contratistas"><i data-lucide="users"></i> Contratistas</a>
       </nav>
       <div class="sidebar-bottom">
         <button id="btn-logout"><i data-lucide="log-out"></i> Cerrar sesión</button>
@@ -58,76 +60,141 @@
 
     <main class="main-content">
       <header class="topbar">
-        <h1>Moderación de Parcelas</h1>
+        <h1 id="topbar-title">Moderación de Publicaciones</h1>
         <div class="user-info">
           <span id="user-name-display">Cargando...</span>
           <div class="avatar"><i data-lucide="user"></i></div>
         </div>
       </header>
 
-      <!-- Métricas -->
-      <section class="metrics-grid">
-        <div class="metric-card warning">
-          <div class="metric-icon"><i data-lucide="clock"></i></div>
-          <div class="metric-data">
-            <span class="metric-value" id="metric-pendientes">-</span>
-            <span class="metric-label">Pendientes</span>
+      <!-- VISTA SOLICITUDES (PUBLICACIONES) -->
+      <div id="view-solicitudes" class="dashboard-section active-section">
+        <!-- Métricas -->
+        <section class="metrics-grid">
+          <div class="metric-card warning">
+            <div class="metric-icon"><i data-lucide="clock"></i></div>
+            <div class="metric-data">
+              <span class="metric-value" id="metric-pendientes">-</span>
+              <span class="metric-label">Pendientes</span>
+            </div>
           </div>
-        </div>
-        <div class="metric-card info">
-          <div class="metric-icon"><i data-lucide="alert-circle"></i></div>
-          <div class="metric-data">
-            <span class="metric-value" id="metric-corregir">-</span>
-            <span class="metric-label">En Corrección</span>
+          <div class="metric-card info">
+            <div class="metric-icon"><i data-lucide="alert-circle"></i></div>
+            <div class="metric-data">
+              <span class="metric-value" id="metric-corregir">-</span>
+              <span class="metric-label">En Corrección</span>
+            </div>
           </div>
-        </div>
-        <div class="metric-card success">
-          <div class="metric-icon"><i data-lucide="check-circle"></i></div>
-          <div class="metric-data">
-            <span class="metric-value" id="metric-aprobadas">-</span>
-            <span class="metric-label">Aprobadas</span>
+          <div class="metric-card success">
+            <div class="metric-icon"><i data-lucide="check-circle"></i></div>
+            <div class="metric-data">
+              <span class="metric-value" id="metric-aprobadas">-</span>
+              <span class="metric-label">Aprobadas</span>
+            </div>
           </div>
-        </div>
-        <div class="metric-card danger">
-          <div class="metric-icon"><i data-lucide="x-circle"></i></div>
-          <div class="metric-data">
-            <span class="metric-value" id="metric-rechazadas">-</span>
-            <span class="metric-label">Rechazadas</span>
+          <div class="metric-card danger">
+            <div class="metric-icon"><i data-lucide="x-circle"></i></div>
+            <div class="metric-data">
+              <span class="metric-value" id="metric-rechazadas">-</span>
+              <span class="metric-label">Rechazadas</span>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Filtros -->
-      <section class="filters-bar">
-        <select id="filter-estado">
-          <option value="">Todos los estados</option>
-          <option value="pendiente_revision" selected>Pendientes de Revisión</option>
-          <option value="requiere_cambios">Requiere Cambios</option>
-          <option value="aprobada">Aprobadas</option>
-          <option value="rechazada">Rechazadas</option>
-        </select>
-        <button id="btn-refresh"><i data-lucide="refresh-cw"></i> Actualizar</button>
-      </section>
+        <!-- Filtros -->
+        <section class="filters-bar">
+          <select id="filter-estado">
+            <option value="">Todos los estados</option>
+            <option value="pendiente_revision" selected>Pendientes de Revisión</option>
+            <option value="requiere_cambios">Requiere Cambios</option>
+            <option value="aprobada">Aprobadas</option>
+            <option value="rechazada">Rechazadas</option>
+          </select>
+          <button id="btn-refresh"><i data-lucide="refresh-cw"></i> Actualizar</button>
+        </section>
 
-      <!-- Tabla -->
-      <section class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Propiedad</th>
-              <th>Corredor / Dueño</th>
-              <th>Comuna</th>
-              <th>Plan</th>
-              <th>Estado</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody id="table-body">
-            <!-- Filas dinámicas -->
-          </tbody>
-        </table>
-      </section>
+        <!-- Tabla -->
+        <section class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Propiedad</th>
+                <th>Corredor / Dueño</th>
+                <th>Comuna</th>
+                <th>Plan</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <!-- Filas dinámicas -->
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <!-- VISTA COTIZACIONES -->
+      <div id="view-cotizaciones" class="dashboard-section" style="display:none;">
+        <section class="filters-bar">
+          <select id="filter-estado-cotizacion">
+            <option value="">Todos los estados</option>
+            <option value="Nueva" selected>Nuevas</option>
+            <option value="Buscando contratista">Buscando Contratista</option>
+            <option value="Adjudicada">Adjudicada</option>
+          </select>
+          <button id="btn-refresh-cotizaciones"><i data-lucide="refresh-cw"></i> Actualizar</button>
+        </section>
+        <section class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Parcela/Comuna</th>
+                <th>Instalación</th>
+                <th>Estado</th>
+                <th>Smart Match</th>
+              </tr>
+            </thead>
+            <tbody id="table-body-cotizaciones">
+              <!-- Filas dinámicas -->
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <!-- VISTA CONTRATISTAS -->
+      <div id="view-contratistas" class="dashboard-section" style="display:none;">
+        <section class="filters-bar">
+          <button id="btn-new-contratista" class="btn-primary" style="margin-right:auto;"><i data-lucide="plus"></i> Nuevo Contratista</button>
+          <select id="filter-estado-contratista">
+            <option value="">Todos</option>
+            <option value="Activo" selected>Activos</option>
+            <option value="Inactivo">Inactivos</option>
+          </select>
+          <button id="btn-refresh-contratistas"><i data-lucide="refresh-cw"></i> Actualizar</button>
+        </section>
+        <section class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Ubicación Base</th>
+                <th>Especialidad</th>
+                <th>Teléfono</th>
+                <th>Estrellas</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="table-body-contratistas">
+              <!-- Filas dinámicas -->
+            </tbody>
+          </table>
+        </section>
+      </div>
+
     </main>
   </div>
 

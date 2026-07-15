@@ -649,10 +649,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <a class="card-image card-image-link" href="${detailHref}" aria-label="Ver detalles de ${p.nombre}">
           ${window.TasadorInteligente && window.TasadorInteligente.isOpportunity(getAllParcelas(), p) ? `<div class="badge-opportunity" style="position:absolute; top:12px; left:12px; background:linear-gradient(135deg, #f59e0b, #d97706); color:white; padding:4px 10px; border-radius:12px; font-size:0.75rem; font-weight:800; z-index:10; box-shadow:0 4px 12px rgba(245,158,11,0.4);"><i data-lucide="flame" style="width:12px;height:12px;margin-right:4px;vertical-align:-2px;"></i> Oportunidad de Inversión</div>` : ''}
           
-          <div class="card-top-icons" style="position:absolute; top:12px; right:12px; display:flex; gap:8px; z-index:10;">
-            <button class="btn-card-icon btn-favorite" type="button" aria-label="Guardar a favoritos" style="background:rgba(240,244,248,0.9); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#4a5568; transition:all 0.2s;" onclick="event.preventDefault(); event.stopPropagation(); window.tplToggleFavorite('${p.id}', this);"><i data-lucide="heart" style="width:18px; height:18px;"></i></button>
-            <button class="btn-card-icon btn-share" type="button" aria-label="Compartir" data-share-url="parcela.html?id=${encodeURIComponent(p.id)}" data-share-title="${p.nombre}" style="background:rgba(240,244,248,0.9); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#4a5568; transition:all 0.2s;" onclick="event.preventDefault(); navigator.share ? navigator.share({title: this.dataset.shareTitle, url: window.location.origin + '/' + this.dataset.shareUrl}) : window.open('https://api.whatsapp.com/send?text=Te quiero enseñar esta parcela, dime que te parece: ' + encodeURIComponent(window.location.origin + '/' + this.dataset.shareUrl))"><i data-lucide="share-2" style="width:18px; height:18px;"></i></button>
-          </div>
+          <div class="card-top-icons" style="position:absolute; top:12px; right:12px; display:flex; gap:8px; z-index:10;"></div>
           <img src="${img}" alt="${p.nombre}" loading="${state.recommendationActive ? "eager" : "lazy"}" fetchpriority="${state.recommendationActive ? "high" : "auto"}" decoding="async" width="800" height="600">
           ${renderParcelaFeatureChips(p, "mobile")}
         </a>
@@ -2220,7 +2217,29 @@ document.addEventListener("DOMContentLoaded", () => {
         `Se generó un PDF descargable de respaldo${pdfResult?.filename ? ` (${pdfResult.filename})` : ""}.\n\n` +
         `Quiero que un ejecutivo me contacte para revisar disponibilidad, reserva y pasos de compra.`
       );
+            // Guardar en Supabase Cotizaciones
+      try {
+        const payload = {
+          cliente_nombre: 'Cliente Web Anónimo',
+          parcela_id: state.selectedParcela ? state.selectedParcela.id.toString() : 'Desconocido',
+          parcela_comuna: state.selectedParcela ? state.selectedParcela.comuna : 'Desconocida',
+          casa_id: state.selectedCasa ? state.selectedCasa.id.toString() : 'Ninguna',
+          presupuesto_estimado: state.selectedCasa ? state.selectedCasa.precio : 0,
+          requiere_instalacion: state.installationService === 'si'
+        };
+        fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/cotizaciones_proyectos', {
+          method: 'POST',
+          headers: {
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(payload)
+        }).catch(e => console.warn("Error guardando cotizacion", e));
+      } catch (e) {}
       window.open(`https://wa.me/${CONTACT_PHONE_WA}?text=${msg}`, "_blank");
+
     });
 
     DOM.activateProjectBtn?.addEventListener("click", openActivationModal);
@@ -2248,7 +2267,31 @@ document.addEventListener("DOMContentLoaded", () => {
       if (DOM.activationStatus) DOM.activationStatus.textContent = "Guardando solicitud y redirigiendo a Flow...";
       
       try {
+                // Guardar en Supabase Cotizaciones (REST API para Smart Match Contratistas)
+        try {
+          const payload = {
+            cliente_nombre: cliente.nombre || 'Cliente Web Activación',
+            cliente_telefono: cliente.telefono,
+            cliente_email: cliente.email,
+            parcela_id: state.selectedParcela ? state.selectedParcela.id.toString() : 'Desconocido',
+            parcela_comuna: state.selectedParcela ? state.selectedParcela.comuna : 'Desconocida',
+            casa_id: state.selectedCasa ? state.selectedCasa.id.toString() : 'Ninguna',
+            presupuesto_estimado: state.selectedCasa ? state.selectedCasa.precio : 0,
+            requiere_instalacion: state.installationService === 'si'
+          };
+          fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/cotizaciones_proyectos', {
+            method: 'POST',
+            headers: {
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
+              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
+              'Content-Type': 'application/json',
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify(payload)
+          }).catch(e => console.warn("No se pudo guardar la cotización en DB", e));
+        } catch (e) {}
         const leadRes = await window.apiSaveLead(cliente);
+
         const leadId = leadRes?.data?.[0]?.id || `TPL-${Date.now()}`;
         const amount = (parseClp(state.selectedParcela.precio) * 0.01) || 10000;
 
@@ -2650,7 +2693,7 @@ document.addEventListener("DOMContentLoaded", () => {
               '<li>Casa: ' + (c.metros || c.m2 || "-") + ' m² construidos</li>' +
               '<li>Ubicación: ' + (p.comuna || "Sur de Chile") + '</li>' +
             '</ul>' +
-            '<button type="button" class="amazon-btn promo-cta-button">Ver proyecto completo</button>' +
+            '<a href="parcela.html?id=' + encodeURIComponent(p.id) + '" class="amazon-btn promo-cta-button" style="text-decoration:none; display:block; text-align:center;">Ver proyecto completo</a>' +
           '</div>';
         
         card.addEventListener('click', (e) => {
