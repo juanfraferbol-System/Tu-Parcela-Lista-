@@ -35,7 +35,8 @@ const casas = [
   },
 
   {
-    id: "aura36",\n    empresa: "ChileHome",
+    id: "aura36",
+    empresa: "ChileHome",
     nombre: "Casa prefabricada 36m²",
     metros: 36,
     habitaciones: 2,
@@ -51,7 +52,8 @@ const casas = [
   },
 
 {
-    id: "aura42",\n    empresa: "ChileHome",
+    id: "aura42",
+    empresa: "ChileHome",
     nombre: "Casa prefabricada 42m²",
     metros: 42,
     habitaciones: 3,
@@ -67,7 +69,8 @@ const casas = [
   },
 
   {
-    id: "aura48",\n    empresa: "ChileHome",
+    id: "aura48",
+    empresa: "ChileHome",
     nombre: "Casa prefabricada 48m²",
     metros: 48,
     habitaciones: 3,
@@ -82,7 +85,8 @@ const casas = [
   },
 
     {
-    id: "aura54",\n    empresa: "ChileHome",
+    id: "aura54",
+    empresa: "ChileHome",
     nombre: "Casa prefabricada 48m²",
     metros: 54,
     habitaciones: 3,
@@ -98,7 +102,8 @@ const casas = [
     tiempo: "25 días"
   },
   {
-    id: "aura72",\n    empresa: "ChileHome",
+    id: "aura72",
+    empresa: "ChileHome",
     nombre: "Casa prefabricada 72m²",
     metros: 72,
     habitaciones: 3,
@@ -115,7 +120,8 @@ const casas = [
 
   
 {
-    id: "aura84_1",\n    empresa: "ChileHome",
+    id: "aura84_1",
+    empresa: "ChileHome",
     nombre:"Casa prefabricada 82mts2,",
     metros:84,
     habitaciones:4,
@@ -134,7 +140,8 @@ const casas = [
 },
 
 {
-    id: "aura84_2",\n    empresa: "ChileHome",
+    id: "aura84_2",
+    empresa: "ChileHome",
     nombre:"Casa prefabricada 84mts2 de 6 aguas,",
     metros:84,
     habitaciones:4,
@@ -152,7 +159,8 @@ const casas = [
 },
 
 {
-    id: "aura108",\n    empresa: "ChileHome",
+    id: "aura108",
+    empresa: "ChileHome",
     nombre:"Casa prefabricada 108mts2 de 6 aguas,",
     metros:108,
     habitaciones:6,
@@ -171,7 +179,8 @@ const casas = [
 },
 
 {
-    id: "aura120",\n    empresa: "ChileHome",
+    id: "aura120",
+    empresa: "ChileHome",
     nombre:"Casa prefabricada 120mts2 de 6 aguas,",
     metros:120,
     habitaciones:6,
@@ -189,7 +198,8 @@ const casas = [
 },
 
 {
-   id: "Innova18",\n    empresa: "Innova",
+   id: "Innova18",
+    empresa: "Innova",
     nombre:"Casa Moderna madera full 18mts2,",
     metros:18,
     habitaciones:1,
@@ -210,7 +220,8 @@ const casas = [
 
     {
 
-   id: "Innova54",\n    empresa: "Innova",
+   id: "Innova54",
+    empresa: "Innova",
     nombre:"Casa Moderna completa full 54mts2,",
     metros:54,
     habitaciones:3,
@@ -229,7 +240,8 @@ const casas = [
 
   {
 
-   id: "Nogal72",\n    empresa: "Los Nogales",
+   id: "Nogal72",
+    empresa: "Los Nogales",
     nombre:"Casa Moderna completa full 72mts2,",
     metros:72,
     habitaciones:3,
