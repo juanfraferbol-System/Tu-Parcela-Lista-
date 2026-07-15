@@ -2580,95 +2580,99 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   function renderProjectPromos() {
-    const grid = document.getElementById("promos-grid");
-    if (!grid) return;
 
-    const parcelasList = getAllParcelas()
-      .filter(p => p && p.id && parseClp(p.precio) > 0)
-      .slice()
-      .sort((a, b) => parseClp(a.precio) - parseClp(b.precio))
-      .slice(0, 10);
-
-    const casasList = getAllCasas()
-      .filter(c => c && c.id && Number(c.valorCasa || c.precio || 0) > 0)
-      .slice()
-      .sort((a, b) => Number(a.valorCasa || a.precio || 0) - Number(b.valorCasa || b.precio || 0))
-      .slice(0, 10);
-
-    if (!parcelasList.length || !casasList.length) return;
-
-    const promos = [];
-    parcelasList.forEach(p => {
-      casasList.forEach(c => {
+      const grid = document.getElementById("promos-grid");
+      if (!grid) return;
+  
+      const parcelasList = getAllParcelas()
+        .filter(p => p && p.id && parseClp(p.precio) > 0)
+        .slice()
+        .sort((a, b) => parseClp(a.precio) - parseClp(b.precio))
+        .slice(0, 10);
+  
+      const casasList = getAllCasas()
+        .filter(c => c && c.id && Number(c.valorCasa || c.precio || 0) > 0)
+        .slice()
+        .sort((a, b) => Number(a.valorCasa || a.precio || 0) - Number(b.valorCasa || b.precio || 0))
+        .slice(0, 10);
+  
+      if (!parcelasList.length || !casasList.length) return;
+  
+      const promos = [];
+      parcelasList.forEach(p => {
+        casasList.forEach(c => {
+          const houseVal = Number(c.valorCasa || c.precio || 0);
+          const total = parseClp(p.precio) + houseVal + getFundacionValue(getCheapestFundacion(), c);
+          promos.push({ p, c, total });
+        });
+      });
+  
+      const used = new Set();
+      const picks = promos
+        .sort((a, b) => a.total - b.total)
+        .filter(item => {
+          const key = item.p.id; // Only 1 promo per parcel
+          if (used.has(key)) return false;
+          used.add(key);
+          return true;
+        })
+        .slice(0, 5);
+  
+      const promoBadges = ["MÁS VENDIDO", "OFERTA DEL DÍA", "AMAZON'S CHOICE", "REBAJADO", "MÁS POPULAR"];
+      
+      grid.className = "amazon-grid"; 
+      grid.innerHTML = "";
+      
+      picks.forEach((item, index) => {
+        const p = item.p;
+        const c = item.c;
+        const landVal = parseClp(p.precio);
         const houseVal = Number(c.valorCasa || c.precio || 0);
-        const total = parseClp(p.precio) + houseVal + getFundacionValue(getCheapestFundacion(), c);
-        promos.push({ p, c, total });
+        const m2 = getParcelaM2(p);
+        
+        const card = document.createElement("article");
+        card.className = "amazon-promo-card";
+        
+        const priceStr = money(item.total).replace('$', '').trim();
+        const reviews = Math.floor(Math.random() * 300) + 50;
+        
+        card.innerHTML = '<div class="amazon-badge" style="background: ' + (index === 2 ? '#232F3E' : '#C45500') + '">' + promoBadges[index] + '</div>' +
+          '<div class="amazon-img-container">' +
+            '<img src="' + getParcelaMainImage(p) + '" alt="' + (p.nombre||'') + '">' +
+            '<img src="' + (c.foto || 'image/placeholder-casa.jpg') + '" alt="' + (c.nombre||'') + '" class="amazon-house-inset">' +
+          '</div>' +
+          '<div class="amazon-content">' +
+            '<div class="amazon-title">' + (p.nombre || "Parcela seleccionada") + ' con ' + (c.nombre || "Casa") + (c.habitaciones ? ' (' + c.habitaciones + ' habs.)' : '') + '</div>' +
+            '<div class="amazon-rating">⭐⭐⭐⭐⭐ <span class="amazon-reviews">(' + reviews + ')</span></div>' +
+            '<div class="amazon-price">' +
+              '<span class="amazon-currency">$</span><span class="amazon-whole">' + priceStr + '</span>' +
+            '</div>' +
+            '<div class="amazon-prime">✓ <span>Prime</span> Entrega llave en mano</div>' +
+            '<ul class="amazon-bullets">' +
+              '<li>Terreno: ' + m2.toLocaleString("es-CL") + ' m²</li>' +
+              '<li>Casa: ' + (c.metros || c.m2 || "-") + ' m² construidos</li>' +
+              '<li>Ubicación: ' + (p.comuna || "Sur de Chile") + '</li>' +
+            '</ul>' +
+            '<button type="button" class="amazon-btn promo-cta-button">Ver proyecto completo</button>' +
+          '</div>';
+        
+        card.addEventListener('click', (e) => {
+          if(e.target.tagName === 'BUTTON' || e.target.closest('.amazon-btn')) {
+             if (window.selectParcela) window.selectParcela(p);
+             if (window.selectCasa) window.selectCasa(c);
+             const el = document.getElementById("cotizador-premium-section") || document.getElementById("casas-section");
+             if (el) {
+               el.classList.add("active");
+               el.scrollIntoView({behavior: "smooth"});
+             }
+          }
+        });
+        
+        grid.appendChild(card);
       });
-    });
 
-    const used = new Set();
-    const picks = promos
-      .sort((a, b) => a.total - b.total)
-      .filter(item => {
-        const key = `${item.p.id}-${item.c.id}`;
-        if (used.has(key)) return false;
-        used.add(key);
-        return true;
-      })
-      .slice(0, 5);
+}
 
-    const promoThemes = ["orange", "teal", "blue", "green", "gold"];
-    const promoTags = ["Oferta inicial", "Casa + terreno", "Precio oportunidad", "Proyecto familiar", "Más completo"];
-    const promoSubTags = ["LOW PRICE", "READY TO QUOTE", "HOT DEAL", "BEST VALUE", "FULL PROJECT"];
-
-    grid.innerHTML = "";
-    picks.forEach((item, index) => {
-      const p = item.p;
-      const c = item.c;
-      const landVal = parseClp(p.precio);
-      const houseVal = Number(c.valorCasa || c.precio || 0);
-      const m2 = getParcelaM2(p);
-      const card = document.createElement("article");
-      card.className = `promo-card-v2 promo-card-modern promo-gringo promo-theme-${promoThemes[index]}`;
-      card.innerHTML = `
-        <div class="promo-photo" style="background-image:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,43,82,.88)),url('${getParcelaMainImage(p)}')">
-          <span class="promo-chip">${promoTags[index]}</span>
-          <span class="promo-us-tag">${promoSubTags[index]}</span>
-          <strong>${p.comuna || p.nombre || "Proyecto"}</strong>
-        </div>
-        <div class="promo-body">
-          <div class="promo-index">PROMO ${index + 1}</div>
-          <h3>${p.nombre || "Parcela seleccionada"} + ${c.nombre || "Casa"}</h3>
-          <p>${m2.toLocaleString("es-CL")} m² de terreno · ${c.habitaciones || c.dormitorios || "-"} hab · ${c.metros || c.m2 || "-"} m² construidos.</p>
-          <div class="promo-mini-grid">
-            <span><b>Parcela</b>${p.precio || money(landVal)}</span>
-            <span><b>Casa</b>${money(houseVal)}</span>
-          </div>
-          <div class="promo-price-wrap">
-            <small>Desde</small>
-            <div class="promo-price">${money(item.total)}</div>
-          </div>
-          <div class="promo-actions-row">
-            <button type="button" class="promo-cta-button">Cotizar proyecto</button>
-            <button type="button" class="promo-location-button">Ver ubicación</button>
-          </div>
-        </div>`;
-      card.addEventListener("click", (ev) => {
-        if (ev.target.closest(".promo-location-button")) return;
-        window.TPLSelectProyectoListo(p.id, c.id);
-      });
-      card.querySelector(".promo-cta-button")?.addEventListener("click", (ev) => {
-        ev.stopPropagation();
-        window.TPLSelectProyectoListo(p.id, c.id);
-      });
-      card.querySelector(".promo-location-button")?.addEventListener("click", (ev) => {
-        ev.stopPropagation();
-        openLocationModal(p);
-      });
-      grid.appendChild(card);
-    });
-    if (window.lucide) lucide.createIcons();
-  }
 
   document.getElementById("share-project-btn")?.addEventListener("click", () => {
     if (!state.selectedParcela) return;
