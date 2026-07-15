@@ -62,3 +62,56 @@
   border-top-left-radius: 12px !important;
   border-top-right-radius: 12px !important;
 }
+
+/* --- Minimalist Amazon/YouTube Style for Popups & Modals --- */
+.summary-info-card, .house-plan-modal-panel, .tpl-modal-dialog, .lead-modal, .tpl-ficha-dialog {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12) !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+}
+
+/* Modal Close Buttons (Pill shaped, subtle gray) */
+.modal-close, .summary-info-close, .house-plan-modal-close, .friendly-message-close {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-radius: 9999px !important;
+  border: none !important;
+  transition: background 0.2s !important;
+  box-shadow: none !important;
+}
+.modal-close:hover, .summary-info-close:hover, .house-plan-modal-close:hover, .friendly-message-close:hover {
+  background: #e2e8f0 !important;
+}
+
+/* Modal Primary Buttons */
+.summary-info-actions [data-summary-select-house], .tpl-info-modal .primary, .lead-modal .btn-primary-submit, .tpl-submit-project, .btn-activate-project {
+  border-radius: 9999px !important;
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  transition: background 0.2s !important;
+}
+.summary-info-actions [data-summary-select-house]:hover, .tpl-info-modal .primary:hover, .lead-modal .btn-primary-submit:hover, .tpl-submit-project:hover, .btn-activate-project:hover {
+  background: #334155 !important;
+}
+
+/* Modal Secondary Buttons */
+.summary-info-actions [data-summary-house-plan], .tpl-info-modal .soft, .tpl-location-modal button {
+  border-radius: 9999px !important;
+  background: transparent !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  padding: 10px 22px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+.summary-info-actions [data-summary-house-plan]:hover, .tpl-info-modal .soft:hover {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+}
