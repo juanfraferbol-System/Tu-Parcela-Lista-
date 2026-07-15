@@ -650,7 +650,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ${window.TasadorInteligente && window.TasadorInteligente.isOpportunity(getAllParcelas(), p) ? `<div class="badge-opportunity" style="position:absolute; top:12px; left:12px; background:linear-gradient(135deg, #f59e0b, #d97706); color:white; padding:4px 10px; border-radius:12px; font-size:0.75rem; font-weight:800; z-index:10; box-shadow:0 4px 12px rgba(245,158,11,0.4);"><i data-lucide="flame" style="width:12px;height:12px;margin-right:4px;vertical-align:-2px;"></i> Oportunidad de Inversión</div>` : ''}
           <span class="card-comuna">📍 ${p.comuna || "Chile"}</span>
           <div class="card-top-icons" style="position:absolute; top:12px; right:12px; display:flex; gap:8px; z-index:10;">
-            <button class="btn-card-icon btn-favorite" type="button" aria-label="Guardar a favoritos" style="background:rgba(240,244,248,0.9); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#4a5568; transition:all 0.2s;" onclick="event.preventDefault(); window.tplToggleFavorite('${p.id}', this);"><i data-lucide="heart" style="width:18px; height:18px;"></i></button>
+            <button class="btn-card-icon btn-favorite" type="button" aria-label="Guardar a favoritos" style="background:rgba(240,244,248,0.9); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#4a5568; transition:all 0.2s;" onclick="event.preventDefault(); event.stopPropagation(); window.tplToggleFavorite('${p.id}', this);"><i data-lucide="heart" style="width:18px; height:18px;"></i></button>
             <button class="btn-card-icon btn-share" type="button" aria-label="Compartir" data-share-url="parcela.html?id=${encodeURIComponent(p.id)}" data-share-title="${p.nombre}" style="background:rgba(240,244,248,0.9); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#4a5568; transition:all 0.2s;" onclick="event.preventDefault(); navigator.share ? navigator.share({title: this.dataset.shareTitle, url: window.location.origin + '/' + this.dataset.shareUrl}) : window.open('https://api.whatsapp.com/send?text=Te quiero enseñar esta parcela, dime que te parece: ' + encodeURIComponent(window.location.origin + '/' + this.dataset.shareUrl))"><i data-lucide="share-2" style="width:18px; height:18px;"></i></button>
           </div>
           <img src="${img}" alt="${p.nombre}" loading="${state.recommendationActive ? "eager" : "lazy"}" fetchpriority="${state.recommendationActive ? "high" : "auto"}" decoding="async" width="800" height="600">
@@ -2922,3 +2922,14 @@ document.addEventListener('error', (event) => {
   img.alt = img.alt || 'Imagen temporalmente no disponible';
   img.src = 'image/logo_compartir.png';
 }, true);
+
+window.tplToggleFavorite = function(id, btn) {
+    if (btn) {
+        const icon = btn.querySelector('i');
+        const isFav = btn.style.color === 'red';
+        btn.style.color = isFav ? '#4a5568' : 'red';
+        if (icon) {
+            icon.style.fill = isFav ? 'none' : 'red';
+        }
+    }
+};
