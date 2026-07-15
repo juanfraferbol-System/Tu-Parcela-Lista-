@@ -2977,3 +2977,57 @@ window.tplToggleFavorite = function(id, btn) {
         }
     }
 };
+
+// --- GENERADOR DE VIDEO IA (Automated Flow) ---
+document.addEventListener('DOMContentLoaded', () => {
+  // Since the button is recreated dynamically inside updateCotizacionSummary,
+  // we will attach the listener to the document and delegate the event.
+  document.addEventListener('click', (e) => {
+    const btnAi = e.target.closest('#btn-generate-ai-video');
+    if (btnAi) {
+      e.preventDefault();
+      let prompt = 'A photorealistic cinematic drone shot over a beautiful terrain. ';
+      if (state.selectedCasa) {
+        const isWood = state.selectedCasa.nombre.toLowerCase().includes('madera');
+        prompt += 'A ' + (state.selectedCasa.habitaciones || 3) + '-bedroom modern ' + (isWood ? 'wooden' : 'prefabricated') + ' house is built on this plot. ';
+      }
+      if (state.selectedExtras && state.selectedExtras.size > 0) {
+         let extrasArr = Array.from(state.selectedExtras).map(id => {
+           let e = [...extrasAutomaticos, ...extrasOpcionales].find(x => x.id === id);
+           return e ? e.nombre.toLowerCase() : null;
+         }).filter(Boolean);
+         if (extrasArr.length > 0) {
+           prompt += 'The property features: ' + extrasArr.join(', ') + '. ';
+         }
+      }
+      prompt += 'Highly detailed, sunny day, architectural visualization style, 8k resolution, smooth camera movement.';
+      const email = window.prompt('Para procesar tu pago de $2.990 y enviarte el video cinemático con IA a tu correo, por favor ingresa tu email:');
+      if (email && email.includes('@')) {
+        const oldHtml = btnAi.innerHTML;
+        btnAi.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Generando Orden de Pago...';
+        fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/cotizaciones_proyectos', {
+          method: 'POST',
+          headers: {
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            cliente_nombre: 'ORDEN VIDEO IA',
+            cliente_email: email,
+            parcela_id: state.selectedParcela ? state.selectedParcela.id.toString() : 'Desconocido',
+            casa_id: 'PROMPT: ' + prompt,
+            presupuesto_estimado: 2990
+          })
+        }).then(() => {
+          alert('Simulación: Pago completado.\n\nEl Prompt dinámico generado para tu Video IA es:\n\n' + prompt + '\n\nEl equipo ya puede verlo en el CRM.');
+          btnAi.innerHTML = '<i data-lucide="check"></i> Video Solicitado';
+        }).catch(() => {
+          alert('Error de conexión.');
+          btnAi.innerHTML = oldHtml;
+        });
+      }
+    }
+  });
+});
