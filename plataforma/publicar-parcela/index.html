@@ -16,8 +16,8 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="publicar-parcela.css" />
-    <script src="supabase-config.js"></script>
+    <link rel="stylesheet" href="publicar-parcela.css?v=20260715-9" />
+    <script src="supabase-config.js?v=20260715-9"></script>
   </head>
   <body>
     <a class="skip-link" href="#publish-form">Saltar al formulario</a>
@@ -43,12 +43,11 @@
           <span id="progress-fill"></span>
         </div>
         <ol id="progress-steps">
-          <li aria-current="step"><span>1</span><b>Plan</b></li>
-          <li><span>2</span><b>Fotos</b></li>
-          <li><span>3</span><b>Relato</b></li>
-          <li><span>4</span><b>Datos</b></li>
-          <li><span>5</span><b>Preparación</b></li>
-          <li><span>6</span><b>Publicación</b></li>
+          <li aria-current="step"><span>1</span><b>Fotos</b></li>
+          <li><span>2</span><b>Relato</b></li>
+          <li><span>3</span><b>Datos</b></li>
+          <li><span>4</span><b>Vista Previa</b></li>
+          <li><span>5</span><b>Publicación</b></li>
         </ol>
       </nav>
       <form id="publish-form" class="flow-card" novalidate>
@@ -58,390 +57,12 @@
           role="status"
           aria-live="polite"
         ></div>
+        
         <section
-          class="flow-step"
-          data-step="1" class="flow-step is-active"
-          aria-labelledby="step-4-title"
-          hidden
-        >
-          <p class="eyebrow">Identificación</p>
-          <h2 id="step-4-title">¿Cuál es tu relación con esta parcela?</h2>
-          <fieldset class="identity-grid">
-            <legend class="sr-only">Relación con la parcela</legend>
-            <label
-              ><input
-                type="radio"
-                name="tipoPublicador"
-                value="dueno"
-                required
-              /><span aria-hidden="true">🏡</span
-              ><strong>Soy dueño de la parcela</strong></label
-            ><label
-              ><input
-                type="radio"
-                name="tipoPublicador"
-                value="corredor"
-                required
-              /><span aria-hidden="true">🤝</span
-              ><strong>Soy corredor de propiedades</strong></label
-            >
-          </fieldset>
-          <div id="owner-contact" class="publisher-fields" hidden>
-            <h3>Datos de contacto del propietario</h3>
-            <div class="contact-grid">
-              <label
-                >Nombre completo<input
-                  name="nombreDueno"
-                  autocomplete="name" /></label
-              ><label
-                >Correo electrónico<input
-                  type="email"
-                  name="correoDueno"
-                  autocomplete="email" /></label
-              ><label
-                >Teléfono<input
-                  type="tel"
-                  name="telefonoDueno"
-                  autocomplete="tel"
-              /></label>
-            </div>
-            <div class="parcel-quantity-field" style="margin-top: 18px;">
-              <label style="display:flex; flex-direction:column; gap:5px; color:var(--navy); font-weight:800;">
-                ¿Cuántas parcelas quieres publicar?
-                <input type="number" name="cantidadParcelas" min="1" value="1" style="max-width: 120px; padding: 10px 13px; border: 1px solid #c9d8e3; border-radius: 15px;" />
-              </label>
-              <div id="extra-parcel-warning" hidden style="margin-top: 10px; padding: 12px; background: #fff5f5; border: 1px solid #ffcccc; border-radius: 12px; color: #b73e3e; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
-                <span aria-hidden="true" style="font-size: 1.2rem;">💳</span>
-                <span>Se aplicará un cargo de <strong>$5.990</strong> por cada parcela extra al enviar la publicación.</span>
-              </div>
-            </div>
-          </div>
-          <div
-            id="broker-contact"
-            class="publisher-fields broker-fields"
-            hidden
-          >
-            <h3>Datos profesionales del corredor</h3>
-            <p class="field-note">
-              Si trabajas de forma independiente, puedes usar tu nombre personal
-              como presentación.
-            </p>
-            <div class="contact-grid">
-              <label
-                >Nombre de la corredora<input
-                  name="corredoraNombre"
-                  autocomplete="organization" /></label
-              ><label
-                >Nombre del representante<input
-                  name="representanteNombre"
-                  autocomplete="name" /></label
-              ><label
-                >Correo electrónico<input
-                  type="email"
-                  name="correoCorredor"
-                  autocomplete="email" /></label
-              ><label
-                >Teléfono<input
-                  type="tel"
-                  name="telefonoCorredor"
-                  autocomplete="tel" /></label
-              ><label
-                >WhatsApp<input
-                  type="tel"
-                  name="whatsappCorredor"
-                  autocomplete="tel" /></label
-              ><label
-                >Años de experiencia<input
-                  type="number"
-                  name="anosExperiencia"
-                  min="0"
-                  max="80" /></label
-              ><label
-                >RUT personal o de empresa <small>Opcional</small
-                ><input name="rutCorredor" /></label
-              ><label
-                >Sitio web <small>Opcional</small
-                ><input
-                  type="url"
-                  name="sitioWeb"
-                  placeholder="https://" /></label
-              ><label
-                >Instagram o red social <small>Opcional</small
-                ><input
-                  type="url"
-                  name="redSocial"
-                  placeholder="https://" /></label
-              ><label
-                >Logotipo <small>Opcional</small
-                ><input
-                  type="file"
-                  name="logoCorredor"
-                  id="broker-logo"
-                  accept="image/png,image/jpeg,image/webp"
-              /></label>
-            </div>
-            <label class="public-description"
-              >Breve presentación profesional <small>Opcional</small
-              ><textarea
-                name="presentacionCorredor"
-                rows="4"
-                maxlength="800"
-              ></textarea>
-            </label>
-          </div>
-        </section>
-        
-<div id="step-1-plan-container">
-          <div id="owner-model" hidden>
-            <p class="eyebrow">Servicio Partner TPL</p>
-            <h2>Trabajemos como partners para vender tu parcela</h2>
-            <p class="lead">
-              Tú indicas el monto líquido que deseas recibir. TPL agrega un 2 %
-              al precio de publicación y presta el Servicio Partner de
-              comercialización.
-            </p>
-            <label class="money-field"
-              >¿Cuánto deseas recibir por la venta?<span
-                ><b>$</b
-                ><input
-                  name="montoLiquido"
-                  inputmode="numeric"
-                  placeholder="Ej.: 15.000.000" /></span></label
-            ><button
-              type="button"
-              class="secondary-action estimate-trigger"
-              id="open-estimator"
-            >
-              Conocer valor estimado
-            </button>
-            <div id="estimator" class="estimator" hidden aria-live="polite">
-              <div id="estimator-loading" hidden>
-                Analizando ubicación, superficie y características…
-              </div>
-              <div id="estimator-result"></div>
-            </div>
-            <div class="price-summary">
-              <div>
-                <span>Monto líquido del dueño</span
-                ><strong id="owner-liquid">$0</strong>
-              </div>
-              <div>
-                <span>Servicio Partner TPL 2 %</span
-                ><strong id="partner-service">$0</strong>
-              </div>
-              <div class="total">
-                <span>Precio final de publicación</span
-                ><strong id="publication-total">$0</strong>
-              </div>
-            </div>
-            <div class="included-box">
-              <h3>Servicio Partner de comercialización</h3>
-              <ul>
-                <li>Preparación y optimización del anuncio.</li>
-                <li>Contacto con interesados.</li>
-                <li>Cotizaciones con casas.</li>
-                <li>Coordinación de visitas.</li>
-                <li>Seguimiento comercial.</li>
-                <li>Apoyo documental.</li>
-                <li>Acompañamiento hasta la firma.</li>
-                <li>Panel del propietario.</li>
-                <li>
-                  Evaluación interna de fotografía, video, dron o campañas.
-                </li>
-              </ul>
-              <p>
-                Los recursos audiovisuales y campañas se evalúan internamente
-                según cada propiedad y no están garantizados.
-              </p>
-            </div>
-            <label class="acceptance"
-              ><input type="checkbox" name="aceptaPartner" /><span
-                >Acepto trabajar con Tu Parcela Lista como partner de
-                comercialización y confirmo las condiciones del servicio del 2
-                %.</span
-              ></label
-            >
-            <div id="partner-alternative" class="partner-alternative" hidden>
-              <h3>¿Prefieres publicar como corredor de propiedades?</h3>
-              <p>
-                Podrás conservar toda la información ingresada y elegir un plan
-                de publicación directa, sin el acompañamiento comercial del
-                modelo Partner.
-              </p>
-              <div>
-                <button
-                  type="button"
-                  class="secondary-action"
-                  id="keep-partner"
-                >
-                  Mantener Servicio Partner</button
-                ><button
-                  type="button"
-                  class="secondary-action"
-                  id="switch-to-broker"
-                >
-                  Ver planes para corredores
-                </button>
-              </div>
-            </div>
-          </div>
-          <div id="broker-model" hidden>
-            <p class="eyebrow">Planes para corredores</p>
-            <h2>Elige el plan que acompaña tu trabajo</h2>
-            <p class="lead">
-              Compara capacidad, visibilidad y herramientas sin listas
-              repetidas.
-            </p>
-            <div
-              class="plan-grid"
-              id="broker-plans"
-              role="radiogroup"
-              aria-label="Planes para corredores"
-            ></div>
-            <div
-              id="broker-plan-detail"
-              class="plan-detail"
-              aria-live="polite"
-            ></div>
-            <section class="plan-comparison" aria-labelledby="comparison-title">
-              <h3 id="comparison-title">Comparación de planes</h3>
-              <div
-                class="comparison-scroll"
-                tabindex="0"
-                role="region"
-                aria-label="Tabla comparativa de planes; desplázate horizontalmente en pantallas pequeñas"
-              >
-                <table id="plan-comparison-table"></table>
-              </div>
-            </section>
-            <details class="plan-full-details">
-              <summary>Ver detalle completo de los planes</summary>
-              <div id="full-plan-details" class="full-plan-details"></div>
-            </details>
-            <div class="plan-help">
-              <strong>¿No sabes cuál elegir?</strong
-              ><span
-                >Puedes comenzar gratuitamente y cambiar de plan cuando
-                quieras.</span
-              >
-            </div>
-            <section class="quality-commitment" aria-labelledby="quality-title">
-              <p class="eyebrow">Confianza y atención</p>
-              <h3 id="quality-title">Compromiso de calidad TPL</h3>
-              <p>
-                Para cuidar la confianza de compradores y propietarios, Tu
-                Parcela Lista podrá revisar, pausar o retirar publicaciones
-                cuando existan incumplimientos reiterados, información
-                incorrecta, falta de respuesta, trato inadecuado o reclamos
-                fundados. Antes de retirar una publicación, TPL podrá solicitar
-                aclaraciones o correcciones al corredor, salvo en situaciones
-                graves que requieran una suspensión inmediata.
-              </p>
-              <label class="acceptance"
-                ><input type="checkbox" name="aceptaEstandaresCorredor" /><span
-                  >Acepto mantener información correcta, responder oportunamente
-                  y cumplir los estándares de atención de Tu Parcela
-                  Lista.</span
-                ></label
-              >
-            </section>
-            <section
-              class="broker-profile-preview"
-              aria-labelledby="broker-preview-title"
-            >
-              <div class="profile-demo-note">
-                Vista demostrativa · reputación simulada e independiente del
-                plan
-              </div>
-              <h3 id="broker-preview-title">
-                Vista previa del perfil profesional
-              </h3>
-              <div class="broker-profile-head">
-                <div
-                  id="profile-avatar"
-                  class="profile-avatar"
-                  aria-hidden="true"
-                >
-                  TPL
-                </div>
-                <div>
-                  <h4 id="profile-company">Nombre del corredor</h4>
-                  <p id="profile-representative">Representante por completar</p>
-                  <span id="profile-experience">Experiencia por informar</span>
-                </div>
-              </div>
-              <div class="profile-stats">
-                <div>
-                  <strong id="profile-publications">0</strong
-                  ><span>Publicaciones</span>
-                </div>
-                <div>
-                  <strong id="profile-score">4,7 ★</strong
-                  ><span>Valoración de usuarios</span>
-                </div>
-                <div>
-                  <strong id="profile-rating-count">18</strong
-                  ><span>Evaluaciones</span>
-                </div>
-                <div>
-                  <strong id="profile-response"
-                    >Sin información suficiente</strong
-                  ><span>Tiempo medio de respuesta</span>
-                </div>
-              </div>
-              <div class="reputation-columns">
-                <section>
-                  <h4>Valoración de usuarios</h4>
-                  <div id="rating-categories" class="rating-categories"></div>
-                </section>
-                <section>
-                  <h4>Evaluación TPL</h4>
-                  <strong id="tpl-evaluation-level" class="tpl-level"
-                    >En evaluación</strong
-                  >
-                  <p>
-                    La evaluación considera atención y comportamiento; ningún
-                    plan permite comprar una mejor valoración.
-                  </p>
-                </section>
-              </div>
-              <section class="verified-comments">
-                <h4>Comentarios recientes</h4>
-                <div id="verified-comment-list"></div>
-                <p>
-                  Las opiniones corresponden a usuarios que registraron una
-                  interacción mediante TPL.
-                </p>
-              </section>
-              <div class="profile-actions">
-                <button
-                  type="button"
-                  class="secondary-action"
-                  id="view-broker-listings"
-                >
-                  Ver sus parcelas</button
-                ><button
-                  type="button"
-                  class="secondary-action"
-                  id="contact-broker-preview"
-                >
-                  Contacto directo
-                </button>
-              </div>
-              <div
-                id="profile-action-status"
-                role="status"
-                aria-live="polite"
-              ></div>
-            </section>
-          </div>
-        </section>
-        
-<section
-          class="flow-step"
-          data-step="2"
+          class="flow-step is-active"
+          data-step="1"
           aria-labelledby="step-3-title"
-          hidden
+          
         >
           <p class="eyebrow">Contenido visual</p>
           <h2 id="step-3-title">Agrega las mejores fotografías</h2>
@@ -565,22 +186,9 @@
                 <li>Regresa y pega el enlace en el formulario.</li>
               </ol>
             </section>
-            <section>
-              <h3>Desde un computador:</h3>
-              <ol>
-                <li>Abre Google Maps.</li>
-                <li>Busca la propiedad y haz clic en el punto correcto.</li>
-                <li>Presiona Compartir.</li>
-                <li>Selecciona Copiar enlace.</li>
-                <li>Pega el enlace en el formulario.</li>
-              </ol>
-            </section>
-          </dialog>
-        </section>
-        
-<section
+        <section
           class="flow-step "
-          data-step="3"
+          data-step="2"
           aria-labelledby="step-1-title"
         >
           <p class="eyebrow">Comencemos por lo más importante</p>
@@ -638,10 +246,83 @@
             ></div>
           </div>
         </section>
-        
-<section
+        <section
           class="flow-step"
-          data-step="4"
+          data-step="loading"
+          aria-labelledby="step-6-title"
+          hidden
+        >
+          <p class="eyebrow">Preparación automática de fotografías</p>
+          <h2 id="step-6-title">Preparemos tu anuncio</h2>
+          <p class="lead">
+            Optimizamos tamaño, orientación y peso antes del envío. Revisa el
+            contenido que será visible. Nada del relato original aparecerá
+            públicamente.
+          </p>
+          <div class="content-editor">
+            <label
+              >Título sugerido por TPL<input
+                name="tituloPublico"
+                maxlength="70"
+                required /></label
+            ><button
+              type="button"
+              class="secondary-action"
+              id="regenerate-title"
+            >
+              Volver a generar título</button
+            ><label class="public-description"
+              >Descripción sugerida por TPL<textarea
+                name="descripcionPublica"
+                rows="8"
+                minlength="30"
+                maxlength="3000"
+                required
+              ></textarea></label
+            ><button
+              type="button"
+              class="secondary-action"
+              id="regenerate-description"
+            >
+              Volver a generar descripción
+            </button>
+          </div>
+          <section class="enrichment-box" aria-labelledby="enrichment-title">
+            <h3 id="enrichment-title">
+              Información complementaria basada en los datos ingresados.
+            </h3>
+            <p>Esta información se mantiene separada hasta que la revises.</p>
+            <textarea
+              name="informacionComplementaria"
+              rows="5"
+              aria-label="Información complementaria"
+            ></textarea>
+            <div class="enrichment-actions">
+              <button
+                type="button"
+                class="secondary-action"
+                id="accept-enrichment"
+              >
+                Aceptar</button
+              ><button
+                type="button"
+                class="secondary-action"
+                id="edit-enrichment"
+              >
+                Editar</button
+              ><button
+                type="button"
+                class="secondary-action"
+                id="reject-enrichment"
+              >
+                Rechazar
+              </button>
+            </div>
+            <div id="enrichment-status" role="status" aria-live="polite"></div>
+          </section>
+        <section
+          class="flow-step"
+          data-step="3"
           aria-labelledby="step-2-title"
           hidden
         >
@@ -910,101 +591,9 @@
             /><small>Opcional</small></label
           >
         </section>
-        
-<section
+        <section
           class="flow-step"
-          data-step="5"
-          aria-labelledby="step-6-title"
-          hidden
-        >
-          <p class="eyebrow">Preparación automática de fotografías</p>
-          <h2 id="step-6-title">Preparemos tu anuncio</h2>
-          <p class="lead">
-            Optimizamos tamaño, orientación y peso antes del envío. Revisa el
-            contenido que será visible. Nada del relato original aparecerá
-            públicamente.
-          </p>
-          <div class="content-editor">
-            <label
-              >Título sugerido por TPL<input
-                name="tituloPublico"
-                maxlength="70"
-                required /></label
-            ><button
-              type="button"
-              class="secondary-action"
-              id="regenerate-title"
-            >
-              Volver a generar título</button
-            ><label class="public-description"
-              >Descripción sugerida por TPL<textarea
-                name="descripcionPublica"
-                rows="8"
-                minlength="30"
-                maxlength="3000"
-                required
-              ></textarea></label
-            ><button
-              type="button"
-              class="secondary-action"
-              id="regenerate-description"
-            >
-              Volver a generar descripción
-            </button>
-          </div>
-          <section class="enrichment-box" aria-labelledby="enrichment-title">
-            <h3 id="enrichment-title">
-              Información complementaria basada en los datos ingresados.
-            </h3>
-            <p>Esta información se mantiene separada hasta que la revises.</p>
-            <textarea
-              name="informacionComplementaria"
-              rows="5"
-              aria-label="Información complementaria"
-            ></textarea>
-            <div class="enrichment-actions">
-              <button
-                type="button"
-                class="secondary-action"
-                id="accept-enrichment"
-              >
-                Aceptar</button
-              ><button
-                type="button"
-                class="secondary-action"
-                id="edit-enrichment"
-              >
-                Editar</button
-              ><button
-                type="button"
-                class="secondary-action"
-                id="reject-enrichment"
-              >
-                Rechazar
-              </button>
-            </div>
-            <div id="enrichment-status" role="status" aria-live="polite"></div>
-          </section>
-          <div class="preparation-grid">
-            <section>
-              <h3>Portada seleccionada</h3>
-              <div id="preparation-cover" class="preparation-cover">
-                Sin portada seleccionada
-              </div>
-              <button type="button" class="secondary-action" id="change-cover">
-                Revisar fotografías
-              </button>
-            </section>
-            <section>
-              <h3>Etiquetas automáticas</h3>
-              <div id="preparation-tags" class="listing-tags"></div>
-            </section>
-          </div>
-        </section>
-        
-<section
-          class="flow-step"
-          data-step="6"
+          data-step="4"
           aria-labelledby="step-7-title"
           hidden
         >
@@ -1052,7 +641,139 @@
                 id="preview-publisher"
                 class="preview-publisher"
               ></section>
-              <div class="preview-actions">
+        <section
+          class="flow-step"
+          data-step="5" class="flow-step "
+          aria-labelledby="step-4-title"
+          hidden
+        >
+          <p class="eyebrow">Identificación</p>
+          <h2 id="step-4-title">¿Cuál es tu relación con esta parcela?</h2>
+          <fieldset class="identity-grid">
+            <legend class="sr-only">Relación con la parcela</legend>
+            <label
+              ><input
+                type="radio"
+                name="tipoPublicador"
+                value="dueno"
+                required
+              /><span aria-hidden="true">🏡</span
+              ><strong>Soy dueño de la parcela</strong></label
+            ><label
+              ><input
+                type="radio"
+                name="tipoPublicador"
+                value="corredor"
+                required
+              /><span aria-hidden="true">🤝</span
+              ><strong>Soy corredor de propiedades</strong></label
+            >
+          </fieldset>
+          <div id="owner-contact" class="publisher-fields" hidden>
+            <h3>Datos de contacto del propietario</h3>
+            <div class="contact-grid">
+              <label
+                >Nombre completo<input
+                  name="nombreDueno"
+                  autocomplete="name" /></label
+              ><label
+                >Correo electrónico<input
+                  type="email"
+                  name="correoDueno"
+                  autocomplete="email" /></label
+              ><label
+                >Teléfono<input
+                  type="tel"
+                  name="telefonoDueno"
+                  autocomplete="tel"
+              /></label>
+            </div>
+            <div class="parcel-quantity-field" style="margin-top: 18px;">
+              <label style="display:flex; flex-direction:column; gap:5px; color:var(--navy); font-weight:800;">
+                ¿Cuántas parcelas quieres publicar?
+                <input type="number" name="cantidadParcelas" min="1" value="1" style="max-width: 120px; padding: 10px 13px; border: 1px solid #c9d8e3; border-radius: 15px;" />
+              </label>
+              <div id="extra-parcel-warning" hidden style="margin-top: 10px; padding: 12px; background: #fff5f5; border: 1px solid #ffcccc; border-radius: 12px; color: #b73e3e; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                <span aria-hidden="true" style="font-size: 1.2rem;">💳</span>
+                <span>Se aplicará un cargo de <strong>$5.990</strong> por cada parcela extra al enviar la publicación.</span>
+              </div>
+            </div>
+          </div>
+          <div
+            id="broker-contact"
+            class="publisher-fields broker-fields"
+            hidden
+          >
+            <h3>Datos profesionales del corredor</h3>
+            <p class="field-note">
+              Si trabajas de forma independiente, puedes usar tu nombre personal
+              como presentación.
+            </p>
+            <div class="contact-grid">
+              <label
+                >Nombre de la corredora<input
+                  name="corredoraNombre"
+                  autocomplete="organization" /></label
+              ><label
+                >Nombre del representante<input
+                  name="representanteNombre"
+                  autocomplete="name" /></label
+              ><label
+                >Correo electrónico<input
+                  type="email"
+                  name="correoCorredor"
+                  autocomplete="email" /></label
+              ><label
+                >Teléfono<input
+                  type="tel"
+                  name="telefonoCorredor"
+                  autocomplete="tel" /></label
+              ><label
+                >WhatsApp<input
+                  type="tel"
+                  name="whatsappCorredor"
+                  autocomplete="tel" /></label
+              ><label
+                >Años de experiencia<input
+                  type="number"
+                  name="anosExperiencia"
+                  min="0"
+                  max="80" /></label
+              ><label
+                >RUT personal o de empresa <small>Opcional</small
+                ><input name="rutCorredor" /></label
+              ><label
+                >Sitio web <small>Opcional</small
+                ><input
+                  type="url"
+                  name="sitioWeb"
+                  placeholder="https://" /></label
+              ><label
+                >Instagram o red social <small>Opcional</small
+                ><input
+                  type="url"
+                  name="redSocial"
+                  placeholder="https://" /></label
+              ><label
+                >Logotipo <small>Opcional</small
+                ><input
+                  type="file"
+                  name="logoCorredor"
+                  id="broker-logo"
+                  accept="image/png,image/jpeg,image/webp"
+              /></label>
+            </div>
+            <label class="public-description"
+              >Breve presentación profesional <small>Opcional</small
+              ><textarea
+                name="presentacionCorredor"
+                rows="4"
+                maxlength="800"
+              ></textarea>
+            </label>
+          </div>
+        </section>
+      <div class="preview-actions">
                 <a
                   class="primary-action whatsapp-action"
                   id="whatsapp-action"
@@ -1151,7 +872,7 @@
     </main>
     <footer>© 2026 Tu Parcela Lista · Vista previa local</footer>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="publicar-parcela.js"></script>
+    <script type="module" src="publicar-parcela.js?v=20260715-9"></script>
   
 <div class="modal-overlay" id="upsell-modal" style="display:none; z-index:9999;">
   <div class="modal-content" style="max-width:500px; text-align:center; padding:40px 30px;">
