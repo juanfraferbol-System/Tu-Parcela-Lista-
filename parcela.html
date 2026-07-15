@@ -824,7 +824,8 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
         if(window.lucide) window.lucide.createIcons();
       }
 
-      function showHelperWidget() {\n        if(document.querySelector('.cotizador-parcela-helper')) return;
+      function showHelperWidget() {
+        if(document.querySelector('.cotizador-parcela-helper')) return;
         const helper = document.createElement("div");
         helper.className = "cotizador-parcela-helper";
         helper.innerHTML = `
