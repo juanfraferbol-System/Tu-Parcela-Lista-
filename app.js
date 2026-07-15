@@ -2638,7 +2638,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         card.innerHTML = '<div class="amazon-badge" style="background: ' + (index === 2 ? '#232F3E' : '#C45500') + '">' + promoBadges[index] + '</div>' +
           '<div class="amazon-img-container">' +
-            '<img src="' + getParcelaMainImage(p) + '" alt="' + (p.nombre||'') + '">' +
+            '<img src="' + getParcelaMainImage(p) + '" alt="' + (p.nombre||'') + '" class="amazon-img-main">' +
             '<img src="' + (c.foto || 'image/placeholder-casa.jpg') + '" alt="' + (c.nombre||'') + '" class="amazon-house-inset">' +
           '</div>' +
           '<div class="amazon-content">' +
