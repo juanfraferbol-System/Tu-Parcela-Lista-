@@ -1701,7 +1701,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     renderMapa(focusId);
     setTimeout(() => { map?.invalidateSize(); if (focusId) renderMapa(focusId); }, 80);
-  }, 80);
   }
 
   function closeMap() {
