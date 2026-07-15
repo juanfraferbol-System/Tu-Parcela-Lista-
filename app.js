@@ -664,7 +664,9 @@ document.addEventListener("DOMContentLoaded", () => {
           ${renderParcelaFeatureChips(p, "desktop")}
           ${getDistanceBadge(p)}
           <p class="card-description">${p.descripcion || "Parcela disponible para tu proyecto."}</p>
-          <button class="card-location-link" type="button" data-location-id="${p.id}">Ver ubicación</button>
+          <div style="text-align: center; margin: 16px 0 8px;">
+            <button class="card-location-link" type="button" data-location-id="${p.id}" style="background: transparent; border: 1px solid rgba(0,0,0,0.1); color: var(--tpl-brand, #0c2b2e); font-weight: 600; border-radius: 8px; padding: 8px 16px; font-size: 0.9rem; cursor: pointer; transition: background 0.2s, border-color 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'"><i data-lucide="map" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px;"></i>Ver ubicación en mapa</button>
+          </div>
           <div class="card-actions">
             <a class="btn-card btn-details" href="${detailHref}">Más detalles</a>
             <button class="btn-card ${primaryClass}" type="button" data-id="${p.id}">${primaryLabel}</button>
