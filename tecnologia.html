@@ -34,7 +34,31 @@
   </header>
 
   <main class="tech-page">
-    <section class="tech-hero">
+    
+
+<style>
+.internal-hero-banner {
+  width: 100%;
+  height: 35vh;
+  min-height: 250px;
+  max-height: 400px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  margin-bottom: 40px;
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+.internal-hero-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3));
+  border-radius: 0 0 24px 24px;
+}
+</style>
+<div class="internal-hero-banner" style="background-image: url('image/banner-tech.jpg');"></div>
+<section class="tech-hero">
       <div class="container tech-hero-inner">
         <span class="publish-eyebrow">Tecnología · IA · Desarrollo chileno</span>
         <h1>Tecnología que potencia la experiencia humana.</h1>
