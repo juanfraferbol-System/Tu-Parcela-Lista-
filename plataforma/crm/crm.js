@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Inicializar Supabase
   const supabase = window.supabase.createClient(
-    window.TPL_SUPABASE_CONFIG.url,
-    window.TPL_SUPABASE_CONFIG.anonKey
+    'https://qxavbqhyqaqalpzbhwmh.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA'
   );
 
   // Elementos DOM
