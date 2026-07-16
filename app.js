@@ -3045,7 +3045,7 @@ async function loadDynamicInventory() {
       const dbParcelas = await res.json();
       if (dbParcelas && dbParcelas.length > 0) {
         window.SERVER_PARCELAS = dbParcelas.map(db => ({
-          id: db.codigo_publico,
+          id: db.datos_formulario?.old_id || db.codigo_publico,
           nombre: db.titulo_publico,
           precio: db.precio_publicacion ? "$" + db.precio_publicacion.toLocaleString('es-CL') : "$0",
           tamano: db.superficie_m2 || 5000,
