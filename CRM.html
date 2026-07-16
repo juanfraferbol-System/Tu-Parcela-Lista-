@@ -24,7 +24,15 @@
 
   <main id="crm-app" class="crm-app" hidden>
     <header class="crm-header">
-      <div><span class="eyebrow">CRM Fase 1</span><h1>Bandeja de moderación</h1><p id="admin-identity"></p></div>
+      <div>
+        <span class="eyebrow">CRM Fase 2</span>
+        <h1>Bandeja de Moderación</h1>
+        <nav class="crm-tabs" style="margin-top:10px; display:flex; gap:10px;">
+          <button class="primary" id="tab-publicaciones">Publicaciones</button>
+          <button class="secondary" id="tab-contratistas">Smart Match: Contratistas</button>
+        </nav>
+        <p id="admin-identity"></p>
+      </div>
       <button type="button" class="secondary" id="logout">Cerrar sesión</button>
     </header>
 
@@ -49,6 +57,33 @@
       <div class="inbox-card"><div class="table-scroll"><table><thead><tr><th>Código</th><th>Corredor</th><th>Propiedad</th><th>Comuna</th><th>Fecha</th><th>Plan</th><th>Estado</th></tr></thead><tbody id="inbox-body"></tbody></table></div></div>
       <article id="publication-detail" class="detail-card" aria-live="polite"><div class="empty-detail"><h2>Selecciona una publicación</h2><p>Aquí aparecerán los datos privados, fotografías e historial.</p></div></article>
     </section>
+    
+    <section id="contratistas-layout" class="crm-layout" style="display: none; margin-top: 2rem;">
+      <div class="inbox-card" style="width: 100%;">
+        <h2>Directorio de Contratistas (Smart Match)</h2>
+        <p>Estos son los maestros inyectados desde tu PDF. En la próxima fase, aquí podrás asignar los proyectos creados.</p>
+        <div class="table-scroll" style="margin-top: 1rem;">
+          <table style="width:100%;">
+            <thead>
+              <tr>
+                <th>Empresa / Encargado</th>
+                <th>Teléfono</th>
+                <th>Ubicación</th>
+                <th>Calificación</th>
+                <th>Precio Llave en Mano</th>
+                <th>Acción (Próximamente)</th>
+              </tr>
+            </thead>
+            <tbody id="contratistas-body">
+              <tr>
+                <td colspan="6" style="text-align:center;">Cargando contratistas desde Supabase...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <aside class="mail-note"><strong>Notificaciones por correo pendientes de configuración</strong><p>Las decisiones se agregan a una cola privada. No se marca ningún correo como enviado hasta conectar un proveedor.</p></aside>
   </main>
 
@@ -58,6 +93,58 @@
 
   <script src="plataforma/publicar-parcela/supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const tabPub = document.getElementById("tab-publicaciones");
+      const tabCon = document.getElementById("tab-contratistas");
+      
+      const pubSection1 = document.querySelector(".metrics");
+      const pubSection2 = document.querySelector(".filters");
+      const pubSection3 = document.querySelector(".crm-layout:not(#contratistas-layout)");
+      const conSection = document.getElementById("contratistas-layout");
+
+      if(tabPub && tabCon) {
+        tabPub.addEventListener("click", () => {
+          tabPub.className = "primary";
+          tabCon.className = "secondary";
+          pubSection1.style.display = "";
+          pubSection2.style.display = "";
+          pubSection3.style.display = "";
+          conSection.style.display = "none";
+        });
+        
+        tabCon.addEventListener("click", async () => {
+          tabPub.className = "secondary";
+          tabCon.className = "primary";
+          pubSection1.style.display = "none";
+          pubSection2.style.display = "none";
+          pubSection3.style.display = "none";
+          conSection.style.display = "flex";
+          
+          // Load contratistas using global client
+          if(window.client) {
+            const { data, error } = await window.client.from('contratistas').select('*').order('created_at', { ascending: true });
+            const tbody = document.getElementById("contratistas-body");
+            if(data && data.length > 0) {
+              tbody.innerHTML = data.map(c => `
+                <tr>
+                  <td><strong>${c.nombre_empresa}</strong></td>
+                  <td><a href="https://wa.me/${c.telefono}" target="_blank">${c.telefono}</a></td>
+                  <td>${c.ubicacion_base || 'No especificada'}</td>
+                  <td>${c.calificacion || '-'}</td>
+                  <td>${c.precio_llave_en_mano || 'Consultar'}</td>
+                  <td><button class="secondary" disabled>Match Automático (Próximamente)</button></td>
+                </tr>
+              `).join('');
+            } else {
+              tbody.innerHTML = '<tr><td colspan="6">No hay contratistas o no tienes permisos de Admin</td></tr>';
+            }
+          }
+        });
+      }
+    });
+  </script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script type="module" src="js/crm-admin.js"></script>
 </body>
