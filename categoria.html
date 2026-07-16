@@ -95,109 +95,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 </div>
 </header>
-<div class="location-filter-bar">
-  <div class="container loc-bar-container">
-    <button class="loc-global-btn active" data-filter-type="all">Chile</button>
-    <div class="loc-divider"></div>
-    
-    <div class="loc-region-group">
-      <button class="loc-region-title" data-filter-type="region" data-value="biobio">Biobío</button>
-      <button class="loc-commune-btn" data-filter-type="commune" data-value="florida">Florida</button>
-      <button class="loc-commune-btn" data-filter-type="commune" data-value="nacimiento">Nacimiento</button>
-      <button class="loc-commune-btn" data-filter-type="commune" data-value="negrete">Negrete</button>
-      <button class="loc-commune-btn" data-filter-type="commune" data-value="yumbel">Yumbel</button>
-    </div>
 
-    <div class="loc-divider"></div>
-
-    <div class="loc-region-group">
-      <button class="loc-region-title" data-filter-type="region" data-value="nuble">Ñuble</button>
-      <button class="loc-commune-btn" data-filter-type="commune" data-value="nipas">Ñipas</button>
-      <button class="loc-commune-btn" data-filter-type="commune" data-value="pemuco">Pemuco</button>
-      <button class="loc-commune-btn" data-filter-type="commune" data-value="quillon">Quillón</button>
-    </div>
-
-    <div class="loc-divider"></div>
-
-    <div class="loc-region-group">
-      <button class="loc-region-title" data-filter-type="region" data-value="araucania">La Araucanía</button>
-      <button class="loc-commune-btn" data-filter-type="commune" data-value="caburgua">Caburgua</button>
-    </div>
-  </div>
 </div>
 <main id="contenido-principal">
-<section class="hero hero-life-masonry" aria-labelledby="hero-title">
-  <div class="hero-bubble b-left-large" style="background-image: url('image/banner-pareja.jpg');"></div>
-  <div class="hero-bubble b-left-small" style="background-image: url('image/banner-leyendo.jpg');"></div>
-  <div class="hero-bubble b-left-oval" style="background-image: url('image/banner-invernadero.jpg');"></div>
-  <div class="hero-bubble b-right-oval" style="background-image: url('image/banner-inversion.jpg');"></div>
-  <div class="hero-bubble b-right-large" style="background-image: url('image/banner-tranquilidad.jpg');"></div>
-  <div class="hero-bubble b-right-small" style="background-image: url('image/banner-espacio.jpg');"></div>
-  <div class="container hero-masonry-content">
-      <span class="hero-life-kicker">TU PARCELA LISTA</span>
-      <h1 id="hero-title">Un gran espacio para tu próximo proyecto</h1>
-      <p>Parcelas para vivir, invertir o construir en familia, Tú Parcela Lista te acompaña en todas las etapas.</p>
+
+<section class="category-hero" id="cat-hero" style="min-height: 50vh; display: flex; align-items: center; position: relative; background-size: cover; background-position: center;">
+  <div style="position: absolute; inset: 0; background: linear-gradient(0deg, rgba(6, 25, 27, 0.95), rgba(6, 25, 27, 0.4));"></div>
+  <div class="container" style="position: relative; z-index: 2; padding-top: 80px; text-align: center; color: white;">
+    <span id="cat-badge" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); padding: 8px 16px; border-radius: 99px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Categoría</span>
+    <h1 id="cat-title" style="font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 900; margin: 16px 0;">Cargando...</h1>
+    <p id="cat-subtitle" style="font-size: 1.25rem; max-width: 600px; margin: 0 auto 32px; opacity: 0.9;"></p>
+    
+    <div style="display: flex; gap: 40px; justify-content: center; text-align: left; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); padding: 32px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); max-width: 900px; margin: 0 auto; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 250px;">
+        <h4 style="color: var(--tpl-secondary); margin-bottom: 12px; font-size: 1.1rem;"><i class="fa-solid fa-person-hiking"></i> Actividades y Experiencia</h4>
+        <ul id="cat-activities" style="margin: 0; padding-left: 20px; color: #fff; line-height: 1.6; font-size: 0.95rem;"></ul>
+      </div>
+      <div style="flex: 1; min-width: 250px;">
+        <h4 style="color: var(--tpl-secondary); margin-bottom: 12px; font-size: 1.1rem;"><i class="fa-solid fa-handshake"></i> Apoyo Tu Parcela Lista</h4>
+        <ul id="cat-support" style="margin: 0; padding-left: 20px; color: #fff; line-height: 1.6; font-size: 0.95rem;"></ul>
+      </div>
+    </div>
   </div>
 </section>
 
 
-<section class="decision-flow" id="decision-flow" style="position: relative; z-index: 10; padding: 20px 0;">
-<div class="decision-box">
-<span class="decision-eyebrow">COMIENZA AHORA</span>
-<p class="decision-intro">Da el primer paso y encuentra el lugar ideal hecho a tu medida.</p>
-<div class="decision-buttons decision-buttons-clean decision-buttons-v5" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; position: relative; z-index: 15;">
-  <button class="tpl-decision-card" id="opt-parcela" type="button" style="padding: 0; border: none; border-radius: 20px; text-align: left; background: url('image/btn_parcela_person.jpg') center/cover no-repeat !important; background-color: #0c2b2e !important; box-shadow: 0 15px 35px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; display: flex; align-items: flex-end; min-height: 240px; cursor: pointer;; z-index: 20;">
-    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 100%) !important; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'"></div>
-    <div style="position: relative; z-index: 2; padding: 24px; width: 100%; display: flex; align-items: flex-start; gap: 16px;">
-      <div style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #fff; width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.4);">
-        <i data-lucide="circle-dollar-sign" style="width: 28px; height: 28px;"></i>
-      </div>
-      <div style="display: flex; flex-direction: column; flex: 1; padding-top: 4px;">
-        <strong style="font-size: 1.9rem; font-family: Outfit, sans-serif; color: #ffffff; line-height: 1.1; margin-bottom: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.4);">Parcelas...</strong>
-        <span style="font-size: 1.05rem; color: rgba(255,255,255,0.9); line-height: 1.4; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">A la medida de tu presupuesto.</span>
-      </div>
-    </div>
-  </button>
 
-  <button class="tpl-decision-card" id="opt-combo" type="button" style="padding: 0; border: none; border-radius: 20px; text-align: left; background: url('image/btn_casa_modern.jpg') center/cover no-repeat !important; background-color: #0c2b2e !important; box-shadow: 0 15px 35px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; display: flex; align-items: flex-end; min-height: 240px; cursor: pointer;; z-index: 20;">
-    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 100%) !important; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'"></div>
-    <div style="position: relative; z-index: 2; padding: 24px; width: 100%; display: flex; align-items: flex-start; gap: 16px;">
-      <div style="background: var(--tpl-brand, #0c2b2e); color: #fff; width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(12,43,46,0.6);">
-        <i data-lucide="trending-up" style="width: 28px; height: 28px;"></i>
-      </div>
-      <div style="display: flex; flex-direction: column; flex: 1; padding-top: 4px;">
-        <strong style="font-size: 1.9rem; font-family: Outfit, sans-serif; color: #ffffff; line-height: 1.1; margin-bottom: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.4);">Proyectos con Casa</strong>
-        <span style="font-size: 1.05rem; color: rgba(255,255,255,0.9); line-height: 1.4; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">Sube tu inversión. Diseña y construye tu hogar soñado.</span>
-      </div>
-    </div>
-  </button>
-</div>
-</div>
-<div class="budget-box" id="budget-box" style="display:none;">
-<div class="budget-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
-<span class="budget-kicker">PORTAL DE BÚSQUEDA</span>
-<h3 id="budget-title">¿Cuál es tu presupuesto total?</h3>
-<p id="budget-help">Te mostraremos opciones cercanas a tu presupuesto.</p>
-<input id="budget-input" inputmode="numeric" placeholder="Ej: 15.000.000" type="text"/>
-<div class="combo-fields hidden" id="combo-fields">
-<select aria-label="Cantidad de habitaciones" id="combo-room-input">
-<option value="all">Cualquier cantidad de habitaciones</option>
-<option value="1">1 habitación</option>
-<option value="2">2 habitaciones</option>
-<option value="3">3 habitaciones</option>
-<option value="4">4 habitaciones</option>
-<option value="5">5 habitaciones</option>
-<option value="6">6 habitaciones</option>
-</select>
-<input id="combo-meters-input" placeholder="Metros cuadrados deseados, ej: 72" type="number"/>
-</div>
-<button id="budget-go" type="button">
-      <span>Buscar</span>
-      <b aria-hidden="true">→</b>
-    </button>
-<p class="budget-trust">Resultados claros · Sin compromiso · Acompañamiento TPL</p>
-</div>
-</section>
+
 
 
 
@@ -314,55 +238,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 <!-- ========================================= -->
-<!-- CATEGORIAS DE PARCELAS -->
-<!-- ========================================= -->
-<section class="parcel-categories-section container" style="margin-top: 60px; margin-bottom: 20px; padding-top: 20px;">
-  <div style="text-align: center; margin-bottom: 32px;">
-    <span style="background:rgba(0,130,138,0.1);color:var(--secondary);padding:6px 16px;border-radius:var(--radius-full);font-weight:700;font-size:0.9rem; letter-spacing: 0.05em; display: inline-block; margin-bottom: 12px;">DESCUBRE TU LUGAR IDEAL</span>
-    <h2 style="font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 800; color: var(--primary); margin: 0; line-height: 1.15;">Encuentra según tu estilo</h2>
-    <p style="color: var(--text-muted); max-width: 600px; margin: 12px auto 0; font-size: 1.05rem;">
-      Explora las parcelas agrupadas por la experiencia que buscas.
-    </p>
-  </div>
-  
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; padding-bottom: 20px;">
-    <!-- Tarjeta 1: Descanso -->
-    <a href="categoria.html?cat=descanso" class="category-card" style="background: linear-gradient(to top, rgba(12, 43, 46, 0.9) 0%, rgba(12, 43, 46, 0.2) 60%, rgba(12,43,46,0) 100%), url('image/hammock_rest.jpg') center/cover; text-decoration: none; text-align: left; display: flex;">
-      <div class="category-content">
-        <div class="category-icon"><i class="fa-solid fa-leaf"></i></div>
-        <h3>Descanso</h3>
-        <p>Refugios silenciosos</p>
-      </div>
-    </a>
-    
-    <!-- Tarjeta 2: Inversión -->
-    <a href="categoria.html?cat=inversion" class="category-card" style="background: linear-gradient(to top, rgba(0, 71, 95, 0.9) 0%, rgba(0, 71, 95, 0.2) 60%, rgba(0,71,95,0) 100%), url('image/investment_handshake.jpg') center/cover; text-decoration: none; text-align: left; display: flex;">
-      <div class="category-content">
-        <div class="category-icon"><i class="fa-solid fa-chart-line"></i></div>
-        <h3>Inversión</h3>
-        <p>Alta plusvalía garantizada</p>
-      </div>
-    </a>
 
-    <!-- Tarjeta 3: Nativas y Salvajes -->
-    <a href="categoria.html?cat=nativas" class="category-card" style="background: linear-gradient(to top, rgba(31, 61, 35, 0.9) 0%, rgba(31, 61, 35, 0.2) 60%, rgba(31,61,35,0) 100%), url('image/native_forest.jpg') center/cover; text-decoration: none; text-align: left; display: flex;">
-      <div class="category-content">
-        <div class="category-icon"><i class="fa-solid fa-tree"></i></div>
-        <h3>Nativas y Salvajes</h3>
-        <p>Bosques e inmersión total</p>
-      </div>
-    </a>
-
-    <!-- Tarjeta 4: Con Agua -->
-    <a href="categoria.html?cat=agua" class="category-card" style="background: linear-gradient(to top, rgba(0, 89, 133, 0.9) 0%, rgba(0, 89, 133, 0.2) 60%, rgba(0,89,133,0) 100%), url('image/river_water.jpg') center/cover; text-decoration: none; text-align: left; display: flex;">
-      <div class="category-content">
-        <div class="category-icon"><i class="fa-solid fa-water"></i></div>
-        <h3>Con Agua</h3>
-        <p>Ríos, lagos y vertientes</p>
-      </div>
-    </a>
-  </div>
-</section>
 
 <style>
 .category-card {
@@ -524,212 +400,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- -------------------------------------------------------------
        Sección Casas (Desbloqueable)
        ------------------------------------------------------------- -->
-<section class="section-casas" id="casas-section">
-<div class="container">
-<div class="combo-proposals-section" hidden="" id="combo-proposals-section">
-<div class="combo-proposals-head">
-<span class="combo-kicker">Parcela + casa</span>
-<h3>5 propuestas cercanas a tu presupuesto</h3>
-<p>Elige una alternativa para revisar fundación, fotografías y extras en el cotizador.</p>
-</div>
-<div class="combo-proposals-grid" id="combo-proposals-container"></div>
-</div>
-<div style="text-align:center;margin-bottom:48px;">
-<span style="background:rgba(0,130,138,0.1);color:var(--secondary);padding:6px 16px;border-radius:var(--radius-full);font-weight:700;font-size:0.9rem;">PASO 2</span>
-<h2 style="font-size:2.2rem;font-weight:800;color:var(--primary);margin-top:12px;">Ahora tu casa soñada</h2>
-<p style="color:var(--text-muted);max-width:500px;margin:8px auto 0;">
-        Elige el modelo que mejor calza con tu parcela y tu presupuesto.
-      </p>
-</div>
-<div class="casas-room-filter">
-<button class="room-filter-btn active" data-rooms="all">
-<i class="fa-solid fa-house"></i>
-        Todas
-    </button>
-<button class="room-filter-btn" data-rooms="1">
-<i class="fa-solid fa-bed"></i>
-        1 Hab
-    </button>
-<button class="room-filter-btn" data-rooms="2">
-<i class="fa-solid fa-bed"></i>
-        2 Hab
-    </button>
-<button class="room-filter-btn" data-rooms="3">
-<i class="fa-solid fa-bed"></i>
-        3 Hab
-    </button>
-<button class="room-filter-btn" data-rooms="4">
-<i class="fa-solid fa-bed"></i>
-        4 Hab
-    </button>
-<button class="room-filter-btn" data-rooms="6">
-<i class="fa-solid fa-building"></i>
-        +6 Hab
-    </button>
-</div>
-<!-- SOLO las casas -->
-<div class="casas-grid" id="casas-container"></div>
-<section class="section-own-design container" id="diseño-propio" style="margin-top: 48px; margin-bottom: 48px;">
-  <div style="background: linear-gradient(135deg, #0c2b2e, #163a3d); color: white; border-radius: 20px; overflow: hidden; display: flex; flex-wrap: wrap; align-items: center; box-shadow: 0 15px 35px rgba(12, 43, 46, 0.15);">
-    
-    <div style="flex: 1 1 350px; padding: 48px 40px; text-align: left;">
-      <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 20px; display: inline-block;">TU PROYECTO 100% PERSONALIZADO</span>
-      <h3 style="font-size: clamp(1.8rem, 4vw, 2.4rem); font-family: Outfit, sans-serif; margin-bottom: 16px; line-height: 1.15; font-weight: 700; color: white !important; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">¿No encontraste la casa ideal? Diseñemos la tuya.</h3>
-      <p style="margin-bottom: 32px; font-size: 1.05rem; opacity: 0.85; line-height: 1.6; max-width: 450px; color: white !important;">Cotiza una vivienda a tu medida usando madera, metalcon o material sólido. Ingresa tus requerimientos y recibe una estimación instantánea.</p>
-      <a class="btn-own-design-index" href="cotizador.html" style="background: #ffffff; color: #0c2b2e; padding: 14px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; font-size: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s;">
-        Ir al cotizador premium 
-        <i data-lucide="arrow-right" style="width: 18px; height: 18px; margin-left: 8px;"></i>
-      </a>
-    </div>
 
-    <div style="flex: 1 1 300px; display: flex; justify-content: flex-end; position: relative;">
-      <div style="position: absolute; top: 0; bottom: 0; left: -1px; width: 80px; background: linear-gradient(to right, #113336, transparent); z-index: 1;"></div>
-      <img src="image/3d_house.jpg" alt="Cotizador Premium de Casas" style="width: 100%; height: 100%; object-fit: cover; min-height: 350px; max-height: 400px; display: block;">
-    </div>
-    
-  </div>
-</section>
 
 </div></section>
 <!-- -------------------------------------------------------------
        Sección Cotizador e Integraciones (Desbloqueable)
        ------------------------------------------------------------- -->
-<section class="section-cotizador" id="cotizador-section">
-  <div class="container">
-    <div style="text-align: center; margin-bottom: 56px;">
-      <h2 style="font-family: Outfit, sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--text-high); letter-spacing: -1px; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 12px;">
-        <i data-lucide="calculator" style="color: var(--tpl-primary); width: 32px; height: 32px;"></i> Cotizador de Proyectos
-      </h2>
-<span style="background: rgba(0, 130, 138, 0.1); color: var(--secondary); padding: 6px 16px; border-radius: var(--radius-full); font-weight: 700; font-size: 0.9rem;">PASO 3</span>
-<h2 style="font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-top: 12px;">Estás a un paso de lograr tu sueño</h2>
-<p style="color: var(--text-muted); max-width: 500px; margin: 8px auto 0 auto;">Revisa tu proyecto completo, ajusta fundación y adicionales, y envía tu cotización por WhatsApp.</p>
-</div>
-<div class="cotizador-layout">
-<!-- Panel izquierdo: Opciones e inputs -->
-<div class="cotizador-left">
-<!-- Opciones de fundaciones -->
-<div class="options-box installation-service-box">
-<div class="installation-step-header">
-<span class="installation-step-kicker">INSTALACIÓN OPCIONAL</span>
-<h3><i data-lucide="wrench"></i> ¿Necesitas fundación y montaje?</h3>
-<div class="installation-highlight-copy">
-<strong>Tú eliges.</strong> Continúa con tu constructor o agrega uno de nuestros planes.
-</div>
-<label class="installation-service-toggle-card">
-<input type="checkbox" id="installation-service-toggle">
-<span>
-<strong>Agregar fundación y montaje</strong>
-<small>Verás alternativas y valores para la casa seleccionada.</small>
-</span>
-</label>
-<div class="installation-plan-status" id="installation-plan-status">
-Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de instalación.
-</div>
-</div>
-<h4 class="installation-plans-title" id="installation-plans-title" hidden>Elige la alternativa que mejor se ajuste</h4>
-<div class="fundaciones-grid installation-plans-grid" id="fundaciones-container" hidden>
-<!-- Planes de instalación inyectados dinámicamente por app.js -->
-</div>
-</div>
-<!-- Opciones extras automáticas / semi-obligatorias -->
-<div class="options-box" id="automaticos-box" style="display: none;">
-<h3><i data-lucide="shield-check"></i> Adicionales Automáticos</h3>
-<div class="extras-list" id="automaticos-container">
-<!-- Extras automáticos inyectados dinámicamente -->
-</div>
-</div>
-<!-- Opciones opcionales con inputs numéricos -->
-<div class="options-box deferred-extras-box" id="deferred-extras-box" hidden>
-<h3><i data-lucide="plus-circle"></i> ¿Quieres agregar extras antes de continuar?</h3>
-<p style="font-size: 0.9rem; color: var(--text-muted); margin-top: -16px; margin-bottom: 20px;">
-              Agrégalos solo si los necesitas. El total se actualiza automáticamente.
-            </p>
-<div class="extras-list" id="opcionales-container">
-<!-- Opciones extras inyectadas dinámicamente por app.js -->
-</div>
-</div>
-</div>
-<!-- Panel derecho: Resumen Fijo -->
-<div class="cotizador-right">
-<div class="cotizacion-summary-card">
-<div class="summary-project-preview">
-<div class="preview-images">
-<div class="preview-photo-box">
-<button class="preview-ficha-btn" data-project-info="parcela" type="button">Ver parcela</button>
-<img alt="Parcela seleccionada" data-project-info="parcela" id="preview-parcela-img" src="image/placeholder-parcela.jpg"/>
-<button class="summary-change-link" data-change-project="parcela" id="change-parcela" style="display:none;" type="button">Cambiar parcela</button>
-</div>
-<div class="preview-photo-box">
-<button class="preview-ficha-btn" data-project-info="casa" type="button">Ver casa</button>
-<img alt="Casa seleccionada" data-project-info="casa" id="preview-casa-img" src="image/placeholder-casa.jpg"/>
-<button class="summary-change-link" data-change-project="casa" id="change-casa" style="display:none;" type="button">Cambiar casa</button>
-</div>
-</div>
-<div class="preview-info">
-<span class="preview-badge">
-      TU PROYECTO
-    </span>
-<h3 id="preview-title">
-      Parcela + Casa
-    </h3>
-<p id="preview-location">
-      Selecciona una parcela y una casa para visualizar tu proyecto final.
-    </p>
-<div aria-live="polite" class="project-main-details" id="project-main-details">
-<div class="project-detail-card project-detail-land">
-<span class="project-detail-label" id="preview-land-type">PARCELA</span>
-<strong id="preview-land-name">Por seleccionar</strong>
-<small id="preview-land-size">Superficie por definir</small>
-</div>
-<div class="project-detail-card project-detail-house">
-<span class="project-detail-label">CASA</span>
-<strong id="preview-house-name">Por seleccionar</strong>
-<small id="preview-house-specs">Habitaciones y superficie por definir</small>
-</div>
-</div>
-</div>
-</div>
-<div class="summary-header">
-<h3><i data-lucide="receipt"></i> Resumen de Cotización</h3>
-</div>
-<table class="summary-table">
-<thead>
-<tr>
-<th>Detalle del Ítem</th>
-<th style="text-align: right;">Total</th>
-</tr>
-</thead>
-<tbody id="summary-items">
-<!-- Ítems inyectados por JS -->
-</tbody>
-</table>
-<button class="btn-whatsapp-quote pulse" id="whatsapp-btn" type="button">
-<i data-lucide="message-circle"></i> Enviar Cotización por WhatsApp
-            </button>
-<button class="btn-activate-project pulse" id="activate-project-btn" type="button">
-<i data-lucide="send"></i>
-              Activar Proyecto
-            </button>
-<button class="btn-share-project" id="share-project-btn" type="button" style="margin-top: 10px; width: 100%; padding: 14px; border-radius: var(--radius-md); border: 2px solid var(--border-color); background: #fff; color: var(--primary); font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease;">
-<i data-lucide="share-2"></i>
-              Compartir este proyecto
-            </button>
-<button class="btn-ai-video" id="btn-generate-ai-video" type="button" style="margin-top: 10px; width: 100%; padding: 14px; border-radius: var(--radius-md); border: none; background: linear-gradient(135deg, #8b5cf6, #d946ef); color: #fff; font-weight: 800; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(217, 70, 239, 0.3);">
-<i data-lucide="video"></i>
-              Generar Recorrido en Video IA ($2.990)
-            </button>
-<p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 16px; line-height: 1.4;">
-              * Puedes enviar tu cotización por WhatsApp o activar el proyecto completando tus datos. Se generará un PDF de respaldo y se enviará la solicitud al equipo de Tu Parcela Lista.
-            </p>
-<div class="summary-total-row summary-total-final">
-<span class="total-label">Total estimado del proyecto</span>
-<span class="total-amount" id="total-amount">$0</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
+
 <!-- Modal Activar Proyecto -->
 <div aria-hidden="true" class="project-activation-modal" id="project-activation-modal">
 <div class="project-activation-backdrop" data-close-activation=""></div>
@@ -791,35 +468,9 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <!-- -------------------------------------------------------------
        Sección Quiénes Somos / Contacto
        ------------------------------------------------------------- -->
-<section class="tpl-faq-section" aria-labelledby="faq-title">
-  <div class="container tpl-faq-layout">
-    <div><span class="section-kicker">ANTES DE DECIDIR</span><h2 id="faq-title">Preguntas frecuentes</h2><p>Respuestas simples para avanzar con mayor seguridad.</p></div>
-    <div class="tpl-faq-list">
-      <details><summary>¿Puedo visitar una parcela antes de reservar?</summary><p>Sí. Puedes solicitar una visita o videollamada desde la ficha de cada parcela y nuestro equipo coordinará la disponibilidad.</p></details>
-      <details><summary>¿Los valores del cotizador son definitivos?</summary><p>Son una estimación orientativa. Antes de comprar se confirma disponibilidad, condiciones del terreno, transporte, instalación y antecedentes vigentes.</p></details>
-      <details><summary>¿Puedo elegir primero la parcela y después la casa?</summary><p>Sí. La barra “Tu proyecto guardado” conservará tu parcela mientras revisas modelos de casas y te llevará al cotizador cuando estés listo.</p></details>
-      <details><summary>¿Cómo guardo opciones para revisarlas después?</summary><p>Usa el corazón para favoritos o el botón de comparación de cada parcela. La selección queda guardada en este dispositivo.</p></details>
-    </div>
-  </div>
-</section>
-<!-- Mejores Alternativas (Algoritmo Dinámico) -->
-<section class="section-padding" id="mejores-alternativas" style="background: linear-gradient(180deg, var(--surface-subtle) 0%, #fff 100%); border-top: 1px solid rgba(0,63,122,0.05);">
-  <div class="container">
-    <div class="section-header text-center" style="margin-bottom:48px;">
-      <span class="eyebrow" style="background:var(--tpl-accent); color:#fff; padding:6px 16px; border-radius:99px; font-weight:900; letter-spacing:1px; display:inline-block; margin-bottom:12px;"><i data-lucide="flame" style="width:16px; height:16px; vertical-align:-3px; margin-right:4px;"></i> TOP OPCIONES</span>
-      <h2 style="font-size:2.8rem; font-weight:800; color:var(--tpl-primary); margin-bottom:16px;">Las Mejores Alternativas del Día</h2>
-      <p style="font-size:1.15rem; color:var(--text-medium); max-width:600px; margin:0 auto;">Nuestro sistema inteligente ha analizado factores como cercanía a ciudades, conectividad, tamaño y precio para ofrecerte las 3 opciones más destacadas en este momento.</p>
-    </div>
 
-    <div class="grid-3" id="mejores-alternativas-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:24px;">
-      <!-- Se rellena por app.js -->
-      <div style="text-align:center; padding:40px; grid-column:1/-1;">
-        <i data-lucide="loader-2" class="spin" style="width:32px;height:32px;color:var(--tpl-primary);"></i>
-        <p style="margin-top:12px; color:var(--text-medium); font-weight:600;">Calculando las mejores opciones...</p>
-      </div>
-    </div>
-  </div>
-</section>
+<!-- Mejores Alternativas (Algoritmo Dinámico) -->
+
 
 <section class="section-footer-info" id="quienes-somos">
 <div class="container footer-layout">
@@ -916,5 +567,91 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 })();
 </script>
 <script src="alternativas.js" defer></script>
+
+<script type="module">
+  import { CATEGORIAS_PARCELAS } from './js/config/categorias-parcelas.js';
+  import { calcularCategoriasParcela } from './js/core/category-engine.js';
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const catSlug = params.get('cat') || 'descanso';
+    const catConfig = CATEGORIAS_PARCELAS[catSlug];
+    
+    if (!catConfig) {
+      window.location.href = 'index.html';
+      return;
+    }
+    
+    // Configurar Hero
+    document.getElementById('cat-hero').style.backgroundImage = `url('${catConfig.imagenHero}')`;
+    document.getElementById('cat-badge').textContent = catConfig.nombre;
+    document.getElementById('cat-title').textContent = catConfig.titulo;
+    document.getElementById('cat-subtitle').textContent = catConfig.descripcion;
+    
+    document.getElementById('cat-activities').innerHTML = catConfig.actividades.map(a => `<li>${a}</li>`).join('');
+    document.getElementById('cat-support').innerHTML = catConfig.apoyoTpl.map(a => `<li>${a}</li>`).join('');
+    
+    // Sobrescribir lógica de renderizado del catálogo cuando carguen las parcelas
+    const originalRender = window.tplRenderCustomFilter; // Si existe, o nos enganchamos al array global
+    
+    // El app.js (parcelas.js) inicializará y llamará a render. 
+    // Como esto es estático, interceptamos el array global si es posible.
+    // Hack para la versión actual: Ocultar parcelas que no calcen vía CSS
+    
+    const applyCategoryFilter = () => {
+       const cards = document.querySelectorAll('.card-parcela-v5');
+       if(cards.length === 0) return;
+       
+       let matchCount = 0;
+       
+       cards.forEach(card => {
+         // Reconstruir objeto de parcela básico a partir de la tarjeta (o buscar en window.parcelasData)
+         const id = card.dataset.id;
+         // Buscar en data original
+         const parcela = (window.cachedParcelas || []).find(p => p.id === id);
+         
+         if (parcela) {
+           const scores = calcularCategoriasParcela(parcela);
+           const result = scores[catSlug];
+           if (result && result.coincide) {
+             card.style.display = ''; // Mostrar
+             matchCount++;
+             
+             // Agregar badge temático si no existe
+             if (!card.querySelector('.cat-badge-injected')) {
+                const imgContainer = card.querySelector('.card-image-wrapper') || card.querySelector('.card-gallery-container');
+                if (imgContainer) {
+                  imgContainer.insertAdjacentHTML('afterbegin', `
+                    <div class="cat-badge-injected" style="position: absolute; top: 10px; left: 10px; background: var(--tpl-secondary); color: #000; font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                      <i class="fa-solid fa-check-circle" style="margin-right:4px;"></i> ${catConfig.nombre}
+                    </div>
+                  `);
+                }
+             }
+           } else {
+             card.style.display = 'none'; // Ocultar
+           }
+         } else {
+           card.style.display = 'none';
+         }
+       });
+       
+       const countPill = document.getElementById('results-count');
+       if (countPill) countPill.textContent = `${matchCount} parcelas encontradas en ${catConfig.nombre}`;
+    };
+
+    // Observar cuando se inserten las parcelas en el contenedor
+    const container = document.getElementById('parcelas-container');
+    if (container) {
+      const observer = new MutationObserver((mutations) => {
+        applyCategoryFilter();
+      });
+      observer.observe(container, { childList: true, subtree: true });
+      
+      // Aplicar por si ya cargaron
+      setTimeout(applyCategoryFilter, 1000);
+    }
+  });
+</script>
 </body>
 </html>
