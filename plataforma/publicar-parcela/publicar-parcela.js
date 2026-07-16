@@ -126,14 +126,6 @@ async function analyzePhotoGps(){if(hasConfirmedLocation()){gpsConsent.checked=f
 function openLocationHelp(){locationHelpReturnFocus=document.activeElement;if(typeof locationHelpDialog.showModal==='function')locationHelpDialog.showModal();else locationHelpDialog.setAttribute('open','');requestAnimationFrame(()=>document.querySelector('#location-help-title').focus());}
 function closeLocationHelp(){if(typeof locationHelpDialog.close==='function'&&locationHelpDialog.open)locationHelpDialog.close();else{locationHelpDialog.removeAttribute('open');locationHelpReturnFocus?.focus?.();}}
 function appendText(container,tag,text,className){const element=document.createElement(tag);element.textContent=text;if(className)element.className=className;container.append(element);return element;}
-function photoButton(text, onClick) {
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'photo-tool';
-  btn.textContent = text;
-  btn.addEventListener('click', onClick);
-  return btn;
-}
 function createLocationChoiceUi(){
  const section=document.createElement('section');section.className='location-choice';section.setAttribute('aria-labelledby','location-choice-title');const title=appendText(section,'h3','¿Cómo quieres indicar la ubicación?');title.id='location-choice-title';
  const actions=document.createElement('div');actions.className='location-choice-actions';
@@ -251,6 +243,7 @@ function handlePublishWithUpsell() {
 
   modal.querySelector('#skip-upsell-btn').addEventListener('click', (e) => {
       modal.close();
+      modal.remove();
       submitPublication(e);
   });
   
@@ -372,71 +365,72 @@ if (urlParams.get('flow') === 'success' && urlParams.get('plan')) {
 // ==========================================
 // INYECCIÓN DE LÓGICA IA Y UX
 // ==========================================
+// Módulo de IA Visual
+// ==========================================
 import { simulateAIEnrichment } from './description-generator.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-  const btnAI = document.getElementById('btn-magic-ai');
-  if (btnAI) {
-    btnAI.addEventListener('click', async () => {
-      const planElegido = document.querySelector('input[name="planCorredor"]:checked')?.value;
-      const isCorredor = document.querySelector('input[name="tipoPublicador"][value="corredor"]').checked;
-      
-      // Permitir si es Gold, Platinum, o si pagó el upsell de $7.990 (hasAIPower)
-      const isPremiumPlan = isCorredor && (planElegido === 'gold' || planElegido === 'platinum');
-      
-      if (!isPremiumPlan && !window.hasAIPower && isCorredor) {
-        alert('Esta función es exclusiva de los planes Gold/Platinum o el ticket de $7.990. Simula el pago dándole a "Publicar Parcela" con el plan Inicio para probarlo.');
-        return;
+// Funciones y eventos de la Inteligencia Artificial (UI Magic)
+const btnAI = document.getElementById('btn-magic-ai');
+if (btnAI) {
+  btnAI.addEventListener('click', async () => {
+    const planElegido = document.querySelector('input[name="planCorredor"]:checked')?.value;
+    const isCorredor = document.querySelector('input[name="tipoPublicador"][value="corredor"]').checked;
+    
+    // Permitir si es Gold, Platinum, o si pagó el upsell de $7.990 (hasAIPower)
+    const isPremiumPlan = isCorredor && (planElegido === 'gold' || planElegido === 'platinum');
+    
+    if (!isPremiumPlan && !window.hasAIPower && isCorredor) {
+      alert('Esta función es exclusiva de los planes Gold/Platinum o el ticket de $7.990. Simula el pago dándole a "Publicar Parcela" con el plan Inicio para probarlo.');
+      return;
+    }
+    
+    btnAI.textContent = 'Analizando fotos...';
+    btnAI.disabled = true;
+    
+    // Construir data básica de lo ingresado para mandarla a la IA
+    const aiForm = document.getElementById('publication-form');
+    const data = {
+      superficie: aiForm?.elements.superficieMinima?.value || '',
+      comuna: document.getElementById('comuna-display')?.textContent || '',
+    };
+    
+    try {
+      const result = await simulateAIEnrichment(data, true);
+      const descArea = document.getElementById('descripcion-publica');
+      if (descArea) {
+        descArea.value = result.enrichedDescription;
+        descArea.style.border = "2px solid #4f46e5";
+        descArea.style.backgroundColor = "rgba(99,102,241,0.05)";
       }
       
-      btnAI.textContent = 'Analizando fotos...';
-      btnAI.disabled = true;
-      
-      // Construir data básica de lo ingresado para mandarla a la IA
-      const form = document.getElementById('publication-form');
-      const data = {
-        superficie: form.elements.superficieMinima?.value || '',
-        comuna: document.getElementById('comuna-display')?.textContent || '',
-      };
-      
-      try {
-        const result = await simulateAIEnrichment(data, true);
-        const descArea = document.getElementById('descripcion-publica');
-        if (descArea) {
-          descArea.value = result.enrichedDescription;
-          descArea.style.border = "2px solid #4f46e5";
-          descArea.style.backgroundColor = "rgba(99,102,241,0.05)";
-        }
-        
-        // Simular que encontró la ubicación
-        if (window.confirm('La IA detectó una posible ubicación de la parcela basándose en el análisis visual. ¿Deseas aplicar las coordenadas recomendadas?')) {
-           const mapInp = document.getElementById('link-google-maps');
-           if(mapInp) mapInp.value = 'https://maps.google.com/?q=' + result.suggestedCoordinates.latitude + ',' + result.suggestedCoordinates.longitude;
-        }
-        
-      } catch(e) {
-        console.error(e);
-      } finally {
-        btnAI.textContent = '✨ Enriquecido con IA';
-        btnAI.style.background = '#10b981';
+      // Simular que encontró la ubicación
+      if (window.confirm('La IA detectó una posible ubicación de la parcela basándose en el análisis visual. ¿Deseas aplicar las coordenadas recomendadas?')) {
+         const mapInp = document.getElementById('link-google-maps');
+         if(mapInp) mapInp.value = 'https://maps.google.com/?q=' + result.suggestedCoordinates.latitude + ',' + result.suggestedCoordinates.longitude;
       }
-    });
-  }
-  
-  // Simulación Visual de Sugerencia de Foto de Portada
-  const dropZone = document.getElementById('photo-drop-zone');
-  const aiBadge = document.getElementById('ai-photo-suggestion');
-  if (dropZone && aiBadge) {
-    const observer = new MutationObserver(() => {
-      // Si hay fotos, mostrar el badge simulando análisis
-      if (dropZone.querySelectorAll('.photo-thumbnail').length > 0) {
-        aiBadge.style.display = 'block';
-      } else {
-        aiBadge.style.display = 'none';
-      }
-    });
-    observer.observe(dropZone, { childList: true });
-  }
-});
+      
+    } catch(e) {
+      console.error(e);
+    } finally {
+      btnAI.textContent = '✨ Enriquecido con IA';
+      btnAI.style.background = '#10b981';
+    }
+  });
+}
+
+// Simulación Visual de Sugerencia de Foto de Portada
+const dropZone = document.getElementById('photo-drop-zone');
+const aiBadge = document.getElementById('ai-photo-suggestion');
+if (dropZone && aiBadge) {
+  const observer = new MutationObserver(() => {
+    // Si hay fotos, mostrar el badge simulando análisis
+    if (dropZone.querySelectorAll('.photo-thumbnail').length > 0) {
+      aiBadge.style.display = 'block';
+    } else {
+      aiBadge.style.display = 'none';
+    }
+  });
+  observer.observe(dropZone, { childList: true });
+}
 
 form.addEventListener('submit', submitPublication);
