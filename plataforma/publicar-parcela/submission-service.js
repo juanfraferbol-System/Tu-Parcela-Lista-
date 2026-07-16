@@ -1,6 +1,10 @@
 import {getSupabaseClient,hasValidSupabaseConfig,readSupabaseConfig} from '../../js/supabase-client.js';
 import {ALLOWED_PHOTO_TYPES,MAX_PHOTOS,MAX_FINAL_TOTAL_PHOTO_BYTES} from './photo-optimizer.js';
 import {planIncludesVisualAnalysis} from './plans-config.js';
+import {createDraft, submitForReview} from './publication-api.js';
+import {uploadImage, saveImageRecord} from './storage-api.js';
+import {calcularCategoriasParcela} from '../../js/core/category-engine.js';
+import {analyzePhotosForClassification} from './photo-classification-service.js';
 
 export const PENDING_BUCKET='publicaciones-pendientes';
 export {ALLOWED_PHOTO_TYPES,MAX_PHOTOS};
@@ -98,6 +102,30 @@ async function submitToSupabase(draft={},options={},client=null){
     transport:'supabase-v1',adapterLabel:'Supabase Direct API'
    };
    let recoveryDraft=checkpointDraft(draft,submission);await notifyCheckpoint(options.onCheckpoint,recoveryDraft);
+   
+   try {
+     const photos = options.photos || [];
+     const photoFiles = photos.map(p => p.file).filter(Boolean);
+     
+     // 1. Análisis visual de fotos (simulado por ahora)
+     const photoLabels = await analyzePhotosForClassification(photoFiles);
+     
+     // 2. Correr motor de reglas sobre la parcela
+     const categoriasResult = calcularCategoriasParcela(draft.parcela || {});
+     
+     // 3. Inyectar resultados en datos_parcela
+     if (!draft.parcela) draft.parcela = {};
+     draft.parcela.categorias_calculadas = categoriasResult;
+     draft.parcela.etiquetas_visuales = photoLabels;
+     
+     // Extraer sugeridas (las que coinciden > puntaje)
+     draft.parcela.categorias_sugeridas = Object.entries(categoriasResult)
+       .filter(([key, cat]) => cat.coincide)
+       .map(([key]) => key);
+       
+   } catch (catErr) {
+     console.warn('Error al calcular categorías:', catErr);
+   }
    
    try {
      const pub = await createDraft(draft);
