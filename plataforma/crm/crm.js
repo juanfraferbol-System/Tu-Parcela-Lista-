@@ -196,7 +196,11 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="detail-item">
           <strong>Precio</strong>
-          <span>${pub.moneda} ${pub.precio.toLocaleString('es-CL')}</span>
+          <span style="display:flex; gap:8px; align-items:center;">
+            ${pub.moneda} 
+            <input type="number" id="edit-precio-${pub.id}" value="${pub.precio}" style="width:120px; padding:4px; border:1px solid #ccc; border-radius:4px;">
+            <button class="btn-action" onclick="window.actualizarPrecio('${pub.id}')" style="padding:4px 8px;">Guardar</button>
+          </span>
         </div>
         <div class="detail-item">
           <strong>Comuna</strong>

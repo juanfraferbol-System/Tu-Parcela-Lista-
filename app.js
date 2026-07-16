@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  loadDynamicInventory();
   const CLP = new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
   const CONTACT_PHONE_DISPLAY = "+56988508361";
   const CONTACT_PHONE_WA = "56988508361";
@@ -3030,3 +3031,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+\n
+async function loadDynamicInventory() {
+  try {
+    const res = await fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/publicaciones?estado=eq.aprobada&select=*', {
+      headers: {
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
+        'Content-Type': 'application/json'
+      }
+    });
+    if (res.ok) {
+      const dbParcelas = await res.json();
+      if (dbParcelas && dbParcelas.length > 0) {
+        window.SERVER_PARCELAS = dbParcelas.map(db => ({
+          id: db.codigo_publico,
+          nombre: db.titulo_publico,
+          precio: db.precio_publicacion ? "$" + db.precio_publicacion.toLocaleString('es-CL') : "$0",
+          tamano: db.superficie_m2 || 5000,
+          lat: db.latitud_privada,
+          lng: db.longitud_privada,
+          imagen: db.datos_formulario?.imagen_principal || "",
+          imagenes: db.datos_formulario?.imagenes || [],
+          descripcion: db.descripcion_publica,
+          luz: db.luz || 'no',
+          agua: db.agua || 'no',
+          naturaleza: db.datos_formulario?.naturaleza || 'no',
+          rol: db.rol || 'si',
+          servicios: db.datos_formulario?.servicios || 'no',
+          destacada: db.datos_formulario?.destacada || 'no',
+          distanciaConcepcion: db.ubicacion_publica_aproximada || '',
+          tiempoConcepcion: db.datos_formulario?.tiempoConcepcion || '',
+          comuna: db.comuna || ''
+        }));
+        // Re-render everything that depends on parcelas
+        if (typeof renderParcelas === 'function') renderParcelas();
+        if (typeof renderMap === 'function') renderMap();
+        if (typeof renderMapMobile === 'function') renderMapMobile();
+      }
+    }
+  } catch (e) {
+    console.error("Error cargando inventario dinamico", e);
+  }
+}
