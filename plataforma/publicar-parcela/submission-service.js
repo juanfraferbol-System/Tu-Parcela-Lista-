@@ -88,30 +88,45 @@ function checkpointDraft(draft,submission){
 
 async function notifyCheckpoint(callback,draft){if(typeof callback==='function')await callback(draft);}
 
-async function submitToSupabase(draft,options,client){
- const photos=normalizeSubmissionPhotos(options.photos||[]),previous=draft.submission?.transport==='supabase-v1'?draft.submission:null;
- if(previous&&!photos.length&&Array.isArray(draft.photos)&&draft.photos.length)throw new SubmissionError('Vuelve a seleccionar las fotografías para reanudar el envío.',{code:'missing_recovery_files',recoveryDraft:draft});
- const idempotencyKey=previous?.idempotencyKey||createIdempotencyKey();
- let submission={
-  ...previous,status:'procesando_en_servidor',submittedAt:previous?.submittedAt||nowIso(options.date),
-  contactEmail:contactEmailFor(draft),temporaryCode:previous?.temporaryCode||'',idempotencyKey,
-  publisherType:draft.tipoPublicador||'',commercialModel:commercialModelFor(draft),
-  publicTitle:draft.titulo_publico||'',publicDescription:draft.descripcion_publica||'',
-  transport:'supabase-v1',adapterLabel:'Supabase Edge Function'
- };
- let recoveryDraft=checkpointDraft(draft,submission);await notifyCheckpoint(options.onCheckpoint,recoveryDraft);
- const formData=new FormData();formData.append('payload',JSON.stringify(safePayload(draft)));formData.append('idempotency_key',idempotencyKey);
- const coverIndex=Math.max(0,photos.findIndex(photo=>photo.cover));formData.append('cover_index',String(coverIndex));
- photos.forEach(photo=>formData.append('photos',photo.file));
- let response;
- try{response=await client.functions.invoke('publicar-parcela',{body:formData});}
- catch(cause){throw new SubmissionError('No fue posible conectar con el servicio seguro de publicación. El reintento conservará la misma idempotencia.',{code:'edge_function_failed',cause,recoveryDraft});}
- const error=responseError(response),result=response?.data;
- if(error||!result?.ok||!result?.id||!result?.codigo_publico)throw new SubmissionError(result?.error||error?.message||'No fue posible completar la publicación.',{code:result?.code||'edge_function_failed',cause:error,recoveryDraft});
- const visualAnalysis=result.analisis_visual||{status:'not_requested'},reviewed=['accepted','edited','rejected'].includes(String(draft.analisisVisual?.reviewStatus||''));
- submission={...submission,status:visualAnalysis.status==='completed'&&visualAnalysis.suggestions&&!reviewed?'revision_ia_pendiente':'publicado',temporaryCode:result.codigo_publico,publicationId:result.id,submittedAt:result.creado_en||submission.submittedAt,completedAt:nowIso(options.date),processedPhotos:Number(result.fotos_procesadas||0),visualAnalysis};
- recoveryDraft=checkpointDraft(draft,submission);await notifyCheckpoint(options.onCheckpoint,recoveryDraft);
- return recoveryDraft;
+async function submitToSupabase(draft={},options={},client=null){
+   const previous=draft.submission||{};
+   let submission={
+    ...previous,status:'procesando_en_servidor',submittedAt:previous?.submittedAt||nowIso(options.date),
+    contactEmail:contactEmailFor(draft),temporaryCode:previous?.temporaryCode||'',
+    publisherType:draft.tipoPublicador||'',commercialModel:commercialModelFor(draft),
+    publicTitle:draft.titulo_publico||'',publicDescription:draft.descripcion_publica||'',
+    transport:'supabase-v1',adapterLabel:'Supabase Direct API'
+   };
+   let recoveryDraft=checkpointDraft(draft,submission);await notifyCheckpoint(options.onCheckpoint,recoveryDraft);
+   
+   try {
+     const pub = await createDraft(draft);
+     const publicacionId = pub.id;
+     submission.publicationId = publicacionId;
+     submission.temporaryCode = 'TPL-' + publicacionId.split('-')[0].toUpperCase();
+
+     let procesadas = 0;
+     const photos = options.photos || [];
+     for (let i = 0; i < photos.length; i++) {
+       const photo = photos[i];
+       const imageMeta = await uploadImage(photo.file);
+       await saveImageRecord(publicacionId, imageMeta, i, photo.cover || (i === 0));
+       procesadas++;
+     }
+
+     await submitForReview(publicacionId);
+
+     submission.status = 'publicado';
+     submission.completedAt = nowIso(options.date);
+     submission.processedPhotos = procesadas;
+     
+     recoveryDraft = checkpointDraft(draft, submission);
+     await notifyCheckpoint(options.onCheckpoint, recoveryDraft);
+     return recoveryDraft;
+
+   } catch (cause) {
+     throw new SubmissionError('No fue posible completar la publicación. ' + cause.message, {code: 'api_failed', cause, recoveryDraft});
+   }
 }
 
 export function createSubmissionAdapter(dependencies={}){
