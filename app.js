@@ -3031,7 +3031,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-\n
+
 async function loadDynamicInventory() {
   try {
     const res = await fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/publicaciones?estado=eq.aprobada&select=*', {
