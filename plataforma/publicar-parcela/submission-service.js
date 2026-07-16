@@ -1,8 +1,8 @@
 import {getSupabaseClient,hasValidSupabaseConfig,readSupabaseConfig} from '../../js/supabase-client.js';
 import {ALLOWED_PHOTO_TYPES,MAX_PHOTOS,MAX_FINAL_TOTAL_PHOTO_BYTES} from './photo-optimizer.js';
 import {planIncludesVisualAnalysis} from './plans-config.js';
-import {createDraft, submitForReview} from './publication-api.js';
-import {uploadImage, saveImageRecord} from './storage-api.js';
+import {createDraft, submitForReview, saveImageRecord} from './publication-api.js';
+import {uploadImage} from './storage-api.js';
 import {calcularCategoriasParcela} from '../../js/core/category-engine.js';
 import {analyzePhotosForClassification} from './photo-classification-service.js';
 
