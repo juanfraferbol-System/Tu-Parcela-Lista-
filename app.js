@@ -949,7 +949,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="casa-body">
           <div class="casa-head-row">
             <h3 class="casa-title">${c.nombre}</h3>
-            <div class="casa-price">${money(c.valorCasa)}</div>
+            <div class="casa-price">${money(c.valorCasa || c.precio)}</div>
           </div>
           <p class="casa-desc">${c.descripcion_breve || "Casa prefabricada lista para cotizar."}</p>
           <div class="casa-specs-strip"><span>🛏 ${c.habitaciones} hab</span><span>🚿 ${c.banos || 1} baño</span><span>📐 ${c.metros} m²</span></div>
@@ -1173,7 +1173,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (state.selectedCasa) {
-      const val = Number(state.selectedCasa.valorCasa || 0);
+      const val = Number(state.selectedCasa.valorCasa || state.selectedCasa.precio || 0);
       const casaM2 = Number(state.selectedCasa.metros || state.selectedCasa.m2 || 0);
       const habitaciones = Number(state.selectedCasa.habitaciones || state.selectedCasa.dormitorios || 0);
       const textoHabitaciones = habitaciones === 1 ? "1 habitación" : `${habitaciones} habitaciones`;
@@ -1339,7 +1339,7 @@ document.addEventListener("DOMContentLoaded", () => {
     doc.text("Tu Parcela Lista", margin, 42);
     doc.setFontSize(13);
     doc.setFont("helvetica", "normal");
-    doc.text("Cotización de proyecto parcela + casa", margin, 66);
+    doc.text("Cotizaci\u00F3n de proyecto parcela + casa" + (cliente.numero_proyecto ? " | N: " + cliente.numero_proyecto : ""), margin, 66);
     doc.setFontSize(9);
     doc.text(`Generado: ${data.fecha}`, margin, 84);
     y = 126;
@@ -2192,7 +2192,7 @@ document.addEventListener("DOMContentLoaded", () => {
       beginProjectChange("casa");
     });
 
-    DOM.whatsappBtn?.addEventListener("click", () => {
+    DOM.whatsappBtn?.addEventListener("click", async () => {
       if (!state.selectedParcela) {
         showFriendlyMessage("Primero selecciona una parcela para enviar la cotización.");
         scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor);
@@ -2204,7 +2204,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = getCotizacionData();
       const msg = encodeURIComponent(
         `Hola Tu Parcela Lista, quiero avanzar con esta cotización.\n\n` +
-        `🏡 PROYECTO COTIZADO\n` +
+        `🏡 PROYECTO COTIZADO (${numeroProyecto})\n` +
         `Parcela/Campo: ${data.parcela?.nombre || "por definir"}\n` +
         `Comuna: ${data.parcela?.comuna || "por definir"}\n` +
         `Tamaño terreno: ${data.parcela ? (data.parcela.tamano || data.parcela.superficie || data.parcela.m2 || "por definir") : "por definir"} m²\n` +
@@ -2218,27 +2218,33 @@ document.addEventListener("DOMContentLoaded", () => {
         `Se generó un PDF descargable de respaldo${pdfResult?.filename ? ` (${pdfResult.filename})` : ""}.\n\n` +
         `Quiero que un ejecutivo me contacte para revisar disponibilidad, reserva y pasos de compra.`
       );
-            // Guardar en Supabase Cotizaciones
+                  // Guardar en Supabase Cotizaciones usando RPC
       try {
-        const payload = {
-          cliente_nombre: 'Cliente Web Anónimo',
-          parcela_id: state.selectedParcela ? state.selectedParcela.id.toString() : 'Desconocido',
-          parcela_comuna: state.selectedParcela ? state.selectedParcela.comuna : 'Desconocida',
-          casa_id: state.selectedCasa ? state.selectedCasa.id.toString() : 'Ninguna',
-          presupuesto_estimado: state.selectedCasa ? state.selectedCasa.precio : 0,
-          requiere_instalacion: state.installationService === 'si'
-        };
-        fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/cotizaciones_proyectos', {
+        const res = await fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/rpc/crear_proyecto_completo', {
           method: 'POST',
           headers: {
             'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
             'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify(payload)
-        }).catch(e => console.warn("Error guardando cotizacion", e));
+          body: JSON.stringify({
+            p_cliente_nombre: 'Cliente Web Anonimo',
+            p_cliente_email: 'anonimo@tuparcelalista.cl',
+            p_cliente_telefono: '',
+            p_parcela_id: state.selectedParcela ? (state.selectedParcela.uuid || null) : null,
+            p_casa_codigo: state.selectedCasa ? state.selectedCasa.id.toString() : null,
+            p_total: data.totalNum || 0,
+            p_extras: []
+          })
+        });
+        if (res.ok) {
+          const respText = await res.text();
+          numeroProyecto = respText.replace(/"/g, '');
+        }
       } catch (e) {}
+      DOM.whatsappBtn.textContent = "Quiero este proyecto";
+      DOM.whatsappBtn.style.pointerEvents = "auto";
+      DOM.whatsappBtn.style.opacity = "1";
       window.open(`https://wa.me/${CONTACT_PHONE_WA}?text=${msg}`, "_blank");
 
     });
@@ -2267,31 +2273,32 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       if (DOM.activationStatus) DOM.activationStatus.textContent = "Guardando solicitud y redirigiendo a Flow...";
       
-      try {
-                // Guardar en Supabase Cotizaciones (REST API para Smart Match Contratistas)
-        try {
-          const payload = {
-            cliente_nombre: cliente.nombre || 'Cliente Web Activación',
-            cliente_telefono: cliente.telefono,
-            cliente_email: cliente.email,
-            parcela_id: state.selectedParcela ? state.selectedParcela.id.toString() : 'Desconocido',
-            parcela_comuna: state.selectedParcela ? state.selectedParcela.comuna : 'Desconocida',
-            casa_id: state.selectedCasa ? state.selectedCasa.id.toString() : 'Ninguna',
-            presupuesto_estimado: state.selectedCasa ? state.selectedCasa.precio : 0,
-            requiere_instalacion: state.installationService === 'si'
-          };
-          fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/cotizaciones_proyectos', {
+              try {
+          const data = getCotizacionData();
+          const res = await fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/rpc/crear_proyecto_completo', {
             method: 'POST',
             headers: {
               'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
               'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
-              'Content-Type': 'application/json',
-              'Prefer': 'return=minimal'
+              'Content-Type': 'application/json'
             },
-            body: JSON.stringify(payload)
-          }).catch(e => console.warn("No se pudo guardar la cotización en DB", e));
-        } catch (e) {}
-        const leadRes = await window.apiSaveLead(cliente);
+            body: JSON.stringify({
+              p_cliente_nombre: cliente.nombre || 'Cliente Web Activacion',
+              p_cliente_email: cliente.email || 'activacion@tuparcelalista.cl',
+              p_cliente_telefono: cliente.telefono || '',
+              p_parcela_id: state.selectedParcela ? (state.selectedParcela.uuid || null) : null,
+              p_casa_codigo: state.selectedCasa ? state.selectedCasa.id.toString() : null,
+              p_total: data.totalNum || 0,
+              p_extras: []
+            })
+          });
+          if (res.ok) {
+            const respText = await res.text();
+            cliente.mensaje = "Nº Proyecto: " + respText.replace(/"/g, '') + "\n\n" + cliente.mensaje;
+          }
+        } catch (e) { console.warn("No se pudo guardar la cotizacion en DB", e); }
+        try {
+          const leadRes = await window.apiSaveLead(cliente);
 
         const leadId = leadRes?.data?.[0]?.id || `TPL-${Date.now()}`;
         const amount = (parseClp(state.selectedParcela.precio) * 0.01) || 10000;
