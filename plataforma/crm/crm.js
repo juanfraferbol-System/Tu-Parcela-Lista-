@@ -150,12 +150,23 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const renderTable = () => {
-    if (publicacionesCache.length === 0) {
-      DOM.tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No hay publicaciones en este estado.</td></tr>`;
+    let filtradas = publicacionesCache;
+    const q = document.getElementById('search-input')?.value.toLowerCase().trim();
+    if (q) {
+      filtradas = filtradas.filter(p => 
+        (p.propiedad && p.propiedad.toLowerCase().includes(q)) ||
+        (p.codigo_publico && p.codigo_publico.toLowerCase().includes(q)) ||
+        (p.comuna && p.comuna.toLowerCase().includes(q)) ||
+        (p.corredor && p.corredor.toLowerCase().includes(q))
+      );
+    }
+    
+    if (filtradas.length === 0) {
+      DOM.tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No hay publicaciones que coincidan.</td></tr>`;
       return;
     }
     
-    DOM.tableBody.innerHTML = publicacionesCache.map(p => `
+    DOM.tableBody.innerHTML = filtradas.map(p => `
       <tr>
         <td>${new Date(p.creado_en).toLocaleDateString('es-CL')}</td>
         <td><strong>${p.propiedad}</strong><br><small style="color:var(--text-muted)">${p.codigo_publico}</small></td>
@@ -171,6 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   DOM.filterEstado.addEventListener("change", loadTable);
+  document.getElementById('search-input')?.addEventListener('input', renderTable);
   DOM.btnRefresh.addEventListener("click", loadData);
 
   // 3. Detalle y Moderación
@@ -211,12 +223,29 @@ document.addEventListener("DOMContentLoaded", () => {
           <span>${pub.contacto_nombre} (${pub.contacto_telefono})</span>
         </div>
         <div class="detail-item" style="grid-column: 1 / -1">
+          <strong>Categorías e IA</strong>
+          <div id="crm-categories-display" style="padding:10px; background:#f0f4f8; border-radius:8px; font-size:14px; color:#2c3e50;">
+            ${pub.datos_parcela?.categorias ? 
+              Object.entries(pub.datos_parcela.categorias)
+                .map(([cat, score]) => `<span style="display:inline-block; margin-right:15px;"><b>${cat.toUpperCase()}:</b> ${score} pts</span>`)
+                .join('') 
+              : 'Sin categorizar'}
+          </div>
+        </div>
+        <div class="detail-item" style="grid-column: 1 / -1">
           <strong>Descripción</strong>
-          <p>${pub.descripcion || 'Sin descripción'}</p>
+          <p>
+            <textarea id="edit-relato-${pub.id}" rows="5" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:inherit;">${pub.descripcion || ''}</textarea>
+          </p>
+          <button class="btn-action" onclick="window.actualizarDatos('${pub.id}')" style="margin-top:5px; padding:6px 12px;">Guardar Cambios de Texto y Precio</button>
         </div>
       </div>
-      <div class="detail-fotos">
-        ${fotos.map(f => `<img src="${f.url_storage}" alt="Foto" loading="lazy">`).join('')}
+      <div class="detail-fotos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
+        ${fotos.length ? fotos.map(f => `
+          <a href="${f.url_storage}" target="_blank" style="display:block; border-radius:8px; overflow:hidden; border:2px solid #ddd;">
+            <img src="${f.url_storage}" alt="Foto" loading="lazy" style="width:100%; height:120px; object-fit:cover; display:block;">
+          </a>
+        `).join('') : '<p>Sin fotografías</p>'}
       </div>
     `;
     
@@ -227,14 +256,54 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="btn-secondary" onclick="window.solicitarCambios('${pub.id}')">Pedir Corrección</button>
         <button class="btn-danger" onclick="window.rechazar('${pub.id}')">Rechazar</button>
         <button class="btn-success" onclick="window.aprobar('${pub.id}')">Aprobar Publicación</button>
+        ${getContactButtons(pub)}
       `;
     } else {
-      DOM.modalActions.innerHTML = `<button class="btn-secondary" onclick="document.getElementById('btn-close-modal').click()">Cerrar</button>`;
+      DOM.modalActions.innerHTML = `
+        <button class="btn-secondary" onclick="document.getElementById('btn-close-modal').click()">Cerrar</button>
+        ${getContactButtons(pub)}
+      `;
     }
+  };
+
+  const getContactButtons = (pub) => {
+    const telefono = pub.contacto_telefono ? pub.contacto_telefono.replace(/[^0-9]/g, '') : '';
+    const email = pub.contacto_email || '';
+    const name = pub.contacto_nombre || 'Cliente';
+    
+    let wppUrl = telefono ? `https://wa.me/${telefono}?text=Hola ${encodeURIComponent(name)}, te escribimos de Tu Parcela Lista sobre tu publicación "${encodeURIComponent(pub.titulo_publico)}"` : '#';
+    let mailUrl = email ? `mailto:${email}?subject=Sobre tu publicación en Tu Parcela Lista&body=Hola ${encodeURIComponent(name)},%0D%0ATe escribimos sobre tu publicación "${encodeURIComponent(pub.titulo_publico)}".` : '#';
+    
+    return `
+      <a href="${wppUrl}" target="_blank" class="btn-action" style="background:#25D366; color:white; padding:8px 15px; border-radius:5px; text-decoration:none; margin-left:10px;"><i data-lucide="message-circle" style="width:16px; height:16px; vertical-align:middle; margin-right:5px;"></i> WhatsApp</a>
+      <a href="${mailUrl}" target="_blank" class="btn-action" style="background:#0078D4; color:white; padding:8px 15px; border-radius:5px; text-decoration:none; margin-left:5px;"><i data-lucide="mail" style="width:16px; height:16px; vertical-align:middle; margin-right:5px;"></i> Correo</a>
+    `;
   };
 
   const closeModalDetalle = () => DOM.modalDetalle.classList.remove('active');
   DOM.btnCloseDetalle.addEventListener("click", closeModalDetalle);
+
+  // Edición Directa
+  window.actualizarDatos = async (id) => {
+    const nuevoPrecio = document.getElementById(`edit-precio-${id}`)?.value;
+    const nuevoRelato = document.getElementById(`edit-relato-${id}`)?.value;
+    
+    if (!confirm("¿Guardar cambios de texto y precio?")) return;
+    
+    const { error } = await supabase.rpc('crm_actualizar_datos_publicacion', {
+      p_publicacion_id: id,
+      p_titulo_publico: null, // Si quisieramos editar el título, podemos agregarlo después. Por ahora solo pasamos relato y precio
+      p_precio: parseFloat(nuevoPrecio),
+      p_relato: nuevoRelato
+    });
+    
+    if (!error) {
+      alert("Cambios guardados correctamente.");
+      loadData();
+    } else {
+      alert("Error al guardar cambios: " + error.message);
+    }
+  };
 
   // Acciones
   window.aprobar = async (id) => {

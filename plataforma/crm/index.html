@@ -113,15 +113,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <!-- Filtros -->
-        <section class="filters-bar">
-          <select id="filter-estado">
+        <section class="filters-bar" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+          <input type="text" id="search-input" placeholder="Buscar por código, nombre o comuna..." style="padding:8px 12px; border:1px solid #ccc; border-radius:6px; flex:1; min-width:200px;">
+          <select id="filter-estado" style="padding:8px; border:1px solid #ccc; border-radius:6px;">
             <option value="">Todos los estados</option>
             <option value="pendiente_revision" selected>Pendientes de Revisión</option>
             <option value="requiere_cambios">Requiere Cambios</option>
             <option value="aprobada">Aprobadas</option>
             <option value="rechazada">Rechazadas</option>
           </select>
-          <button id="btn-refresh"><i data-lucide="refresh-cw"></i> Actualizar</button>
+          <button id="btn-refresh" style="padding:8px 15px; border-radius:6px; cursor:pointer;"><i data-lucide="refresh-cw" style="width:16px; height:16px; vertical-align:middle;"></i> Actualizar</button>
         </section>
 
         <!-- Tabla -->
