@@ -126,6 +126,14 @@ async function analyzePhotoGps(){if(hasConfirmedLocation()){gpsConsent.checked=f
 function openLocationHelp(){locationHelpReturnFocus=document.activeElement;if(typeof locationHelpDialog.showModal==='function')locationHelpDialog.showModal();else locationHelpDialog.setAttribute('open','');requestAnimationFrame(()=>document.querySelector('#location-help-title').focus());}
 function closeLocationHelp(){if(typeof locationHelpDialog.close==='function'&&locationHelpDialog.open)locationHelpDialog.close();else{locationHelpDialog.removeAttribute('open');locationHelpReturnFocus?.focus?.();}}
 function appendText(container,tag,text,className){const element=document.createElement(tag);element.textContent=text;if(className)element.className=className;container.append(element);return element;}
+function photoButton(text, onClick) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'photo-tool';
+  btn.textContent = text;
+  btn.addEventListener('click', onClick);
+  return btn;
+}
 function createLocationChoiceUi(){
  const section=document.createElement('section');section.className='location-choice';section.setAttribute('aria-labelledby','location-choice-title');const title=appendText(section,'h3','¿Cómo quieres indicar la ubicación?');title.id='location-choice-title';
  const actions=document.createElement('div');actions.className='location-choice-actions';
