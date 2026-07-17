@@ -374,8 +374,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 inputmode="numeric"
                 data-detected-field
                 placeholder="Ej.: 20.000.000"
+                required
               /><small>Nos falta este dato</small></label
             >
+            <aside class="tpl-valuator-card" id="tpl-valuator-card" aria-labelledby="tpl-valuator-title">
+              <div>
+                <span class="tpl-valuator-kicker">Tasador TPL – Tu Parcela Lista</span>
+                <h3 id="tpl-valuator-title">¿Quieres comprobar si el precio de tu parcela está acorde a los antecedentes disponibles?</h3>
+                <p>Usaremos los datos que ya ingresaste. Es opcional y no bloquea tu publicación.</p>
+              </div>
+              <button type="button" class="secondary-action" id="open-estimator">Comprobar mi precio</button>
+              <section id="estimator" class="tpl-valuator-panel" hidden aria-live="polite">
+                <p id="estimator-loading" hidden>Consultando antecedentes comparables…</p>
+                <div id="estimator-result"></div>
+              </section>
+            </aside>
             <label
               >Rol<select name="rol" data-detected-field required>
                 <option value="">Selecciona</option>

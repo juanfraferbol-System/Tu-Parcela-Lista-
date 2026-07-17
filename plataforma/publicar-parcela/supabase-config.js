@@ -1,3 +1,4 @@
 export const SUPABASE_URL='https://qxavbqhyqaqalpzbhwmh.supabase.co';
 export const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
 export const PUBLICATION_FUNCTION_URL=`${SUPABASE_URL}/functions/v1/publicar-parcela`;
+export const VALUATION_FUNCTION_URL=`${SUPABASE_URL}/functions/v1/tasar-parcela`;
