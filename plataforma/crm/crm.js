@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     'https://qxavbqhyqaqalpzbhwmh.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA'
   );
+  window.tplCrmSupabase = supabase;
 
   const DOM = {
     loginContainer: document.getElementById("login-container"),
@@ -123,12 +124,12 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById('metric-pendientes-clientes').innerText = resClientes.count || 0;
       
       // Proyectos/Cotizaciones
-      const resProyectos = await supabase.from('proyectos').select('id, cotizacion_referencial, creado_en', { count: 'exact' }).eq('estado', 'cotizacion_generada').limit(5);
+      const resProyectos = await supabase.from('proyectos').select('id, total, creado_en', { count: 'exact' }).eq('estado', 'cotizacion_generada').limit(5);
       document.getElementById('metric-pendientes-cotizaciones').innerText = resProyectos.count || 0;
 
       // Publicaciones por revisar
-      const resPubs = await supabase.from('publicaciones_parcela').select('id, titulo_publico, creado_en', { count: 'exact' }).in('estado', ['borrador', 'pendiente_revision']).limit(5);
-      document.getElementById('metric-pendientes-publicaciones').innerText = resPubs.count || 0;
+      const resPubs = await supabase.rpc('crm_listar_publicaciones', { p_estado: 'pendiente_revision' });
+      document.getElementById('metric-pendientes-publicaciones').innerText = resPubs.data?.length || 0;
 
       const tbody = document.getElementById('table-body-pendientes');
       let html = '';
@@ -147,10 +148,10 @@ document.addEventListener("DOMContentLoaded", () => {
         resClientes.data.forEach(c => html += createRow('Lead', c.creado_en, `Cliente Nuevo: ${c.nombre}`, 'Sin contactar', `<button class="btn-action" onclick="alert('Funcionalidad próxima: Abrir Ficha')">Ver</button>`));
       }
       if (resProyectos.data?.length) {
-        resProyectos.data.forEach(p => html += createRow('Cotización', p.creado_en, `Cotización de: $${p.cotizacion_referencial?.toLocaleString('es-CL')}`, 'Huérfana', `<button class="btn-action">Revisar</button>`));
+        resProyectos.data.forEach(p => html += createRow('Cotización', p.creado_en, `Cotización de: $${Number(p.total||0).toLocaleString('es-CL')}`, 'Huérfana', `<button class="btn-action">Revisar</button>`));
       }
       if (resPubs.data?.length) {
-        resPubs.data.forEach(p => html += createRow('Parcela', p.creado_en, `Revisar: ${p.titulo_publico}`, 'Pendiente', `<button class="btn-action" onclick="window.verDetalle('${p.id}')">Revisar</button>`));
+        resPubs.data.forEach(p => html += createRow('Parcela', p.creado_en, `Revisar: ${p.propiedad}`, 'Pendiente', `<button class="btn-action" onclick="window.verDetalle('${p.id}')">Revisar</button>`));
       }
 
       if (!html) html = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#64748b;">No hay tareas operativas pendientes. ¡Todo al día!</td></tr>';
@@ -450,6 +451,7 @@ navItems.forEach(item => {
     const topbarTitle = document.getElementById('topbar-title');
     if (topbarTitle) {
       if (targetId === 'view-solicitudes') topbarTitle.textContent = 'Moderación de Publicaciones';
+      if (targetId === 'view-tasador') topbarTitle.textContent = 'Tasador TPL';
       if (targetId === 'view-cotizaciones') topbarTitle.textContent = 'Cotizaciones y Smart Match';
       if (targetId === 'view-contratistas') topbarTitle.textContent = 'Gestión de Contratistas';
     }
@@ -482,7 +484,7 @@ async function loadContratistas() {
   if (!domContratistas.tableBody) return;
   domContratistas.tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Cargando contratistas...</td></tr>';
   
-  const { data, error } = await window.supabase.from('contratistas').select('*').order('created_at', { ascending: false });
+  const { data, error } = await window.tplCrmSupabase.from('contratistas').select('*').order('created_at', { ascending: false });
   
   if (error) {
     console.error("Error al cargar contratistas:", error);
@@ -535,7 +537,7 @@ function renderContratistas() {
 
 window.updatePartnerStatus = async function(id, newStatus) {
   try {
-    const { error } = await window.supabase.from('contratistas').update({ estado_verificacion: newStatus }).eq('id', id);
+    const { error } = await window.tplCrmSupabase.from('contratistas').update({ estado_verificacion: newStatus }).eq('id', id);
     if (error) {
       alert('Error al actualizar estado');
       console.error(error);
@@ -554,7 +556,8 @@ async function loadCotizaciones() {
   if (!domCotizaciones.tableBody) return;
   domCotizaciones.tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Cargando cotizaciones...</td></tr>';
   
-  const { data, error } = await window.supabase.from('cotizaciones_proyectos').select('*').order('created_at', { ascending: false });
+  const { data:projectRows, error } = await window.tplCrmSupabase.from('proyectos').select('id,creado_en,estado,total,modalidad,parcela_id,clientes(nombre,telefono),publicaciones(comuna)').order('creado_en', { ascending: false });
+  const data=(projectRows||[]).map(project=>({id:project.id,created_at:project.creado_en,estado:project.estado,parcela_id:project.parcela_id,parcela_comuna:project.publicaciones?.comuna||'',cliente_nombre:project.clientes?.nombre||'',cliente_telefono:project.clientes?.telefono||'',requiere_instalacion:project.modalidad==='llave_en_mano',total:project.total}));
   
   if (error) {
     console.error("Error al cargar cotizaciones:", error);
@@ -564,7 +567,7 @@ async function loadCotizaciones() {
   
   // Si no tenemos contratistas cargados aún, los necesitamos para el Smart Match
   if (contratistasCache.length === 0) {
-    const res = await window.supabase.from('contratistas').select('*').eq('estado_verificacion', 'verificado');
+    const res = await window.tplCrmSupabase.from('contratistas').select('*').eq('estado_verificacion', 'verificado');
     if (!res.error) contratistasCache = res.data;
   }
   
@@ -632,11 +635,35 @@ if (domContratistas.filterEstado) domContratistas.filterEstado.addEventListener(
 if (domCotizaciones.btnRefresh) domCotizaciones.btnRefresh.addEventListener('click', loadCotizaciones);
 if (domCotizaciones.filterEstado) domCotizaciones.filterEstado.addEventListener('change', renderCotizaciones);
 
+async function loadTasadorPanel(){
+ const status=document.getElementById('tasador-admin-status'),tbody=document.getElementById('table-body-tasaciones');
+ if(!window.tplCrmSupabase||!tbody)return;
+ status.hidden=true;tbody.innerHTML='<tr><td colspan="7" class="launch-empty">Cargando tasaciones…</td></tr>';
+ const [valuationResponse,configResponse]=await Promise.all([
+  window.tplCrmSupabase.from('tasaciones').select('id,creada_en,precio_ingresado,valor_minimo,valor_mercado,valor_maximo,confianza,cobertura,decision_usuario,resumen_factores,datos_entrada').order('creada_en',{ascending:false}).limit(200),
+  window.tplCrmSupabase.from('configuracion_tasador').select('version,algoritmo,parametros').eq('estado','activa').maybeSingle()
+ ]);
+ if(valuationResponse.error){status.hidden=false;status.textContent='El esquema del Tasador TPL todavía no está desplegado o tu sesión no tiene permisos.';tbody.innerHTML='<tr><td colspan="7" class="launch-empty">Sin datos disponibles.</td></tr>';return;}
+ const rows=valuationResponse.data||[];
+ document.getElementById('metric-tasaciones-total').textContent=rows.length;
+ document.getElementById('metric-tasaciones-baja').textContent=rows.filter(row=>['experimental','informacion_insuficiente'].includes(row.cobertura)).length;
+ document.getElementById('metric-tasaciones-fuera').textContent=rows.filter(row=>row.resumen_factores?.position==='sobre_el_rango').length;
+ document.getElementById('metric-tasaciones-aceptadas').textContent=rows.filter(row=>row.decision_usuario==='adoptar_mercado').length;
+ if(configResponse.data){document.getElementById('tasador-config-version').textContent=`${configResponse.data.version} · ${configResponse.data.algoritmo}`;const parameters=configResponse.data.parametros||{};document.getElementById('tasador-config-summary').textContent=`Mínimo ${parameters.comparables_minimos||'—'} comparables · cobertura limitada desde ${parameters.cobertura_limitada_desde||'—'} · máxima ${parameters.distancia_maxima_km||'—'} km geográficos.`;}
+ tbody.replaceChildren();
+ if(!rows.length){const row=tbody.insertRow();const cell=row.insertCell();cell.colSpan=7;cell.className='launch-empty';cell.textContent='Todavía no existen tasaciones.';return;}
+ rows.forEach(item=>{const row=tbody.insertRow(),values=[new Date(item.creada_en).toLocaleDateString('es-CL'),item.datos_entrada?.comuna||'—',formatAdminMoney(item.precio_ingresado),item.valor_minimo&&item.valor_maximo?`${formatAdminMoney(item.valor_minimo)} – ${formatAdminMoney(item.valor_maximo)}`:'Información insuficiente',item.confianza,item.cobertura,item.decision_usuario||'sin_decision'];values.forEach(value=>{const cell=row.insertCell();cell.textContent=String(value??'—');});});
+}
+
+function formatAdminMoney(value){return Number(value||0).toLocaleString('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0});}
+document.getElementById('btn-refresh-tasador')?.addEventListener('click',loadTasadorPanel);
+
 // Interceptar la navegación para cargar datos la primera vez
 document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
   item.addEventListener('click', (e) => {
     const targetId = item.getAttribute('data-target');
     if (targetId === 'view-contratistas' && contratistasCache.length === 0) loadContratistas();
     if (targetId === 'view-cotizaciones' && cotizacionesCache.length === 0) loadCotizaciones();
+    if (targetId === 'view-tasador') loadTasadorPanel();
   });
 });

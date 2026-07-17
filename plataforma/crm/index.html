@@ -68,6 +68,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <nav class="sidebar-nav">
         <a href="#" class="nav-item active" data-target="view-pendientes"><i data-lucide="bell"></i> Pendientes Operativos</a>
         <a href="#" class="nav-item" data-target="view-solicitudes"><i data-lucide="inbox"></i> Publicaciones</a>
+        <a href="#" class="nav-item" data-target="view-tasador"><i data-lucide="calculator"></i> Tasador TPL</a>
         <a href="#" class="nav-item" data-target="view-cotizaciones"><i data-lucide="briefcase"></i> Cotizaciones / Proyectos</a>
         <a href="#" class="nav-item" data-target="view-contratistas"><i data-lucide="users"></i> Red de Partners</a>
         <a href="#" class="nav-item" data-target="view-promociones"><i data-lucide="megaphone"></i> Promociones y Ads</a>
@@ -232,6 +233,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
 
       
+      <div id="view-tasador" class="dashboard-section" style="display:none;">
+        <section class="tasador-admin-heading">
+          <div><span class="eyebrow">Estimaciones referenciales</span><h2>Tasador TPL – Tu Parcela Lista</h2><p>Revisa cobertura, confianza y decisiones sin exponer coordenadas ni datos privados.</p></div>
+          <button id="btn-refresh-tasador" class="btn-action" type="button">Actualizar</button>
+        </section>
+        <p id="tasador-admin-status" class="launch-status" hidden></p>
+        <section class="metrics-grid">
+          <div class="metric-card info"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-total">0</span><span class="metric-label">Tasaciones</span></div></div>
+          <div class="metric-card warning"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-baja">0</span><span class="metric-label">Cobertura baja o insuficiente</span></div></div>
+          <div class="metric-card danger"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-fuera">0</span><span class="metric-label">Precio sobre el rango</span></div></div>
+          <div class="metric-card success"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-aceptadas">0</span><span class="metric-label">Recomendación adoptada</span></div></div>
+        </section>
+        <section class="tasador-config-card"><div><strong>Configuración activa</strong><span id="tasador-config-version">Sin desplegar</span></div><p id="tasador-config-summary">Los cambios de parámetros deben publicarse como una nueva versión auditable.</p><button type="button" disabled title="Se habilitará después de desplegar y validar el MVP">Crear nueva versión</button></section>
+        <section class="table-container">
+          <table class="data-table"><thead><tr><th>Fecha</th><th>Comuna</th><th>Precio ingresado</th><th>Rango</th><th>Confianza</th><th>Cobertura</th><th>Decisión</th></tr></thead><tbody id="table-body-tasaciones"><tr><td colspan="7" class="launch-empty">El módulo todavía no está desplegado.</td></tr></tbody></table>
+        </section>
+      </div>
+
       <!-- VISTA PROMOCIONES Y ADS -->
       <div id="view-promociones" class="dashboard-section" style="display:none;">
         <section class="filters-bar" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
@@ -273,9 +292,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <section class="filters-bar">
           <select id="filter-estado-cotizacion">
             <option value="">Todos los estados</option>
-            <option value="Nueva" selected>Nuevas</option>
-            <option value="Buscando contratista">Buscando Contratista</option>
-            <option value="Adjudicada">Adjudicada</option>
+            <option value="cotizacion_generada" selected>Cotización generada</option>
+            <option value="activo">Proyecto activo</option>
+            <option value="cerrado">Cerrado</option>
           </select>
           <button id="btn-refresh-cotizaciones"><i data-lucide="refresh-cw"></i> Actualizar</button>
         </section>

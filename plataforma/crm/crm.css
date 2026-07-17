@@ -477,3 +477,4 @@ button[type="submit"]:hover, .btn-primary:hover {
   border-radius: 6px;
   border: 1px solid var(--border);
 }
+.tasador-admin-heading{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:18px}.tasador-admin-heading h2{margin:4px 0 6px}.tasador-admin-heading p{margin:0;color:#64748b}.tasador-config-card{display:grid;grid-template-columns:minmax(180px,.6fr) 1fr auto;gap:18px;align-items:center;margin:18px 0;padding:18px;border:1px solid #dbe5ef;border-radius:14px;background:#f8fbfd}.tasador-config-card strong,.tasador-config-card span{display:block}.tasador-config-card span{margin-top:4px;color:#0f766e;font-weight:800}.tasador-config-card p{margin:0;color:#64748b}.tasador-config-card button{padding:9px 12px;border:1px solid #cbd5e1;border-radius:9px;background:white}@media(max-width:800px){.tasador-admin-heading{display:block}.tasador-admin-heading button{margin-top:12px}.tasador-config-card{grid-template-columns:1fr}}
