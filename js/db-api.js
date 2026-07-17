@@ -12,6 +12,7 @@ if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'TU_SUPABASE_URL_
 } else {
   console.warn("⚠️ Supabase no está configurado en db-api.js. Usando fallback local (parcelas.js).");
 }
+window.tplSupabase = supabase;
 
 /**
  * Obtiene la lista de parcelas. 
@@ -40,16 +41,31 @@ async function apiGetParcelas() {
 /**
  * Guarda un lead o cotización en Supabase
  */
-async function apiSaveLead(leadData) {
+async function apiSaveLead(payload) {
   if (!supabase) {
-    console.log("Mock: Lead guardado", leadData);
-    return { success: true, mock: true };
+    if (window.TplErrorLogger) window.TplErrorLogger.log("DB-API", "apiSaveLead", "Error de conexión", "No hay conexión a Supabase", null, "crítico");
+    return { success: false, error: new Error("No se pudo conectar con la base de datos.") };
   }
 
   try {
+    if (payload.cliente) {
+      const { data, error } = await supabase.rpc('crm_registrar_oportunidad_publica', {
+        p_cliente: payload.cliente,
+        p_proyecto: payload.proyecto || null,
+        p_evento: payload.evento || 'informacion_solicitada',
+        p_etapa: payload.etapa || 'solicito_informacion',
+        p_origen: payload.proyecto?.origen || payload.origen || 'web',
+        p_pagina: location.pathname,
+        p_metadata: payload.metadata || {}
+      });
+      if (error) throw error;
+      return data || { success: true };
+    }
+
+    // Fallback legacy behavior
     const { data, error } = await supabase
       .from('leads_cotizaciones')
-      .insert([leadData])
+      .insert([payload])
       .select();
       
     if (error) throw error;

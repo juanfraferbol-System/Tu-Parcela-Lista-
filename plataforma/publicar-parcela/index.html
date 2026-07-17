@@ -1,6 +1,13 @@
 <!doctype html>
 <html lang="es">
   <head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WK4M33H4');</script>
+<!-- End Google Tag Manager -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Publica tu parcela | Tu Parcela Lista</title>
@@ -16,9 +23,25 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <!-- Scripts de Categorías (Scoring) -->
+    <script src="../../js/categorias-estilo.js"></script>
+    <script src="../../js/categoria.js"></script>
     <link rel="stylesheet" href="publicar-parcela.css?v=20260715-9" />
-  </head>
+  
+<!-- Google Ads Tracking -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-TU_ID_DE_GOOGLE_ADS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-TU_ID_DE_GOOGLE_ADS');
+</script>
+</head>
   <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WK4M33H4"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
     <a class="skip-link" href="#publish-form">Saltar al formulario</a>
     <header class="app-header">
       <a
@@ -46,7 +69,8 @@
           <li><span>2</span><b>Relato</b></li>
           <li><span>3</span><b>Datos</b></li>
           <li><span>4</span><b>Vista Previa</b></li>
-          <li><span>5</span><b>Publicación</b></li>
+          <li><span>5</span><b>Identificación</b></li>
+          <li><span>6</span><b>Promoción</b></li>
         </ol>
       </nav>
       <form id="publish-form" class="flow-card" novalidate>
@@ -57,18 +81,26 @@
           aria-live="polite"
         ></div>
         
-        <section
+                <section
           class="flow-step is-active"
           data-step="1"
           aria-labelledby="step-3-title"
-          
         >
-          <p class="eyebrow">Contenido visual</p>
-          <h2 id="step-3-title">Agrega las mejores fotografías</h2>
+          <!-- Hero de la sección de fotos -->
+          <div class="photo-hero" style="position:relative; border-radius:24px; overflow:hidden; margin-bottom:24px; box-shadow:0 12px 35px rgba(0,0,0,0.06);">
+            <img src="../../image/btn_parcela_person.jpg" alt="Hombre tomando fotografía en el campo" style="width:100%; height:220px; object-fit:cover; display:block;">
+            <div style="position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,43,82,0.85) 0%, rgba(0,43,82,0.2) 100%); display:flex; flex-direction:column; justify-content:flex-end; padding:24px;">
+              <span class="eyebrow" style="color:#71c9c2;">Contenido visual</span>
+              <h2 id="step-3-title" style="color:white; margin:0; font-size:clamp(1.6rem, 4vw, 2.4rem);">Una buena imagen puede hacer la diferencia</h2>
+            </div>
+          </div>
+
+          <h3 style="color:var(--navy); font-size:1.6rem; margin-bottom:8px;">Muestra lo mejor de tu parcela</h3>
           <p class="lead" id="photo-guidance">
-            Sube entre 1 y 12 fotografías. Peso máximo total: 20 MB. Formatos
-            permitidos: JPG, PNG y WebP.
+            Sube fotografías claras y variadas. Una buena presentación ayuda a que más personas conozcan el lugar y se interesen en visitarlo.<br><br>
+            <strong>La primera fotografía será la portada, pero podrás cambiarla y ordenar todas las imágenes.</strong>
           </p>
+
           <div
             class="photo-drop"
             id="photo-drop"
@@ -76,86 +108,61 @@
             role="button"
             aria-describedby="photo-guidance photo-status photo-summary"
           >
-            <span aria-hidden="true">📷</span
-            ><strong>Seleccionar o arrastrar fotografías</strong
-            ><small
-              >Los originales de hasta 20 MB se optimizan sin recortar ni
-              deformar.</small
-            ><input
+            <div class="drop-icon" style="font-size:3rem; color:var(--teal); margin-bottom:12px;">📸</div>
+            <strong>Arrastra tus fotografías aquí</strong>
+            <small style="display:block; margin:6px 0 12px;">o selecciónalas desde tu dispositivo</small>
+            <label for="photo-input" class="primary-action" style="display:inline-flex; min-height:44px; padding:8px 24px; cursor:pointer; align-items:center; justify-content:center;">Seleccionar fotografías</label>
+            <input
               type="file"
               id="photo-input"
               name="fotos"
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/jpeg,image/png,image/webp,image/heic"
               multiple
+              class="sr-only"
             />
           </div>
-          <div class="photo-actions">
-            <label class="camera-action"
-              >Usar cámara<input
+          
+          <div class="photo-actions" style="display:flex; justify-content:center; margin-top:16px;">
+            <label class="camera-action" style="display:inline-flex; align-items:center; gap:8px;">
+              <span style="font-size:1.2rem;">📱</span> Tomar una fotografía
+              <input
                 type="file"
                 id="camera-input"
                 accept="image/jpeg,image/png,image/webp"
                 capture="environment"
-            /></label>
+                class="sr-only"
+              />
+            </label>
           </div>
-          <strong id="photo-summary" class="photo-summary"
-            >0 de 12 fotografías · 0,0 MB de 20 MB</strong
-          >
-          <div id="photo-status" role="status" aria-live="polite">
-            Todavía no has seleccionado fotografías.
-          </div>
-          <div id="photo-list" class="photo-list"></div>
-          <label class="gps-consent"
-            ><input type="checkbox" name="autorizaGpsFotos" /><span
-              ><strong>Buscar ubicación GPS en las fotografías</strong
-              ><small
-                >Si tus fotografías contienen ubicación GPS, podemos utilizarla
-                para ayudarte a completar la ubicación. No analizaremos
-                visualmente el contenido de las fotografías en esta
-                etapa.</small
-              ></span
-            ></label
-          >
-          <div
-            id="gps-analysis-status"
-            class="gps-analysis-status"
-            role="status"
-            aria-live="polite"
-          ></div>
-          <aside
-            id="location-warning"
-            class="location-warning"
-            aria-labelledby="location-warning-title"
-            hidden
-          >
-            <h3 id="location-warning-title">
-              Este anuncio no tiene geolocalización
-            </h3>
-            <p>
-              La geolocalización es el punto que permite ubicar aproximadamente
-              la propiedad en el mapa. Sin ella, el anuncio podrá publicarse,
-              pero no aparecerá correctamente en búsquedas por cercanía, mapa o
-              cálculo de distancias.
-            </p>
-            <strong>La ubicación exacta nunca se mostrará públicamente.</strong>
-            <div class="location-warning-actions">
-              <button type="button" class="secondary-action" id="add-location">
-                Agregar ubicación</button
-              ><button
-                type="button"
-                class="secondary-action"
-                id="open-location-help"
-              >
-                ¿Cómo obtenerla?</button
-              ><button
-                type="button"
-                class="location-continue"
-                id="continue-without-location"
-              >
-                Continuar sin ubicación
-              </button>
+
+          <div class="photo-status-bar" style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-bottom:12px; border-bottom:1px solid var(--line);">
+            <strong id="photo-summary" class="photo-summary" style="margin:0;">
+              0 de 20 fotografías
+            </strong>
+            <div id="photo-status" role="status" aria-live="polite" style="font-size:0.86rem; color:var(--teal); font-weight:800;">
+              Todavía no has seleccionado fotografías.
             </div>
-          </aside>
+          </div>
+
+          <div id="photo-list" class="modern-photo-grid"></div>
+          
+          <div id="photo-errors" style="margin-top:16px;"></div>
+
+          <!-- Recomendaciones de fotografía -->
+          <div class="photo-recommendations" style="margin-top:32px; padding:24px; background:#f4f8fa; border:1px solid #c9d8e3; border-radius:20px;">
+            <h3 style="margin-top:0; color:var(--navy); font-size:1.2rem;">¿Qué fotografías recomendamos?</h3>
+            <p style="color:var(--muted); font-size:0.9rem;">Intenta mostrar tanto los atractivos como las condiciones reales del terreno. Esto genera confianza y ayuda a evitar visitas innecesarias.</p>
+            
+            <ul style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px; list-style:none; padding:0; margin-top:16px;">
+              <li style="display:flex; align-items:center; gap:8px; font-weight:600; color:#3e5364;"><span style="color:var(--teal);">✓</span> Vista general</li>
+              <li style="display:flex; align-items:center; gap:8px; font-weight:600; color:#3e5364;"><span style="color:var(--teal);">✓</span> Acceso</li>
+              <li style="display:flex; align-items:center; gap:8px; font-weight:600; color:#3e5364;"><span style="color:#b9cad5;">○</span> Caminos interiores</li>
+              <li style="display:flex; align-items:center; gap:8px; font-weight:600; color:#3e5364;"><span style="color:#b9cad5;">○</span> Vegetación</li>
+              <li style="display:flex; align-items:center; gap:8px; font-weight:600; color:#3e5364;"><span style="color:#b9cad5;">○</span> Agua (si aplica)</li>
+              <li style="display:flex; align-items:center; gap:8px; font-weight:600; color:#3e5364;"><span style="color:#b9cad5;">○</span> Deslindes</li>
+            </ul>
+          </div>
+        </section>
           <dialog
             id="location-help-dialog"
             class="location-help-dialog"
@@ -184,10 +191,11 @@
                 <li>Selecciona Copiar enlace.</li>
                 <li>Regresa y pega el enlace en el formulario.</li>
               </ol>
-            </section>
-        <section
-          class="flow-step "
-          data-step="2"
+              </section>
+            </dialog>
+          <section
+            class="flow-step "
+            data-step="2"
           aria-labelledby="step-1-title"
           >
             <p class="eyebrow">Comencemos por lo más importante</p>
@@ -640,9 +648,36 @@
                 id="preview-publisher"
                 class="preview-publisher"
               ></section>
-        <section
+        
+      <div class="preview-actions">
+                <a
+                  class="primary-action whatsapp-action"
+                  id="whatsapp-action"
+                  href="#"
+                  target="_blank"
+                  rel="noopener"
+                  >WhatsApp</a
+                ><button
+                  type="button"
+                  class="primary-action"
+                  id="schedule-visit"
+                >
+                  Agendar visita
+                </button>
+              </div>
+            </div>
+          </article>
+          <button
+            type="button"
+            class="secondary-action edit-information"
+            id="edit-publication"
+          >
+            Editar publicación
+          </button>
+        </section>
+<section
           class="flow-step"
-          data-step="5" class="flow-step "
+          data-step="5"
           aria-labelledby="step-4-title"
           hidden
         >
@@ -772,32 +807,71 @@
             </label>
           </div>
         </section>
-      <div class="preview-actions">
-                <a
-                  class="primary-action whatsapp-action"
-                  id="whatsapp-action"
-                  href="#"
-                  target="_blank"
-                  rel="noopener"
-                  >WhatsApp</a
-                ><button
-                  type="button"
-                  class="primary-action"
-                  id="schedule-visit"
-                >
-                  Agendar visita
-                </button>
+        <section
+          class="flow-step"
+          data-step="6"
+          aria-labelledby="step-promo-title"
+          hidden
+        >
+          <p class="eyebrow">Impulsa tu publicación</p>
+          <h2 id="step-promo-title">¿Qué tan pronto quieres vender?</h2>
+          <p class="lead">
+            La plataforma puede promocionar tu parcela en redes sociales (Meta Ads) y buscadores (Google Ads). Cuéntanos tu apuro y elegiremos la mejor estrategia de difusión.
+          </p>
+
+          <fieldset class="urgency-grid" style="display:flex; flex-direction:column; gap:16px; margin-bottom:32px; border:none; padding:0;">
+            <legend class="sr-only">Nivel de Urgencia</legend>
+            <label class="urgency-option" style="padding:16px; border:2px solid #e2e8f0; border-radius:12px; cursor:pointer; display:flex; gap:16px; align-items:flex-start; transition:all 0.2s;">
+              <input type="radio" name="urgenciaVenta" value="sin_apuro" required style="margin-top:4px;" />
+              <div>
+                <strong style="display:block; font-size:1.1rem; color:#1e293b;">Sin apuro (Publicación Gratis)</strong>
+                <span style="color:#64748b; font-size:0.9rem;">Quiero publicar y esperar oportunidades orgánicas sin invertir en publicidad.</span>
               </div>
+            </label>
+            <label class="urgency-option" style="padding:16px; border:2px solid #e2e8f0; border-radius:12px; cursor:pointer; display:flex; gap:16px; align-items:flex-start; transition:all 0.2s;">
+              <input type="radio" name="urgenciaVenta" value="visibilidad" required style="margin-top:4px;" />
+              <div>
+                <strong style="display:block; font-size:1.1rem; color:#1e293b;">Quiero aumentar la visibilidad</strong>
+                <span style="color:#64748b; font-size:0.9rem;">Me gustaría recibir más visitas y consultas durante las próximas semanas.</span>
+              </div>
+            </label>
+            <label class="urgency-option" style="padding:16px; border:2px solid #e2e8f0; border-radius:12px; cursor:pointer; display:flex; gap:16px; align-items:flex-start; transition:all 0.2s;">
+              <input type="radio" name="urgenciaVenta" value="urgente" required style="margin-top:4px;" />
+              <div>
+                <strong style="display:block; font-size:1.1rem; color:#1e293b;">Necesito vender lo antes posible 🔥</strong>
+                <span style="color:#64748b; font-size:0.9rem;">Quiero que la plataforma impulse activamente mi publicación en todos los canales.</span>
+              </div>
+            </label>
+          </fieldset>
+
+          <div id="promo-plans-container" hidden>
+            <h3 style="color:#0f172a; margin-bottom:16px;">Planes Recomendados</h3>
+            <div class="plans-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:24px; margin-bottom:32px;">
+              <!-- Plan Cards Inyectadas via JS -->
             </div>
-          </article>
-          <button
-            type="button"
-            class="secondary-action edit-information"
-            id="edit-publication"
-          >
-            Editar publicación
-          </button>
+          </div>
+
+          <div id="promo-preview-container" hidden style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:24px; margin-bottom:24px;">
+            <h3 style="color:#0f172a; margin-top:0;">Vista Previa de tu Anuncio</h3>
+            <div id="ad-preview" style="background:white; border-radius:12px; padding:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); max-width:400px; margin:16px auto;">
+              <!-- AD Preview via JS -->
+            </div>
+            
+            <div class="consent-box" style="margin-top:24px; padding-top:16px; border-top:1px solid #e2e8f0;">
+              <label style="display:flex; gap:12px; font-size:0.9rem; color:#475569; align-items:flex-start; margin-bottom:12px; cursor:pointer;">
+                <input type="checkbox" id="consent-ads" required style="margin-top:4px;">
+                <span>Autorizo utilizar las fotografías y datos de la publicación para promocionarla, aceptando que la publicidad aumenta la exposición pero no garantiza ventas.</span>
+              </label>
+              <label style="display:flex; gap:12px; font-size:0.9rem; color:#475569; align-items:flex-start; cursor:pointer;">
+                <input type="checkbox" id="consent-adjust" required style="margin-top:4px;">
+                <span>Acepto que la plataforma ajuste textos, formatos y la plataforma elegida (Meta/Google) para optimizar los resultados.</span>
+              </label>
+            </div>
+          </div>
+
         </section>
+
+
         <div class="flow-actions">
           <button
             type="button"
@@ -871,6 +945,9 @@
     </main>
     <footer>© 2026 Tu Parcela Lista · Vista previa local</footer>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/config-negocio.js"></script>
+    <script src="../../js/db-api.js"></script>
+    <script src="../../js/tpl-launch.js"></script>
     <script type="module" src="publicar-parcela.js?v=20260716-1"></script>
   
 <div class="modal-overlay" id="upsell-modal" style="display:none; z-index:9999;">

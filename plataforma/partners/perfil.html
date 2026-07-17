@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WK4M33H4');</script>
+<!-- End Google Tag Manager -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cargando Perfil... - Red de Partners TPL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #003f7a;
+      --secondary: #00828a;
+      --accent: #f59e0b; /* para estrellas */
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 60px 20px 100px;
+      text-align: center;
+      color: white;
+    }
+    .profile-container {
+      max-width: 900px;
+      margin: -60px auto 40px;
+      padding: 0 20px;
+    }
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      padding: 40px;
+      margin-bottom: 30px;
+      position: relative;
+    }
+    .logo-container {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: white;
+      padding: 5px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      margin: -90px auto 20px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+    .badge-verified {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    h1 {
+      margin: 0 0 5px 0;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      text-align: center;
+    }
+    .rating {
+      color: var(--accent);
+      font-size: 1.2rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .rating span {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-left: 5px;
+    }
+    .description {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: var(--text);
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 30px;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      padding: 14px 24px;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-whatsapp {
+      background: #25D366;
+      color: white;
+    }
+    .grid-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 1px solid var(--border);
+    }
+    .info-block h3 {
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin: 0 0 10px 0;
+    }
+    .info-block ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      color: var(--text-muted);
+    }
+    .info-block ul li {
+      margin-bottom: 8px;
+      position: relative;
+      padding-left: 20px;
+    }
+    .info-block ul li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--secondary);
+      font-weight: bold;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .gallery img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    #loading, #error-state {
+      text-align: center;
+      padding: 100px 20px;
+    }
+    #error-state {
+      display: none;
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
+
+<!-- Google Ads Tracking -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-TU_ID_DE_GOOGLE_ADS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-TU_ID_DE_GOOGLE_ADS');
+</script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WK4M33H4"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <div id="loading">
+    <h2>Cargando perfil...</h2>
+  </div>
+
+  <div id="error-state">
+    <h2>Perfil no encontrado o no disponible</h2>
+    <p>Este partner no está verificado o no tiene una landing page pública.</p>
+    <a href="/" class="btn btn-primary" style="margin-top: 20px;">Volver a Tu Parcela Lista</a>
+  </div>
+
+  <div id="profile-content" class="hidden">
+    <div class="header">
+      <!-- Fondo decorativo -->
+    </div>
+
+    <div class="profile-container">
+      <div class="card">
+        <div class="logo-container">
+          <img id="partner-logo" src="" alt="Logo">
+        </div>
+        
+        <div style="text-align: center;">
+          <span class="badge-verified">✓ Partner Verificado por TPL</span>
+        </div>
+        
+        <h1 id="partner-name">Nombre Empresa</h1>
+        
+        <div class="rating">
+          ★★★★★ <span id="partner-rating">5.0 (0 evaluaciones)</span>
+        </div>
+        
+        <p class="description" id="partner-desc">
+          Descripción del servicio prestado por el contratista.
+        </p>
+        
+        <div class="actions">
+          <a href="#" id="btn-whatsapp" class="btn btn-whatsapp" target="_blank">WhatsApp</a>
+          <a href="#contacto" id="btn-email" class="btn btn-primary">Solicitar Cotización</a>
+        </div>
+        
+        <div class="grid-info">
+          <div class="info-block">
+            <h3>Cobertura</h3>
+            <ul id="list-coverage"></ul>
+          </div>
+          <div class="info-block">
+            <h3>Especialidades</h3>
+            <ul id="list-specialties"></ul>
+          </div>
+          <div class="info-block">
+            <h3>Experiencia</h3>
+            <ul id="list-experience">
+              <li id="exp-years">Años de experiencia</li>
+              <li id="jobs-done">Trabajos realizados en TPL</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="gallery-card">
+        <h2 style="color: var(--primary); margin-top: 0;">Trabajos Realizados</h2>
+        <div class="gallery" id="gallery-grid">
+          <!-- Imágenes dinámicas -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const SUPABASE_URL = 'https://qxavbqhyqaqalpzbhwmh.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
+
+    async function loadProfile() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const slug = urlParams.get('id');
+
+      if (!slug) {
+        showError();
+        return;
+      }
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/contratistas?slug=eq.${slug}&select=*`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+        
+        const data = await response.json();
+        if (!data || data.length === 0) {
+          showError();
+          return;
+        }
+
+        const partner = data[0];
+
+        // Solo permitir si está verificado y si su plan es profesional o premium
+        if (partner.estado_verificacion !== 'verificado' || partner.plan_elegido === 'gratis') {
+          showError();
+          return;
+        }
+
+        renderProfile(partner);
+
+      } catch (err) {
+        console.error(err);
+        showError();
+      }
+    }
+
+    function renderProfile(partner) {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('profile-content').classList.remove('hidden');
+
+      document.title = `${partner.nombre_comercial} - Red de Partners TPL`;
+      
+      document.getElementById('partner-logo').src = partner.logo_url || 'https://via.placeholder.com/120?text=Logo';
+      document.getElementById('partner-name').textContent = partner.nombre_comercial;
+      document.getElementById('partner-rating').textContent = `${partner.rating} (${partner.trabajos_realizados} trabajos)`;
+      document.getElementById('partner-desc').textContent = partner.descripcion_servicios;
+      
+      // Botones
+      const waBtn = document.getElementById('btn-whatsapp');
+      if (partner.whatsapp) {
+        let number = partner.whatsapp.replace(/\D/g,'');
+        if(!number.startsWith('56')) number = '56' + number;
+        waBtn.href = `https://wa.me/${number}?text=Hola, vengo desde Tu Parcela Lista y me gustaría cotizar servicios de ${partner.tipo_servicio}.`;
+      } else {
+        waBtn.style.display = 'none';
+      }
+
+      if (partner.correo) {
+        document.getElementById('btn-email').href = `mailto:${partner.correo}?subject=Cotización desde Tu Parcela Lista`;
+      }
+
+      // Listas
+      populateList('list-coverage', [partner.region].concat(partner.comunas_atendidas.split(',').map(s=>s.trim())));
+      populateList('list-specialties', partner.especialidades.split(',').map(s=>s.trim()));
+      
+      document.getElementById('exp-years').textContent = `${partner.anos_experiencia} años de experiencia`;
+      document.getElementById('jobs-done').textContent = `${partner.trabajos_realizados} trabajos derivados por TPL`;
+
+      // Galeria
+      const galleryCard = document.getElementById('gallery-card');
+      const galleryGrid = document.getElementById('gallery-grid');
+      
+      if (partner.galeria_urls && partner.galeria_urls.length > 0) {
+        partner.galeria_urls.forEach(url => {
+          const img = document.createElement('img');
+          img.src = url;
+          img.loading = "lazy";
+          galleryGrid.appendChild(img);
+        });
+      } else {
+        galleryCard.style.display = 'none';
+      }
+    }
+
+    function populateList(ulId, items) {
+      const ul = document.getElementById(ulId);
+      ul.innerHTML = '';
+      const uniqueItems = [...new Set(items)].filter(Boolean);
+      uniqueItems.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        ul.appendChild(li);
+      });
+    }
+
+    function showError() {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('error-state').style.display = 'block';
+    }
+
+    // Inicializar
+    loadProfile();
+  </script>
+</body>
+</html>

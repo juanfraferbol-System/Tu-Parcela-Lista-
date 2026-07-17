@@ -40,3 +40,13 @@ for = "/admin-publicaciones.html"
 for = "/CRM.html"
   [headers.values]
   X-Robots-Tag = "noindex, nofollow"
+[[headers]]
+for = "/plataforma/crm/*"
+  [headers.values]
+  X-Robots-Tag = "noindex, nofollow"
+  Cache-Control = "private, no-store"
+
+[[headers]]
+for = "/tuparcelalistamanager/*"
+  [headers.values]
+  X-Robots-Tag = "noindex, nofollow"

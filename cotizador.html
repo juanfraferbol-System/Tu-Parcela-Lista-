@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-<!DOCTYPE html>
-<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,20 +9,12 @@
   <script src="https://unpkg.com/lucide@latest" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/v2-base.css">
-  <link rel="stylesheet" href="css/v2-sidebar.css">
-  <link rel="stylesheet" href="css/v2-components.css">
-  <link rel="stylesheet" href="css/v2-responsive.css">
-  <link rel="stylesheet" href="css/v3-production.css">
   <link rel="stylesheet" href="agente/agente.css">
-  <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="cotizador.css" />
   <link rel="icon" type="image/png" href="image/favicon.png">
   <link rel="apple-touch-icon" href="image/apple-touch-icon.png">
   <link rel="stylesheet" href="css/v4-minimal.css?v=20260710-4">
-  <link href="css/site-polish.css?v=20260710" rel="stylesheet">
-  <link rel="stylesheet" href="css/modern-aesthetics.css?v=2">
-  <link rel="stylesheet" href="css/styles.min.css?v=20260715-4">\n</head>
+  <link rel="stylesheet" href="css/styles.min.css?v=20260715-4"></head>
 <body>
   <!-- Header Premium -->
   <header class="main-header">
@@ -280,10 +270,15 @@
         <input required id="activate-phone" placeholder="Número de contacto">
         <input required id="activate-email" type="email" placeholder="Correo electrónico">
         <textarea id="activate-message" rows="3" placeholder="Comentarios o fecha ideal para ser contactado"></textarea>
-        <button class="btn-activate-project" type="submit">Descargar PDF y preparar correo</button>
+        <div class="activate-actions"><button class="btn-activate-project" id="save-quote-btn" type="button">Guardar cotización</button><button class="btn-activate-project" type="submit">Activar, descargar PDF y preparar correo</button></div>
       </form>
     </div>
   </div>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/config-negocio.js"></script>
+  <script src="js/error-logger.js"></script>
+  <script src="js/db-api.js"></script>
+  <script src="js/tpl-launch.js"></script>
   <script src="tpl-analytics.js" defer></script>
   <script src="agente/agente.js" defer></script>
 <script src="js/site-polish.js" defer></script>

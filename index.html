@@ -24,43 +24,221 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta content="es_CL" property="og:locale"/>
 <meta content="Tu Parcela Lista" property="og:site_name"/>
 <meta content="Tu Parcela Lista | Encuentra tu parcela ideal" property="og:title"/>
-<meta content="Parcelas con rol propio + casas prefabricadas. Cotiza online y encuentra tu proyecto ideal." property="og:description"/>
 <meta content="https://parcelalista.cl/" property="og:url"/>
-<meta content="https://parcelalista.cl/image/logo_compartir.png" property="og:image"/>
-<meta content="https://parcelalista.cl/image/logo_compartir.png" property="og:image:secure_url"/>
-<meta content="image/png" property="og:image:type"/>
-<meta content="1200" property="og:image:width"/>
-<meta content="630" property="og:image:height"/>
+<meta content="Tu Parcela Lista - Parcelas en Chile" property="og:title"/>
+<meta content="El cotizador Inteligente de Parcelas que estabas esperando en Chile. Cuentanos donde quieres vivir y que tipo de casa, nosotros te calculamos todo." property="og:description"/>
+<meta content="https://tuparcelalista.cl/image/hero-family-field.jpg" property="og:image"/>
+<meta content="website" property="og:type"/>
+  
 <meta content="summary_large_image" name="twitter:card"/>
-<meta content="Tu Parcela Lista" name="twitter:title"/>
-<meta content="Parcelas con rol propio + casas prefabricadas. Cotiza online." name="twitter:description"/>
-<meta content="https://parcelalista.cl/image/logo_compartir.png" name="twitter:image"/>
-<link href="image/favicon.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="image/favicon.png" rel="icon" sizes="16x16" type="image/png"/>
-<link href="image/favicon.png" rel="apple-touch-icon" sizes="180x180"/>
+<meta content="Tu Parcela Lista - Parcelas en Chile" name="twitter:title"/>
+<meta content="El cotizador Inteligente de Parcelas que estabas esperando en Chile. Cuentanos donde quieres vivir y que tipo de casa, nosotros te calculamos todo." name="twitter:description"/>
+<meta content="https://tuparcelalista.cl/image/hero-family-field.jpg" name="twitter:image"/>
+
+<link href="image/favicon-512.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="image/favicon-512.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="image/favicon-512.png" rel="apple-touch-icon" sizes="180x180"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
 <link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/><link href="css/styles.min.css?v=20260715-4" rel="stylesheet"/>
 
-<link href="css/v2-base.css" rel="stylesheet"/>
-<link href="css/v2-sidebar.css" rel="stylesheet"/>
-<link href="css/v2-components.css" rel="stylesheet"/>
-<link href="css/v2-responsive.css" rel="stylesheet"/>
-<link href="css/v2-ajustes-filtros.css" rel="stylesheet"/>
-<link href="css/v3-ux.css" rel="stylesheet"/>
-<link href="css/v3-production.css" rel="stylesheet"/>
 <!-- <link href="agente/agente.css" rel="stylesheet"/> -->
 
 <link rel="preload" as="image" href="image/hero-woman-tomatoes.jpg" fetchpriority="high"/>
 <link rel="preload" as="image" href="image/hero-family-field.jpg" fetchpriority="high"/>
 <link rel="preload" as="image" href="image/hero-older-couple.jpg" fetchpriority="high"/>
-<link href="style.css?v=20260710-5" rel="stylesheet"/>
-<link href="css/tpl-minimal.css?v=20260710-1" rel="stylesheet"/>
-<link href="css/site-polish.css?v=20260710" rel="stylesheet"/>
-<link href="css/modern-aesthetics.css?v=2" rel="stylesheet"/>
 <script defer="" src="https://unpkg.com/lucide@latest"></script>
+
+<!-- Google Ads Tracking -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-TU_ID_DE_GOOGLE_ADS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-TU_ID_DE_GOOGLE_ADS');
+</script>
+
+<style id="premium-packs-styles">
+.opcionales-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1024px) {
+  .opcionales-grid-compact { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .opcionales-grid-compact { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .opcionales-grid-compact { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .sello-elegido { display: none !important; }
+}
+
+.extra-card-compact {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible; /* To allow tooltip */
+  height: 100%;
+}
+.extra-card-compact:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+  border-color: #cbd5e1;
+}
+.extra-card-compact.selected {
+  border-color: #10b981;
+  background: #f0fdf4;
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.15);
+}
+.extra-card-compact.selected:hover {
+  transform: translateY(-2px);
+}
+
+/* Badge top right */
+.extra-card-compact .status-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  background: #10b981;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+  z-index: 2;
+}
+.extra-card-compact.selected .status-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Icon Container */
+.extra-icon-box {
+  width: 56px;
+  height: 56px;
+  background: #f8fafc;
+  color: #64748b;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+.extra-card-compact.selected .extra-icon-box {
+  background: #d1fae5;
+  color: #10b981;
+}
+
+.extra-title-compact {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.extra-price-compact {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.extra-card-compact.selected .extra-price-compact {
+  color: #059669;
+}
+
+.extra-btn-compact {
+  margin-top: auto;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 8px 16px;
+  border-radius: 99px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  width: 100%;
+  transition: all 0.2s ease;
+  border: none;
+  pointer-events: none; /* Let the card handle the click */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.extra-card-compact.selected .extra-btn-compact {
+  background: #10b981;
+  color: #ffffff;
+}
+
+/* Tooltip (Info icon) */
+.extra-info-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  color: #cbd5e1;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+.extra-info-btn:hover {
+  color: #3b82f6;
+}
+.extra-tooltip {
+  position: absolute;
+  top: 36px;
+  left: 8px;
+  right: 8px;
+  background: #1e293b;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  text-align: left;
+}
+.extra-info-btn:hover + .extra-tooltip {
+  opacity: 1;
+  visibility: visible;
+  top: 32px;
+}
+
+/* Active Pack Completo */
+.pack-completo-banner.active {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2) !important;
+}
+.pack-completo-banner.active .pack-btn {
+  background: #10b981 !important;
+  color: white !important;
+}
+</style>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -72,18 +250,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
        ------------------------------------------------------------- -->
 <header class="navbar">
 <div class="container navbar-inner">
-<a class="logo-container" href="index.html" title="Tu Parcela Lista, inicio" style="display: flex; align-items: center; gap: 12px; text-decoration: none; padding: 5px 0; z-index: 50; position: relative;">
-    <img alt="Tu Parcela Lista" class="brand-logo-img" src="image/logo-tu-parcela-lista.png" style="height: 55px; width: auto;" />
-    <img src="https://flagcdn.com/h24/cl.png" srcset="https://flagcdn.com/h48/cl.png 2x" height="24" alt="Chile">
-  </a>
+<a class="logo-container" href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; padding: 5px 0; z-index: 50; position: relative;" title="Tu Parcela Lista, inicio">
+<img alt="Tu Parcela Lista" class="brand-logo-img" src="image/logo-tu-parcela-lista.png" style="height: 75px; width: auto;"/>
+<img alt="Chile" height="24" src="https://flagcdn.com/h24/cl.png" srcset="https://flagcdn.com/h48/cl.png 2x"/>
+</a>
 <nav>
 <ul class="nav-links" id="nav-links">
 <li><a href="index.html">Inicio</a></li>
 <li><a href="#parcelas-anchor">Parcelas</a></li>
 <li><a href="#casas-section">Casas</a></li>
-<li><a href="#mejores-alternativas" style="color:var(--tpl-primary); font-weight:800;">🔥 Mejores Alternativas</a></li>
+<li><a href="#mejores-alternativas" style="color:var(--tpl-primary); font-weight:800;">⭐ Mejores Alternativas</a></li>
 <li><a class="nav-link-feature" href="como-comprar.html">Cómo comprar</a></li>
 <li><a class="nav-link-publish" href="plataforma/publicar-parcela/index.html">Publicar</a></li>
+<li><a href="plataforma/partners/index.html" style="color: #003f7a; font-weight: 700;"><i data-lucide="handshake" style="color: #003f7a; width: 18px; height: 18px; vertical-align: text-bottom; margin-right: 4px;"></i> Red de Partners</a></li>
 <li><a href="#quienes-somos">Quiénes Somos</a></li>
 </ul>
 </nav>
@@ -638,16 +817,65 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <!-- Extras automáticos inyectados dinámicamente -->
 </div>
 </div>
-<!-- Opciones opcionales con inputs numéricos -->
-<div class="options-box deferred-extras-box" id="deferred-extras-box" hidden>
-<h3><i data-lucide="plus-circle"></i> ¿Quieres agregar extras antes de continuar?</h3>
-<p style="font-size: 0.9rem; color: var(--text-muted); margin-top: -16px; margin-bottom: 20px;">
-              Agrégalos solo si los necesitas. El total se actualiza automáticamente.
-            </p>
-<div class="extras-list" id="opcionales-container">
-<!-- Opciones extras inyectadas dinámicamente por app.js -->
+<!-- Opciones opcionales rediseñadas -->
+  <div class="options-box deferred-extras-box" id="deferred-extras-box" style="margin-top: 30px;">
+  <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; margin-bottom:15px; gap:10px;">
+    <div>
+      <span class="installation-step-kicker" style="color:var(--primary); font-weight:700; font-size:0.85rem; letter-spacing:1px;">COMPLETA TU PROYECTO</span>
+      <h3 style="margin:5px 0 0 0;"><i data-lucide="plus-circle"></i> Agrega terminaciones y servicios</h3>
+      <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 5px; margin-bottom: 0;">
+        Personaliza tu proyecto según las necesidades de tu casa y parcela.
+      </p>
+    </div>
+    <div class="extras-stats" style="background:#f1f5f9; padding:8px 16px; border-radius:20px; font-size:0.9rem; font-weight:600; color:var(--primary);">
+      <span id="extras-count-indicator">0 extras</span> · <span id="extras-total-indicator">$0</span>
+    </div>
+  </div>
+
+  <div class="extras-filters" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:10px; margin-bottom:15px;">
+    <button type="button" class="extra-filter-btn active" data-filter="todos">Todos</button>
+    <button type="button" class="extra-filter-btn" data-filter="terminaciones">Terminaciones</button>
+    <button type="button" class="extra-filter-btn" data-filter="instalaciones">Instalaciones</button>
+    <button type="button" class="extra-filter-btn" data-filter="exterior">Exterior</button>
+    <button type="button" class="extra-filter-btn" data-filter="sanitario">Sanitario</button>
+  </div>
+
+  <!-- Botón Pack Llave en Mano -->
+  <div class="pack-completo-banner" id="btn-pack-llave" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 24px; border-radius: 20px; border: 2px solid #334155; position: relative; overflow: hidden; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; box-shadow: 0 12px 30px rgba(0,0,0,0.15);">
+  <!-- Sello -->
+  <div class="sello-elegido" style="position: absolute; top: 0; right: 24px; background: #f59e0b; color: #fff; font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: 0 0 8px 8px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); z-index: 2;">Ms elegido por nuestros clientes</div>
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; z-index: 1; flex-wrap: wrap; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div style="background: rgba(255,255,255,0.1); padding: 14px; border-radius: 16px;">
+        <i data-lucide="rocket" style="width: 32px; height: 32px; color: #38bdf8;"></i>
+      </div>
+      <div>
+        <h4 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: white;">Mi Proyecto Completo</h4>
+        <p style="margin: 4px 0 0 0; font-size: 0.95rem; color: #94a3b8;">Todo lo esencial para iniciar tu construccin.</p>
+      </div>
+    </div>
+    <div class="pack-btn" style="background: #38bdf8; color: #0f172a; padding: 12px 28px; border-radius: 99px; font-weight: 800; white-space: nowrap; transition: all 0.2s; font-size: 1rem;">
+      <span class="btn-text">Agregar Pack</span>
+    </div>
+  </div>
+  
+  <div class="pack-accordion" style="display: none; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 8px; padding-top: 16px;">
+    <p style="margin: 0 0 12px 0; font-size: 0.9rem; color: #94a3b8; font-weight: 600;">Este pack incluye automáticamente:</p>
+    <ul style="list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Instalacin elǸctrica y empalme</li>
+      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Instalacin sanitaria</li>
+      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Fosa sǸptica y drenaje</li>
+      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Artefactos bǭsicos (Bao y Cocina)</li>
+      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Pozo profundo (Base)</li>
+    </ul>
+  </div>
 </div>
-</div>
+
+  <div class="extras-grid" id="opcionales-container">
+  <!-- Opciones extras inyectadas dinámicamente por app.js -->
+  </div>
+  </div>
 </div>
 <!-- Panel derecho: Resumen Fijo -->
 <div class="cotizador-right">
@@ -870,7 +1098,10 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="js/config-negocio.js"></script>
 <script defer src="js/db-api.js"></script>
+<script defer src="js/tpl-launch.js"></script>
+<script defer src="js/launch-control.js"></script>
 <script defer src="app.js?v=20260715-4"></script>
 <script defer src="premium-features.js"></script>
 <script defer src="js/tpl-modals.js"></script>
