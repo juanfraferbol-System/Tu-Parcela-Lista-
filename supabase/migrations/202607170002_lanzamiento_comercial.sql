@@ -136,10 +136,14 @@ create policy "Admin full access extras" on public.extras for all to authenticat
 using (public.es_administrador_activo())
 with check (public.es_administrador_activo());
 
-drop policy if exists "Admin full access visitas" on public.visitas;
-create policy "Admin full access visitas" on public.visitas for all to authenticated
-using (public.es_administrador_activo())
-with check (public.es_administrador_activo());
+do $$
+begin
+  if to_regclass('public.visitas') is not null then
+    execute 'drop policy if exists "Admin full access visitas" on public.visitas';
+    execute 'create policy "Admin full access visitas" on public.visitas for all to authenticated using (public.es_administrador_activo()) with check (public.es_administrador_activo())';
+  end if;
+end
+$$;
 
 create or replace function public.crm_registrar_oportunidad_publica(
   p_cliente jsonb,
