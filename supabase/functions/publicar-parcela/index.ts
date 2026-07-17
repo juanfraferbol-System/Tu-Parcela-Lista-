@@ -159,6 +159,18 @@ Deno.serve(async request=>{
   }
   if(!publication?.id||!publication?.codigo_publico)throw new Error('publication_create_failed');
 
+  const authorization=request.headers.get('authorization')||'',jwt=authorization.replace(/^Bearer\s+/i,'');
+  let userId:string|null=null;
+  if(jwt&&jwt!==apiKey){const userResult=await admin.auth.getUser(jwt);if(!userResult.error)userId=userResult.data.user?.id||null;}
+  const enteredPrice=Number(payload.precio||0),ownerAmount=Number(payload.precioPropietarioSolicitado||payload.montoLiquido||0);
+  const commercialUpdate:Record<string,unknown>={usuario_id:userId,precio_publico:enteredPrice||null,precision_ubicacion:payload.ubicacionFuente||null,consentimiento_uso_ubicacion:payload.autorizaGpsFotos===true||payload.consentimientoUbicacion===true,consentimiento_uso_ubicacion_en:payload.ubicacionConfirmadaEn||null};
+  if(publisherType==='dueno'&&ownerAmount>0){
+   const commercialConfig=await admin.from('crm_configuracion').select('valor_numero').eq('clave','partner_service_percent').maybeSingle();
+   const servicePercent=Number(commercialConfig.data?.valor_numero);
+   if(Number.isFinite(servicePercent)&&servicePercent>=0&&servicePercent<=1){const serviceAmount=Math.round(ownerAmount*servicePercent);commercialUpdate.precio_propietario_solicitado=ownerAmount;commercialUpdate.monto_liquido=ownerAmount;commercialUpdate.porcentaje_servicio=servicePercent;commercialUpdate.monto_servicio=serviceAmount;commercialUpdate.precio_publico=ownerAmount+serviceAmount;commercialUpdate.precio_publicacion=ownerAmount+serviceAmount;}
+  }
+  await admin.from('publicaciones').update(commercialUpdate).eq('id',publication.id);
+
   const uploadResult=await uploadMissingPhotos({storage:admin.storage,bucket:BUCKET,publicationId:publication.id,photos,manifest,mimeExtensions:MIME_EXTENSIONS});
   const visualAnalysis=visualConsent&&visualIncluded?await processVisualAnalysis(admin,publication.id):{status:'not_requested'};
 
