@@ -397,6 +397,7 @@ if (urlParams.has('flow')) {
 }
 
 
+/* Legacy IA/upsell experiment isolated from the production publication flow.
 // ==========================================
 // INYECCIÓN DE LÓGICA IA Y UX
 // ==========================================
@@ -467,6 +468,8 @@ if (dropZone && aiBadge) {
   });
   observer.observe(dropZone, { childList: true });
 }
+
+*/
 
 form.addEventListener('submit', submitPublication);
 

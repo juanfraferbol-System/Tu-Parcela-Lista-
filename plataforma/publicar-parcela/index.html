@@ -82,7 +82,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         ></div>
         
                 <section
-          class="flow-step is-active"
+          class="flow-step"
           data-step="5"
           aria-labelledby="step-3-title"
         >
@@ -194,7 +194,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </section>
             </dialog>
           <section
-            class="flow-step "
+            class="flow-step is-active"
           data-step="1"
           aria-labelledby="step-1-title"
           >
@@ -964,7 +964,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script src="../../js/tpl-launch.js"></script>
     <script type="module" src="publicar-parcela.js?v=20260717-urgent"></script>
   
-<div class="modal-overlay" id="upsell-modal" style="display:none; z-index:9999;">
+<template id="legacy-upsell-template">
+<div class="modal-overlay" style="display:none; z-index:9999;">
   <div class="modal-content" style="max-width:500px; text-align:center; padding:40px 30px;">
     <div style="font-size:3rem; margin-bottom:10px;">🚀</div>
     <h3 style="color:#003f7a; margin-bottom:10px; font-size:1.5rem;">¡Has alcanzado tu límite!</h3>
@@ -984,6 +985,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 </div>
+</template>
 
 </body>
 </html>
