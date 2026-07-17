@@ -1,18 +1,17 @@
-# Publicar parcela — asistente local v10
+# Publicar parcela — asistente de publicación
 
-Módulo aislado de siete pasos, sin conexión al catálogo público, pagos ni autenticación. La Fase 1 puede enviar publicaciones y fotografías pendientes a Supabase; en desarrollo conserva respaldo local explícito.
+Módulo de seis etapas con borrador local, preparación comercial, optimización de fotografías, ubicación privada opcional y envío mediante el adaptador configurado.
 
 ## Recorrido
 
-1. Relato privado por texto o dictado.
-2. Datos detectados y corrección de faltantes.
-3. Fotografías y portada.
-4. Tipo de publicador y datos de contacto.
-5. Servicio Partner o plan para corredores.
-6. Preparación automática de título, descripción, enriquecimiento, portada y etiquetas.
-7. Previsualización real y publicación local.
+1. Descripción privada por texto o dictado.
+2. Datos detectados, corrección de faltantes y ubicación opcional.
+3. Tipo de publicador, contacto, Servicio Partner o plan de corredor.
+4. Nivel de promoción y autorización comercial.
+5. Fotografías, portada, orden, optimización y GPS opcional.
+6. Vista previa real y envío de la publicación.
 
-No existe un paso independiente de resumen. La ficha final muestra únicamente información publicable.
+La preparación automática de título y descripción se genera desde la descripción inicial y no cuenta como una etapa adicional.
 
 ## Contenido público y privado
 

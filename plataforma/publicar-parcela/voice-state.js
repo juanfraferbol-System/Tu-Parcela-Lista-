@@ -1,0 +1,3 @@
+const states={initial:{label:'Comenzar',icon:'●',pressed:false,showFinish:false},listening:{label:'Escuchando…',icon:'Ⅱ',pressed:true,showFinish:true},processing:{label:'Escuchando…',icon:'Ⅱ',pressed:true,showFinish:true},paused:{label:'Continuar',icon:'▶',pressed:false,showFinish:true},finished:{label:'Agregar información',icon:'●',pressed:false,showFinish:false},unsupported:{label:'Comenzar',icon:'●',pressed:false,showFinish:false}};
+export function getVoiceView(state,hasText=false){const view={...(states[state]||states.initial)};if((state==='initial'||state==='finished'||state==='unsupported')&&hasText)view.label='Agregar información';return view;}
+
