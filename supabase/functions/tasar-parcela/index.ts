@@ -20,6 +20,8 @@ function serverKey(){
 
 function publicKeys(){
  const values:string[]=[];
+ const configured=String(Deno.env.get('TPL_PUBLIC_API_KEYS')||'').split(',').map(value=>value.trim()).filter(Boolean);
+ values.push(...configured);
  const current=Deno.env.get('SUPABASE_PUBLISHABLE_KEYS');
  if(current){try{for(const value of Object.values(JSON.parse(current)||{}))if(typeof value==='string'&&value)values.push(value);}catch{}}
  const legacy=Deno.env.get('SUPABASE_ANON_KEY');if(legacy)values.push(legacy);
