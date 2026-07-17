@@ -1,5 +1,14 @@
 export const BROKER_COMMON_BENEFITS=['Contacto directo con el corredor','WhatsApp directo','Correo electrónico','Fotografías','Ubicación en mapa','Galería de imágenes','Descripción optimizada por TPL','Cotizador de parcela + casa','Contacto directo con compradores','Administración desde su panel'];
 
+export const VISUAL_ANALYSIS_ALLOWED_PLAN_IDS=Object.freeze(['gold','platinum']);
+export const planIncludesVisualAnalysis=planId=>VISUAL_ANALYSIS_ALLOWED_PLAN_IDS.includes(String(planId||''));
+export const VISUAL_ANALYSIS_COMPARISON_ROWS=Object.freeze([
+ {label:'Análisis visual de fotografías',inicio:'Análisis visual con IA: no incluido',profesional:'Análisis visual con IA: no incluido',gold:'Incluido',platinum:'Incluido'},
+ {label:'Descripción enriquecida',inicio:'Manual',profesional:'Manual',gold:'Incluida con IA',platinum:'Incluida con IA'},
+ {label:'Características visibles sugeridas',inicio:'No incluido',profesional:'No incluido',gold:'Incluidas',platinum:'Incluidas'},
+ {label:'Sugerencia de fotografía de portada',inicio:'No incluido',profesional:'No incluido',gold:'Incluida',platinum:'Incluida'}
+]);
+
 export const BROKER_PLANS=[
  {id:'inicio',name:'Plan Inicio',badge:'🚀 Comienza Gratis',theme:'start',priceLabel:'Gratis',price:0,limit:1,tagline:'Ideal para comenzar a publicar.',cta:'Comenzar gratis',includes:['1 publicación activa','Página profesional básica',...BROKER_COMMON_BENEFITS,'Estadísticas básicas de visitas'],excludes:['Gestión de interesados','Publicaciones destacadas','Prioridad especial en resultados','Agenda de visitas']},
  {id:'profesional',name:'Plan Profesional',badge:'⭐ Más elegido',theme:'recommended',priceLabel:'$47.000',price:47000,limit:5,tagline:'Gestión profesional para una cartera en crecimiento.',cta:'Elegir Profesional',inherits:'inicio',includes:['Hasta 5 publicaciones activas','Página profesional personalizada','Logo y presentación','Estadísticas avanzadas','Gestión de interesados','Una publicación destacada','Prioridad media en resultados','Agenda de visitas','Acceso a servicios audiovisuales','Soporte prioritario'],excludes:[]},
@@ -23,4 +32,3 @@ export const PLAN_COMPARISON=[
 ];
 
 export function resolvedPlanBenefits(planId){const plan=BROKER_PLANS.find(item=>item.id===planId);if(!plan)return[];return [...(plan.inherits?resolvedPlanBenefits(plan.inherits):[]),...plan.includes];}
-

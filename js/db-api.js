@@ -5,26 +5,26 @@
 const SUPABASE_URL = 'https://qxavbqhyqaqalpzbhwmh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
 
-let supabase = null;
+let tplDbSupabase = null;
 
 if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'TU_SUPABASE_URL_AQUI') {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  tplDbSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 } else {
   console.warn("⚠️ Supabase no está configurado en db-api.js. Usando fallback local (parcelas.js).");
 }
-window.tplSupabase = supabase;
+window.tplSupabase = tplDbSupabase;
 
 /**
  * Obtiene la lista de parcelas. 
  * Si Supabase no está listo, retorna los datos de parcelas.js
  */
 async function apiGetParcelas() {
-  if (!supabase) {
+  if (!tplDbSupabase) {
     return typeof window.PARCELAS_DB !== 'undefined' ? window.PARCELAS_DB : (typeof window.parcelas !== 'undefined' ? window.parcelas : []);
   }
   
   try {
-    const { data, error } = await supabase
+    const { data, error } = await tplDbSupabase
       .from('publicaciones_publicas')
       .select('*')
       .order('actualizado_en', { ascending: false });
@@ -41,14 +41,14 @@ async function apiGetParcelas() {
  * Guarda un lead o cotización en Supabase
  */
 async function apiSaveLead(payload) {
-  if (!supabase) {
+  if (!tplDbSupabase) {
     if (window.TplErrorLogger) window.TplErrorLogger.log("DB-API", "apiSaveLead", "Error de conexión", "No hay conexión a Supabase", null, "crítico");
     return { success: false, error: new Error("No se pudo conectar con la base de datos.") };
   }
 
   try {
     if (payload.cliente) {
-      const { data, error } = await supabase.rpc('crm_registrar_oportunidad_publica', {
+      const { data, error } = await tplDbSupabase.rpc('crm_registrar_oportunidad_publica', {
         p_cliente: payload.cliente,
         p_proyecto: payload.proyecto || null,
         p_evento: payload.evento || 'informacion_solicitada',
@@ -62,7 +62,7 @@ async function apiSaveLead(payload) {
     }
 
     // Fallback legacy behavior
-    const { data, error } = await supabase
+    const { data, error } = await tplDbSupabase
       .from('leads_cotizaciones')
       .insert([payload])
       .select();
@@ -77,4 +77,3 @@ async function apiSaveLead(payload) {
 
 window.apiGetParcelas = apiGetParcelas;
 window.apiSaveLead = apiSaveLead;
-
