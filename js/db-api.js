@@ -5,51 +5,209 @@
 const SUPABASE_URL = 'https://qxavbqhyqaqalpzbhwmh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
 
-let supabase = null;
+let tplDbSupabase = null;
 
 if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'TU_SUPABASE_URL_AQUI') {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  tplDbSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 } else {
   console.warn("⚠️ Supabase no está configurado en db-api.js. Usando fallback local (parcelas.js).");
 }
+window.tplSupabase = tplDbSupabase;
 
 /**
  * Obtiene la lista de parcelas. 
  * Si Supabase no está listo, retorna los datos de parcelas.js
  */
 async function apiGetParcelas() {
-  if (!supabase) {
-    return typeof window.PARCELAS_DB !== 'undefined' ? window.PARCELAS_DB : (typeof window.parcelas !== 'undefined' ? window.parcelas : []);
+  const parcelasLocales =
+    typeof window.PARCELAS_DB !== "undefined"
+      ? window.PARCELAS_DB
+      : typeof window.parcelas !== "undefined"
+        ? window.parcelas
+        : [];
+
+  if (!tplDbSupabase) {
+    return parcelasLocales;
   }
-  
+
   try {
-    const { data, error } = await supabase
-      .from('parcelas')
-      .select('*')
-      .eq('activo', true)
-      .order('created_at', { ascending: false });
-      
+    const { data, error } = await tplDbSupabase
+      .from("publicaciones_publicas")
+      .select("*")
+      .order("actualizado_en", { ascending: false });
+
     if (error) throw error;
-    return data && data.length > 0 ? data : (typeof window.PARCELAS_DB !== 'undefined' ? window.PARCELAS_DB : (typeof window.parcelas !== 'undefined' ? window.parcelas : []));
+
+    if (!Array.isArray(data) || data.length === 0) {
+      return parcelasLocales;
+    }
+
+    return data.map((db) => {
+      const precioNumero = Number(
+        db.precio_publicacion ??
+        db.precio ??
+        db.valor ??
+        0
+      );
+
+      const tamano = Number(
+        db.superficie_m2 ??
+        db.tamano_m2 ??
+        db.tamano ??
+        db.superficie ??
+        0
+      );
+
+      const imagenPrincipal =
+        db.imagen_portada_url ??
+        db.portada_url ??
+        db.imagen_url ??
+        db.imagen ??
+        "";
+
+      let imagenes = [];
+
+      if (Array.isArray(db.imagenes)) {
+        imagenes = db.imagenes
+          .map((imagen) => {
+            if (typeof imagen === "string") {
+              return imagen;
+            }
+
+            return (
+              imagen?.url ??
+              imagen?.imagen_url ??
+              imagen?.storage_url ??
+              ""
+            );
+          })
+          .filter(Boolean);
+      }
+
+      if (imagenPrincipal && !imagenes.includes(imagenPrincipal)) {
+        imagenes.unshift(imagenPrincipal);
+      }
+
+      return {
+        ...db,
+
+        id: db.id ?? db.slug ?? crypto.randomUUID(),
+
+        nombre:
+          db.titulo_publico ??
+          db.titulo ??
+          db.nombre ??
+          "Parcela disponible",
+
+        precio: precioNumero
+          ? precioNumero.toLocaleString("es-CL", {
+              style: "currency",
+              currency: "CLP",
+              maximumFractionDigits: 0
+            })
+          : "Consultar",
+
+        precioNumero,
+        tamano,
+
+        comuna:
+          db.comuna ??
+          db.nombre_comuna ??
+          db.ubicacion_comuna ??
+          "",
+
+        region:
+          db.region ??
+          db.nombre_region ??
+          db.ubicacion_region ??
+          "",
+
+        descripcion:
+          db.descripcion_publica ??
+          db.descripcion ??
+          db.descripcion_breve ??
+          "Parcela disponible para tu proyecto.",
+
+        lat: Number(
+          db.latitud ??
+          db.lat ??
+          db.latitude ??
+          0
+        ),
+
+        lng: Number(
+          db.longitud ??
+          db.lng ??
+          db.longitude ??
+          0
+        ),
+
+        imagen:
+          imagenPrincipal ||
+          imagenes[0] ||
+          "image/placeholder-parcela.jpg",
+
+        imagenes:
+          imagenes.length > 0
+            ? imagenes
+            : ["image/placeholder-parcela.jpg"],
+
+        agua:
+          db.agua ??
+          db.disponibilidad_agua ??
+          false,
+
+        luz:
+          db.luz ??
+          db.disponibilidad_luz ??
+          false,
+
+        naturaleza:
+          db.naturaleza ??
+          db.bosque_nativo ??
+          false,
+
+        facilidad:
+          db.facilidad_pago ??
+          db.facilidad ??
+          false,
+
+        servicios:
+          db.cercana_servicios ??
+          db.servicios ??
+          false
+      };
+    });
   } catch (err) {
     console.error("Error al obtener parcelas de Supabase:", err);
-    return typeof window.PARCELAS_DB !== 'undefined' ? window.PARCELAS_DB : (typeof window.parcelas !== 'undefined' ? window.parcelas : []);
+    return parcelasLocales;
   }
 }
-
-/**
- * Guarda un lead o cotización en Supabase
- */
-async function apiSaveLead(leadData) {
-  if (!supabase) {
-    console.log("Mock: Lead guardado", leadData);
-    return { success: true, mock: true };
+async function apiSaveLead(payload) {
+  if (!tplDbSupabase) {
+    if (window.TplErrorLogger) window.TplErrorLogger.log("DB-API", "apiSaveLead", "Error de conexión", "No hay conexión a Supabase", null, "crítico");
+    return { success: false, error: new Error("No se pudo conectar con la base de datos.") };
   }
 
   try {
-    const { data, error } = await supabase
+    if (payload.cliente) {
+      const { data, error } = await tplDbSupabase.rpc('crm_registrar_oportunidad_publica', {
+        p_cliente: payload.cliente,
+        p_proyecto: payload.proyecto || null,
+        p_evento: payload.evento || 'informacion_solicitada',
+        p_etapa: payload.etapa || 'solicito_informacion',
+        p_origen: payload.proyecto?.origen || payload.origen || 'web',
+        p_pagina: location.pathname,
+        p_metadata: payload.metadata || {}
+      });
+      if (error) throw error;
+      return data || { success: true };
+    }
+
+    // Fallback legacy behavior
+    const { data, error } = await tplDbSupabase
       .from('leads_cotizaciones')
-      .insert([leadData])
+      .insert([payload])
       .select();
       
     if (error) throw error;
@@ -62,46 +220,3 @@ async function apiSaveLead(leadData) {
 
 window.apiGetParcelas = apiGetParcelas;
 window.apiSaveLead = apiSaveLead;
-
-
-// ==========================================
-// TASADOR INTELIGENTE E INVERSIÓN
-// ==========================================
-window.TasadorInteligente = {
-  getCommuneAverage: function(parcelas, comuna) {
-    if (!parcelas || !comuna) return 0;
-    const filtered = parcelas.filter(p => p.comuna === comuna);
-    if(filtered.length === 0) return 0;
-    let total = 0;
-    filtered.forEach(p => {
-      let price = p.precio;
-      if (typeof price === 'string') {
-        price = parseInt(price.replace(/[^0-9]/g, ''), 10);
-      }
-      total += (price || 0);
-    });
-    return total / filtered.length;
-  },
-  isOpportunity: function(parcelas, parcela) {
-    if (!parcelas || !parcela) return false;
-    const avg = this.getCommuneAverage(parcelas, parcela.comuna);
-    if(avg === 0) return false;
-    
-    let price = parcela.precio;
-    if (typeof price === 'string') {
-      price = parseInt(price.replace(/[^0-9]/g, ''), 10);
-    }
-    
-    // Es oportunidad si el precio es <= 85% del promedio
-    return price > 0 && price <= (avg * 0.85);
-  },
-  getMockVisits: function(parcelaId) {
-    // Simulador de visitas para el CRM basado en el ID
-    const seed = String(parcelaId).split('').reduce((a, b) => a + b.charCodeAt(0), 0);
-    return {
-      visitasTotales: (seed * 13) % 450 + 50,
-      visitasMes: (seed * 7) % 80 + 10,
-      tiempoPromedio: ((seed * 3) % 4 + 1) + ' min'
-    };
-  }
-};
