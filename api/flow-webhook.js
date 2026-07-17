@@ -10,9 +10,10 @@ export default async function handler(req, res) {
     const { token } = req.body;
     if (!token) return res.status(400).send('Token missing');
 
-    const apiKey = process.env.FLOW_API_KEY || '4977FF23-EB73-4813-8453-1L69DB7ACE17';
-    const secretKey = process.env.FLOW_SECRET_KEY || '68b3b6e656ad70c27c9dbf830a1c27b84903d53f';
-    const baseUrl = 'https://www.flow.cl/api';
+    const apiKey = process.env.FLOW_API_KEY;
+    const secretKey = process.env.FLOW_SECRET_KEY;
+    const baseUrl = process.env.FLOW_API_BASE_URL || 'https://www.flow.cl/api';
+    if (!apiKey || !secretKey) return res.status(503).send('Payment integration disabled');
 
     // Para confirmar el pago, debemos consultar el status en Flow usando el token
     const toSign = 'apiKey' + apiKey + 'token' + token;
@@ -31,12 +32,8 @@ export default async function handler(req, res) {
 
     const statusData = await statusRes.json();
     
-    console.log("Flow Webhook Status:", statusData);
-
     if (statusData.status === 2) {
-      // status 2 = pagado
-      // AQUI DEBERIAMOS ACTUALIZAR SUPABASE (usando service role key)
-      console.log(`Pago Exitoso confirmado para la orden: ${statusData.commerceOrder}`);
+      console.log(`Pago confirmado sin beneficios automáticos para la orden: ${statusData.commerceOrder}`);
     }
 
     return res.status(200).send('OK');
