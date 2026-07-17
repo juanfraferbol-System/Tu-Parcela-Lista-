@@ -1,5 +1,5 @@
 import {analyzeParcelText,cleanVoiceTranscript} from './analyzer.js';
-import {BROKER_PLANS,PLAN_COMPARISON,VISUAL_ANALYSIS_COMPARISON_ROWS,planIncludesVisualAnalysis,resolvedPlanBenefits} from './plans-config.js';
+import {BROKER_PLANS,PLAN_COMPARISON,VISUAL_ANALYSIS_COMPARISON_ROWS,planIncludesVisualAnalysis,resolvedPlanBenefits} from './plans-config.js?v=20260717-urgent';
 import {CHILE_LOCATIONS,communesForRegion,regionForCommune} from './chile-locations.js';
 import {generateCommercialContent,generatePublicTitle,shouldConfirmDescriptionRegeneration} from './content-generator.js';
 import {enrichmentProvider,ENRICHMENT_STATUS} from './enrichment-service.js';
