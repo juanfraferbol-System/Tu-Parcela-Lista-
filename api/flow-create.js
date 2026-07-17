@@ -9,10 +9,19 @@ export default async function handler(req, res) {
   try {
     const { amount, email, subject, leadId } = req.body;
 
-    // Credenciales Flow
-    const apiKey = process.env.FLOW_API_KEY || '4977FF23-EB73-4813-8453-1L69DB7ACE17';
-    const secretKey = process.env.FLOW_SECRET_KEY || '68b3b6e656ad70c27c9dbf830a1c27b84903d53f';
-    const baseUrl = 'https://www.flow.cl/api'; // O sandbox: https://sandbox.flow.cl/api
+    const apiKey = process.env.FLOW_API_KEY;
+    const secretKey = process.env.FLOW_SECRET_KEY;
+    const baseUrl = process.env.FLOW_API_BASE_URL || 'https://www.flow.cl/api';
+    const confirmationUrl = process.env.FLOW_CONFIRMATION_URL;
+    if (!apiKey || !secretKey || !confirmationUrl) {
+      return res.status(503).json({ error: 'La integración de pagos no está habilitada.' });
+    }
+    if (!Number.isFinite(Number(amount)) || Number(amount) <= 0 || !String(email || '').includes('@') || !String(leadId || '').trim()) {
+      return res.status(400).json({ error: 'Los datos del pago no son válidos.' });
+    }
+    const requestedReturn = String(req.body.returnUrl || '');
+    const allowedReturn = /^https:\/\/(www\.)?parcelalista\.cl\//i.test(requestedReturn);
+    const returnUrl = allowedReturn ? requestedReturn : 'https://www.parcelalista.cl/';
 
     // Parámetros obligatorios
     const params = {
@@ -23,8 +32,8 @@ export default async function handler(req, res) {
       amount: Math.round(amount),
       email: email,
       paymentMethod: 9, // 9 es Todos los medios de pago
-      urlConfirmation: `https://www.parcelalista.cl/api/flow-webhook`,
-      urlReturn: req.body.returnUrl || `https://www.parcelalista.cl/index.html?flow=success&id=${leadId}`,
+      urlConfirmation: confirmationUrl,
+      urlReturn: returnUrl,
     };
 
     // Ordenar alfabéticamente por llave y concatenar llave=valor

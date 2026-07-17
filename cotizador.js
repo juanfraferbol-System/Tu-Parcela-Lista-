@@ -335,56 +335,157 @@ function renderFundaciones() {
 /**
  * Render optional extras as premium selectable row cards.
  */
+
+// MAPA DE ICONOS LUCIDE PARA EXTRAS
+const EXTRAS_ICON_MAP = {
+  "Instalacion_electrica": "zap",
+  "piso ceramico": "layout-grid",
+  "pintura": "paint-bucket",
+  "instalacion_sanitaria": "bath",
+  "artefactos_cocina": "chef-hat",
+  "artefactos_bano": "droplets",
+  "fosa_septica": "archive",
+  "pozo_profundo": "droplet",
+  "cierre_perimetral": "fence",
+  "porton": "layout-template",
+  "empalme_electrico": "plug",
+  "maquinaria": "tractor",
+  "piscina": "waves",
+  "quincho": "flame",
+  "terraza": "tent"
+};
+
+
+  const INCLUIDOS_POR_TIPO = {
+      madera: [],
+      metalcon: ["instalacion_electrica", "instalacion_sanitaria", "Instalacion_electrica"],
+      madera_premium: ["instalacion_electrica", "instalacion_sanitaria", "Instalacion_electrica", "artefactos_cocina", "artefactos_bano"],
+      metalcon_premium: ["instalacion_electrica", "instalacion_sanitaria", "Instalacion_electrica", "artefactos_cocina", "artefactos_bano"],
+      solido: ["instalacion_electrica", "instalacion_sanitaria", "Instalacion_electrica", "artefactos_cocina", "artefactos_bano"]
+  };
+
 function renderExtrasOpcionales() {
-  const container = document.getElementById('opcionales-container');
-  if (!container || typeof window.extrasOpcionales === 'undefined') return;
-  const storedId = localStorage.getItem('selectedParcelaId');
-  const storedCasaId = localStorage.getItem('selectedCasaId');
-  const parcela = getParcelasArray().find(p => String(p.id) === storedId);
-  const casa = getCasasArray().find(c => String(c.id) === storedCasaId);
-  const extrasFiltrados = window.extrasOpcionales.filter(e => {
-    if (isWoodConstruction()) return true;
-    const name = String(`${e.id || ''} ${e.nombre || ''}`).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    return !(name.includes('electrica') || name.includes('electricidad') || name.includes('pintura') || name.includes('ceramico') || name.includes('ceramica') || name.includes('piso'));
-  });
-  const html = extrasFiltrados.map(e => {
-    const defaultQty = getDefaultExtraQty(e, parcela, casa);
-    const min = e.minQty ?? 1;
-    const max = e.maxQty ?? 9999;
+    const container = document.getElementById('opcionales-container');
+    if (!container || typeof window.extrasOpcionales === 'undefined') return;
     
-    // Define label according to type
-    let priceLabel = '';
-    if (e.tipoCalculo === 'mt2') {
-      priceLabel = `${formatCurrency(e.valor)} / m²`;
-    } else if (e.tipoCalculo === 'metro') {
-      priceLabel = `${formatCurrency(e.valor)} / metro`;
+    // Cambiar layout a grid compacto
+    container.className = 'opcionales-grid-compact';
+    
+    const storedId = localStorage.getItem('selectedParcelaId');
+    const storedCasaId = localStorage.getItem('selectedCasaId');
+    
+    let parcela = null;
+    let isParcelaIncluded = true;
+    if (typeof window.getTplProjectState === 'function') {
+        const state = window.getTplProjectState();
+        parcela = state.incluidaEnProyecto ? getParcelasArray().find(p => String(p.id) === String(state.parcelaId)) : null;
+        isParcelaIncluded = state.incluidaEnProyecto && state.parcelaId;
     } else {
-      priceLabel = `${formatCurrency(e.valor)} c/u`;
+        parcela = getParcelasArray().find(p => String(p.id) === storedId);
+        isParcelaIncluded = !!parcela;
     }
-    // Qty input if needed
-    const showQty = true;
-    const qtyInputHtml = showQty ? `
-      <div class="qty-control-wrapper" style="pointer-events: auto;">
-        <input type="number" class="extra-qty" data-id="${e.id}" min="${min}" max="${max}" value="${defaultQty}" />
-      </div>
-    ` : `<span class="badge-highlight">Calculado por m²</span>`;
-    return `
-      <div class="extra-card-premium" data-id="${e.id}">
-        <input type="checkbox" class="extra-check" data-id="${e.id}" data-valor="${e.valor}" data-tipo="${e.tipoCalculo}" style="pointer-events: none;" />
-        <div class="extra-info-group">
-          <span class="extra-card-title">${e.nombre}</span>
-          <span class="extra-card-desc">${e.descripcion || 'Servicio e instalación garantizada'}</span>
+
+    const casa = getCasasArray().find(c => String(c.id) === storedCasaId);
+    
+    let extrasFiltrados = window.extrasOpcionales.filter(e => {
+      if (isWoodConstruction()) return true;
+      const name = String(`${e.id || ''} ${e.nombre || ''}`).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      return !(name.includes('electrica') || name.includes('electricidad') || name.includes('pintura') || 
+name.includes('ceramico') || name.includes('ceramica') || name.includes('piso'));
+    });
+
+    // Smart Sorting Logic
+    extrasFiltrados.sort((a, b) => {
+        let scoreA = 0, scoreB = 0;
+        const parcelaGrande = parcela && Number(parcela.superficie) >= 5000;
+        const casaGrande = casa && Number(casa.area) > 70;
+        
+        const prioridadesParcela = ['cierre_perimetral', 'pozo_profundo', 'maquinaria'];
+        const prioridadesCasa = ['Instalacion_electrica', 'instalacion_sanitaria', 'pintura'];
+        
+        if (parcelaGrande && prioridadesParcela.includes(a.id)) scoreA += 10;
+        if (parcelaGrande && prioridadesParcela.includes(b.id)) scoreB += 10;
+        
+        if (casaGrande && prioridadesCasa.includes(a.id)) scoreA += 10;
+        if (casaGrande && prioridadesCasa.includes(b.id)) scoreB += 10;
+        
+        return scoreB - scoreA;
+    });
+
+    const html = extrasFiltrados.map(e => {
+      const defaultQty = getDefaultExtraQty(e, parcela, casa);
+      
+      const requiresParcela = ['fosa_septica', 'pozo_profundo', 'cierre_perimetral', 'maquinaria', 'empalme_electrico'].includes(e.id) || e.tipoCalculo2 === 'parcela';
+      const isDisabled = requiresParcela && !isParcelaIncluded;
+      
+      const isDisenoPropio = window.location.pathname.includes('cotizador.html') || document.getElementById('custom-designer-panel')?.classList.contains('active');
+      let isMaterialIncluded = false;
+      if (isDisenoPropio) {
+          const materialActual = typeof window.getCustomState === 'function' 
+            ? window.getCustomState().material 
+            : (document.querySelector('input[name="custom-material"]:checked')?.value || 'madera');
+            
+          const incluidosArray = INCLUIDOS_POR_TIPO[materialActual] || [];
+          if (incluidosArray.includes(e.id)) {
+              isMaterialIncluded = true;
+          }
+      }
+      
+      
+      let priceLabel = '';
+        if (isMaterialIncluded) {
+          priceLabel = '<span style="color:#10b981; font-weight:700;">Incluido en tu material</span>';
+        } else if (e.tipoCalculo === 'mt2') {
+        priceLabel = `${formatCurrency(e.valor)} / m`;
+      } else if (e.tipoCalculo === 'metro') {
+        priceLabel = `${formatCurrency(e.valor)} / mt`;
+      } else {
+        priceLabel = `Desde ${formatCurrency(e.valor)}`;
+      }
+      
+      const iconName = EXTRAS_ICON_MAP[e.id] || 'check-square';
+      const tooltipText = isDisabled ? '⚠️ Requiere agregar y activar una parcela en el proyecto.' : (e.descripcion || 'Servicio e instalacin garantizada.');
+
+      
+      const isChecked = isMaterialIncluded ? 'checked' : '';
+      const dataEstado = isMaterialIncluded ? 'incluido' : 'opcional';
+      const actualVal = isMaterialIncluded ? 0 : e.valor;
+      const extraClass = isMaterialIncluded ? 'included selected' : '';
+      const tooltipInfo = isMaterialIncluded ? 'Este extra ya viene incluido gratuitamente en el tipo de construccin que seleccionaste.' : tooltipText;
+      
+      return `
+        <div class="extra-card-compact ${isDisabled ? 'disabled' : ''} ${extraClass}" data-id="${e.id}">
+          <input type="checkbox" class="extra-check sr-only" data-id="${e.id}" data-valor="${actualVal}" data-estado="${dataEstado}" ${isChecked} ${isMaterialIncluded ? 'style="pointer-events:none;" onclick="return false;"' : ''} data-tipo="${e.tipoCalculo}" style="display:none;" />
+          
+          <div class="status-badge"><i data-lucide="check" style="width:16px; height:16px;"></i></div>
+          
+          <div class="extra-info-btn"><i data-lucide="info" style="width:16px; height:16px;"></i></div>
+          <div class="extra-tooltip">${tooltipInfo}</div>
+          
+          <div class="extra-icon-box">
+            <i data-lucide="${iconName}" style="width: 28px; height: 28px;"></i>
+          </div>
+          
+          <h4 class="extra-title-compact">${e.nombre}</h4>
+          <span class="extra-price-compact">${priceLabel}</span>
+          
+          <button type="button" class="extra-btn-compact">
+            ${isMaterialIncluded ? '<i data-lucide="check-circle" style="width:16px;"></i> Incluido' : '<span class="btn-text">Agregar</span>'}
+          </button>
         </div>
-        <div style="display:flex; align-items:center; gap:1.25rem;">
-          <span class="extra-card-price">${priceLabel}</span>
-          ${qtyInputHtml}
-        </div>
-      </div>
-    `;
-  }).join('');
-  container.innerHTML = html;
-  // Add click listeners to cards to handle checkbox toggling
-  const cards = container.querySelectorAll('.extra-card-premium');
+      `;
+    }).join('');
+    
+    container.innerHTML = html;
+    
+    // Instanciar iconos Lucide
+    if(typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    // Add click listeners
+    const cards = container.querySelectorAll('.extra-card-compact');
+
   cards.forEach(card => {
     card.addEventListener('click', (event) => {
       // If clicking inside the qty number input, don't toggle the checkbox
@@ -849,8 +950,46 @@ function setupActivateProjectModal() {
   if (!btn || !modal || !form) return;
   btn.addEventListener('click', () => modal.classList.add('active'));
   close?.addEventListener('click', () => modal.classList.remove('active'));
+  const saveQuoteButton = document.getElementById('save-quote-btn');
+  saveQuoteButton?.addEventListener('click', async () => {
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    if (saveQuoteButton.disabled) return;
+    saveQuoteButton.disabled = true;
+    const originalText = saveQuoteButton.textContent;
+    saveQuoteButton.textContent = 'Guardando…';
+    const total = calculateTotal();
+    const storedId = localStorage.getItem('selectedParcelaId');
+    const storedCasaId = localStorage.getItem('selectedCasaId');
+    const saved = await window.apiSaveLead?.({
+      cliente: {
+        nombre: document.getElementById('activate-name').value,
+        telefono: document.getElementById('activate-phone').value,
+        correo: document.getElementById('activate-email').value,
+        observaciones: document.getElementById('activate-message').value,
+        presupuesto_estimado: total,
+        estado: 'cotizado',
+        origen: 'cotizador'
+      },
+      proyecto: {
+        parcela_id: storedId || null,
+        casa_id: storedCasaId || null,
+        cotizacion_referencial: total,
+        estado: 'cotizacion_generada',
+        origen: 'cotizador'
+      },
+      evento: 'cotizacion_guardada',
+      etapa: 'guardo_cotizacion',
+      metadata: { parcela_codigo: storedId || '', casa_codigo: storedCasaId || '', valor: total, origen: 'cotizador' }
+    });
+    saveQuoteButton.disabled = false;
+    saveQuoteButton.textContent = originalText;
+    if (!saved?.success) return alert('No pudimos guardar tu cotización. Revisa tu conexión e inténtalo nuevamente.');
+    window.TPLLaunch?.clearDraft('cotizador');
+    alert('Cotización guardada. El equipo comercial podrá continuar el seguimiento.');
+  });
   form.addEventListener('submit', async e => {
     e.preventDefault();
+    if (!window.TPLLaunch?.guardSubmit(form, 'Activando…')) return;
     const client = {
       name: document.getElementById('activate-name').value,
       phone: document.getElementById('activate-phone').value,
@@ -858,25 +997,87 @@ function setupActivateProjectModal() {
       message: document.getElementById('activate-message').value
     };
 
-    // Guardar lead en Supabase
+    // Guardar lead estructurado en Supabase
     if (window.apiSaveLead) {
       const summaryText = buildQuotePlainText(client);
-      await window.apiSaveLead({
-        nombre: client.name,
-        telefono: client.phone,
-        email: client.email,
-        mensaje: client.message + "\n\n--- Cotización Generada ---\n" + summaryText,
-        origen: "Cotizador Diseño Propio",
-        fecha: new Date().toISOString()
-      });
+      const total = calculateTotal();
+      const storedId = localStorage.getItem('selectedParcelaId');
+      const storedCasaId = localStorage.getItem('selectedCasaId');
+      
+      const payload = {
+        cliente: {
+          nombre: client.name,
+          correo: client.email,
+          telefono: client.phone,
+          observaciones: client.message,
+          presupuesto_estimado: total,
+          estado: 'cotizado',
+          origen: 'cotizador'
+        },
+        proyecto: {
+          parcela_id: storedId || null,
+          casa_id: storedCasaId || null,
+          cotizacion_referencial: total,
+          estado: 'activo',
+          activado_en: new Date().toISOString(),
+          origen: 'cotizador'
+        },
+        evento: 'proyecto_activado',
+        etapa: 'activo_proyecto',
+        metadata: { parcela_codigo: storedId || '', casa_codigo: storedCasaId || '', valor: total, origen: 'cotizador' },
+        rawText: summaryText
+      };
+      const saved = await window.apiSaveLead(payload);
+      if (!saved?.success) {
+        window.TPLLaunch?.releaseSubmit(form);
+        alert('No pudimos registrar el proyecto. Revisa tu conexión e inténtalo nuevamente.');
+        return;
+      }
     }
+
+    // Redirección y Tracking
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      'event': 'tpl_purchase',
+      'ecommerce': {
+        'currency': 'CLP',
+        'value': total,
+        'transaction_id': 'PROJ-' + Date.now()
+      }
+    });
+
+    window.isSubmittingCotizador = true; // Para evitar el alert de beforeunload
 
     const filename = await generateProjectPdf(client);
     const subject = encodeURIComponent('Activación de proyecto - Tu Parcela Lista');
     const body = encodeURIComponent(buildQuotePlainText(client) + `\n\nPDF generado en el navegador: ${filename || 'no disponible'}. Adjuntar el archivo descargado a este correo.`);
+    await window.TPLLaunch?.track('pdf_generado', { valor: calculateTotal(), origen: 'cotizador' });
     window.location.href = `mailto:tuparcelalista@gmail.com?cc=${encodeURIComponent(client.email)}&subject=${subject}&body=${body}`;
     modal.classList.remove('active');
+    window.TPLLaunch?.releaseSubmit(form);
+  });
+
+  // Track cuando abren el modal (Save Quote)
+  btn.addEventListener('click', () => {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      'event': 'tpl_save_quote',
+      'ecommerce': {
+        'currency': 'CLP',
+        'value': calculateTotal()
+      }
+    });
+  });
+
+  // Prevención de abandono
+  window.addEventListener('beforeunload', (e) => {
+    if (!window.isSubmittingCotizador && calculateTotal() > 0) {
+      e.preventDefault();
+      e.returnValue = 'Tienes una cotización en curso. ¿Seguro que quieres salir sin guardarla?';
+    }
   });
 }
 
 document.addEventListener('DOMContentLoaded', setupActivateProjectModal);
+
+window.renderExtrasOpcionales = renderExtrasOpcionales;

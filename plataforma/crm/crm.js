@@ -4,13 +4,17 @@ document.addEventListener("DOMContentLoaded", () => {
     'https://qxavbqhyqaqalpzbhwmh.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA'
   );
+  window.tplCrmSupabase = supabase;
 
-  // Elementos DOM
   const DOM = {
-    loginView: document.getElementById("login-view"),
-    dashboardView: document.getElementById("dashboard-view"),
+    loginContainer: document.getElementById("login-container"),
+    appContainer: document.getElementById("app-container"),
     loginForm: document.getElementById("login-form"),
-    loginError: document.getElementById("login-error"),
+    loginEmail: document.getElementById("login-email"),
+    loginPassword: document.getElementById("login-password"),
+    btnLogin: document.getElementById("btn-login"),
+    loginMsg: document.getElementById("login-msg"),
+    
     btnLogout: document.getElementById("btn-logout"),
     userName: document.getElementById("user-name-display"),
     
@@ -31,69 +35,69 @@ document.addEventListener("DOMContentLoaded", () => {
     modalContent: document.getElementById("modal-content"),
     modalActions: document.getElementById("modal-actions"),
     feedbackTitle: document.getElementById("feedback-title"),
-    feedbackMotivo: document.getElementById("feedback-motivo"),
-    feedbackError: document.getElementById("feedback-error"),
     
-    // Cierres de modales
-    btnCloseDetalle: document.getElementById("btn-close-modal"),
-    btnCloseFeedback: document.getElementById("btn-close-feedback"),
+    // Formularios y Botones
+    inputFeedback: document.getElementById("input-feedback"),
+    btnConfirmFeedback: document.getElementById("btn-confirm-feedback"),
     btnCancelFeedback: document.getElementById("btn-cancel-feedback"),
-    btnConfirmFeedback: document.getElementById("btn-confirm-feedback")
+    btnCloseModal: document.getElementById("btn-close-modal"),
+    btnCloseDetalle: document.getElementById("btn-close-detalle")
   };
-
-  lucide.createIcons();
 
   let sessionUser = null;
   let publicacionesCache = [];
-  let currentAction = null; // { id, action: 'rechazar' | 'requiere_cambios' }
+  let itemToProcess = null; // ID de la publicacion
+  let newStatusProcess = null; // "Aprobada", "Corregir", "Rechazada"
 
-  // 1. Autenticación
+  // 1. Inicialización y Auth
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
+    
     if (session) {
-      // Verificar si es admin activo
-      const { data, error } = await supabase.rpc('crm_sesion_actual');
-      if (error || !data || data.length === 0) {
-        await supabase.auth.signOut();
-        showLogin("Tu cuenta no tiene privilegios de administrador.");
-      } else {
-        sessionUser = data[0];
+      const { data: profileRows, error: profileError } = await supabase.rpc('crm_sesion_actual');
+      const profile = profileRows?.[0];
+
+      if (!profileError && profile?.tipo === 'administrador') {
+        sessionUser = { nombre: profile.nombre || session.user.email };
         showDashboard();
+      } else {
+        await supabase.auth.signOut();
+        showLogin("Acceso denegado. No tienes rol de administrador.");
       }
     } else {
       showLogin();
     }
   };
 
-  const showLogin = (errorMsg = "") => {
-    DOM.loginView.classList.add("active");
-    DOM.dashboardView.style.display = "none";
-    DOM.loginError.innerText = errorMsg;
+  const showLogin = (msg = "") => {
+    DOM.loginContainer.style.display = "flex";
+    DOM.appContainer.style.display = "none";
+    if(msg) DOM.loginMsg.innerText = msg;
   };
 
   const showDashboard = () => {
-    DOM.loginView.classList.remove("active");
-    DOM.dashboardView.style.display = "flex";
+    DOM.loginContainer.style.display = "none";
+    DOM.appContainer.style.display = "flex";
     DOM.userName.innerText = sessionUser.nombre;
     loadData();
   };
 
   DOM.loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const btn = document.getElementById("btn-login");
+    const email = DOM.loginEmail.value.trim();
+    const password = DOM.loginPassword.value;
+    if (!email || !password) return;
     
-    btn.disabled = true;
-    btn.innerText = "Verificando...";
-    DOM.loginError.innerText = "";
+    DOM.btnLogin.disabled = true;
+    DOM.btnLogin.innerText = "Verificando...";
+    DOM.loginMsg.innerText = "";
     
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     
     if (error) {
-      DOM.loginError.innerText = "Credenciales incorrectas.";
-      btn.disabled = false;
-      btn.innerText = "Ingresar al Sistema";
+      DOM.loginMsg.innerText = "Credenciales incorrectas.";
+      DOM.btnLogin.disabled = false;
+      DOM.btnLogin.innerText = "Ingresar";
     } else {
       checkAuth();
     }
@@ -106,8 +110,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 2. Carga de Datos
   const loadData = async () => {
+    loadPendientesOperativos();
     loadMetrics();
     loadTable();
+  };
+
+  const loadPendientesOperativos = async () => {
+    // Simularemos la recolección de los datos de "Pendientes"
+    // En producción se haría con endpoints RPC o conteos
+    try {
+      // Clientes Nuevos
+      const resClientes = await supabase.from('clientes').select('id, nombre, creado_en', { count: 'exact' }).eq('estado', 'nuevo').limit(5);
+      document.getElementById('metric-pendientes-clientes').innerText = resClientes.count || 0;
+      
+      // Proyectos/Cotizaciones
+      const resProyectos = await supabase.from('proyectos').select('id, total, creado_en', { count: 'exact' }).eq('estado', 'cotizacion_generada').limit(5);
+      document.getElementById('metric-pendientes-cotizaciones').innerText = resProyectos.count || 0;
+
+      // Publicaciones por revisar
+      const resPubs = await supabase.rpc('crm_listar_publicaciones', { p_estado: 'pendiente_revision' });
+      document.getElementById('metric-pendientes-publicaciones').innerText = resPubs.data?.length || 0;
+
+      const tbody = document.getElementById('table-body-pendientes');
+      let html = '';
+
+      const createRow = (tipo, fecha, desc, estado, accion) => `
+        <tr>
+          <td><span class="badge ${tipo.toLowerCase()}">${tipo}</span></td>
+          <td>${new Date(fecha).toLocaleDateString('es-CL')}</td>
+          <td>${desc}</td>
+          <td>${estado}</td>
+          <td>${accion}</td>
+        </tr>
+      `;
+
+      if (resClientes.data?.length) {
+        resClientes.data.forEach(c => html += createRow('Lead', c.creado_en, `Cliente Nuevo: ${c.nombre}`, 'Sin contactar', `<button class="btn-action" onclick="alert('Funcionalidad próxima: Abrir Ficha')">Ver</button>`));
+      }
+      if (resProyectos.data?.length) {
+        resProyectos.data.forEach(p => html += createRow('Cotización', p.creado_en, `Cotización de: $${Number(p.total||0).toLocaleString('es-CL')}`, 'Huérfana', `<button class="btn-action">Revisar</button>`));
+      }
+      if (resPubs.data?.length) {
+        resPubs.data.forEach(p => html += createRow('Parcela', p.creado_en, `Revisar: ${p.propiedad}`, 'Pendiente', `<button class="btn-action" onclick="window.verDetalle('${p.id}')">Revisar</button>`));
+      }
+
+      if (!html) html = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#64748b;">No hay tareas operativas pendientes. ¡Todo al día!</td></tr>';
+      
+      if(tbody) tbody.innerHTML = html;
+
+    } catch (e) {
+      console.error("Error al cargar pendientes:", e);
+    }
   };
 
   const loadMetrics = async () => {
@@ -398,6 +451,7 @@ navItems.forEach(item => {
     const topbarTitle = document.getElementById('topbar-title');
     if (topbarTitle) {
       if (targetId === 'view-solicitudes') topbarTitle.textContent = 'Moderación de Publicaciones';
+      if (targetId === 'view-tasador') topbarTitle.textContent = 'Tasador TPL';
       if (targetId === 'view-cotizaciones') topbarTitle.textContent = 'Cotizaciones y Smart Match';
       if (targetId === 'view-contratistas') topbarTitle.textContent = 'Gestión de Contratistas';
     }
@@ -430,7 +484,7 @@ async function loadContratistas() {
   if (!domContratistas.tableBody) return;
   domContratistas.tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Cargando contratistas...</td></tr>';
   
-  const { data, error } = await window.supabase.from('contratistas').select('*').order('created_at', { ascending: false });
+  const { data, error } = await window.tplCrmSupabase.from('contratistas').select('*').order('created_at', { ascending: false });
   
   if (error) {
     console.error("Error al cargar contratistas:", error);
@@ -447,24 +501,33 @@ function renderContratistas() {
   domContratistas.tableBody.innerHTML = '';
   
   const filter = domContratistas.filterEstado ? domContratistas.filterEstado.value : '';
-  const filtered = filter ? contratistasCache.filter(c => c.estado === filter) : contratistasCache;
+  const filtered = filter ? contratistasCache.filter(c => c.estado_verificacion === filter) : contratistasCache;
   
   if (filtered.length === 0) {
-    domContratistas.tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay contratistas.</td></tr>';
+    domContratistas.tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay partners.</td></tr>';
     return;
   }
   
   filtered.forEach(c => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><strong>${c.nombre || 'Sin nombre'}</strong></td>
-      <td>${c.ubicacion_base || '-'}</td>
-      <td>${c.actividad_especialidad || '-'}</td>
-      <td>${c.telefono || '-'}</td>
-      <td>${c.estrellas_calificacion ? c.estrellas_calificacion + ' ★' : '-'}</td>
-      <td><span class="preview-badge" style="background:${c.estado === 'Activo' ? '#dcfce7' : '#f1f5f9'}; color:${c.estado === 'Activo' ? '#166534' : '#475569'};">${c.estado || 'Inactivo'}</span></td>
       <td>
-        <button class="btn-primary-submit" style="padding: 6px 12px; font-size:0.8rem;" onclick="window.open('https://wa.me/${c.telefono}', '_blank')"><i data-lucide="message-circle" style="width:14px;"></i> Chat</button>
+        <strong>${c.nombre_comercial || 'Sin nombre'}</strong>
+        <br><small style="color: #64748b;">${c.plan_elegido ? c.plan_elegido.toUpperCase() : 'GRATIS'}</small>
+      </td>
+      <td>${c.comunas_atendidas || c.region || '-'}</td>
+      <td>${c.tipo_servicio || '-'}</td>
+      <td>${c.whatsapp || c.telefono || '-'}</td>
+      <td>${c.rating ? c.rating + ' ⭐' : '0.00 ⭐'}</td>
+      <td>
+        <select onchange="updatePartnerStatus('${c.id}', this.value)" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc;">
+          <option value="pendiente" ${c.estado_verificacion === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+          <option value="verificado" ${c.estado_verificacion === 'verificado' ? 'selected' : ''}>Verificado</option>
+          <option value="rechazado" ${c.estado_verificacion === 'rechazado' ? 'selected' : ''}>Rechazado</option>
+        </select>
+      </td>
+      <td>
+        <button class="btn-primary-submit" style="padding: 6px 12px; font-size:0.8rem;" onclick="window.open('https://wa.me/${c.whatsapp || c.telefono}', '_blank')"><i data-lucide="message-circle" style="width:14px;"></i> Chat</button>
       </td>
     `;
     domContratistas.tableBody.appendChild(tr);
@@ -472,12 +535,29 @@ function renderContratistas() {
   if(window.lucide) window.lucide.createIcons();
 }
 
+window.updatePartnerStatus = async function(id, newStatus) {
+  try {
+    const { error } = await window.tplCrmSupabase.from('contratistas').update({ estado_verificacion: newStatus }).eq('id', id);
+    if (error) {
+      alert('Error al actualizar estado');
+      console.error(error);
+    } else {
+      const idx = contratistasCache.findIndex(c => c.id === id);
+      if(idx > -1) contratistasCache[idx].estado_verificacion = newStatus;
+      showFriendlyMessage('Estado de partner actualizado a: ' + newStatus);
+    }
+  } catch(e) {
+    console.error(e);
+  }
+}
+
 // Cargar Cotizaciones y Smart Match
 async function loadCotizaciones() {
   if (!domCotizaciones.tableBody) return;
   domCotizaciones.tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Cargando cotizaciones...</td></tr>';
   
-  const { data, error } = await window.supabase.from('cotizaciones_proyectos').select('*').order('created_at', { ascending: false });
+  const { data:projectRows, error } = await window.tplCrmSupabase.from('proyectos').select('id,creado_en,estado,total,modalidad,parcela_id,clientes(nombre,telefono),publicaciones(comuna)').order('creado_en', { ascending: false });
+  const data=(projectRows||[]).map(project=>({id:project.id,created_at:project.creado_en,estado:project.estado,parcela_id:project.parcela_id,parcela_comuna:project.publicaciones?.comuna||'',cliente_nombre:project.clientes?.nombre||'',cliente_telefono:project.clientes?.telefono||'',requiere_instalacion:project.modalidad==='llave_en_mano',total:project.total}));
   
   if (error) {
     console.error("Error al cargar cotizaciones:", error);
@@ -487,7 +567,7 @@ async function loadCotizaciones() {
   
   // Si no tenemos contratistas cargados aún, los necesitamos para el Smart Match
   if (contratistasCache.length === 0) {
-    const res = await window.supabase.from('contratistas').select('*').eq('estado', 'Activo');
+    const res = await window.tplCrmSupabase.from('contratistas').select('*').eq('estado_verificacion', 'verificado');
     if (!res.error) contratistasCache = res.data;
   }
   
@@ -516,19 +596,20 @@ function renderCotizaciones() {
       const comuna = c.parcela_comuna.toLowerCase();
       mejoresMatch.forEach(cont => {
         let score = 0;
-        if (cont.ubicacion_base && cont.ubicacion_base.toLowerCase().includes(comuna)) score += 50;
-        if (cont.estrellas_calificacion) score += (cont.estrellas_calificacion * 5); // Hasta 25 ptos
+        if (cont.comunas_atendidas && cont.comunas_atendidas.toLowerCase().includes(comuna)) score += 50;
+        else if (cont.region && cont.region.toLowerCase().includes(comuna)) score += 25; // fallback
+        if (cont.rating) score += (cont.rating * 5); // Hasta 25 ptos
         cont._tempScore = score;
       });
       mejoresMatch.sort((a,b) => (b._tempScore || 0) - (a._tempScore || 0));
     }
     
-    const topMatch = mejoresMatch.length > 0 ? mejoresMatch[0] : null;
+    const topMatch = mejoresMatch.length > 0 && mejoresMatch[0]._tempScore > 0 ? mejoresMatch[0] : null;
     const matchHtml = topMatch 
       ? `<div style="font-size:0.8rem; background:#f0fdf4; padding:8px; border-radius:8px; border:1px solid #bbf7d0;">
-          <strong>Sugerido: ${topMatch.nombre}</strong><br>
-          <span style="color:#166534">${topMatch.ubicacion_base || 'Sin zona'} • ${topMatch.estrellas_calificacion || 0}★</span><br>
-          <button onclick="window.open('https://wa.me/${topMatch.telefono}?text=Hola ${encodeURIComponent(topMatch.nombre)}, tengo un proyecto en ${encodeURIComponent(c.parcela_comuna)} que podría interesarte.', '_blank')" style="margin-top:4px; padding:4px 8px; font-size:0.75rem; background:#25D366; color:#fff; border:none; border-radius:4px; cursor:pointer;">Contactar</button>
+          <strong>Sugerido: ${topMatch.nombre_comercial}</strong><br>
+          <span style="color:#166534">${topMatch.comunas_atendidas || 'Sin zona'} • ${topMatch.rating || 0}⭐</span><br>
+          <button onclick="window.open('https://wa.me/${topMatch.whatsapp || topMatch.telefono}?text=Hola ${encodeURIComponent(topMatch.nombre_comercial)}, tengo un proyecto en ${encodeURIComponent(c.parcela_comuna)} que podría interesarte.', '_blank')" style="margin-top:4px; padding:4px 8px; font-size:0.75rem; background:#25D366; color:#fff; border:none; border-radius:4px; cursor:pointer;">Contactar</button>
          </div>`
       : '<span style="color:#94a3b8; font-size:0.8rem;">Sin sugerencias</span>';
 
@@ -554,11 +635,35 @@ if (domContratistas.filterEstado) domContratistas.filterEstado.addEventListener(
 if (domCotizaciones.btnRefresh) domCotizaciones.btnRefresh.addEventListener('click', loadCotizaciones);
 if (domCotizaciones.filterEstado) domCotizaciones.filterEstado.addEventListener('change', renderCotizaciones);
 
+async function loadTasadorPanel(){
+ const status=document.getElementById('tasador-admin-status'),tbody=document.getElementById('table-body-tasaciones');
+ if(!window.tplCrmSupabase||!tbody)return;
+ status.hidden=true;tbody.innerHTML='<tr><td colspan="7" class="launch-empty">Cargando tasaciones…</td></tr>';
+ const [valuationResponse,configResponse]=await Promise.all([
+  window.tplCrmSupabase.from('tasaciones').select('id,creada_en,precio_ingresado,valor_minimo,valor_mercado,valor_maximo,confianza,cobertura,decision_usuario,resumen_factores,datos_entrada').order('creada_en',{ascending:false}).limit(200),
+  window.tplCrmSupabase.from('configuracion_tasador').select('version,algoritmo,parametros').eq('estado','activa').maybeSingle()
+ ]);
+ if(valuationResponse.error){status.hidden=false;status.textContent='El esquema del Tasador TPL todavía no está desplegado o tu sesión no tiene permisos.';tbody.innerHTML='<tr><td colspan="7" class="launch-empty">Sin datos disponibles.</td></tr>';return;}
+ const rows=valuationResponse.data||[];
+ document.getElementById('metric-tasaciones-total').textContent=rows.length;
+ document.getElementById('metric-tasaciones-baja').textContent=rows.filter(row=>['experimental','informacion_insuficiente'].includes(row.cobertura)).length;
+ document.getElementById('metric-tasaciones-fuera').textContent=rows.filter(row=>row.resumen_factores?.position==='sobre_el_rango').length;
+ document.getElementById('metric-tasaciones-aceptadas').textContent=rows.filter(row=>row.decision_usuario==='adoptar_mercado').length;
+ if(configResponse.data){document.getElementById('tasador-config-version').textContent=`${configResponse.data.version} · ${configResponse.data.algoritmo}`;const parameters=configResponse.data.parametros||{};document.getElementById('tasador-config-summary').textContent=`Mínimo ${parameters.comparables_minimos||'—'} comparables · cobertura limitada desde ${parameters.cobertura_limitada_desde||'—'} · máxima ${parameters.distancia_maxima_km||'—'} km geográficos.`;}
+ tbody.replaceChildren();
+ if(!rows.length){const row=tbody.insertRow();const cell=row.insertCell();cell.colSpan=7;cell.className='launch-empty';cell.textContent='Todavía no existen tasaciones.';return;}
+ rows.forEach(item=>{const row=tbody.insertRow(),values=[new Date(item.creada_en).toLocaleDateString('es-CL'),item.datos_entrada?.comuna||'—',formatAdminMoney(item.precio_ingresado),item.valor_minimo&&item.valor_maximo?`${formatAdminMoney(item.valor_minimo)} – ${formatAdminMoney(item.valor_maximo)}`:'Información insuficiente',item.confianza,item.cobertura,item.decision_usuario||'sin_decision'];values.forEach(value=>{const cell=row.insertCell();cell.textContent=String(value??'—');});});
+}
+
+function formatAdminMoney(value){return Number(value||0).toLocaleString('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0});}
+document.getElementById('btn-refresh-tasador')?.addEventListener('click',loadTasadorPanel);
+
 // Interceptar la navegación para cargar datos la primera vez
 document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
   item.addEventListener('click', (e) => {
     const targetId = item.getAttribute('data-target');
     if (targetId === 'view-contratistas' && contratistasCache.length === 0) loadContratistas();
     if (targetId === 'view-cotizaciones' && cotizacionesCache.length === 0) loadCotizaciones();
+    if (targetId === 'view-tasador') loadTasadorPanel();
   });
 });

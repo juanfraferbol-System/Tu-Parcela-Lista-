@@ -1120,3 +1120,5 @@ footer.main-footer {
   .executor-total-box { grid-template-columns: 1fr; }
   .tpl-modal-dialog { padding: 22px; border-radius: 22px; }
 }
+
+.activate-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.activate-actions .btn-activate-project{width:100%}@media(max-width:640px){.activate-actions{grid-template-columns:1fr}}

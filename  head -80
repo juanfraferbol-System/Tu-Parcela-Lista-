@@ -1,0 +1,324 @@
+warning: in the working copy of 'app.js', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/app.js b/app.js[m
+[1mindex f9a42d6..3564dd5 100644[m
+[1m--- a/app.js[m
+[1m+++ b/app.js[m
+[36m@@ -1047,96 +1047,186 @@[m [mdocument.addEventListener("DOMContentLoaded", () => {[m
+         <strong class="installation-plan-title">${meta.title}</strong>[m
+         <small class="installation-plan-tag">${meta.tag}</small>[m
+         <p>${meta.desc}</p>[m
+[31m-        <ul>${meta.bullets.map(b => `<li>✓ ${b}</li>`).join("")}</ul>[m
+[31m-        <span class="installation-plan-price">${money(valor)}</span>`;[m
+[31m-      btn.addEventListener("click", () => {[m
+[31m-        state.installationService = true;[m
+[32m+[m[32m        <ul>${meta.bullets.map(b => `<li>✓ ${b}</li>`).join("")}</ul>`;[m
+[32m+[m[41m      [m
+[32m+[m[32m      btn.onclick = () => {[m
+         state.selectedFundacion = f;[m
+[31m-        if (isPremiumInstallationPlan(f)) removePremiumIncludedExtrasFromSelection();[m
+[32m+[m[32m        state.installationService = true;[m
+         renderFundaciones();[m
+[31m-        renderExtras();[m
+         updateCotizacionSummary();[m
+[31m-      });[m
+[32m+[m[32m      };[m
+       DOM.fundacionesContainer.appendChild(btn);[m
+     });[m
+   }[m
+ [m
+[32m+[m[32m  function getExtraIcon(id) {[m
+[32m+[m[32m    const iconMap = {[m
+[32m+[m[32m      "piso ceramico": "fa-border-all",[m
+[32m+[m[32m      "instalacion_electrica": "fa-bolt",[m
+[32m+[m[32m      "instalacion_sanitaria": "fa-droplet",[m
+[32m+[m[32m      "pintura": "fa-paint-roller",[m
+[32m+[m[32m      "artefactos_cocina": "fa-sink",[m
+[32m+[m[32m      "artefactos_bano": "fa-bath",[m
+[32m+[m[32m      "fosa_septica": "fa-trash-can",[m
+[32m+[m[32m      "pozo_profundo": "fa-water",[m
+[32m+[m[32m      "cierre_perimetral": "fa-bars-staggered",[m
+[32m+[m[32m      "porton": "fa-door-open",[m
+[32m+[m[32m      "empalme_electrico": "fa-plug",[m
+[32m+[m[32m      "maquinaria": "fa-tractor",[m
+[32m+[m[32m      "piscina": "fa-person-swimming",[m
+[32m+[m[32m      "quincho": "fa-fire-burner",[m
+[32m+[m[32m      "terraza": "fa-umbrella-beach",[m
+[32m+[m[32m      "aislacion": "fa-temperature-half"[m
+[32m+[m[32m    };[m
+[32m+[m[32m    return iconMap[id] || "fa-plus";[m
+[32m+[m[32m  }[m
+[32m+[m
+   function renderExtras() {[m
+     if (DOM.automaticosBox) DOM.automaticosBox.style.display = Array.isArray(extrasAutomaticos) && extrasAutomaticos.length ? "block" : "none";[m
+     if (DOM.automaticosContainer) DOM.automaticosContainer.innerHTML = (Array.isArray(extrasAutomaticos) ? extrasAutomaticos : []).map(e => `<div class="extra-row"><span>${e.nombre}</span><strong>${money(e.valor || e.precio || 0)}</strong></div>`).join("");[m
+[32m+[m[41m    [m
+     if (!DOM.opcionalesContainer || !Array.isArray(extrasOpcionales)) return;[m
+[32m+[m[41m    [m
+     DOM.opcionalesContainer.innerHTML = "";[m
+[32m+[m[41m    [m
+[32m+[m[32m    let activeExtrasCount = 0;[m
+[32m+[m[32m    let activeExtrasTotal = 0;[m
+[32m+[m
+     const premiumActive = isPremiumInstallationPlan();[m
+[32m+[m[41m    [m
+     if (premiumActive) {[m
+       removePremiumIncludedExtrasFromSelection();[m
+       const included = document.createElement("div");[m
+       included.className = "premium-included-card";[m
+[32m+[m[32m      included.style.gridColumn = "1 / -1";[m
+       included.innerHTML = `[m
+[31m-        <span class="premium-included-kicker">🎁 Incluido en tu Plan Premium</span>[m
+[32m+[m[32m        <span class="premium-included-kicker">✨ Incluido en tu Plan Premium</span>[m
+         <strong>Estos trabajos ya forman parte del plan y no se cobran como extras.</strong>[m
+[31m-        <ul>${getPremiumIncludedExtrasList().map(item => `<li>✓ ${item}</li>`).join("")}</ul>`;[m
+[32m+[m[32m        <ul>${getPremiumIncludedExtrasList().map(item => `<li>✅ ${item}</li>`).join("")}</ul>`;[m
+       DOM.opcionalesContainer.appendChild(included);[m
+     }[m
+[32m+[m[41m    [m
+     extrasOpcionales.forEach(e => {[m
+       if (premiumActive && isPremiumIncludedExtra(e)) return;[m
+[31m-      const id = e.id || e.nombre;[m
+[32m+[m[41m      [m
+[32m+[m[32m      const id = normalizar(e.id || e.nombre);[m
+       const defaultQty = Math.max(1, getDefaultExtraQty(e));[m
+       const isSelected = state.selectedExtras.has(id);[m
+       const currentQty = isSelected ? state.selectedExtras.get(id) : defaultQty;[m
+       const unitLabel = e.tipoCalculo === "mt2" ? "m²" : (e.tipoCalculo === "metro" ? "ml" : (e.tipoCalculo || "unidad"));[m
+[31m-      const row = document.createElement("div");[m
+[31m-      row.className = `extra-row extra-row-modern ${isSelected ? "checked" : ""}`;[m
+[31m-      row.tabIndex = 0;[m
+[31m-      row.setAttribute("role", "button");[m
+[31m-      row.setAttribute("aria-pressed", isSelected ? "true" : "false");[m
+[31m-      row.innerHTML = `[m
+[31m-        <label class="extra-left">[m
+[31m-          <input class="extra-checkbox" type="checkbox" ${isSelected ? "checked" : ""} aria-label="Activar ${e.nombre}">[m
+[31m-          <span class="extra-info-text">[m
+[31m-            <b class="extra-name">${e.nombre}</b>[m
+[31m-            <small class="extra-desc">${money(e.valor || e.precio || 0)} por ${unitLabel}</small>[m
+[31m-          </span>[m
+[31m-        </label>[m
+[31m-        <div class="extra-controls">[m
+[31m-          <input class="qty-input-box" type="number" min="1" value="${currentQty}" aria-label="Cantidad ${e.nombre}">[m
+[31m-          <strong class="extra-total-val">${money((e.valor || e.precio || 0) * (isSelected ? currentQty : 0))}</strong>[m
+[31m-        </div>`;[m
+[31m-[m
+[31m-      const checkbox = row.querySelector(".extra-checkbox");[m
+[31m-      const qtyInput = row.querySelector(".qty-input-box");[m
+[31m-      const totalEl = row.querySelector(".extra-total-val");[m
+[32m+[m[41m      [m
+[32m+[m[32m      const pricePerUnit = e.valor || e.precio || 0;[m
+[32m+[m[32m      const totalItem = isSelected ? (pricePerUnit * currentQty) : 0;[m
+[32m+[m[41m      [m
+[32m+[m[32m      if (isSelected) {[m
+[32m+[m[32m        activeExtrasCount++;[m
+[32m+[m[32m        activeExtrasTotal += totalItem;[m
+[32m+[m[32m      }[m
+[32m+[m[41m      [m
+[32m+[m[32m      let cat = "otros";[m
+[32m+[m[32m      if (id.includes("piso") || id.includes("pintura") || id.includes("revestimiento")) cat = "terminaciones";[m
+[32m+[m[32m      else if (id.includes("electrica") || id.includes("empalme") || id.includes("sanitaria") || id.includes("cocina") || id.includes("bano")) cat = "instalaciones";[m
+[32m+[m[32m      else if (id.includes("cierre") || id.includes("porton") || id.includes("piscina") || id.includes("quincho") || id.includes("terraza")) cat = "exterior";[m
+[32m+[m[32m      else if (id.includes("fosa") || id.includes("pozo")) cat = "sanitario";[m
+[32m+[m[41m      [m
+[32m+[m[32m      const card = document.createElement("div");[m
+[32m+[m[32m      card.className = `extra-card ${isSelected ? "selected" : ""}`;[m
+[32m+[m[32m      card.setAttribute("data-category", cat);[m
+[32m+[m[32m      card.innerHTML = `[m
+[32m+[m[32m        <div class="extra-card-header" style="display:flex; justify-content:space-between; align-items:flex-start;">[m
+[32m+[m[32m          <div class="extra-icon-box" style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:${isSelected ? 'var(--primary)' : '#f1f5f9'}; color:${isSelected ? 'white' : 'var(--text-muted)'}; font-size:1.2rem; transition:0.2s;">[m
+[32m+[m[32m            <i class="fa-solid ${getExtraIcon(id)}"></i>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m          <label class="extra-toggle">[m
+[32m+[m[32m            <input type="checkbox" class="extra-checkbox" ${isSelected ? "checked" : ""}>[m
+[32m+[m[32m            <span class="slider"></span>[m
+[32m+[m[32m          </label>[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m        <div class="extra-card-body" style="margin-top:12px; flex-grow:1;">[m
+[32m+[m[32m          <h4 style="margin:0 0 4px 0; font-size:1rem; color:var(--text);">${e.nombre}</h4>[m
+[32m+[m[32m          ${e.descripcion ? `<p style="margin:0 0 8px 0; font-size:0.8rem; color:var(--text-muted);">${e.descripcion}</p>` : ''}[m
+[32m+[m[32m          <div class="extra-price-tag" style="font-size:0.85rem; color:var(--primary); font-weight:600;">[m
+[32m+[m[32m            ${money(pricePerUnit)} / ${unitLabel}[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m        <div class="extra-card-footer" style="margin-top:15px; border-top:1px solid #e2e8f0; padding-top:12px; display:${isSelected ? 'block' : 'none'};">[m
+[32m+[m[32m          <div class="stepper-modern" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border-radius:8px; padding:4px;">[m
+[32m+[m[32m            <button type="button" class="stepper-btn minus" style="width:30px; height:30px; border:none; background:white; border-radius:6px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><i class="fa-solid fa-minus"></i></button>[m
+[32m+[m[32m            <div style="font-weight:700; font-size:0.95rem; text-align:center; flex-grow:1;">[m
+[32m+[m[32m              <span class="stepper-val">${currentQty}</span> <span style="font-size:0.8rem; color:var(--text-muted);">${unitLabel}</span>[m
+[32m+[m[32m            </div>[m
+[32m+[m[32m            <button type="button" class="stepper-btn plus" style="width:30px; height:30px; border:none; background:white; border-radius:6px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><i class="fa-solid fa-plus"></i></button>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m          <div style="text-align:right; margin-top:10px; font-weight:800; color:var(--primary); font-size:1.1rem;" class="extra-card-total">[m
+[32m+[m[32m            ${money(totalItem)}[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m      `;[m
+ [m
+[31m-      const sync = (selected, qty = Number(qtyInput.value) || defaultQty) => {[m
+[32m+[m[32m      const checkbox = card.querySelector(".extra-checkbox");[m
+[32m+[m[32m      const btnMinus = card.querySelector(".minus");[m
+[32m+[m[32m      const btnPlus = card.querySelector(".plus");[m
+[32m+[m[41m      [m
+[32m+[m[32m      const sync = (selected, qty = currentQty) => {[m
+         qty = Math.max(1, qty);[m
+[31m-        qtyInput.value = qty;[m
+[31m-        if (selected) state.selectedExtras.set(id, qty); else state.selectedExtras.delete(id);[m
+[31m-        row.classList.toggle("checked", selected);[m
+[31m-        row.setAttribute("aria-pressed", selected ? "true" : "false");[m
+[31m-        checkbox.checked = selected;[m
+[31m-        if (totalEl) totalEl.textContent = money((e.valor || e.precio || 0) * (selected ? qty : 0));[m
+[32m+[m[32m        if (selected) state.selectedExtras.set(id, qty);[m[41m [m
+[32m+[m[32m        else state.selectedExtras.delete(id);[m
+[32m+[m[41m        [m
+[32m+[m[32m        renderExtras();[m
+         updateCotizacionSummary();[m
+       };[m
+ [m
+[31m-      row.addEventListener("click", ev => {[m
+[31m-        if (ev.target.closest("input.qty-input-box")) return;[m
+[31m-        sync(!state.selectedExtras.has(id));[m
+[31m-      });[m
+[31m-      row.addEventListener("keydown", ev => {[m
+[31m-        if (ev.key === "Enter" || ev.key === " ") {[m
+[31m-          ev.preventDefault();[m
+[31m-          sync(!state.selectedExtras.has(id));[m
+[31m-        }[m
+[31m-      });[m
+[31m-      checkbox.addEventListener("change", ev => {[m
+[31m-        ev.stopPropagation();[m
+[31m-        sync(checkbox.checked);[m
+[31m-      });[m
+[31m-      qtyInput.addEventListener("input", ev => {[m
+[31m-        ev.stopPropagation();[m
+[31m-        sync(true, Number(qtyInput.value) || defaultQty);[m
+[31m-      });[m
+[31m-      DOM.opcionalesContainer.appendChild(row);[m
+[32m+[m[32m      checkbox.addEventListener("change", (ev) => sync(ev.target.checked, currentQty));[m
+[32m+[m[41m      [m
+[32m+[m[32m      if (btnMinus) {[m
+[32m+[m[32m        btnMinus.addEventListener("click", () => sync(true, currentQty - 1));[m
+[32m+[m[32m        btnPlus.addEventListener("click", () => sync(true, currentQty + 1));[m
+[32m+[m[32m      }[m
+[32m+[m
+[32m+[m[32m      DOM.opcionalesContainer.appendChild(card);[m
+     });[m
+[32m+[m
+[32m+[m[32m    const countInd = document.getElementById("extras-count-indicator");[m
+[32m+[m[32m    const totalInd = document.getElementById("extras-total-indicator");[m
+[32m+[m[32m    if (countInd) countInd.textContent = `${activeExtrasCount} extras`;[m
+[32m+[m[32m    if (totalInd) totalInd.textContent = money(activeExtrasTotal);[m
+[32m+[m
+[32m+[m[32m    document.querySelectorAll(".extra-filter-btn").forEach(btn => {[m
+[32m+[m[32m      btn.onclick = (e) => {[m
+[32m+[m[32m        document.querySelectorAll(".extra-filter-btn").forEach(b => b.classList.remove("active"));[m
+[32m+[m[32m        btn.classList.add("active");[m
+[32m+[m[32m        const filter = btn.dataset.filter;[m
+[32m+[m[32m        document.querySelectorAll(".extra-card").forEach(card => {[m
+[32m+[m[32m          if (filter === "todos" || card.dataset.category === filter) {[m
+[32m+[m[32m            card.style.display = "flex";[m
+[32m+[m[32m          } else {[m
+[32m+[m[32m            card.style.display = "none";[m
+[32m+[m[32m          }[m
+[32m+[m[32m        });[m
+[32m+[m[32m      };[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    const btnLlave = document.getElementById("btn-pack-llave");[m
+[32m+[m[32m    if (btnLlave) {[m
+[32m+[m[32m      btnLlave.onclick = () => {[m
+[32m+[m[32m        const packKeys = ["piso ceramico", "instalacion_electrica", "instalacion_sanitaria", "pintura", "fosa_septica"];[m
+[32m+[m[32m        let added = false;[m
+[32m+[m[32m        packKeys.forEach(k => {[m
+[32m+[m[32m          const normKey = normalizar(k);[m
+[32m+[m[32m          if (!state.selectedExtras.has(normKey)) {[m
+[32m+[m[32m            const extra = extrasOpcionales.find(e => normalizar(e.id || e.nombre) === normKey);[m
+[32m+[m[32m            if (extra) {[m
+[32m+[m[32m              state.selectedExtras.set(normKey, Math.max(1, getDefaultExtraQty(extra)));[m
+[32m+[m[32m              added = true;[m
+[32m+[m[32m            }[m
+[32m+[m[32m          }[m
+[32m+[m[32m        });[m
+[32m+[m[32m        if (added) {[m
+[32m+[m[32m          renderExtras();[m
+[32m+[m[32m          updateCotizacionSummary();[m
+[32m+[m[32m        }[m
+[32m+[m[32m      };[m
+[32m+[m[32m    }[m
+   }[m
+ [m
+   function updateCotizacionSummary() {[m
+[36m@@ -1205,15 +1295,29 @@[m [mdocument.addEventListener("DOMContentLoaded", () => {[m
+       total += val;[m
+       rows.push([e.nombre, val]);[m
+     });[m
+[32m+[m[41m    [m
+[32m+[m[32m    let extrasSubtotal = 0;[m
+[32m+[m[32m    let hasExtras = state.selectedExtras.size > 0;[m
+[32m+[m[41m    [m
+[32m+[m[32m    if (hasExtras) {[m
+[32m+[m[32m      rows.push([`<div style="margin-top:15px; padding-top:15px; border-top:1px solid #e2e8f0; font-weight:700; color:var(--primary);"><i class="fa-solid fa-list-check"></i> Extras seleccionados</div>`, '']);[m
+[32m+[m[32m    }[m
+[32m+[m[41m    [m
+     state.selectedExtras.forEach((qty, id) => {[m
+[31m-      const e = extrasOpcionales.find(x => (x.id || x.nombre) === id);[m
+[32m+[m[32m      const e = extrasOpcionales.find(x => normalizar(x.id || x.nombre) === normalizar(id));[m
+       if (!e) return;[m
+       const val = Number(e.valor || e.precio || 0) * qty;[m
+[32m+[m[32m      extrasSubtotal += val;[m
+       const unitLabel = e.tipoCalculo === "mt2" ? "m²" : (e.tipoCalculo === "metro" ? "ml" : (e.tipoCalculo || "unidad"));[m
+       total += val;[m
+[31m-      rows.push([`${e.nombre} x ${qty} ${unitLabel}`, val]);[m
+[32m+[m[32m      rows.push([`<span style="padding-left:15px; font-size:0.9rem;">${e.nombre} — ${qty} ${unitLabel}</span>`, val]);[m
+     });[m
+[31m-    DOM.summaryItems.innerHTML = rows.map(([name, val]) => `<tr><td>${name}</td><td style="text-align:right;">${money(val)}</td></tr>`).join("") || `<tr><td>Selecciona parcela y casa</td><td style="text-align:right;">$0</td></tr>`;[m
+[32m+[m
+[32m+[m[32m    if (hasExtras) {[m
+[32m+[m[32m      rows.push([`<div style="text-align:right; font-weight:600; font-size:0.85rem; color:var(--text-muted);">Subtotal extras:</div>`, `<div style="font-weight:600; font-size:0.85rem;">${money(extrasSubtotal)}</div>`]);[m
+[32m+[m[32m    }[m
+[32m+[m[41m    [m
+[32m+[m[32m    DOM.summaryItems.innerHTML = rows.map(([name, val]) => `<tr><td>${name}</td><td style="text-align:right; white-space:nowrap;">${val === '' ? '' : (typeof val === 'string' ? val : money(val))}</td></tr>`).join("") || `<tr><td>Selecciona parcela y casa</td><td style="text-align:right;">$0</td></tr>`;[m
+     DOM.totalAmount.textContent = money(total);[m
+     if (DOM.changeParcelaBtn) DOM.changeParcelaBtn.style.display = state.selectedParcela ? "inline-flex" : "none";[m
+     if (DOM.changeCasaBtn) DOM.changeCasaBtn.style.display = state.selectedCasa ? "inline-flex" : "none";[m
+[36m@@ -3041,7 +3145,7 @@[m [mdocument.addEventListener('DOMContentLoaded', () => {[m
+ [m
+ async function loadDynamicInventory() {[m
+   try {[m
+[31m-    const res = await fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/publicaciones?estado=eq.aprobada&select=*', {[m
+[32m+[m[32m    const res = await fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/publicaciones_publicas?select=*', {[m
+       headers: {[m
+         'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',[m
+         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',[m
+[36m@@ -3052,23 +3156,23 @@[m [masync function loadDynamicInventory() {[m
+       const dbParcelas = await res.json();[m
+       if (dbParcelas && dbParcelas.length > 0) {[m
+         window.SERVER_PARCELAS = dbParcelas.map(db => ({[m
+[31m-          id: db.datos_formulario?.old_id || db.codigo_publico,[m
+[32m+[m[32m          id: db.identificador_legacy || db.codigo_publico,[m
+           nombre: db.titulo_publico,[m
+           precio: db.precio_publicacion ? "$" + db.precio_publicacion.toLocaleString('es-CL') : "$0",[m
+           tamano: db.superficie_m2 || 5000,[m
+[31m-          lat: db.latitud_privada,[m
+[31m-          lng: db.longitud_privada,[m
+[31m-          imagen: db.datos_formulario?.imagen_principal || "",[m
+[31m-          imagenes: db.datos_formulario?.imagenes || [],[m
+[32m+[m[32m          lat: db.latitud_publica,[m
+[32m+[m[32m          lng: db.longitud_publica,[m
+[32m+[m[32m          imagen: db.imagen_principal || "",[m
+[32m+[m[32m          imagenes: db.imagenes || [],[m
+           descripcion: db.descripcion_publica,[m
+           luz: db.luz || 'no',[m
+           agua: db.agua || 'no',[m
+[31m-          naturaleza: db.datos_formulario?.naturaleza || 'no',[m
+[32m+[m[32m          naturaleza: Array.isArray(db.naturaleza) && db.naturaleza.length ? 'si' : 'no',[m
+           rol: db.rol || 'si',[m
+[31m-          servicios: db.datos_formulario?.servicios || 'no',[m
+[31m-          destacada: db.datos_formulario?.destacada || 'no',[m
+[32m+[m[32m          servicios: Array.isArray(db.servicios) && db.servicios.length ? 'si' : 'no',[m
+[32m+[m[32m          destacada: db.destacada || 'no',[m
+           distanciaConcepcion: db.ubicacion_publica_aproximada || '',[m
+[31m-          tiempoConcepcion: db.datos_formulario?.tiempoConcepcion || '',[m
+[32m+[m[32m          tiempoConcepcion: db.tiempo_concepcion || '',[m
+           comuna: db.comuna || ''[m
+         }));[m
+         // Re-render everything that depends on parcelas[m

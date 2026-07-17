@@ -46,6 +46,7 @@
     };
   }
 
+  window.getCustomState = getCustomState;
   function saveCustomState(s) {
     localStorage.setItem('tplDisenoPropio', String(s.active));
     localStorage.setItem('tplCustomM2', String(s.m2));
@@ -103,6 +104,109 @@
     if (window.lucide) window.lucide.createIcons();
   }
 
+  
+  // TPL PROJECT STATE MANAGEMENT
+  window.getTplProjectState = function() {
+    try {
+      const stored = localStorage.getItem('tplProjectState');
+      if (stored) return JSON.parse(stored);
+    } catch(e) {}
+    const oldPid = localStorage.getItem('selectedParcelaId');
+    return {
+      parcelaId: oldPid || null,
+      incluidaEnProyecto: oldPid ? true : false,
+      origen: "cotizador.html",
+      returnTo: "diseno-propio"
+    };
+  }
+  
+  window.saveTplProjectState = function(state) {
+    localStorage.setItem('tplProjectState', JSON.stringify(state));
+    if (state.parcelaId && state.incluidaEnProyecto) {
+      localStorage.setItem('selectedParcelaId', state.parcelaId); 
+    } else {
+      localStorage.removeItem('selectedParcelaId');
+    }
+  }
+
+  function getParcelaActiva(state) {
+      if (!state.parcelaId) return null;
+      return getParcelas().find(p => String(p.id) === String(state.parcelaId)) || null;
+  }
+
+  window.renderSelectedParcelBlock = function() {
+    const block = document.getElementById('tu-parcela-block');
+    if(!block) return;
+    
+    const state = window.getTplProjectState();
+    const parcela = getParcelaActiva(state);
+    
+    if (!parcela) {
+        block.innerHTML = `
+          <div class="empty-parcel-card">
+            <div style="background:#e2e8f0; width:56px; height:56px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+              <i data-lucide="map" style="color:#64748b; width:28px; height:28px;"></i>
+            </div>
+            <h4>Ya tienes una parcela?</h4>
+            <p>Puedes disear tu casa sin parcela o agregar una para calcular el proyecto completo.</p>
+            <button class="btn-primary-small" onclick="window.location.href='index.html?modo=seleccionar-parcela&returnTo=diseno-propio#parcelas-anchor'"><i data-lucide="plus" style="width:16px; height:16px; vertical-align:middle;"></i> Agregar una parcela</button>
+          </div>
+        `;
+    } else {
+        const isIncluded = state.incluidaEnProyecto;
+        const opacityClass = isIncluded ? '' : 'inactive';
+        const img = (parcela.imagenes && parcela.imagenes[0]) || 'image/placeholder-parcela.jpg';
+        
+        block.innerHTML = `
+          <div class="parcel-selection-card ${opacityClass}">
+            <div class="parcel-switch-container">
+              <span class="parcel-switch-label">Incluir parcela en este proyecto</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-parcel-inclusion" ${isIncluded ? 'checked' : ''}>
+                <span class="slider"></span>
+              </label>
+            </div>
+            
+            <div class="parcel-card-content">
+              <img src="${img}" class="parcel-thumb" alt="Parcela">
+              <div class="parcel-details">
+                <span style="font-size:0.75rem; background:#dbeafe; color:#1e40af; padding:2px 8px; border-radius:99px; font-weight:700; text-transform:uppercase;">Parcela Seleccionada</span>
+                <h4>${parcela.titulo || parcela.nombre || 'Parcela'}</h4>
+                <p>${parcela.ubicacion || ''}  ${parcela.superficie || ''}</p>
+                <div class="parcel-price">${isIncluded ? money(parcelaPrice(parcela)) : 'No incluida en el total'}</div>
+              </div>
+            </div>
+            
+            <div class="parcel-actions">
+              <button class="btn-outline-small" onclick="window.location.href='parcela.html?id=${parcela.id}&returnTo=diseno-propio'"><i data-lucide="external-link" style="width:14px; height:14px; vertical-align:middle;"></i> Ver detalles</button>
+              <button class="btn-outline-small" onclick="window.location.href='index.html?modo=seleccionar-parcela&returnTo=diseno-propio#parcelas-anchor'"><i data-lucide="refresh-cw" style="width:14px; height:14px; vertical-align:middle;"></i> Cambiar</button>
+              <button class="btn-danger-small" id="btn-remove-parcel"><i data-lucide="trash-2" style="width:14px; height:14px; vertical-align:middle;"></i> Quitar parcela</button>
+            </div>
+          </div>
+        `;
+        
+        document.getElementById('toggle-parcel-inclusion').addEventListener('change', (e) => {
+            state.incluidaEnProyecto = e.target.checked;
+            window.saveTplProjectState(state);
+            window.renderSelectedParcelBlock();
+            if(typeof window.renderExtrasOpcionales !== 'undefined') window.renderExtrasOpcionales();
+            if(typeof updatePremiumSummary !== 'undefined') updatePremiumSummary();
+            if(typeof updateResumenCotizacion !== 'undefined') updateResumenCotizacion();
+        });
+        
+        document.getElementById('btn-remove-parcel').addEventListener('click', () => {
+            state.parcelaId = null;
+            state.incluidaEnProyecto = false;
+            window.saveTplProjectState(state);
+            window.renderSelectedParcelBlock();
+            if(typeof window.renderExtrasOpcionales !== 'undefined') window.renderExtrasOpcionales();
+            if(typeof updatePremiumSummary !== 'undefined') updatePremiumSummary();
+            if(typeof updateResumenCotizacion !== 'undefined') updateResumenCotizacion();
+        });
+    }
+    if(typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
   function updatePremiumSummary() {
     const s = getCustomState();
     saveCustomState(s);
@@ -111,7 +215,10 @@
     const tbody = document.getElementById('summary-items');
     const totalSpan = document.getElementById('total-amount');
     if (!tbody || !totalSpan || !s.active) return;
-    const parcela = getParcelas().find(p => String(p.id) === localStorage.getItem('selectedParcelaId'));
+    
+      const state = window.getTplProjectState();
+      const parcela = state.incluidaEnProyecto ? getParcelaActiva(state) : null;
+
     const terreno = parcelaPrice(parcela);
     const casa = customTotal(s);
     let extras = 0;
@@ -140,19 +247,30 @@
     form.addEventListener('submit', e => {
       const s = getCustomState();
       const total = document.getElementById('total-amount')?.textContent || '$0';
-      const parcela = getParcelas().find(p => String(p.id) === localStorage.getItem('selectedParcelaId'));
+      
+      const state = window.getTplProjectState();
+      const parcela = state.incluidaEnProyecto ? getParcelaActiva(state) : null;
+
       const name = document.getElementById('activate-name')?.value || '';
       const phone = document.getElementById('activate-phone')?.value || '';
       const email = document.getElementById('activate-email')?.value || '';
       const comments = document.getElementById('activate-message')?.value || '';
-      const msg = encodeURIComponent(`Hola Tu Parcela Lista, quiero activar este proyecto.\n\nCliente: ${name}\nTeléfono: ${phone}\nCorreo: ${email}\n\nParcela: ${parcela?.nombre || 'Por definir'}\nComuna: ${parcela?.comuna || ''}\nCasa: ${'Casa prefabricada seleccionada'}\nTotal estimado: ${total}\n\nComentarios: ${comments}\n\nSolicito contacto para revisar factibilidad, visita y reserva.`);
+      const msg = encodeURIComponent(`Hola Tu Parcela Lista, quiero activar este proyecto.\n\nCliente: ${name}\nTeléfono: ${phone}\nCorreo: ${email}\n\nParcela: ${parcela?.nombre || 'Por definir'}\nComuna: ${parcela?.comuna || ''}\nMaterial: ${s.material}\nTotal estimado: ${total}\n\nComentarios: ${comments}\n\nSolicito contacto para revisar factibilidad, visita y reserva.`);
       setTimeout(() => window.open(`https://wa.me/56988508361?text=${msg}`, '_blank'), 700);
     }, true);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    
     const params = new URLSearchParams(location.search);
-    if (params.get('parcela')) localStorage.setItem('selectedParcelaId', params.get('parcela'));
+    const state = window.getTplProjectState();
+    if (params.get('parcela')) {
+        state.parcelaId = params.get('parcela');
+        state.incluidaEnProyecto = true;
+        window.saveTplProjectState(state);
+    }
+    window.renderSelectedParcelBlock();
+
     if (params.get('casa')) localStorage.setItem('selectedCasaId', params.get('casa'));
     setTimeout(() => { localStorage.removeItem('tplDisenoPropio'); setupProjectWhatsAppForm(); }, 350);
   });

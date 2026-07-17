@@ -215,20 +215,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <script src="https://unpkg.com/lucide@latest" defer></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="style.css?v=20260710-1">
-  <link rel="stylesheet" href="css/v2-base.css">
-  <link rel="stylesheet" href="css/v2-sidebar.css">
-  <link rel="stylesheet" href="css/v2-components.css">
-  <link rel="stylesheet" href="css/v2-responsive.css">
 
     
 
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <link rel="stylesheet" href="parcela.css">
-  <link rel="stylesheet" href="css/v3-production.css">
   <link rel="stylesheet" href="agente/agente.css">
-  <link rel="stylesheet" href="css/modern-aesthetics.css?v=2">
 
 <style>
 .cotizador-parcela-helper{
@@ -329,8 +322,16 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </style>
 
   <link rel="stylesheet" href="css/v4-minimal.css?v=20260710-4">
-    <link href="css/site-polish.css?v=20260710" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.min.css?v=20260715-4">\n</head>
+  <link rel="stylesheet" href="css/styles.min.css?v=20260715-4">\n
+<!-- Google Ads Tracking -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-TU_ID_DE_GOOGLE_ADS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-TU_ID_DE_GOOGLE_ADS');
+</script>
+</head>
 <body>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WK4M33H4"
@@ -573,11 +574,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </aside>
 
     </main>
-  </div>
+    </div>
+  
+  
+    <!-- Red de Partners TPL (Inyectado dinámicamente) -->
+    <section class="container" id="partners-section" style="display: none; padding: 40px 0;">
+      <h2 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 20px;">Servicios disponibles en esta zona</h2>
+      <p style="color: var(--text-muted); margin-top: -15px; margin-bottom: 30px;">Partners verificados por TPL que trabajan en <span id="partners-comuna-label">esta comuna</span>.</p>
+      <div id="partners-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+        <!-- Tarjetas generadas por JS -->
+      </div>
+    </section>
 
-
-
-  <!-- Evaluación automática y comentarios -->
+    <!-- Evaluación automática y comentarios -->
   <section class="container parcela-trust-section" id="evaluacion-parcela">
     <div class="rating-panel">
       <div class="rating-copy">
@@ -670,6 +679,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <!-- Carga del Modelo de datos -->
   <script src="parcelas.js?v=20260710-1" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config-negocio.js"></script>
+  <script src="js/db-api.js"></script>
+  <script src="js/tpl-launch.js"></script>
   <script src="tpl-analytics.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 
@@ -949,7 +962,6 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
             const badge = document.createElement('div');
             badge.id = "badge-opportunity-detail";
             badge.innerHTML = '<i data-lucide="flame" style="width:16px;height:16px;margin-right:6px;vertical-align:-3px;"></i> Oportunidad de Inversión';
-            badge.style.cssText = "position:absolute; top:20px; left:20px; background:linear-gradient(135deg, #f59e0b, #d97706); color:white; padding:8px 16px; border-radius:14px; font-size:0.9rem; font-weight:800; z-index:20; box-shadow:0 6px 16px rgba(245,158,11,0.4); pointer-events:none;";
             gallery.style.position = "relative";
             gallery.appendChild(badge);
           }
@@ -1059,15 +1071,23 @@ document.addEventListener("keydown", (e) => {
 });
 
       // 6. Enviar Formulario de Contacto
-      DOM.contactForm.addEventListener("submit", (e) => {
+      DOM.contactForm.addEventListener("submit", async (e) => {
         e.preventDefault();
+        if (!window.TPLLaunch?.guardSubmit(DOM.contactForm)) return;
         const name = document.getElementById("contact-name").value;
         const email = document.getElementById("contact-email").value;
         const phone = document.getElementById("contact-phone").value;
         const message = document.getElementById("contact-message").value;
         const subject = encodeURIComponent(`Consulta parcela ${p.nombre}`);
         const body = encodeURIComponent(`Hola Tu Parcela Lista, solicito información.\n\nParcela: ${p.nombre}\nID: ${p.id}\nPrecio: ${p.precio}\n\nNombre: ${name}\nCorreo: ${email}\nTeléfono: ${phone}\nMensaje: ${message}`);
+        const saved = await window.apiSaveLead?.({
+          cliente: { nombre: name, correo: email, telefono: phone, observaciones: message, estado: 'nuevo', origen: 'ficha_parcela' },
+          evento: 'informacion_solicitada', etapa: 'solicito_informacion', origen: 'ficha_parcela',
+          metadata: { parcela_codigo: String(p.id), origen: 'ficha_parcela' }
+        });
         window.TPLCRM?.addLead?.({ parcelaId: p.id, parcelaNombre: p.nombre, name, email, phone, message, type:'Formulario contacto' });
+        window.TPLLaunch?.releaseSubmit(DOM.contactForm);
+        if (!saved?.success) alert('No pudimos registrar tu solicitud. Se abrirá tu correo para enviarla manualmente.');
         window.location.href = `mailto:tuparcelalista@gmail.com?cc=${encodeURIComponent(email)}&subject=${subject}&body=${body}`;
       });
 
@@ -1110,14 +1130,24 @@ document.addEventListener("keydown", (e) => {
           document.body.insertAdjacentHTML("beforeend", `<div id="visit-modal" class="visit-modal"><div class="visit-card"><button type="button" class="visit-close">×</button><h3>Agendar visita</h3><p>Déjanos tus datos y se abrirá un correo listo para enviar.</p><input id="visit-name" placeholder="Nombre completo"><input id="visit-phone" placeholder="Teléfono"><input id="visit-email" placeholder="Correo"><input id="visit-date" placeholder="Fecha preferida"><button id="visit-send" class="btn-primary-submit">Enviar solicitud</button></div></div>`);
           modal = document.getElementById("visit-modal");
           modal.querySelector(".visit-close").addEventListener("click",()=>modal.classList.remove("show"));
-          modal.querySelector("#visit-send").addEventListener("click",()=>{
+          modal.querySelector("#visit-send").addEventListener("click", async ()=>{
+            const button = modal.querySelector("#visit-send");
+            if (button.disabled) return;
             const name = document.getElementById("visit-name").value; if(!name.trim()) return;
             const phone = document.getElementById("visit-phone").value;
             const email = document.getElementById("visit-email").value;
             const date = document.getElementById("visit-date").value;
+            button.disabled = true; button.textContent = 'Registrando…';
             const subject = encodeURIComponent(`Agendar visita parcela ${p.nombre}`);
             const body = encodeURIComponent(`Hola, quiero agendar una visita.\n\nParcela: ${p.nombre}\nComuna: ${p.comuna || ""}\nPrecio: ${p.precio}\n\nNombre: ${name}\nTeléfono: ${phone}\nCorreo: ${email}\nFecha preferida: ${date}`);
+            const saved = await window.apiSaveLead?.({
+              cliente: { nombre: name, correo: email, telefono: phone, observaciones: `Fecha preferida: ${date}`, estado: 'nuevo', origen: 'visita_parcela' },
+              evento: 'visita_solicitada', etapa: 'solicito_visita', origen: 'visita_parcela',
+              metadata: { parcela_codigo: String(p.id), fecha_visita: date, origen: 'visita_parcela' }
+            });
             window.TPLCRM?.addLead?.({ parcelaId: p.id, parcelaNombre: p.nombre, name, email, phone, message:`Fecha preferida: ${date}`, type:'Agendar visita', visitaFecha: date });
+            button.disabled = false; button.textContent = 'Enviar solicitud';
+            if (!saved?.success) alert('No pudimos registrar la visita. Se abrirá tu correo para enviarla manualmente.');
             window.location.href = `mailto:tuparcelalista@gmail.com?cc=${encodeURIComponent(email)}&subject=${subject}&body=${body}`;
           });
         }
@@ -1185,5 +1215,6 @@ document.addEventListener("keydown", (e) => {
   </script>
   <script src="agente/agente.js" defer></script>
 <script src="js/site-polish.js" defer></script>
+<script src="js/partners-injector.js" defer></script>
 </body>
 </html>

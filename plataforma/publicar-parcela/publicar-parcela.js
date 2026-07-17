@@ -434,3 +434,23 @@ if (dropZone && aiBadge) {
 }
 
 form.addEventListener('submit', submitPublication);
+
+// Tracking and Abandonment Injection
+window.addEventListener('beforeunload', (e) => {
+  if (!window.isSubmittingPublish && typeof currentStep !== 'undefined' && currentStep > 1 && currentStep < 6) {
+    e.preventDefault();
+    e.returnValue = 'Tienes una publicacion en curso. Seguro que quieres salir sin guardarla?';
+  }
+});
+
+const formPub = document.getElementById('publish-form');
+if (formPub) {
+  formPub.addEventListener('submit', () => {
+    window.isSubmittingPublish = true;
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      'event': 'tpl_publish_end',
+      'plan_elegido': 'gratis'
+    });
+  });
+}

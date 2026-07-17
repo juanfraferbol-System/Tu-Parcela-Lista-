@@ -1047,96 +1047,186 @@ document.addEventListener("DOMContentLoaded", () => {
         <strong class="installation-plan-title">${meta.title}</strong>
         <small class="installation-plan-tag">${meta.tag}</small>
         <p>${meta.desc}</p>
-        <ul>${meta.bullets.map(b => `<li>✓ ${b}</li>`).join("")}</ul>
-        <span class="installation-plan-price">${money(valor)}</span>`;
-      btn.addEventListener("click", () => {
-        state.installationService = true;
+        <ul>${meta.bullets.map(b => `<li>✓ ${b}</li>`).join("")}</ul>`;
+      
+      btn.onclick = () => {
         state.selectedFundacion = f;
-        if (isPremiumInstallationPlan(f)) removePremiumIncludedExtrasFromSelection();
+        state.installationService = true;
         renderFundaciones();
-        renderExtras();
         updateCotizacionSummary();
-      });
+      };
       DOM.fundacionesContainer.appendChild(btn);
     });
+  }
+
+  function getExtraIcon(id) {
+    const iconMap = {
+      "piso ceramico": "fa-border-all",
+      "instalacion_electrica": "fa-bolt",
+      "instalacion_sanitaria": "fa-droplet",
+      "pintura": "fa-paint-roller",
+      "artefactos_cocina": "fa-sink",
+      "artefactos_bano": "fa-bath",
+      "fosa_septica": "fa-trash-can",
+      "pozo_profundo": "fa-water",
+      "cierre_perimetral": "fa-bars-staggered",
+      "porton": "fa-door-open",
+      "empalme_electrico": "fa-plug",
+      "maquinaria": "fa-tractor",
+      "piscina": "fa-person-swimming",
+      "quincho": "fa-fire-burner",
+      "terraza": "fa-umbrella-beach",
+      "aislacion": "fa-temperature-half"
+    };
+    return iconMap[id] || "fa-plus";
   }
 
   function renderExtras() {
     if (DOM.automaticosBox) DOM.automaticosBox.style.display = Array.isArray(extrasAutomaticos) && extrasAutomaticos.length ? "block" : "none";
     if (DOM.automaticosContainer) DOM.automaticosContainer.innerHTML = (Array.isArray(extrasAutomaticos) ? extrasAutomaticos : []).map(e => `<div class="extra-row"><span>${e.nombre}</span><strong>${money(e.valor || e.precio || 0)}</strong></div>`).join("");
+    
     if (!DOM.opcionalesContainer || !Array.isArray(extrasOpcionales)) return;
+    
     DOM.opcionalesContainer.innerHTML = "";
+    
+    let activeExtrasCount = 0;
+    let activeExtrasTotal = 0;
+
     const premiumActive = isPremiumInstallationPlan();
+    
     if (premiumActive) {
       removePremiumIncludedExtrasFromSelection();
       const included = document.createElement("div");
       included.className = "premium-included-card";
+      included.style.gridColumn = "1 / -1";
       included.innerHTML = `
-        <span class="premium-included-kicker">🎁 Incluido en tu Plan Premium</span>
+        <span class="premium-included-kicker">✨ Incluido en tu Plan Premium</span>
         <strong>Estos trabajos ya forman parte del plan y no se cobran como extras.</strong>
-        <ul>${getPremiumIncludedExtrasList().map(item => `<li>✓ ${item}</li>`).join("")}</ul>`;
+        <ul>${getPremiumIncludedExtrasList().map(item => `<li>✅ ${item}</li>`).join("")}</ul>`;
       DOM.opcionalesContainer.appendChild(included);
     }
+    
     extrasOpcionales.forEach(e => {
       if (premiumActive && isPremiumIncludedExtra(e)) return;
-      const id = e.id || e.nombre;
+      
+      const id = normalizar(e.id || e.nombre);
       const defaultQty = Math.max(1, getDefaultExtraQty(e));
       const isSelected = state.selectedExtras.has(id);
       const currentQty = isSelected ? state.selectedExtras.get(id) : defaultQty;
       const unitLabel = e.tipoCalculo === "mt2" ? "m²" : (e.tipoCalculo === "metro" ? "ml" : (e.tipoCalculo || "unidad"));
-      const row = document.createElement("div");
-      row.className = `extra-row extra-row-modern ${isSelected ? "checked" : ""}`;
-      row.tabIndex = 0;
-      row.setAttribute("role", "button");
-      row.setAttribute("aria-pressed", isSelected ? "true" : "false");
-      row.innerHTML = `
-        <label class="extra-left">
-          <input class="extra-checkbox" type="checkbox" ${isSelected ? "checked" : ""} aria-label="Activar ${e.nombre}">
-          <span class="extra-info-text">
-            <b class="extra-name">${e.nombre}</b>
-            <small class="extra-desc">${money(e.valor || e.precio || 0)} por ${unitLabel}</small>
-          </span>
-        </label>
-        <div class="extra-controls">
-          <input class="qty-input-box" type="number" min="1" value="${currentQty}" aria-label="Cantidad ${e.nombre}">
-          <strong class="extra-total-val">${money((e.valor || e.precio || 0) * (isSelected ? currentQty : 0))}</strong>
-        </div>`;
+      
+      const pricePerUnit = e.valor || e.precio || 0;
+      const totalItem = isSelected ? (pricePerUnit * currentQty) : 0;
+      
+      if (isSelected) {
+        activeExtrasCount++;
+        activeExtrasTotal += totalItem;
+      }
+      
+      let cat = "otros";
+      if (id.includes("piso") || id.includes("pintura") || id.includes("revestimiento")) cat = "terminaciones";
+      else if (id.includes("electrica") || id.includes("empalme") || id.includes("sanitaria") || id.includes("cocina") || id.includes("bano")) cat = "instalaciones";
+      else if (id.includes("cierre") || id.includes("porton") || id.includes("piscina") || id.includes("quincho") || id.includes("terraza")) cat = "exterior";
+      else if (id.includes("fosa") || id.includes("pozo")) cat = "sanitario";
+      
+      const card = document.createElement("div");
+      card.className = `extra-card ${isSelected ? "selected" : ""}`;
+      card.setAttribute("data-category", cat);
+      card.innerHTML = `
+        <div class="extra-card-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div class="extra-icon-box" style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:${isSelected ? 'var(--primary)' : '#f1f5f9'}; color:${isSelected ? 'white' : 'var(--text-muted)'}; font-size:1.2rem; transition:0.2s;">
+            <i class="fa-solid ${getExtraIcon(id)}"></i>
+          </div>
+          <label class="extra-toggle">
+            <input type="checkbox" class="extra-checkbox" ${isSelected ? "checked" : ""}>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="extra-card-body" style="margin-top:12px; flex-grow:1;">
+          <h4 style="margin:0 0 4px 0; font-size:1rem; color:var(--text);">${e.nombre}</h4>
+          ${e.descripcion ? `<p style="margin:0 0 8px 0; font-size:0.8rem; color:var(--text-muted);">${e.descripcion}</p>` : ''}
+          <div class="extra-price-tag" style="font-size:0.85rem; color:var(--primary); font-weight:600;">
+            ${money(pricePerUnit)} / ${unitLabel}
+          </div>
+        </div>
+        <div class="extra-card-footer" style="margin-top:15px; border-top:1px solid #e2e8f0; padding-top:12px; display:${isSelected ? 'block' : 'none'};">
+          <div class="stepper-modern" style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border-radius:8px; padding:4px;">
+            <button type="button" class="stepper-btn minus" style="width:30px; height:30px; border:none; background:white; border-radius:6px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><i class="fa-solid fa-minus"></i></button>
+            <div style="font-weight:700; font-size:0.95rem; text-align:center; flex-grow:1;">
+              <span class="stepper-val">${currentQty}</span> <span style="font-size:0.8rem; color:var(--text-muted);">${unitLabel}</span>
+            </div>
+            <button type="button" class="stepper-btn plus" style="width:30px; height:30px; border:none; background:white; border-radius:6px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.1);"><i class="fa-solid fa-plus"></i></button>
+          </div>
+          <div style="text-align:right; margin-top:10px; font-weight:800; color:var(--primary); font-size:1.1rem;" class="extra-card-total">
+            ${money(totalItem)}
+          </div>
+        </div>
+      `;
 
-      const checkbox = row.querySelector(".extra-checkbox");
-      const qtyInput = row.querySelector(".qty-input-box");
-      const totalEl = row.querySelector(".extra-total-val");
-
-      const sync = (selected, qty = Number(qtyInput.value) || defaultQty) => {
+      const checkbox = card.querySelector(".extra-checkbox");
+      const btnMinus = card.querySelector(".minus");
+      const btnPlus = card.querySelector(".plus");
+      
+      const sync = (selected, qty = currentQty) => {
         qty = Math.max(1, qty);
-        qtyInput.value = qty;
-        if (selected) state.selectedExtras.set(id, qty); else state.selectedExtras.delete(id);
-        row.classList.toggle("checked", selected);
-        row.setAttribute("aria-pressed", selected ? "true" : "false");
-        checkbox.checked = selected;
-        if (totalEl) totalEl.textContent = money((e.valor || e.precio || 0) * (selected ? qty : 0));
+        if (selected) state.selectedExtras.set(id, qty); 
+        else state.selectedExtras.delete(id);
+        
+        renderExtras();
         updateCotizacionSummary();
       };
 
-      row.addEventListener("click", ev => {
-        if (ev.target.closest("input.qty-input-box")) return;
-        sync(!state.selectedExtras.has(id));
-      });
-      row.addEventListener("keydown", ev => {
-        if (ev.key === "Enter" || ev.key === " ") {
-          ev.preventDefault();
-          sync(!state.selectedExtras.has(id));
-        }
-      });
-      checkbox.addEventListener("change", ev => {
-        ev.stopPropagation();
-        sync(checkbox.checked);
-      });
-      qtyInput.addEventListener("input", ev => {
-        ev.stopPropagation();
-        sync(true, Number(qtyInput.value) || defaultQty);
-      });
-      DOM.opcionalesContainer.appendChild(row);
+      checkbox.addEventListener("change", (ev) => sync(ev.target.checked, currentQty));
+      
+      if (btnMinus) {
+        btnMinus.addEventListener("click", () => sync(true, currentQty - 1));
+        btnPlus.addEventListener("click", () => sync(true, currentQty + 1));
+      }
+
+      DOM.opcionalesContainer.appendChild(card);
     });
+
+    const countInd = document.getElementById("extras-count-indicator");
+    const totalInd = document.getElementById("extras-total-indicator");
+    if (countInd) countInd.textContent = `${activeExtrasCount} extras`;
+    if (totalInd) totalInd.textContent = money(activeExtrasTotal);
+
+    document.querySelectorAll(".extra-filter-btn").forEach(btn => {
+      btn.onclick = (e) => {
+        document.querySelectorAll(".extra-filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const filter = btn.dataset.filter;
+        document.querySelectorAll(".extra-card").forEach(card => {
+          if (filter === "todos" || card.dataset.category === filter) {
+            card.style.display = "flex";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      };
+    });
+
+    const btnLlave = document.getElementById("btn-pack-llave");
+    if (btnLlave) {
+      btnLlave.onclick = () => {
+        const packKeys = ["piso ceramico", "instalacion_electrica", "instalacion_sanitaria", "pintura", "fosa_septica"];
+        let added = false;
+        packKeys.forEach(k => {
+          const normKey = normalizar(k);
+          if (!state.selectedExtras.has(normKey)) {
+            const extra = extrasOpcionales.find(e => normalizar(e.id || e.nombre) === normKey);
+            if (extra) {
+              state.selectedExtras.set(normKey, Math.max(1, getDefaultExtraQty(extra)));
+              added = true;
+            }
+          }
+        });
+        if (added) {
+          renderExtras();
+          updateCotizacionSummary();
+        }
+      };
+    }
   }
 
   function updateCotizacionSummary() {
@@ -1205,15 +1295,29 @@ document.addEventListener("DOMContentLoaded", () => {
       total += val;
       rows.push([e.nombre, val]);
     });
+    
+    let extrasSubtotal = 0;
+    let hasExtras = state.selectedExtras.size > 0;
+    
+    if (hasExtras) {
+      rows.push([`<div style="margin-top:15px; padding-top:15px; border-top:1px solid #e2e8f0; font-weight:700; color:var(--primary);"><i class="fa-solid fa-list-check"></i> Extras seleccionados</div>`, '']);
+    }
+    
     state.selectedExtras.forEach((qty, id) => {
-      const e = extrasOpcionales.find(x => (x.id || x.nombre) === id);
+      const e = extrasOpcionales.find(x => normalizar(x.id || x.nombre) === normalizar(id));
       if (!e) return;
       const val = Number(e.valor || e.precio || 0) * qty;
+      extrasSubtotal += val;
       const unitLabel = e.tipoCalculo === "mt2" ? "m²" : (e.tipoCalculo === "metro" ? "ml" : (e.tipoCalculo || "unidad"));
       total += val;
-      rows.push([`${e.nombre} x ${qty} ${unitLabel}`, val]);
+      rows.push([`<span style="padding-left:15px; font-size:0.9rem;">${e.nombre} — ${qty} ${unitLabel}</span>`, val]);
     });
-    DOM.summaryItems.innerHTML = rows.map(([name, val]) => `<tr><td>${name}</td><td style="text-align:right;">${money(val)}</td></tr>`).join("") || `<tr><td>Selecciona parcela y casa</td><td style="text-align:right;">$0</td></tr>`;
+
+    if (hasExtras) {
+      rows.push([`<div style="text-align:right; font-weight:600; font-size:0.85rem; color:var(--text-muted);">Subtotal extras:</div>`, `<div style="font-weight:600; font-size:0.85rem;">${money(extrasSubtotal)}</div>`]);
+    }
+    
+    DOM.summaryItems.innerHTML = rows.map(([name, val]) => `<tr><td>${name}</td><td style="text-align:right; white-space:nowrap;">${val === '' ? '' : (typeof val === 'string' ? val : money(val))}</td></tr>`).join("") || `<tr><td>Selecciona parcela y casa</td><td style="text-align:right;">$0</td></tr>`;
     DOM.totalAmount.textContent = money(total);
     if (DOM.changeParcelaBtn) DOM.changeParcelaBtn.style.display = state.selectedParcela ? "inline-flex" : "none";
     if (DOM.changeCasaBtn) DOM.changeCasaBtn.style.display = state.selectedCasa ? "inline-flex" : "none";
@@ -3041,7 +3145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadDynamicInventory() {
   try {
-    const res = await fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/publicaciones?estado=eq.aprobada&select=*', {
+    const res = await fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/publicaciones_publicas?select=*', {
       headers: {
         'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
@@ -3051,25 +3155,27 @@ async function loadDynamicInventory() {
     if (res.ok) {
       const dbParcelas = await res.json();
       if (dbParcelas && dbParcelas.length > 0) {
-        window.SERVER_PARCELAS = dbParcelas.map(db => ({
-          id: db.datos_formulario?.old_id || db.codigo_publico,
-          nombre: db.titulo_publico,
+      window.SERVER_PARCELAS = dbParcelas
+  .filter(db => db.titulo_publico || db.nombre || db.titulo)
+  .map(db => ({
+          id: db.identificador_legacy || db.codigo_publico,
+          nombre: db.titulo_publico || db.nombre || db.titulo || "Parcela disponible",
           precio: db.precio_publicacion ? "$" + db.precio_publicacion.toLocaleString('es-CL') : "$0",
           tamano: db.superficie_m2 || 5000,
-          lat: db.latitud_privada,
-          lng: db.longitud_privada,
-          imagen: db.datos_formulario?.imagen_principal || "",
-          imagenes: db.datos_formulario?.imagenes || [],
+          lat: db.latitud_publica,
+          lng: db.longitud_publica,
+          imagen: db.imagen_principal || "",
+          imagenes: db.imagenes || [],
           descripcion: db.descripcion_publica,
           luz: db.luz || 'no',
           agua: db.agua || 'no',
-          naturaleza: db.datos_formulario?.naturaleza || 'no',
+          naturaleza: Array.isArray(db.naturaleza) && db.naturaleza.length ? 'si' : 'no',
           rol: db.rol || 'si',
-          servicios: db.datos_formulario?.servicios || 'no',
-          destacada: db.datos_formulario?.destacada || 'no',
+          servicios: Array.isArray(db.servicios) && db.servicios.length ? 'si' : 'no',
+          destacada: db.destacada || 'no',
           distanciaConcepcion: db.ubicacion_publica_aproximada || '',
-          tiempoConcepcion: db.datos_formulario?.tiempoConcepcion || '',
-          comuna: db.comuna || ''
+          tiempoConcepcion: db.tiempo_concepcion || '',
+          comuna: db.comuna || db.comuna_publica || db.ubicacion_publica || "Chile"
         }));
         // Re-render everything that depends on parcelas
         if (typeof renderParcelas === 'function') renderParcelas();

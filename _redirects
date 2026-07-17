@@ -7,3 +7,8 @@
 /privacidad      /politica-privacidad.html 200
 /terminos        /terminos.html 200
 /parcela/*       /parcela.html        200
+/CRM.html /plataforma/crm/ 301!
+/CMR.html /plataforma/crm/ 301!
+/admin-crm.html /plataforma/crm/ 301!
+/admin-publicaciones.html /plataforma/crm/ 301!
+/tuparcelalistamanager/* /404.html 302!
