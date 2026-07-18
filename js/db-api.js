@@ -19,27 +19,189 @@ window.tplSupabase = tplDbSupabase;
  * Si Supabase no está listo, retorna los datos de parcelas.js
  */
 async function apiGetParcelas() {
+<<<<<<< HEAD
   if (!tplDbSupabase) {
     return typeof window.PARCELAS_DB !== 'undefined' ? window.PARCELAS_DB : (typeof window.parcelas !== 'undefined' ? window.parcelas : []);
+=======
+  const parcelasLocales =
+    typeof window.PARCELAS_DB !== "undefined"
+      ? window.PARCELAS_DB
+      : typeof window.parcelas !== "undefined"
+        ? window.parcelas
+        : [];
+
+  if (!tplDbSupabase) {
+    return parcelasLocales;
+>>>>>>> c0d670c (Corregir formato de parcelas cargadas desde Supabase)
   }
-  
+
   try {
     const { data, error } = await tplDbSupabase
+<<<<<<< HEAD
       .from('publicaciones_publicas')
       .select('*')
       .order('actualizado_en', { ascending: false });
       
+=======
+      .from("publicaciones_publicas")
+      .select("*")
+      .order("actualizado_en", { ascending: false });
+
+>>>>>>> c0d670c (Corregir formato de parcelas cargadas desde Supabase)
     if (error) throw error;
-    return data && data.length > 0 ? data : (typeof window.PARCELAS_DB !== 'undefined' ? window.PARCELAS_DB : (typeof window.parcelas !== 'undefined' ? window.parcelas : []));
+
+    if (!Array.isArray(data) || data.length === 0) {
+      return parcelasLocales;
+    }
+
+    return data.map((db) => {
+      const precioNumero = Number(
+        db.precio_publicacion ??
+        db.precio ??
+        db.valor ??
+        0
+      );
+
+      const tamano = Number(
+        db.superficie_m2 ??
+        db.tamano_m2 ??
+        db.tamano ??
+        db.superficie ??
+        0
+      );
+
+      const imagenPrincipal =
+        db.imagen_portada_url ??
+        db.portada_url ??
+        db.imagen_url ??
+        db.imagen ??
+        "";
+
+      let imagenes = [];
+
+      if (Array.isArray(db.imagenes)) {
+        imagenes = db.imagenes
+          .map((imagen) => {
+            if (typeof imagen === "string") {
+              return imagen;
+            }
+
+            return (
+              imagen?.url ??
+              imagen?.imagen_url ??
+              imagen?.storage_url ??
+              ""
+            );
+          })
+          .filter(Boolean);
+      }
+
+      if (imagenPrincipal && !imagenes.includes(imagenPrincipal)) {
+        imagenes.unshift(imagenPrincipal);
+      }
+
+      return {
+        ...db,
+
+        id: db.id ?? db.slug ?? crypto.randomUUID(),
+
+        nombre:
+          db.titulo_publico ??
+          db.titulo ??
+          db.nombre ??
+          "Parcela disponible",
+
+        precio: precioNumero
+          ? precioNumero.toLocaleString("es-CL", {
+              style: "currency",
+              currency: "CLP",
+              maximumFractionDigits: 0
+            })
+          : "Consultar",
+
+        precioNumero,
+        tamano,
+
+        comuna:
+          db.comuna ??
+          db.nombre_comuna ??
+          db.ubicacion_comuna ??
+          "",
+
+        region:
+          db.region ??
+          db.nombre_region ??
+          db.ubicacion_region ??
+          "",
+
+        descripcion:
+          db.descripcion_publica ??
+          db.descripcion ??
+          db.descripcion_breve ??
+          "Parcela disponible para tu proyecto.",
+
+        lat: Number(
+          db.latitud ??
+          db.lat ??
+          db.latitude ??
+          0
+        ),
+
+        lng: Number(
+          db.longitud ??
+          db.lng ??
+          db.longitude ??
+          0
+        ),
+
+        imagen:
+          imagenPrincipal ||
+          imagenes[0] ||
+          "image/placeholder-parcela.jpg",
+
+        imagenes:
+          imagenes.length > 0
+            ? imagenes
+            : ["image/placeholder-parcela.jpg"],
+
+        agua:
+          db.agua ??
+          db.disponibilidad_agua ??
+          false,
+
+        luz:
+          db.luz ??
+          db.disponibilidad_luz ??
+          false,
+
+        naturaleza:
+          db.naturaleza ??
+          db.bosque_nativo ??
+          false,
+
+        facilidad:
+          db.facilidad_pago ??
+          db.facilidad ??
+          false,
+
+        servicios:
+          db.cercana_servicios ??
+          db.servicios ??
+          false
+      };
+    });
   } catch (err) {
     console.error("Error al obtener parcelas de Supabase:", err);
-    return typeof window.PARCELAS_DB !== 'undefined' ? window.PARCELAS_DB : (typeof window.parcelas !== 'undefined' ? window.parcelas : []);
+    return parcelasLocales;
   }
 }
+<<<<<<< HEAD
 
 /**
  * Guarda un lead o cotización en Supabase
  */
+=======
+>>>>>>> c0d670c (Corregir formato de parcelas cargadas desde Supabase)
 async function apiSaveLead(payload) {
   if (!tplDbSupabase) {
     if (window.TplErrorLogger) window.TplErrorLogger.log("DB-API", "apiSaveLead", "Error de conexión", "No hay conexión a Supabase", null, "crítico");
