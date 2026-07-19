@@ -1081,3 +1081,20 @@ body{background:#f6f9fc;}
   body.mobile-menu-open{overflow:hidden;}
   #detail-content-wrapper{padding-top:0!important;}
 }
+
+
+/* TPL MOBILE SPACE OPTIMIZATION 2026-07-19 */
+.mobile-brand-name{display:none}
+@media(max-width:900px){
+ .navbar{min-height:68px!important;height:auto!important}
+ .navbar-inner{min-height:68px!important;padding:6px 14px!important;gap:9px!important;display:flex!important;align-items:center!important}
+ .navbar .logo-container{flex:0 0 auto!important}
+ .brand-logo-img{height:50px!important;max-width:58px!important;border-radius:12px!important}
+ .mobile-brand-name{display:block;flex:1;min-width:0;text-align:center;font-family:"Cormorant Garamond",serif;font-size:clamp(1.05rem,4.5vw,1.38rem);font-weight:700;color:#003f7a;white-space:nowrap}
+ .navbar-inner>div:last-child{flex:0 0 auto!important;gap:6px!important}
+ .navbar .nav-toggle{width:44px!important;height:44px!important;border-radius:14px!important;background:#f3f7fa!important}
+ #detail-content-wrapper{padding-top:0!important}
+ .detail-section,.detail-grid,.project-actions-section{margin-top:22px!important;margin-bottom:22px!important}
+ .container{padding-left:16px!important;padding-right:16px!important}
+}
+@media(max-width:480px){.navbar-inner{padding-inline:9px!important;gap:6px!important}.brand-logo-img{height:46px!important;max-width:52px!important}.mobile-brand-name{font-size:1rem}.navbar .nav-toggle{width:41px!important;height:41px!important}}

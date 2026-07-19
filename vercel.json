@@ -2,17 +2,17 @@
   "redirects": [
     {
       "source": "/publicar",
-      "destination": "/plataforma/publicar-parcela/",
+      "destination": "/plataforma/publicar/",
       "permanent": true
     },
     {
       "source": "/publicar/",
-      "destination": "/plataforma/publicar-parcela/",
+      "destination": "/plataforma/publicar/",
       "permanent": true
     },
     {
       "source": "/publicar-parcela.html",
-      "destination": "/plataforma/publicar-parcela/",
+      "destination": "/plataforma/publicar/",
       "permanent": true
     },
     {

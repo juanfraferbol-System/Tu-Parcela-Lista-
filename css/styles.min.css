@@ -717,3 +717,38 @@ h1, h2, h3, .buy-kicker, .publish-eyebrow {
 }
 
 .tpl-promotion-badge{display:inline-flex;align-items:center;gap:.35rem;margin:0 0 .55rem;padding:.38rem .68rem;border-radius:999px;font-size:.74rem;font-weight:800;letter-spacing:.01em}.tpl-promotion-badge-free{background:#fff4e6;color:#9a3412;border:1px solid #fdba74}.tpl-promotion-badge-paid{background:linear-gradient(135deg,#fff7cc,#ffe58a);color:#6b4f00;border:1px solid #e5bf36;box-shadow:0 4px 12px rgba(178,130,0,.15)}
+
+
+/* TPL MOBILE SPACE OPTIMIZATION 2026-07-19 */
+.mobile-brand-name{display:none}
+@media(max-width:900px){
+  .navbar{min-height:68px!important;height:auto!important}
+  .navbar-inner{min-height:68px!important;padding:6px 14px!important;gap:10px!important;display:flex!important;align-items:center!important}
+  .navbar .logo-container{flex:0 0 auto!important;gap:5px!important;padding:0!important}
+  .navbar .brand-logo-img{height:50px!important;max-width:58px!important;object-fit:contain!important;border-radius:12px!important}
+  .navbar .logo-container img[alt="Chile"]{width:22px!important;height:auto!important}
+  .mobile-brand-name{display:block;flex:1;min-width:0;text-align:center;font-family:"Cormorant Garamond",serif;font-size:clamp(1.05rem,4.5vw,1.38rem);font-weight:700;line-height:1;color:#003f7a;letter-spacing:.015em;white-space:nowrap;text-shadow:0 1px 0 #fff}
+  .navbar-inner>div:last-child{flex:0 0 auto!important;gap:6px!important}
+  .navbar .nav-toggle{width:44px!important;height:44px!important;padding:0!important;border-radius:14px!important;background:#f3f7fa!important;color:#003f7a!important}
+  .navbar .nav-contact-btn{display:none!important}
+  section{scroll-margin-top:76px}
+  .container{padding-left:16px!important;padding-right:16px!important}
+  .hero,.hero-life-masonry{min-height:auto!important;padding-top:34px!important;padding-bottom:34px!important}
+  .hero-masonry-content{padding-top:12px!important;padding-bottom:12px!important}
+  .hero-masonry-content h1{margin-top:6px!important;margin-bottom:10px!important}
+  .decision-flow{padding-top:12px!important;padding-bottom:12px!important}
+  .section-casas,.section-cotizador,.promos-section,#quienes-somos,#contacto{padding-top:42px!important;padding-bottom:42px!important}
+  .budget-box{padding:22px 16px!important;margin-top:14px!important;margin-bottom:14px!important}
+  .parcelas-grid,.casas-grid,.promos-grid-v2{gap:16px!important}
+  .location-filter-bar{min-height:0!important}
+  .loc-bar-container{padding-top:8px!important;padding-bottom:8px!important}
+}
+@media(max-width:480px){
+  .navbar-inner{padding-inline:9px!important;gap:6px!important}
+  .navbar .brand-logo-img{height:46px!important;max-width:52px!important}
+  .navbar .logo-container img[alt="Chile"]{width:19px!important}
+  .mobile-brand-name{font-size:1rem;letter-spacing:0}
+  .navbar .nav-toggle{width:41px!important;height:41px!important}
+  .hero,.hero-life-masonry{padding-top:26px!important;padding-bottom:26px!important}
+  .section-casas,.section-cotizador,.promos-section,#quienes-somos,#contacto{padding-top:34px!important;padding-bottom:34px!important}
+}
