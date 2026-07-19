@@ -64,21 +64,12 @@ function propertyLabel(){if(state.type==='casa')return val('tipoCasa')||'Casa';c
 function locationLabel(){return [val('localidad'),val('comuna')].filter(Boolean).join(', ')||val('region')||'';}
 function keyLandHighlights(){const all=[];const nature=checked('naturaleza');if(nature.includes('Río dentro o junto a la propiedad'))all.push('río');else if(nature.includes('Estero'))all.push('estero');else if(nature.includes('Vertiente natural'))all.push('vertiente');if(nature.includes('Bosque nativo')||val('vegetacion')==='Bosque nativo')all.push('bosque nativo');if(val('topografia')==='Completamente plana'||val('topografia')==='Mayormente plana')all.push('terreno plano');if(val('vistaPrincipal'))all.push(val('vistaPrincipal').toLowerCase());if(val('rol')==='Rol propio')all.push('rol propio');return [...new Set(all)].slice(0,2);}
 function keyHouseHighlights(){const all=[];const extras=checked('extrasCasa');if(extras.includes('Piscina'))all.push('piscina');if(extras.includes('Vista panorámica'))all.push('vista panorámica');if(extras.includes('Acceso a río o lago'))all.push('acceso a río o lago');if(extras.includes('Bosque o entorno nativo'))all.push('entorno nativo');if(extras.includes('Quincho'))all.push('quincho');if(val('estadoCasa')==='Nueva'||val('estadoCasa')==='Excelente')all.push(val('estadoCasa').toLowerCase());return all.slice(0,2);}
-function generateLandCopy(){const area=number(val('superficie'));const label=propertyLabel();const place=locationLabel();const highlights=keyLandHighlights();const areaText=area?`${formatDigits(area)} m²`:'';let title=[label,areaText].filter(Boolean).join(' de ');if(highlights.length)title+=` con ${listText(highlights)}`;if(place)title+=` en ${place}`;title=sentence(title).slice(0,90);
- const paragraphs=[];let intro=`Se vende ${label.toLowerCase()}`;if(areaText)intro+=` de ${areaText}`;if(place)intro+=` ubicada en ${place}`;intro+='.';paragraphs.push(intro);
- const terrain=[];if(val('topografia'))terrain.push(val('topografia').toLowerCase());if(val('condicionSuelo'))terrain.push(val('condicionSuelo').toLowerCase());if(val('formaTerreno'))terrain.push(`forma ${val('formaTerreno').toLowerCase()}`);if(val('frente'))terrain.push(`aproximadamente ${formatDigits(val('frente'))} metros de frente`);if(terrain.length)paragraphs.push(`El terreno presenta ${listText(terrain)}, características que permiten evaluar distintos usos y proyectos.`);
- const nature=[val('vegetacion'),...checked('naturaleza'),val('vistaPrincipal'),val('orientacion'),val('privacidad')].filter(Boolean);if(nature.length)paragraphs.push(`Su entorno destaca por ${listText(nature.map(x=>x.toLowerCase()))}.`);
- const services=[val('agua'),val('luz')].filter(Boolean);if(services.length)paragraphs.push(`En servicios, cuenta con ${listText(services.map(x=>x.toLowerCase()))}.`);
- const access=[val('acceso'),val('distanciaPavimento'),val('cierre'),val('porton')].filter(Boolean);if(access.length)paragraphs.push(`El acceso y la infraestructura consideran ${listText(access.map(x=>x.toLowerCase()))}.`);
- const legal=[val('rol'),val('subdivision'),val('usoSuelo'),val('construccion')].filter(Boolean);if(legal.length)paragraphs.push(`Antecedentes informados: ${listText(legal.map(x=>x.toLowerCase()))}.`);
- paragraphs.push('Una alternativa atractiva para quienes buscan naturaleza, espacio y una inversión rural con características claramente identificadas.');return{title,description:paragraphs.join('\n\n')};}
-function generateHouseCopy(){const built=number(val('casaSuperficie')),land=number(val('casaTerreno')),beds=val('habitaciones'),baths=val('banos'),place=locationLabel(),label=propertyLabel(),highlights=keyHouseHighlights();let title=label;if(beds)title+=` de ${beds} dormitorios`;if(highlights.length)title+=` con ${listText(highlights)}`;if(place)title+=` en ${place}`;title=sentence(title).slice(0,90);
- const paragraphs=[];let intro=`Se vende ${label.toLowerCase()}`;if(place)intro+=` ubicada en ${place}`;intro+='.';paragraphs.push(intro);
- const distribution=[];if(built)distribution.push(`${formatDigits(built)} m² construidos`);if(land)distribution.push(`${formatDigits(land)} m² de terreno`);if(beds)distribution.push(`${beds} dormitorios`);if(baths)distribution.push(`${baths} baños`);if(val('pisos'))distribution.push(val('pisos').toLowerCase());if(distribution.length)paragraphs.push(`La propiedad ofrece ${listText(distribution)}.`);
- const build=[val('material')&&`construcción en ${val('material').toLowerCase()}`,val('estadoCasa')&&`estado ${val('estadoCasa').toLowerCase()}`,val('regularizacion')&&val('regularizacion').toLowerCase(),val('anioCasa')&&`año aproximado ${val('anioCasa')}`].filter(Boolean);if(build.length)paragraphs.push(`Entre sus antecedentes principales se encuentra ${listText(build)}.`);
- const services=[val('aguaCasa')&&`agua mediante ${val('aguaCasa').toLowerCase()}`,val('sanitarioCasa')&&val('sanitarioCasa').toLowerCase(),val('calefaccion')&&`calefacción ${val('calefaccion').toLowerCase()}`,val('estacionamientos')&&`${val('estacionamientos')} estacionamientos`].filter(Boolean);if(services.length)paragraphs.push(`En servicios y equipamiento dispone de ${listText(services)}.`);
- const extras=checked('extrasCasa');if(extras.length)paragraphs.push(`Además, incorpora ${listText(extras.map(x=>x.toLowerCase()))}, atributos que fortalecen su comodidad y valor comercial.`);
- paragraphs.push('Una propiedad preparada para quienes buscan vivir con mayor tranquilidad, espacio y conexión con su entorno.');return{title,description:paragraphs.join('\n\n')};}
+function redactionInput(){return{
+ region:val('region'),comuna:val('comuna'),sector:val('localidad'),localidad:val('localidad'),tipoTerreno:val('tipoTerreno'),superficie:number(val('superficie')),rol:val('rol'),subdivision:val('subdivision'),usoSuelo:val('usoSuelo'),construccion:val('construccion'),topografia:val('topografia'),condicionSuelo:val('condicionSuelo'),vegetacion:val('vegetacion'),naturaleza:checked('naturaleza'),vistaPrincipal:val('vistaPrincipal'),agua:val('agua'),luz:val('luz'),acceso:val('acceso'),distanciaRutaPrincipalKm:number(val('distanciaRutaPrincipalKm')),
+ tipoCasa:val('tipoCasa'),superficieConstruida:number(val('casaSuperficie')),superficieTerreno:number(val('casaTerreno')),habitaciones:val('habitaciones'),banos:val('banos'),pisos:val('pisos'),material:val('material'),estado:val('estadoCasa'),regularizacion:val('regularizacion'),aguaCasa:val('aguaCasa'),sanitario:val('sanitarioCasa'),calefaccion:val('calefaccion'),estacionamientos:val('estacionamientos'),extras:checked('extrasCasa')
+};}
+function generateLandCopy(){const input=redactionInput();if(window.TPL?.redaccion?.buildLand)return window.TPL.redaccion.buildLand(input);return{title:'',description:'',technicalDescription:''};}
+function generateHouseCopy(){const input=redactionInput();input.agua=input.aguaCasa;return window.TPL?.redaccion?.buildHouse?window.TPL.redaccion.buildHouse(input):{title:'',description:'',technicalDescription:''};}
 function generateCopy(force=false){if(!state.type)return;const generated=state.type==='casa'?generateHouseCopy():generateLandCopy();state.generated=generated;$('#titulo').value=generated.title;$('#descripcionFinal').value=generated.description;$('#generatedTitle').textContent=generated.title||'Completa algunos datos para crear el título';$('#generatedDescription').textContent=generated.description||'La descripción comercial se irá formando automáticamente aquí.';if(force||!state.copyEdited){$('#tituloEditable').value=generated.title;$('#descripcionEditable').value=generated.description;}updatePreview();}
 
 function initMap(){if(!window.L)return;state.map=L.map('map').setView([-37.2,-72.6],7);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(state.map);state.map.on('click',e=>setCoordinates(e.latlng.lat,e.latlng.lng,'Ubicación marcada en el mapa'));}
@@ -92,13 +83,34 @@ function extractCoordinatesFromMapsText(text){
  for(const pattern of patterns){const match=raw.match(pattern);if(match){const lat=Number(match[1]),lng=Number(match[2]);if(Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180)return{lat,lng};}}
  return null;
 }
-function useGoogleMapsLink(){
+const GOOGLE_MAPS_RESOLVER_URL='https://qxavbqhyqaqalpzbhwmh.supabase.co/functions/v1/resolve-google-maps';
+const GOOGLE_MAPS_RESOLVER_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
+function isGoogleMapsUrl(value){try{const url=new URL(String(value||'').trim());return ['http:','https:'].includes(url.protocol)&&/(^|\.)(google\.[a-z.]+|goo\.gl)$/i.test(url.hostname);}catch{return false;}}
+async function resolveShortGoogleMapsLink(raw){
+ const response=await fetch(GOOGLE_MAPS_RESOLVER_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':GOOGLE_MAPS_RESOLVER_ANON_KEY,'Authorization':`Bearer ${GOOGLE_MAPS_RESOLVER_ANON_KEY}`},body:JSON.stringify({url:raw})});
+ const payload=await response.json().catch(()=>({}));
+ if(!response.ok||!payload?.ok||!payload?.coordinates)throw new Error(payload?.error||'coordinates_not_found');
+ return {lat:Number(payload.coordinates.latitude),lng:Number(payload.coordinates.longitude)};
+}
+async function useGoogleMapsLink(){
  clearError('googleMapsLink');
- const raw=$('#googleMapsLink').value.trim();
+ const input=$('#googleMapsLink'),button=$('#useGoogleMapsLink'),raw=input.value.trim();
  if(!raw){error('googleMapsLink','Pega el enlace de Google Maps o las coordenadas.');return;}
- const coords=extractCoordinatesFromMapsText(decodeURIComponent(raw));
- if(!coords){error('googleMapsLink','No pudimos leer las coordenadas. Abre el lugar en Google Maps y copia el enlace completo desde Compartir, o pega latitud y longitud.');return;}
- setCoordinates(coords.lat,coords.lng,'Ubicación obtenida desde enlace de Google Maps');
+ const direct=extractCoordinatesFromMapsText(decodeURIComponent(raw));
+ if(direct){setCoordinates(direct.lat,direct.lng,'Ubicación obtenida desde enlace de Google Maps');return;}
+ if(!isGoogleMapsUrl(raw)){error('googleMapsLink','El enlace no parece pertenecer a Google Maps. Revisa que comience con https://maps.app.goo.gl o https://www.google.com/maps.');return;}
+ const previousText=button.textContent;button.disabled=true;button.textContent='Leyendo enlace…';$('#locationStatus').textContent='Abriendo el enlace corto de Google Maps para obtener las coordenadas…';
+ try{
+  const coords=await resolveShortGoogleMapsLink(raw);
+  if(!Number.isFinite(coords.lat)||!Number.isFinite(coords.lng))throw new Error('invalid_coordinates');
+  setCoordinates(coords.lat,coords.lng,'Ubicación obtenida desde enlace corto de Google Maps');
+  input.value=`https://www.google.com/maps?q=${coords.lat},${coords.lng}`;
+  clearError('googleMapsLink');
+ }catch(err){
+  console.error('No fue posible resolver el enlace corto de Google Maps',err);
+  error('googleMapsLink','El enlace es válido, pero el servidor no pudo obtener las coordenadas. Intenta nuevamente o marca el punto directamente en el mapa.');
+  $('#locationStatus').textContent='No pudimos abrir el enlace corto. Puedes volver a intentarlo o marcar el lugar en el mapa.';
+ }finally{button.disabled=false;button.textContent=previousText;}
 }
 async function inspectAllPhotoLocations(){
  const message=$('#photoLocationMessage'),useButton=$('#usePhotoLocation'),tryButton=$('#tryPhotoLocation');
@@ -151,6 +163,7 @@ const TPL_VALUATION_RULES={
  ],
  adjustments:{waterfront:2.00,electricConnected:.25,electricFeasible:.10,electricUnavailable:-.10,nativeForest:.20,fruitTrees:.25,plantation:-.05},
  globalAdjustments:{rolPropio:.10,rolTramite:-.20,cesionDerechos:-.50,condominio:.10,market:-.20},
+ routeDistanceBands:[{max:5,pct:0,label:'0 a 5 km'},{max:10,pct:-.10,label:'6 a 10 km'},{max:20,pct:-.15,label:'11 a 20 km'},{max:30,pct:-.20,label:'21 a 30 km'},{max:40,pct:-.30,label:'31 a 40 km'},{max:50,pct:-.40,label:'41 a 50 km'},{max:60,pct:-.50,label:'51 a 60 km'},{max:Infinity,pct:-.60,label:'Más de 60 km'}],
  accessibility:{routeFactor:1.20,averageSpeedKmh:60,bands:[
   {minKm:80,pct:-.40,label:'Más de 80 km'},
   {minKm:70,pct:-.30,label:'Más de 70 km'},
@@ -205,6 +218,7 @@ function accessibilityRule(distanceKm){
  else if(estimatedMinutes>60)band=cfg.bands.find(x=>x.minMinutes===60);
  return {applied:!!band,pct:band?.pct||0,label:band?.label||'Sin penalización',distanceKm:Number(distanceKm.toFixed(1)),estimatedRoadKm:Number(estimatedRoadKm.toFixed(1)),estimatedMinutes,source:'estimacion_interna_sin_api_rutas'};
 }
+function mainRouteAdjustment(distanceKm){const km=Number(distanceKm);if(!Number.isFinite(km)||km<0)return{applied:false,pct:0,label:'Sin dato',distanceKm:null};const band=TPL_VALUATION_RULES.routeDistanceBands.find(x=>km<=x.max)||TPL_VALUATION_RULES.routeDistanceBands.at(-1);return{applied:band.pct<0,pct:band.pct,label:band.label,distanceKm:Number(km.toFixed(1))};}
 function calculateLandRuleValuation({asking,area,location,region}){
  const surfacePricing=calculateSurfaceBase(area);
  const base=surfacePricing.base,adjustments=[];
@@ -239,6 +253,8 @@ function calculateLandRuleValuation({asking,area,location,region}){
  if(largeLandAdjustment.applied)calculated=Math.round(calculated*(1+largeLandAdjustment.pct));
  const accessibility=city?accessibilityRule(city.distanceKm):{applied:false,pct:0,label:'Sin ubicación suficiente',distanceKm:null,estimatedRoadKm:null,estimatedMinutes:null,source:'sin_coordenadas'};
  if(accessibility.applied)calculated=Math.round(calculated*(1+accessibility.pct));
+ const routeAdjustment=mainRouteAdjustment(number(val('distanciaRutaPrincipalKm')));
+ if(routeAdjustment.applied)calculated=Math.round(calculated*(1+routeAdjustment.pct));
  calculated=Math.round(calculated*(1+TPL_VALUATION_RULES.globalAdjustments.market));
  const ideal=Math.round(calculated/10000)*10000;
  const quick=Math.round(ideal*.91/10000)*10000;
@@ -247,7 +263,7 @@ function calculateLandRuleValuation({asking,area,location,region}){
  const positivePct=adjustments.filter(x=>x.pct>0).reduce((s,x)=>s+x.pct,0),negativePct=Math.abs(adjustments.filter(x=>x.pct<0).reduce((s,x)=>s+x.pct,0));
  const accessibilityPenalty=accessibility.applied?Math.abs(accessibility.pct)*35:0;
  const score=Math.max(0,Math.min(100,Math.round(35+Math.min(45,positivePct*12)-negativePct*30+(city&&city.distanceKm<=60?15:0)-accessibilityPenalty)));
- return {quick,ideal,patient,reference:ideal,low:quick,high:patient,diff,asking,area,location,region,base,basePriceM2:TPL_VALUATION_RULES.basePriceM2,surfacePricing,totalPct,adjustments,globalAdjustments,largeLandAdjustment,accessibility,marketFactor:TPL_VALUATION_RULES.globalAdjustments.market,nearestCity:city?{name:city.name,distanceKm:Number(city.distanceKm.toFixed(1)),weight:city.weight}:null,score,method:'tpl-rules-biobio-nuble-v3-surface-accessibility'};
+ return {quick,ideal,patient,reference:ideal,low:quick,high:patient,diff,asking,area,location,region,base,basePriceM2:TPL_VALUATION_RULES.basePriceM2,surfacePricing,totalPct,adjustments,globalAdjustments,largeLandAdjustment,accessibility,routeAdjustment,marketFactor:TPL_VALUATION_RULES.globalAdjustments.market,nearestCity:city?{name:city.name,distanceKm:Number(city.distanceKm.toFixed(1)),weight:city.weight}:null,score,method:'tpl-rules-biobio-nuble-v4-surface-route-distance'};
 }
 function calculateComparableValuation({type,asking,area,location,region}){
  const raw=comparableData(),source=type==='casa'?(raw.casas||raw.houses||[]):(raw.parcelas||raw.land||[]);
@@ -332,13 +348,13 @@ function renderFinal(){
 }
 function calculateListingQuality(d){let score=0;const reasons=[];if(d.ubicacion){score+=15}else reasons.push('Completar ubicación');if(d.fotos>=6)score+=20;else if(d.fotos>0)score+=10;else reasons.push('Agregar fotografías');if(d.documentacion?.rol&&d.documentacion.rol!=='No lo sé')score+=15;else reasons.push('Confirmar situación del rol');if(d.precio)score+=10;if(d.propiedad.superficieTerreno||d.propiedad.superficieConstruida)score+=10;if(d.servicios.agua)score+=5;if(d.servicios.electricidad)score+=5;if(d.comercial.urgencia)score+=10;if(d.contacto.email&&d.contacto.telefono)score+=10;return{score:Math.min(100,score),nivel:score>=85?'Excelente':score>=65?'Buena':score>=45?'Mejorable':'Incompleta',mejoras:reasons};}
 function dataObject(){const raw=Object.fromEntries(new FormData(form).entries()),urgency=URGENCY_CONFIG[raw.urgencia]||null,plan=selectedPlanObject();const d={
- version:'publicador-tpl-v6-crm-flow-ready',
+ version:'publicador-tpl-v15-redaccion-inteligente',
  formulario:raw,
- propiedad:{tipo:state.type,subtipo:propertyLabel(),region:raw.region||'',comuna:raw.comuna||'',localidad:raw.localidad||'',superficieTerreno:number(val('superficie'))||number(val('casaTerreno')),superficieConstruida:number(val('casaSuperficie')),precio:number(val('precioVenta')),precioM2:0,titulo:$('#tituloEditable').value||state.generated.title,descripcion:$('#descripcionEditable').value||state.generated.description},
+ propiedad:{tipo:state.type,subtipo:propertyLabel(),region:raw.region||'',comuna:raw.comuna||'',localidad:raw.localidad||'',superficieTerreno:number(val('superficie'))||number(val('casaTerreno')),superficieConstruida:number(val('casaSuperficie')),precio:number(val('precioVenta')),precioM2:0,titulo:$('#tituloEditable').value||state.generated.title,descripcion:$('#descripcionEditable').value||state.generated.description,descripcionComercial:$('#descripcionEditable').value||state.generated.description,descripcionTecnica:state.generated.technicalDescription||'',estiloRedaccion:state.generated.style||'tpl_profesional'},
  ubicacion:state.coordinates?{...state.coordinates,enlaceGoogleMaps:val('googleMapsLink'),publicaAproximada:$('#publicApproximate').checked}:null,
  documentacion:{rol:val('rol'),condominio:val('condominio'),subdivision:val('subdivision'),usoSuelo:val('usoSuelo'),factibilidadConstruccion:val('construccion'),regularizacionCasa:val('regularizacion')},
  terreno:{topografia:val('topografia'),suelo:val('condicionSuelo'),vegetacion:val('vegetacion'),vista:val('vistaPrincipal'),orientacion:val('orientacion'),privacidad:val('privacidad'),forma:val('formaTerreno'),frenteMetros:number(val('frente')),naturaleza:checked('naturaleza')},
- servicios:{agua:val('agua')||val('aguaCasa'),electricidad:val('luz'),sanitario:val('sanitarioCasa'),calefaccion:val('calefaccion'),acceso:val('acceso'),distanciaPavimento:val('distanciaPavimento'),cierre:val('cierre'),porton:val('porton')},
+ servicios:{agua:val('agua')||val('aguaCasa'),electricidad:val('luz'),sanitario:val('sanitarioCasa'),calefaccion:val('calefaccion'),acceso:val('acceso'),distanciaRutaPrincipalKm:number(val('distanciaRutaPrincipalKm')),cierre:val('cierre'),porton:val('porton')},
  casa:{tipo:val('tipoCasa'),habitaciones:val('habitaciones'),banos:val('banos'),pisos:val('pisos'),material:val('material'),estado:val('estadoCasa'),anio:val('anioCasa'),estacionamientos:val('estacionamientos'),extras:checked('extrasCasa')},
  comercial:{urgencia:raw.urgencia||'',urgenciaEtiqueta:urgency?.label||'',urgenciaPuntaje:urgency?.score||0,plazoVenta:raw.plazoVenta||'',tiempoEnVenta:raw.tiempoEnVenta||'',negociacionPrecio:raw.negociacionPrecio||'',disponibilidadVisitas:raw.disponibilidadVisitas||'',protocoloSugerido:urgency?.protocol||'',estrategiaPrecio:urgency?.strategy||''},
  contacto:{tipo:raw.anunciante||'',nombre:raw.nombre||'',telefono:raw.telefono||'',email:raw.email||''},

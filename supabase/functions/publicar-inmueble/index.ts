@@ -69,6 +69,7 @@ Deno.serve(async (req) => {
       rol: tipo === 'parcela' ? clean(payload.rol) || null : null,
       agua: tipo === 'parcela' ? clean(payload.agua) || null : null,
       luz: tipo === 'parcela' ? clean(payload.luz) || null : null,
+      distancia_ruta_principal_km: tipo === 'parcela' ? numberOrNull(payload.distanciaRutaPrincipalKm) : null,
       urgencia: clean(payload.urgencia) || null,
       estado_propiedad: clean(payload.estadoPropiedad) || null,
       nombre_contacto: clean(payload.nombre),

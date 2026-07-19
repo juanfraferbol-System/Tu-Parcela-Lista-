@@ -33,3 +33,6 @@ verify_jwt = false
 
 [functions.tasar-parcela]
 verify_jwt = false
+
+[functions.resolve-google-maps]
+verify_jwt = false

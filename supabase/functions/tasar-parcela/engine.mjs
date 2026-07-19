@@ -29,11 +29,29 @@ export function materialInput(data={}){
   region:normalizeText(data.region),comuna:normalizeText(data.comuna),sector:normalizeText(data.sector),
   superficie_m2:number(data.superficie_m2??data.superficie),
   lat:number(data.lat??data.latitudPrivada),lng:number(data.lng??data.longitudPrivada),
-  acceso:normalizeText(data.acceso),topografia:normalizeText(data.topografia),agua:normalizeText(data.agua),
+  acceso:normalizeText(data.acceso),distancia_ruta_principal_km:number(data.distanciaRutaPrincipalKm??data.distancia_ruta_principal_km),topografia:normalizeText(data.topografia),agua:normalizeText(data.agua),
   luz:normalizeText(data.luz),rol:normalizeText(data.rol),uso:normalizeText(data.uso),
   condicion_legal:normalizeText(data.condicion_legal),subdivision:normalizeText(data.subdivision),
   mejoras:Array.isArray(data.mejoras)?data.mejoras.map(normalizeText).sort():[]
  });
+}
+
+
+export function routeDistanceAdjustment(distanceKm){
+ const km=number(distanceKm);
+ if(km===null||km<0)return {applied:false,pct:0,discountPercent:0,label:'Sin dato de distancia a ruta principal',distanceKm:null};
+ const bands=[
+  {max:5,discountPercent:0,label:'0 a 5 km'},
+  {max:10,discountPercent:10,label:'6 a 10 km'},
+  {max:20,discountPercent:15,label:'11 a 20 km'},
+  {max:30,discountPercent:20,label:'21 a 30 km'},
+  {max:40,discountPercent:30,label:'31 a 40 km'},
+  {max:50,discountPercent:40,label:'41 a 50 km'},
+  {max:60,discountPercent:50,label:'51 a 60 km'},
+  {max:Infinity,discountPercent:60,label:'Más de 60 km'}
+ ];
+ const band=bands.find(item=>km<=item.max)||bands.at(-1);
+ return {applied:band.discountPercent>0,pct:-band.discountPercent/100,discountPercent:band.discountPercent,label:band.label,distanceKm:Number(km.toFixed(1))};
 }
 
 export function propertyIdentityInput(data={}){
@@ -129,16 +147,18 @@ export function calculateValuation(subject={},records=[],parameters={},now=new D
  if(selected.length<minimum)return insufficient(`Solo existen ${selected.length} comparables válidos.`,enteredPrice,selected);
  const q20=weightedQuantile(selected,.2),q25=weightedQuantile(selected,.25),median=weightedQuantile(selected,.5),q80=weightedQuantile(selected,.8);
  const round=value=>Math.round(value/10000)*10000;
- const minValue=round(q20*surface),quickValue=round(q25*surface),marketValue=round(median*surface),maxValue=round(q80*surface);
+ const routeAdjustment=routeDistanceAdjustment(subject.distanciaRutaPrincipalKm??subject.distancia_ruta_principal_km);
+ const applyRouteAdjustment=value=>round(value*(1+routeAdjustment.pct));
+ const minValue=applyRouteAdjustment(q20*surface),quickValue=applyRouteAdjustment(q25*surface),marketValue=applyRouteAdjustment(median*surface),maxValue=applyRouteAdjustment(q80*surface);
  const verifiedCount=selected.filter(row=>row.sourceType==='precio_final_verificado').length;
  const coverage=selected.length>=Number(parameters.cobertura_suficiente_desde||12)?'suficiente':selected.length>=Number(parameters.cobertura_limitada_desde||6)?'limitada':'experimental';
  const confidence=selected.length>=12&&verifiedCount>=3?'alta':selected.length>=6?'media':'baja';
  const confidenceScore=confidence==='alta'?85:confidence==='media'?65:40;
  const difference=enteredPrice&&marketValue?Number((((enteredPrice-marketValue)/marketValue)*100).toFixed(1)):null;
  const position=difference===null?'sin_precio':difference < -15?'aparentemente_bajo':difference < -5?'competitivo':difference <=10?'dentro_del_rango':'sobre_el_rango';
- const strengths=[];if(subjectLocation.lat&&subjectLocation.lng)strengths.push('Ubicación utilizada para medir cercanía geográfica.');if(subject.acceso)strengths.push('Acceso informado para comparar similitud.');if(subject.agua||subject.luz)strengths.push('Servicios básicos informados.');
- const cautions=[];if(!verifiedCount)cautions.push('Los comparables disponibles corresponden a precios publicados, no a ventas verificadas.');if(coverage!=='suficiente')cautions.push('La cobertura del sector todavía es limitada.');if(!subject.acceso||!subject.topografia)cautions.push('Faltan datos de acceso o topografía para mejorar la comparación.');
- return {status:'generated',range:{minimum:minValue,quick:quickValue,market:marketValue,maximum:maxValue},pricePerM2:Number(median.toFixed(0)),difference,position,confidence,confidenceScore,coverage,comparableCount:selected.length,strengths:strengths.slice(0,3),cautions:cautions.slice(0,3),comparables:selected.map(row=>({...row,similarity:Number(row.surfaceScore.toFixed(4)),weight:Number(row.weight.toFixed(4))})),factors:[{code:'comparable_count',value:selected.length,weight:null,effect:null,explanation:`Se utilizaron ${selected.length} antecedentes comparables.`,source:'datos_internos'},{code:'source_quality',value:verifiedCount,weight:null,effect:null,explanation:verifiedCount?`${verifiedCount} comparables tienen precio final verificado.`:'No hay ventas verificadas entre los comparables utilizados.',source:'datos_internos'}]};
+ const strengths=[];if(subjectLocation.lat&&subjectLocation.lng)strengths.push('Ubicación utilizada para medir cercanía geográfica.');if(subject.acceso)strengths.push('Acceso informado para comparar similitud.');if(subject.agua||subject.luz)strengths.push('Servicios básicos informados.');if(routeAdjustment.distanceKm!==null)strengths.push(`Distancia a ruta principal informada: ${routeAdjustment.distanceKm} km.`);
+ const cautions=[];if(!verifiedCount)cautions.push('Los comparables disponibles corresponden a precios publicados, no a ventas verificadas.');if(coverage!=='suficiente')cautions.push('La cobertura del sector todavía es limitada.');if(!subject.acceso||!subject.topografia)cautions.push('Faltan datos de acceso o topografía para mejorar la comparación.');if(routeAdjustment.distanceKm===null)cautions.push('Falta la distancia a la ruta o carretera principal.');
+ return {status:'generated',range:{minimum:minValue,quick:quickValue,market:marketValue,maximum:maxValue},pricePerM2:Number(median.toFixed(0)),difference,position,confidence,confidenceScore,coverage,comparableCount:selected.length,strengths:strengths.slice(0,3),cautions:cautions.slice(0,3),comparables:selected.map(row=>({...row,similarity:Number(row.surfaceScore.toFixed(4)),weight:Number(row.weight.toFixed(4))})),routeAdjustment,factors:[{code:'comparable_count',value:selected.length,weight:null,effect:null,explanation:`Se utilizaron ${selected.length} antecedentes comparables.`,source:'datos_internos'},{code:'source_quality',value:verifiedCount,weight:null,effect:null,explanation:verifiedCount?`${verifiedCount} comparables tienen precio final verificado.`:'No hay ventas verificadas entre los comparables utilizados.',source:'datos_internos'},{code:'route_distance',value:routeAdjustment.distanceKm,weight:routeAdjustment.pct,effect:routeAdjustment.pct,explanation:routeAdjustment.distanceKm===null?'No se informó distancia a ruta principal.':`Distancia informada de ${routeAdjustment.distanceKm} km; ajuste del ${routeAdjustment.discountPercent}% según tramo ${routeAdjustment.label}.`,source:'dato_declarado'}]};
 }
 
 function insufficient(reason,enteredPrice,comparables=[]){

@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import motor from './motor-redaccion.js';
+const land=motor.buildLand({region:'Región del Biobío',comuna:'Cañete',sector:'Lanalhue',tipoTerreno:'Parcela',superficie:7500,rol:'Rol propio',subdivision:'Subdivisión aprobada',construccion:'Apta para construir',topografia:'Mixta',condicionSuelo:'Suelo agrícola',agua:'Pozo',luz:'Postación cercana',acceso:'Ripio en buen estado',distanciaRutaPrincipalKm:4,naturaleza:['Bosque nativo']});
+assert.match(land.description,/Región del Biobío/);
+assert.match(land.description,/comuna de Cañete/);
+assert.match(land.description,/gran superficie de 7\.500 m²/);
+assert.match(land.description,/al día con su rol/);
+assert.match(land.description,/subdivisión aprobada/);
+assert.match(land.description,/sectores planos con llamativos desniveles/);
+assert.doesNotMatch(land.description,/cesión de derechos/i);
+const stable=motor.buildLand({region:'Región del Biobío',comuna:'Cañete',superficie:5000});
+assert.equal(stable.description,motor.buildLand({region:'Región del Biobío',comuna:'Cañete',superficie:5000}).description);
+const other=motor.buildLand({region:'Región del Biobío',comuna:'Cañete',sector:'Otro',superficie:5000});
+assert.notEqual(stable.description,other.description);
+const house=motor.buildHouse({region:'Región del Biobío',comuna:'Concepción',tipoCasa:'Casa rural',superficieConstruida:84,habitaciones:3,banos:2,material:'Metalcon'});
+assert.match(house.description,/84 m² construidos/);
+assert.match(house.description,/3 dormitorios/);
+console.log('Motor de Redacción TPL: pruebas correctas');

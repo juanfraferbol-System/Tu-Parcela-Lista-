@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {calculateValuation,haversineKm,materialInput,propertyIdentityInput} from './engine.mjs';
+import {calculateValuation,haversineKm,materialInput,propertyIdentityInput,routeDistanceAdjustment} from './engine.mjs';
 
 const subject={region:'Biobío',comuna:'Nacimiento',sector:'Nahuelbuta',superficie_m2:5000,lat:-37.5,lng:-72.7,acceso:'Ripio',agua:'Pozo',luz:'Cercana',topografia:'Mixta',precio_ingresado:18000000};
 const records=[
@@ -20,6 +20,19 @@ assert.ok(result.comparables.length>=3);
 const otherPrice=calculateValuation({...subject,precio_ingresado:90000000},records,config,new Date('2026-07-17'));
 assert.equal(otherPrice.range.market,result.range.market);
 assert.notEqual(otherPrice.difference,result.difference);
+
+assert.equal(routeDistanceAdjustment(5).discountPercent,0);
+assert.equal(routeDistanceAdjustment(8).discountPercent,10);
+assert.equal(routeDistanceAdjustment(15).discountPercent,15);
+assert.equal(routeDistanceAdjustment(25).discountPercent,20);
+assert.equal(routeDistanceAdjustment(35).discountPercent,30);
+assert.equal(routeDistanceAdjustment(45).discountPercent,40);
+assert.equal(routeDistanceAdjustment(55).discountPercent,50);
+assert.equal(routeDistanceAdjustment(61).discountPercent,60);
+const routeAdjusted=calculateValuation({...subject,distanciaRutaPrincipalKm:25},records,config,new Date('2026-07-17'));
+assert.equal(routeAdjusted.routeAdjustment.discountPercent,20);
+assert.equal(routeAdjusted.range.market,Math.round((result.range.market*.8)/10000)*10000);
+
 const insufficient=calculateValuation({...subject,region:'Región sin datos',comuna:'Comuna sin datos'},records,config,new Date('2026-07-17'));
 assert.equal(insufficient.status,'insufficient');
 assert.equal(insufficient.range.market,null);
