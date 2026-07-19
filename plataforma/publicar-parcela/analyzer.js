@@ -3,6 +3,8 @@ const NUMBER_WORDS = { un:1, uno:1, una:1, dos:2, tres:3, cuatro:4, cinco:5, sei
 const LOCATIONS=CHILE_LOCATIONS.flatMap(({region,communes})=>communes.map(commune=>[region,commune]));
 
 export function normalizeSpanish(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
+const normalizeLocation=value=>normalizeSpanish(value).replace(/[^a-z0-9]/g,'');
+const REGION_ALIASES=new Map([['biobio','Biobío'],['biobio region','Biobío'],['region del biobio','Biobío'],['bio bio','Biobío'],['bío bío','Biobío']].map(([alias,region])=>[normalizeLocation(alias),region]));
 
 export function cleanVoiceTranscript(value){
   let text=String(value||'').replace(/\s+/g,' ').trim();
@@ -13,21 +15,35 @@ export function cleanVoiceTranscript(value){
 }
 
 export function extractSurface(text){
-  const n=normalizeSpanish(text);
-  if(/media\s+hectarea/.test(n))return 5000;
-  const hw=n.match(/\b(un|uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s+hectareas?\b/);if(hw)return NUMBER_WORDS[hw[1]]*10000;
-  const hn=n.match(/\b(\d+(?:[.,]\d+)?)\s*(?:hectareas?|ha)\b/);if(hn)return Math.round(Number(hn[1].replace(',','.'))*10000);
-  const tw=n.match(/\b(un|uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta)\s+mil\s+(?:metros|m2)\b/);if(tw)return NUMBER_WORDS[tw[1]]*1000;
-  const mn=n.match(/\b(\d{1,3}(?:[.\s]\d{3})+|\d+)\s*(?:metros cuadrados|metros|m2)\b/);return mn?Number(mn[1].replace(/[.\s]/g,'')):null;
+  const n=normalizeSpanish(text)
+    .replace(/m²/g,'m2')
+    .replace(/mts?\.?\s*2/g,'m2')
+    .replace(/metros?\s*cuadrados?/g,'m2');
+  if(/media\s+hectarea|media\s+ha\b/.test(n))return 5000;
+  if(/un\s+cuarto\s+de\s+hectarea/.test(n))return 2500;
+  const hw=n.match(/\b(un|uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s+hectareas?\b/);
+  if(hw)return NUMBER_WORDS[hw[1]]*10000;
+  const hn=n.match(/\b(\d+(?:[.,]\d+)?)\s*(?:hectareas?|ha)\b/);
+  if(hn)return Math.round(Number(hn[1].replace(',','.'))*10000);
+  const tw=n.match(/\b(un|uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta)\s+mil\s*(?:m2|metros?)?\b/);
+  if(tw)return NUMBER_WORDS[tw[1]]*1000;
+  const mn=n.match(/\b(\d{1,3}(?:[.\s]\d{3})+|\d+)\s*(?:m2|metros?)\b/);
+  return mn?Number(mn[1].replace(/[.\s]/g,'')):null;
 }
-
 const first=(text,rules)=>{const found=rules.find(([pattern])=>pattern.test(text));return found?found[1]:null;};
 const capture=(text,pattern)=>text.match(pattern)?.[1]?.trim()||null;
 
 export function analyzeParcelText(value){
   const original=cleanVoiceTranscript(value);const n=normalizeSpanish(original);
-  const location=LOCATIONS.map(item=>({item,index:n.indexOf(normalizeSpanish(item[1]))})).filter(match=>match.index>=0).sort((a,b)=>a.index-b.index)[0]?.item;
-  const regionMention=LOCATIONS.map(([region])=>region).find(region=>n.includes(normalizeSpanish(region)));
+  const location=LOCATIONS.map(item=>{
+    const commune=normalizeSpanish(item[1]);
+    const pattern=new RegExp(`(^|[^\p{L}\d])${commune.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}([^\p{L}\d]|$)`,'u');
+    const match=n.match(pattern);
+    return {item,index:match?.index??-1};
+  }).filter(match=>match.index>=0).sort((a,b)=>a.index-b.index)[0]?.item;
+  const compactText=normalizeLocation(n);
+  const aliasRegion=[...REGION_ALIASES.entries()].find(([alias])=>compactText.includes(alias))?.[1]||null;
+  const regionMention=aliasRegion||CHILE_LOCATIONS.map(({region})=>region).find(region=>compactText.includes(normalizeLocation(region)));
   const sector=capture(original,/(?:sector|localidad|camino)\s+([\p{L}\d -]{3,35})(?=[,.]|\s+(?:de|con|tiene|a)\b)/iu);
   const priceMatch=n.match(/(?:precio|vendo|valor|pido|esperado)[^\d]{0,18}\$?\s*(\d{1,3}(?:[.\s]\d{3})+|\d{6,})/);
   const distanceMatch=n.match(/(?:a|queda a|ubicad[ao] a)\s*(\d+)\s*(kilometros|km|minutos?)\s+(?:de|del)\s+([\p{L} ]{3,30}?)(?=,|\.|\s+y\s+|$)/u);

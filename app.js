@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  loadDynamicInventory();
   const CLP = new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
   const CONTACT_PHONE_DISPLAY = "+56988508361";
   const CONTACT_PHONE_WA = "56988508361";
@@ -609,6 +608,28 @@ document.addEventListener("DOMContentLoaded", () => {
     return `<div class="parcel-feature-chips parcel-feature-chips-${placement}">${chips.join("")}</div>`;
   }
 
+
+  function hasTplBackedValue(p) {
+    return p?.valorRespaldadoTPL === true ||
+      String(p?.valorRespaldadoTPL || '').toLowerCase() === 'true' ||
+      p?.distintivos?.valorRespaldadoTPL === true ||
+      p?.tasacion?.valorRespaldadoTPL === true;
+  }
+
+  function renderTplBackedValueBadge(p, placement = 'card') {
+    if (!hasTplBackedValue(p)) return '';
+    return `<div class="tpl-backed-value-badge tpl-backed-value-badge-${placement}" title="Precio sugerido por el Tasador TPL y aceptado por quien publica.">
+      <span class="tpl-backed-value-check">✓</span>
+      <span><strong>Valor respaldado por Tu Parcela Lista</strong><small>Precio recomendado</small></span>
+    </div>`;
+  }
+
+  function renderPromotionBadge(p) {
+    if (p?.urgenteDestacado) return '<div class="tpl-promotion-badge tpl-promotion-badge-paid">⭐ Urgente destacado</div>';
+    if (p?.ventaUrgente) return '<div class="tpl-promotion-badge tpl-promotion-badge-free">🔥 Venta urgente</div>';
+    return '';
+  }
+
   function getDistanceBadge(p) {
     if (!state.activeFilters.gps || !state.userCoords || !p.lat || !p.lng) return "";
     const km = distanceKm(state.userCoords.lat, state.userCoords.lng, Number(p.lat), Number(p.lng));
@@ -659,6 +680,8 @@ document.addEventListener("DOMContentLoaded", () => {
           <h3 class="card-title">${p.nombre}</h3>
           <div class="card-meta">🌳 ${Number(p.tamano || 0).toLocaleString("es-CL")} m²</div>
           <div class="card-price card-price-clean">${p.precio}</div>
+          ${renderPromotionBadge(p)}
+          ${renderTplBackedValueBadge(p, "card")}
           ${renderParcelaFeatureChips(p, "desktop")}
           ${getDistanceBadge(p)}
           <p class="card-description">${p.descripcion || "Parcela disponible para tu proyecto."}</p>
@@ -1633,7 +1656,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }).addTo(map) : null;
 
     const list = (window.__mapShowAllParcelas ? [...getAllParcelas()] : getFilteredParcelas())
-      .filter(p => p && p.lat && p.lng);
+      .filter(p => p && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng)) && !(Number(p.lat) === 0 && Number(p.lng) === 0));
 
     if (DOM.mapResults) DOM.mapResults.textContent = `${list.length} resultados`;
     if (DOM.mapCards) DOM.mapCards.innerHTML = "";
@@ -1725,7 +1748,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const popupHtml = `<div class="tpl-map-popup-clean" style="padding: 10px; font-family: Outfit, sans-serif; text-align: center; min-width: 180px;">
               <img src="${img}" alt="${p.nombre}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;">
               <h3 style="margin: 0 0 4px; font-size: 1rem; color: #111; font-weight: 600;">${p.nombre}</h3>
-              <strong style="color: #007185; font-size: 1.15rem; display: block; margin-bottom: 12px;">${money(p.precio)}</strong>
+              <strong style="color: #007185; font-size: 1.15rem; display: block; margin-bottom: 8px;">${money(p.precio)}</strong>
+              ${renderPromotionBadge(p)}
+              ${hasTplBackedValue(p) ? `<div style="margin:0 0 10px;padding:7px 8px;border-radius:8px;background:#eefbf4;border:1px solid #b9e8cc;color:#145c37;font-size:.72rem;font-weight:800;line-height:1.25;">✓ Valor respaldado por TPL<br><span style="font-weight:600;">Precio recomendado</span></div>` : ''}
               <div style="display: flex; gap: 8px; align-items: stretch;">
                 <a href="parcela.html?id=${encodeURIComponent(p.id)}" style="flex: 1; padding: 10px 0; background: transparent; color: #111; text-decoration: none; border-radius: 6px; font-size: 0.85rem; font-weight: 500; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center;">Detalles</a>
                 <button type="button" onclick="window.tplSelectMapParcela && window.tplSelectMapParcela('${String(p.id).replace(/'/g, "\'")}')" style="flex: 1; padding: 10px 0; background: #FFD814; color: #111; border: 1px solid #FCD200; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; justify-content: center;">Seleccionar</button>
@@ -1745,7 +1770,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     window.tplSelectMapParcela = function(id) {
-      const p = getAllParcelas().find(x => x.id === id);
+      const p = getAllParcelas().find(x => String(x.id) === String(id));
       if (!p) return;
       selectParcela(p);
       state.mode = "combo";
@@ -2623,7 +2648,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function openLocationModal(parcela) {
-    if (!parcela || !parcela.lat || !parcela.lng) {
+    if (!parcela || !Number.isFinite(Number(parcela.lat)) || !Number.isFinite(Number(parcela.lng)) || (Number(parcela.lat) === 0 && Number(parcela.lng) === 0)) {
       showFriendlyMessage("Esta parcela aún no tiene coordenadas disponibles para mostrarla en el mapa.");
       return;
     }
@@ -3142,46 +3167,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-async function loadDynamicInventory() {
-  try {
-    const res = await fetch('https://qxavbqhyqaqalpzbhwmh.supabase.co/rest/v1/publicaciones_publicas?select=*', {
-      headers: {
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA',
-        'Content-Type': 'application/json'
-      }
-    });
-    if (res.ok) {
-      const dbParcelas = await res.json();
-      if (dbParcelas && dbParcelas.length > 0) {
-        window.SERVER_PARCELAS = dbParcelas.map(db => ({
-          id: db.identificador_legacy || db.codigo_publico,
-          nombre: db.titulo_publico,
-          precio: db.precio_publicacion ? "$" + db.precio_publicacion.toLocaleString('es-CL') : "$0",
-          tamano: db.superficie_m2 || 5000,
-          lat: db.latitud_publica,
-          lng: db.longitud_publica,
-          imagen: db.imagen_principal || "",
-          imagenes: db.imagenes || [],
-          descripcion: db.descripcion_publica,
-          luz: db.luz || 'no',
-          agua: db.agua || 'no',
-          naturaleza: Array.isArray(db.naturaleza) && db.naturaleza.length ? 'si' : 'no',
-          rol: db.rol || 'si',
-          servicios: Array.isArray(db.servicios) && db.servicios.length ? 'si' : 'no',
-          destacada: db.destacada || 'no',
-          distanciaConcepcion: db.ubicacion_publica_aproximada || '',
-          tiempoConcepcion: db.tiempo_concepcion || '',
-          comuna: db.comuna || ''
-        }));
-        // Re-render everything that depends on parcelas
-        if (typeof renderParcelas === 'function') renderParcelas();
-        if (typeof renderMap === 'function') renderMap();
-        if (typeof renderMapMobile === 'function') renderMapMobile();
-      }
-    }
-  } catch (e) {
-    console.error("Error cargando inventario dinamico", e);
-  }
-}

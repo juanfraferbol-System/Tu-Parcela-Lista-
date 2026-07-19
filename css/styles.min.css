@@ -715,3 +715,5 @@ h1, h2, h3, .buy-kicker, .publish-eyebrow {
 .stepper-btn:active {
   transform: scale(0.95);
 }
+
+.tpl-promotion-badge{display:inline-flex;align-items:center;gap:.35rem;margin:0 0 .55rem;padding:.38rem .68rem;border-radius:999px;font-size:.74rem;font-weight:800;letter-spacing:.01em}.tpl-promotion-badge-free{background:#fff4e6;color:#9a3412;border:1px solid #fdba74}.tpl-promotion-badge-paid{background:linear-gradient(135deg,#fff7cc,#ffe58a);color:#6b4f00;border:1px solid #e5bf36;box-shadow:0 4px 12px rgba(178,130,0,.15)}

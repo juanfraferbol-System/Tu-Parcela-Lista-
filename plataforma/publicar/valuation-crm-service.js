@@ -1,0 +1,33 @@
+(()=>{
+'use strict';
+const KEY='tpl_crm_tasaciones_v1';
+const EVENTS_KEY='tpl_crm_tasador_eventos_v1';
+const SESSION_KEY='tpl_tasador_session_id';
+const config=window.TPL_PUBLICADOR_CONFIG||{};
+const now=()=>new Date().toISOString();
+const uuid=()=>globalThis.crypto?.randomUUID?.()||`tas-${Date.now()}-${Math.random().toString(36).slice(2,9)}`;
+const read=(key)=>{try{return JSON.parse(localStorage.getItem(key)||'[]')}catch{return[]}};
+const write=(key,value)=>localStorage.setItem(key,JSON.stringify(value));
+const sanitizeForm=(form={})=>({
+ tipo:form.propiedad?.tipo||form.formulario?.tipo||'',region:form.propiedad?.region||'',comuna:form.propiedad?.comuna||'',localidad:form.propiedad?.localidad||'',
+ superficie:form.propiedad?.superficieTerreno||form.propiedad?.superficieConstruida||0,precioPropietario:form.propiedad?.precio||0,
+ rol:form.documentacion?.rol||'',condominio:form.documentacion?.condominio||'',coordenadas:form.ubicacion?{lat:form.ubicacion.lat,lng:form.ubicacion.lng}:null,
+ nombre:form.contacto?.nombre||'',telefono:form.contacto?.telefono||'',email:form.contacto?.email||'',anunciante:form.contacto?.tipo||''
+});
+async function remote(path,payload){
+ const endpoint=config.valuationCrmEndpoint;
+ if(!endpoint)return null;
+ try{const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:path,...payload})});if(!response.ok)throw new Error(`CRM Tasador ${response.status}`);return await response.json();}catch(error){console.warn('CRM Tasador remoto no disponible; se mantuvo respaldo local.',error);return null;}
+}
+function save(record){const rows=read(KEY);const i=rows.findIndex(x=>x.id===record.id);if(i>=0)rows[i]=record;else rows.unshift(record);write(KEY,rows.slice(0,5000));remote('upsert_valuation',{record});return record;}
+function event(sessionId,type,data={}){if(!sessionId)return null;const events=read(EVENTS_KEY);const item={id:uuid(),sessionId,type,at:now(),data};events.unshift(item);write(EVENTS_KEY,events.slice(0,10000));const rows=read(KEY);const row=rows.find(x=>x.id===sessionId);if(row){row.events=row.events||[];row.events.unshift({type,at:item.at,data});row.updatedAt=item.at;save(row);}remote('valuation_event',{event:item});return item;}
+function start({inputs={},form={},source='tasador'}={}){let id=sessionStorage.getItem(SESSION_KEY)||uuid();sessionStorage.setItem(SESSION_KEY,id);const rows=read(KEY);let row=rows.find(x=>x.id===id);if(!row){row={id,createdAt:now(),updatedAt:now(),status:'tasacion_iniciada',source,visitorId:localStorage.getItem('tpl_visitor_id')||uuid(),contact:{},property:{},askingPrice:Number(inputs.asking||0),result:null,decision:null,published:false,events:[]};localStorage.setItem('tpl_visitor_id',row.visitorId);}const clean=sanitizeForm(form);row.contact={nombre:clean.nombre,telefono:clean.telefono,email:clean.email,tipo:clean.anunciante};row.property={tipo:clean.tipo,region:clean.region,comuna:clean.comuna,localidad:clean.localidad,superficie:clean.superficie,rol:clean.rol,condominio:clean.condominio,coordenadas:clean.coordenadas};row.askingPrice=Number(inputs.asking||clean.precioPropietario||0);row.status='tasacion_iniciada';row.updatedAt=now();save(row);event(id,'tasacion_iniciada',{askingPrice:row.askingPrice,property:row.property});return row;}
+function complete(id,{result,form}={}){if(!id)return;const rows=read(KEY),row=rows.find(x=>x.id===id);if(!row)return;const clean=sanitizeForm(form);row.contact={nombre:clean.nombre,telefono:clean.telefono,email:clean.email,tipo:clean.anunciante};row.result={quick:result.quick,ideal:result.ideal,patient:result.patient,differencePct:Number(result.diff||0),methodVersion:result.method||'unknown',confidenceScore:Number(result.score||0),nearestCity:result.nearestCity||null,accessibility:result.accessibility||null,marketFactorApplied:result.marketFactor??null};row.status='tasacion_completada';row.updatedAt=now();save(row);event(id,'tasacion_generada',{askingPrice:row.askingPrice,idealPrice:result.ideal,differencePct:result.diff});}
+function select(id,{strategy,price,asking,ideal}={}){if(!id)return;const rows=read(KEY),row=rows.find(x=>x.id===id);if(!row)return;row.decision={strategy,selectedPrice:price,acceptedTpl:strategy==='ideal'||strategy==='quick'||strategy==='patient',keptOwnPrice:false,at:now()};row.status='recomendacion_aceptada';row.updatedAt=now();save(row);event(id,'precio_recomendado_aceptado',{strategy,price,asking,ideal});}
+function updateContact(id,form){if(!id)return;const rows=read(KEY),row=rows.find(x=>x.id===id);if(!row)return;const clean=sanitizeForm(form);row.contact={nombre:clean.nombre,telefono:clean.telefono,email:clean.email,tipo:clean.anunciante};row.updatedAt=now();save(row);}
+function markAbandoned(id,{form,reason='abandono'}={}){if(!id)return;const rows=read(KEY),row=rows.find(x=>x.id===id);if(!row||row.published)return;updateContact(id,form);const fresh=read(KEY).find(x=>x.id===id);fresh.status='abandono_sin_publicar';fresh.abandonedAt=now();fresh.abandonReason=reason;fresh.updatedAt=now();if(!fresh.decision&&fresh.result)fresh.decision={acceptedTpl:false,keptOwnPrice:true,at:now()};save(fresh);event(id,'sesion_abandonada',{reason});}
+function markPublished(id,{publicationCode,payload}={}){if(!id)return;const rows=read(KEY),row=rows.find(x=>x.id===id);if(!row)return;row.published=true;row.publicationCode=publicationCode;row.status='publicacion_completada';const clean=sanitizeForm(payload);row.contact={nombre:clean.nombre,telefono:clean.telefono,email:clean.email,tipo:clean.anunciante};row.updatedAt=now();save(row);event(id,'publicacion_enviada',{publicationCode});sessionStorage.removeItem(SESSION_KEY);}
+function list(){return read(KEY)}
+function stats(){const rows=read(KEY);const completed=rows.filter(x=>x.result),published=rows.filter(x=>x.published),abandoned=rows.filter(x=>x.status==='abandono_sin_publicar');return{total:rows.length,completed:completed.length,published:published.length,abandoned:abandoned.length,conversion:completed.length?Math.round(published.length/completed.length*100):0,averageDifference:completed.length?Math.round(completed.reduce((s,x)=>s+Math.abs(x.result?.differencePct||0),0)/completed.length):0};}
+window.TPLValuationCRM={start,complete,select,event,markAbandoned,markPublished,updateContact,list,stats,keys:{valuations:KEY,events:EVENTS_KEY}};
+})();

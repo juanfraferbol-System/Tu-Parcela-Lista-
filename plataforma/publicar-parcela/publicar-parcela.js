@@ -1,4 +1,4 @@
-import {analyzeParcelText,cleanVoiceTranscript} from './analyzer.js';
+import {analyzeParcelText,cleanVoiceTranscript} from './analyzer.js?v=20260718-deep-clean-v1';
 import {BROKER_PLANS,PLAN_COMPARISON,VISUAL_ANALYSIS_COMPARISON_ROWS,planIncludesVisualAnalysis,resolvedPlanBenefits} from './plans-config.js?v=20260717-urgent';
 import {CHILE_LOCATIONS,communesForRegion,regionForCommune} from './chile-locations.js';
 import {generateCommercialContent,generatePublicTitle,shouldConfirmDescriptionRegeneration} from './content-generator.js';
@@ -23,16 +23,30 @@ const stepNames=['Descripción','Datos y ubicación','Identificación','Promoci�
 const whatsappAccessibilityLabel='WhatsApp:';
 const errorMessages={relato:'Cuéntanos sobre la parcela antes de continuar.',region:'Selecciona la región.',comuna:'Selecciona la comuna.',sector:'Completa el sector o localidad.',superficie:'Completa una superficie válida.',rol:'Selecciona la situación del rol.',agua:'Selecciona la disponibilidad de agua.',luz:'Selecciona la disponibilidad de luz.',acceso:'Selecciona el acceso.',topografia:'Selecciona la topografía.',tituloPublico:'Revisa el título público.',descripcionPublica:'Revisa la descripción sugerida por TPL.',tipoPublicador:'Selecciona si eres dueño o corredor.',nombreDueno:'Ingresa tu nombre.',correoDueno:'Ingresa un correo válido.',telefonoDueno:'Ingresa tu teléfono.',representanteNombre:'Ingresa el nombre del representante.',correoCorredor:'Ingresa un correo válido.',telefonoCorredor:'Ingresa un teléfono o WhatsApp válido.',whatsappCorredor:'Ingresa un teléfono o WhatsApp válido.',montoLiquido:'Ingresa cuánto deseas recibir por la venta.',aceptaPartner:'Acepta las condiciones del Servicio Partner TPL.',planCorredor:'Selecciona un plan para corredores.',aceptaEstandaresCorredor:'Acepta el Compromiso de calidad TPL para continuar.'};
 let currentStep=1,recognition=null,voiceState='initial',pauseRequested=false,finishRequested=false,recognitionError=false,analysisData=null,photos=[],coverId=null,isOptimizingPhotos=false,photoProcessingQueue=Promise.resolve(),gpsCoordinates=null,locationSource='',locationConfirmedAt=null,pendingCoordinates=null,pendingLocationSource='',locationMap=null,locationMarker=null,locationMapReturnFocus=null,gpsAnalysisPending=false,locationEvaluationReady=false,locationWarningDismissed=false,lastMapsLinkValid=false,locationHelpReturnFocus=null,confirmedFields=new Set(),changedFromOwnerToBroker=false,selectedEstimate='',estimatorOriginalAmount=0,tasadorSession=null,publicDescriptionModified=false,lastGeneratedDescription='',updatingPublicDescription=false,publicTitleModified=false,lastGeneratedTitle='',updatingPublicTitle=false,enrichmentData=null,visualAnalysisData=null,brokerLogoMeta=null,qualityAcceptedAt=null,currentResponsible=null,visitRequests=[],lastSubmission=null,isSubmitting=false;
-const money=value=>`$${Math.round(Number(value)||0).toLocaleString('es-CL')}`,parseCLP=value=>Number(String(value||'').replace(/\D/g,''))||0,publisherType=()=>form.elements.tipoPublicador.value||'',selectedBrokerPlan=()=>form.elements.planCorredor?.value||'',checkedValues=name=>[...form.querySelectorAll(`input[name="${name}"]:checked`)].map(input=>input.value);
+const money=value=>`$${Math.round(Number(value)||0).toLocaleString('es-CL')}`,parseCLP=value=>Number(String(value||'').replace(/\D/g,''))||0,formatCLP=value=>{const amount=parseCLP(value);return amount?amount.toLocaleString('es-CL'):'';},publisherType=()=>form.elements.tipoPublicador.value||'',selectedBrokerPlan=()=>form.elements.planCorredor?.value||'',checkedValues=name=>[...form.querySelectorAll(`input[name="${name}"]:checked`)].map(input=>input.value);
 
 function setMessage(text='',success=false){message.textContent=text;message.classList.toggle('is-visible',Boolean(text));message.classList.toggle('is-success',success);}
 function visibleFields(step){return [...steps[step-1].querySelectorAll('input,select,textarea')].filter(field=>!field.disabled&&field.type!=='hidden'&&!field.closest('[hidden]'));}
 function validateStep(step){
+  if(step===2)ensureLocationOptions();
   if(step===5&&isOptimizingPhotos){setMessage('Espera a que termine la optimización de las fotografías.');photoDrop.focus({preventScroll:true});return false;}
   if(step===5&&!photos.length){setMessage('Selecciona al menos una fotografía antes de continuar.');photoDrop.scrollIntoView({behavior:'smooth',block:'center'});photoDrop.focus({preventScroll:true});return false;}
   if(step===3&&publisherType()==='dueno'&&!ownerAcceptance.checked){document.querySelector('#partner-alternative').hidden=false;document.querySelector('#partner-alternative').scrollIntoView({behavior:'smooth',block:'center'});setMessage('Elige si deseas mantener el Servicio Partner o revisar los planes para corredores.');return false;}
   if(step===3&&publisherType()==='corredor'){const phone=form.elements.telefonoCorredor,whatsapp=form.elements.whatsappCorredor,valid=value=>String(value||'').replace(/\D/g,'').length>=8;phone.setCustomValidity(valid(phone.value)||valid(whatsapp.value)?'':'Ingresa un teléfono o WhatsApp válido.');whatsapp.setCustomValidity(valid(phone.value)||valid(whatsapp.value)?'':'Ingresa un teléfono o WhatsApp válido.');}
-  const fields=visibleFields(step);fields.forEach(field=>field.removeAttribute('aria-invalid'));const invalid=fields.find(field=>field.name==='montoLiquido'?(field.required&&parseCLP(field.value)<=0):!field.checkValidity());if(!invalid)return true;invalid.setAttribute('aria-invalid','true');invalid.scrollIntoView({behavior:'smooth',block:'center'});invalid.focus({preventScroll:true});setMessage(errorMessages[invalid.name]||'Revisa el campo señalado.');return false;
+  const fields=visibleFields(step);fields.forEach(field=>{field.removeAttribute('aria-invalid');field.closest('label')?.classList.remove('is-missing');});
+  const invalid=fields.find(field=>{
+    if(field.name==='montoLiquido')return field.required&&parseCLP(field.value)<=0;
+    if(step===2&&field.matches('[data-detected-field]'))return !fieldIsValid(field);
+    return !field.checkValidity();
+  });
+  if(!invalid){setMessage();return true;}
+  invalid.setAttribute('aria-invalid','true');
+  refreshFieldState(invalid,{showMissing:true});
+  invalid.scrollIntoView({behavior:'smooth',block:'center'});
+  invalid.focus({preventScroll:true});
+  const labelText=invalid.closest('label')?.childNodes?.[0]?.textContent?.trim();
+  setMessage(errorMessages[invalid.name]||`${labelText||'Este campo'} necesita revisión.`);
+  return false;
 }
 const submissionStepByField={relato:1,region:2,comuna:2,sector:2,superficie:2,rol:2,agua:2,luz:2,acceso:2,topografia:2,tipoPublicador:3,nombreDueno:3,correoDueno:3,telefonoDueno:3,representanteNombre:3,correoCorredor:3,telefonoCorredor:3,whatsappCorredor:3,montoLiquido:3,aceptaPartner:3,planCorredor:3,aceptaEstandaresCorredor:3,tituloPublico:6,descripcionPublica:6};
 function submissionField(name){const control=form.elements[name];if(control instanceof RadioNodeList)return [...control].find(item=>item.checked)||control[0];return control;}
@@ -56,7 +70,7 @@ function renderSubmissionSuccess(submission){
 }
 function updateProgress(){document.querySelector('#progress-label').textContent=`Paso ${currentStep} de 6`;document.querySelector('#progress-name').textContent=stepNames[currentStep-1];document.querySelector('#progress-fill').style.width=`${Math.round(currentStep/6*100)}%`;progressItems.forEach((item,index)=>{item.removeAttribute('aria-current');if(index===currentStep-1)item.setAttribute('aria-current','step');item.classList.toggle('is-complete',index<currentStep-1);});}
 function updatePrimaryLabel(){nextButton.textContent=['Analizar descripción','Continuar a datos','Continuar a promoción','Continuar a fotografías','Revisar publicación','Publicar'][currentStep-1]||'Continuar';}
-function showStep(step,focus=true){
+function showStep(step,focus=true){if(Number(step)===2)ensureLocationOptions();
   currentStep=step==='loading'?'loading':Math.max(1,Math.min(6,step));
   if(currentStep==='loading'){
      allSteps.forEach(section=>{const active=section.dataset.step==='loading';section.hidden=!active;section.classList.toggle('is-active',active);});
@@ -73,24 +87,145 @@ function showStep(step,focus=true){
   if(currentStep===5){renderPhotos();updateLocationWarning();}
   if(currentStep===6){updateLocationWarning();renderPreview();}
   const heading=currentStep==='loading'?allSteps.find(section=>section.dataset.step==='loading')?.querySelector('h1,h2'):steps[currentStep-1]?.querySelector('h1,h2');
-  if(focus&&heading){heading.tabIndex=-1;heading.focus({preventScroll:true});heading.closest('.flow-step')?.scrollIntoView({behavior:'smooth',block:'start'});}
+  if(focus&&heading){
+    heading.tabIndex=-1;
+    requestAnimationFrame(()=>{
+      heading.scrollIntoView({behavior:'smooth',block:'start'});
+      heading.focus({preventScroll:true});
+    });
+  }
 }
-function populateRegions(){const select=form.elements.region;CHILE_LOCATIONS.forEach(item=>select.add(new Option(item.region,item.region)));}
-function populateCommunes(region,value=''){const select=form.elements.comuna;select.replaceChildren(new Option(region?'Selecciona una comuna':'Selecciona primero una región',''));communesForRegion(region).forEach(commune=>select.add(new Option(commune,commune)));select.disabled=!region;if(value&&[...select.options].some(option=>option.value===value))select.value=value;}
-function markMissing(){document.querySelectorAll('[data-detected-field]').forEach(field=>{if(!field.closest('label'))return;const missing=field.required&&!String(field.value||'').trim();field.closest('label').classList.toggle('is-missing',missing);});}
+function createSelectOption(label,value=''){const option=document.createElement('option');option.value=value;option.textContent=label;return option;}
+function normalizeLocationValue(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+function matchingOptionValue(select,wanted){
+  const target=normalizeLocationValue(wanted);
+  if(!target)return '';
+  return [...select.options].find(option=>normalizeLocationValue(option.value)===target)?.value||'';
+}
+function populateRegions(selectedValue=''){
+  const select=form.elements.region;if(!select)return;
+  const current=selectedValue||select.value||'';
+  select.replaceChildren(createSelectOption('Selecciona una región',''));
+  CHILE_LOCATIONS.forEach(item=>select.append(createSelectOption(item.region,item.region)));
+  select.value=matchingOptionValue(select,current);
+}
+function populateCommunes(region,value=''){
+  const select=form.elements.comuna;if(!select)return;
+  const normalizedRegion=CHILE_LOCATIONS.find(item=>normalizeLocationValue(item.region)===normalizeLocationValue(region))?.region||'';
+  const communes=communesForRegion(normalizedRegion);
+  select.replaceChildren(createSelectOption(normalizedRegion?'Selecciona una comuna':'Selecciona primero una región',''));
+  communes.forEach(commune=>select.append(createSelectOption(commune,commune)));
+  select.disabled=!normalizedRegion||!communes.length;
+  select.value=matchingOptionValue(select,value);
+}
+function ensureLocationOptions(){
+  const regionSelect=form.elements.region,communeSelect=form.elements.comuna;if(!regionSelect||!communeSelect)return;
+  const regionValue=regionSelect.value;
+  const communeValue=communeSelect.value;
+  const expectedRegions=CHILE_LOCATIONS.length+1;
+  if(regionSelect.options.length!==expectedRegions)populateRegions(regionValue);
+  const selectedRegion=regionSelect.value||matchingOptionValue(regionSelect,regionValue);
+  const expectedCommunes=selectedRegion?communesForRegion(selectedRegion).length+1:1;
+  if(communeSelect.options.length!==expectedCommunes||communeSelect.disabled===Boolean(selectedRegion))populateCommunes(selectedRegion,communeValue);
+}
+function fieldHasValue(field){
+  if(!field)return false;
+  if(field.type==='checkbox'||field.type==='radio')return field.checked;
+  if(field.tagName==='SELECT')return Boolean(field.value&&[...field.options].some(option=>option.value===field.value));
+  return Boolean(String(field.value??'').trim());
+}
+function fieldIsValid(field){
+  if(!field||field.disabled)return true;
+  if(!field.required)return true;
+  if(!fieldHasValue(field))return false;
+  if(field.name==='superficie')return Number(field.value)>0;
+  if(field.name==='precio')return parseCLP(field.value)>0;
+  return true;
+}
+function clearFieldError(field){
+  if(!field)return;
+  field.setCustomValidity('');
+  field.removeAttribute('aria-invalid');
+  field.closest('label')?.classList.remove('is-missing');
+}
+function refreshFieldState(field,{showMissing=false}={}){
+  if(!field)return;
+  if(fieldIsValid(field)){clearFieldError(field);return;}
+  if(showMissing){
+    field.setAttribute('aria-invalid','true');
+    field.closest('label')?.classList.add('is-missing');
+  }
+}
+function markMissing(){document.querySelectorAll('[data-detected-field]').forEach(field=>refreshFieldState(field,{showMissing:true}));}
 function selectSuggested(name,values){const wanted=(Array.isArray(values)?values:[values]).filter(Boolean).map(value=>String(value).toLowerCase());form.querySelectorAll(`input[name="${name}"]`).forEach(input=>{if(wanted.some(value=>value.includes(input.value.toLowerCase())||input.value.toLowerCase().includes(value)))input.checked=true;});}
 function parcelData(){return {relato:story.value,region:form.elements.region.value,comuna:form.elements.comuna.value,sector:form.elements.sector.value,superficie:form.elements.superficie.value,precio:parseCLP(form.elements.precio.value),rol:optionText(form.elements.rol),agua:optionText(form.elements.agua),luz:optionText(form.elements.luz),acceso:optionText(form.elements.acceso),topografia:optionText(form.elements.topografia),naturaleza:checkedValues('naturaleza'),cuerposAgua:checkedValues('cuerposAgua'),servicios:checkedValues('servicios'),ciudadPrincipal:form.elements.ciudadPrincipal.value,distanciaCiudad:form.elements.distanciaCiudad.value,facilidadPago:form.elements.facilidadPago.value,detalleFacilidad:form.elements.detalleFacilidad.value};}
 function regenerateDescription({confirmOverwrite=true}={}){const field=form.elements.descripcionPublica;if(confirmOverwrite&&shouldConfirmDescriptionRegeneration({modified:publicDescriptionModified,current:field.value,lastGenerated:lastGeneratedDescription})&&!window.confirm('Editaste la descripción pública. ¿Quieres reemplazar tus cambios por una nueva versión sugerida por TPL?'))return false;const generated=generateCommercialContent(parcelData()).descripcion_publica;updatingPublicDescription=true;field.value=generated;updatingPublicDescription=false;lastGeneratedDescription=generated;publicDescriptionModified=false;return true;}
 function regenerateTitle({confirmOverwrite=true}={}){const field=form.elements.tituloPublico;if(confirmOverwrite&&shouldConfirmDescriptionRegeneration({modified:publicTitleModified,current:field.value,lastGenerated:lastGeneratedTitle})&&!window.confirm('Editaste el título público. ¿Quieres reemplazar tus cambios por una nueva versión sugerida por TPL?'))return false;const generated=generatePublicTitle(parcelData());updatingPublicTitle=true;field.value=generated;updatingPublicTitle=false;lastGeneratedTitle=generated;publicTitleModified=false;return true;}
 function applyAnalysis({warn=true}={}){
   const proposed=analyzeParcelText(story.value);analysisData=proposed;if(!proposed.region&&proposed.comuna)proposed.region=regionForCommune(proposed.comuna);const conflicts=fieldNames.filter(name=>{const field=form.elements[name],value=proposed[name];return field&&value!=null&&confirmedFields.has(name)&&String(field.value).trim()&&String(field.value)!==String(value);});const replace=!warn||!conflicts.length||window.confirm(`Ya corregiste estos datos: ${conflicts.join(', ')}. ¿Quieres reemplazarlos con la nueva interpretación?`);
-  if(proposed.region&&!confirmedFields.has('region')){form.elements.region.value=proposed.region;populateCommunes(proposed.region,proposed.comuna||'');}
-  const aliases={distancia:'distanciaCiudad'};Object.entries(proposed).forEach(([raw,value])=>{const name=aliases[raw]||raw,field=form.elements[name];if(!field||value==null||['naturaleza','aguaNatural','serviciosCercanos','descripcionPublica','region','comuna','facilidadPago'].includes(raw))return;if(conflicts.includes(name)&&!replace)return;if(!field.value||replace||!confirmedFields.has(name)){field.value=String(value);field.dispatchEvent(new Event('input',{bubbles:true}));}});
-  if(proposed.naturaleza)selectSuggested('naturaleza',String(proposed.naturaleza).split(','));if(proposed.aguaNatural)selectSuggested('cuerposAgua',String(proposed.aguaNatural).split(','));if(proposed.serviciosCercanos)selectSuggested('servicios',String(proposed.serviciosCercanos).split(','));if(proposed.facilidadPago){form.elements.facilidadPago.value='si';form.elements.detalleFacilidad.value=proposed.facilidadPago;togglePayment();}regenerateTitle({confirmOverwrite:true});regenerateDescription({confirmOverwrite:true});markMissing();
+  if(proposed.region&&!confirmedFields.has('region')){
+    form.elements.region.value=proposed.region;
+    populateCommunes(proposed.region,proposed.comuna||'');
+    refreshFieldState(form.elements.region);
+    refreshFieldState(form.elements.comuna);
+  }
+  const aliases={distancia:'distanciaCiudad'};Object.entries(proposed).forEach(([raw,value])=>{const name=aliases[raw]||raw,field=form.elements[name];if(!field||value==null||['naturaleza','aguaNatural','serviciosCercanos','descripcionPublica','region','comuna','facilidadPago'].includes(raw))return;if(conflicts.includes(name)&&!replace)return;if(!field.value||replace||!confirmedFields.has(name)){
+      field.value=name==='precio'?formatCLP(value):String(value);
+      field.dispatchEvent(new Event(field.tagName==='SELECT'?'change':'input',{bubbles:true}));
+    }});
+  if(proposed.naturaleza)selectSuggested('naturaleza',String(proposed.naturaleza).split(','));if(proposed.aguaNatural)selectSuggested('cuerposAgua',String(proposed.aguaNatural).split(','));if(proposed.serviciosCercanos)selectSuggested('servicios',String(proposed.serviciosCercanos).split(','));if(proposed.facilidadPago){form.elements.facilidadPago.value='si';form.elements.detalleFacilidad.value=proposed.facilidadPago;togglePayment();}regenerateTitle({confirmOverwrite:true});regenerateDescription({confirmOverwrite:true});
+  document.querySelectorAll('[data-detected-field]').forEach(field=>{if(fieldIsValid(field))clearFieldError(field);else refreshFieldState(field,{showMissing:true});});
 }
 
 function setVoiceState(state,text=''){voiceState=state;const view=getVoiceView(state,Boolean(story.value.trim()));voiceButton.dataset.state=state;voiceButton.disabled=state==='processing';voiceButton.setAttribute('aria-pressed',String(view.pressed));voiceButton.setAttribute('aria-label',view.label);document.querySelector('#voice-label').textContent=view.label;document.querySelector('#record-icon').textContent=view.icon;finishVoiceButton.hidden=!view.showFinish;document.querySelector('#voice-status').textContent=text;}
-function setupVoice(){const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Recognition)return;recognition=new Recognition();recognition.lang='es-CL';recognition.continuous=true;recognition.interimResults=true;let base='';recognition.onstart=()=>{base=story.value.trim();pauseRequested=false;recognitionError=false;setVoiceState('listening','Estamos escuchando. Puedes pausar o terminar cuando quieras.');};recognition.onresult=event=>{let spoken='';for(let i=0;i<event.results.length;i+=1)spoken+=`${event.results[i][0].transcript} `;story.value=cleanVoiceTranscript([base,spoken].filter(Boolean).join(' '));updateStoryCount();};recognition.onerror=()=>{recognitionError=true;setVoiceState('unsupported','No pudimos activar el dictado en este navegador. Puedes continuar escribiendo o abrir esta página en Google Chrome o Microsoft Edge.');};recognition.onend=()=>{story.value=cleanVoiceTranscript(story.value);updateStoryCount();if(recognitionError)return;if(finishRequested){finishRequested=false;setVoiceState('finished','Dictado terminado. El texto permanece editable.');return;}if(pauseRequested){pauseRequested=false;setVoiceState('paused','Grabación pausada. Puedes continuar cuando quieras.');return;}setVoiceState('finished','Dictado terminado. El texto permanece editable.');};}
+function setupVoice(){
+  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!Recognition)return;
+  recognition=new Recognition();
+  recognition.lang='es-CL';
+  recognition.continuous=true;
+  recognition.interimResults=true;
+  let base='';
+  const finalSegments=[];
+  recognition.onstart=()=>{
+    base=story.value.trim();
+    finalSegments.length=0;
+    pauseRequested=false;
+    recognitionError=false;
+    story.closest('.story-field')?.classList.add('is-recording');
+    setVoiceState('listening','Grabando en vivo… Habla con naturalidad; las palabras aparecerán aquí.');
+  };
+  recognition.onresult=event=>{
+    let interim='';
+    for(let i=event.resultIndex;i<event.results.length;i+=1){
+      const transcript=event.results[i][0].transcript.trim();
+      if(!transcript)continue;
+      if(event.results[i].isFinal){
+        const normalized=cleanVoiceTranscript(transcript).toLowerCase();
+        if(normalized&&!finalSegments.some(segment=>segment.toLowerCase()===normalized))finalSegments.push(cleanVoiceTranscript(transcript));
+      }else interim=transcript;
+    }
+    story.value=cleanVoiceTranscript([base,...finalSegments,interim].filter(Boolean).join(' '));
+    story.dispatchEvent(new Event('input',{bubbles:true}));
+    updateStoryCount();
+  };
+  recognition.onerror=()=>{
+    recognitionError=true;
+    story.closest('.story-field')?.classList.remove('is-recording');
+    setVoiceState('unsupported','No pudimos activar el dictado en este navegador. Puedes continuar escribiendo o usar Chrome o Edge.');
+  };
+  recognition.onend=()=>{
+    story.value=cleanVoiceTranscript(story.value);
+    story.dispatchEvent(new Event('input',{bubbles:true}));
+    updateStoryCount();
+    story.closest('.story-field')?.classList.remove('is-recording');
+    if(recognitionError)return;
+    if(finishRequested){finishRequested=false;setVoiceState('finished','Dictado terminado. Puedes revisar y editar el texto.');return;}
+    if(pauseRequested){pauseRequested=false;setVoiceState('paused','Grabación pausada. Puedes continuar cuando quieras.');return;}
+    setVoiceState('finished','Dictado terminado. Puedes revisar y editar el texto.');
+  };
+}
+
 function updateStoryCount(){document.querySelector('#story-count').textContent=`${story.value.length.toLocaleString('es-CL')} de 5.000`;if(['initial','paused','finished','unsupported'].includes(voiceState))setVoiceState(voiceState,document.querySelector('#voice-status').textContent);}
 
 const finalPhotoBytes=()=>photos.reduce((sum,item)=>sum+item.file.size,0);
@@ -235,7 +370,7 @@ function restoreVisualAnalysisState(){try{const current=JSON.parse(localStorage.
 function restoreTasadorState(){try{const current=JSON.parse(localStorage.getItem(CURRENT_STORAGE_KEY)||'null'),previous=JSON.parse(localStorage.getItem(PREVIOUS_STORAGE_KEY)||'null'),draft=migrateDraft(current||previous);tasadorSession=draft?.tasacionTPL?createValuationSession(draft.tasacionTPL):null;if(tasadorSession?.result){document.querySelector('#estimator').hidden=false;renderEstimator(tasadorSession.result);}}catch{tasadorSession=null;}}
 function restoreLocationState(){try{const current=JSON.parse(localStorage.getItem(CURRENT_STORAGE_KEY)||'null'),previous=JSON.parse(localStorage.getItem(PREVIOUS_STORAGE_KEY)||'null'),draft=migrateDraft(current||previous);if(!draft)return;const hasStoredCoordinates=draft.latitudPrivada!==''&&draft.latitudPrivada!=null&&draft.longitudPrivada!==''&&draft.longitudPrivada!=null,coordinates={latitude:Number(draft.latitudPrivada),longitude:Number(draft.longitudPrivada)};gpsCoordinates=hasStoredCoordinates&&hasPrivateCoordinates(coordinates)?coordinates:null;locationSource=draft.ubicacionFuente||'';locationConfirmedAt=draft.ubicacionConfirmadaEn||null;gpsConsent.checked=Boolean(draft.autorizaGpsFotos&&!gpsCoordinates&&!isValidGoogleMapsLink(mapsLink.value));locationEvaluationReady=Object.hasOwn(draft,'ubicacion_no_informada');locationWarningDismissed=Boolean(draft.ubicacion_advertencia_descartada);lastMapsLinkValid=isValidGoogleMapsLink(mapsLink.value);if(gpsCoordinates)gpsStatus.textContent='El borrador conserva una ubicación privada confirmada.';else if(gpsConsent.checked)gpsStatus.textContent='Vuelve a seleccionar las fotografías para comprobar si contienen GPS.';updateLocationWarning();}catch{gpsCoordinates=null;locationSource='';locationConfirmedAt=null;gpsConsent.checked=false;}}
 function restoreVisitState(){try{const current=JSON.parse(localStorage.getItem(CURRENT_STORAGE_KEY)||'null'),previous=JSON.parse(localStorage.getItem(PREVIOUS_STORAGE_KEY)||'null'),draft=migrateDraft(current||previous);visitRequests=Array.isArray(draft?.solicitudes_visita)?draft.solicitudes_visita:[];if(draft?.responsable_tipo)currentResponsible={responsable_tipo:draft.responsable_tipo,responsable_id:draft.responsable_id||'',responsable_nombre:draft.responsable_nombre||'',responsable_whatsapp:draft.responsable_whatsapp||'',responsable_email:draft.responsable_email||''};}catch{visitRequests=[];currentResponsible=null;}}
-function restoreSubmissionState(){try{const current=JSON.parse(localStorage.getItem(CURRENT_STORAGE_KEY)||'null'),previous=JSON.parse(localStorage.getItem(PREVIOUS_STORAGE_KEY)||'null'),draft=migrateDraft(current||previous),recoverable=Boolean(draft?.submission?.transport==='supabase-v1'&&draft.submission.publicationId);if(draft?.estado!=='publicado'&&draft?.estado!=='pendiente_revision'&&!draft?.enviado&&!recoverable)return;lastSubmission=draft.submission||{status:'publicado',submittedAt:draft.fecha_envio,contactEmail:draft.correo_contacto,temporaryCode:draft.codigo_temporal,publisherType:draft.tipo_publicador||draft.tipoPublicador,commercialModel:draft.plan_modelo_comercial,publicTitle:draft.titulo_publico,publicDescription:draft.descripcion_publica,transport:'mock-local-v1'};if(lastSubmission.status==='revision_ia_pendiente'&&lastSubmission.visualAnalysis?.suggestions){beginVisualAnalysisReview({...draft,submission:lastSubmission});return;}if(lastSubmission.status==='publicado'||lastSubmission.status==='pendiente_revision'){saveButton.disabled=true;saveButton.textContent='Publicación activa';renderSubmissionSuccess(lastSubmission);}else{saveButton.disabled=false;saveButton.textContent='Reintentar publicación';setMessage(`El envío ${lastSubmission.temporaryCode||''} está pendiente. Vuelve a seleccionar las fotografías indicadas y reintenta.`);}}catch{lastSubmission=null;}}
+function restoreSubmissionState(){try{const current=JSON.parse(localStorage.getItem(CURRENT_STORAGE_KEY)||'null'),previous=JSON.parse(localStorage.getItem(PREVIOUS_STORAGE_KEY)||'null'),draft=migrateDraft(current||previous),recoverable=Boolean(['supabase-v1','supabase-edge-v1'].includes(draft?.submission?.transport)&&draft.submission.publicationId);if(draft?.estado!=='publicado'&&draft?.estado!=='pendiente_revision'&&!draft?.enviado&&!recoverable)return;lastSubmission=draft.submission||{status:'publicado',submittedAt:draft.fecha_envio,contactEmail:draft.correo_contacto,temporaryCode:draft.codigo_temporal,publisherType:draft.tipo_publicador||draft.tipoPublicador,commercialModel:draft.plan_modelo_comercial,publicTitle:draft.titulo_publico,publicDescription:draft.descripcion_publica,transport:'mock-local-v1'};if(lastSubmission.status==='revision_ia_pendiente'&&lastSubmission.visualAnalysis?.suggestions){beginVisualAnalysisReview({...draft,submission:lastSubmission});return;}if(lastSubmission.status==='publicado'||lastSubmission.status==='pendiente_revision'){saveButton.disabled=true;saveButton.textContent='Publicación activa';renderSubmissionSuccess(lastSubmission);}else{saveButton.disabled=false;saveButton.textContent='Reintentar publicación';setMessage(`El envío ${lastSubmission.temporaryCode||''} está pendiente. Vuelve a seleccionar las fotografías indicadas y reintenta.`);}}catch{lastSubmission=null;}}
 function togglePayment(){const yes=form.elements.facilidadPago.value==='si';document.querySelector('#payment-detail').hidden=!yes;form.elements.detalleFacilidad.disabled=!yes;}
 function enforceExclusive(input){const group=input.closest('[data-multi]');if(!group)return;const boxes=[...group.querySelectorAll('input[type="checkbox"]')];if(input.dataset.exclusive!==undefined&&input.checked)boxes.filter(box=>box!==input).forEach(box=>box.checked=false);else if(input.checked){const exclusive=boxes.find(box=>box.dataset.exclusive!==undefined);if(exclusive)exclusive.checked=false;}}
 function updateEnrichmentStatus(){const status=document.querySelector('#enrichment-status');if(!enrichmentData){status.textContent='Sin sugerencias complementarias.';return;}const labels={suggested:'Sugerencia pendiente de revisión.',accepted:'Información complementaria aceptada.',edited:'Información complementaria editada y aceptada.',rejected:'Información complementaria rechazada; no aparecerá en la publicación.'};status.textContent=labels[enrichmentData.status]||'';}
@@ -249,9 +384,48 @@ nextButton.addEventListener('click',async ()=>{
   showStep(currentStep+1);
 });
 backButton.addEventListener('click',()=>showStep(currentStep-1));document.querySelector('#edit-publication').addEventListener('click',()=>showStep(2));document.querySelector('#change-cover').addEventListener('click',()=>showStep(5));story.addEventListener('input',updateStoryCount);
-form.elements.region.addEventListener('change',()=>{populateCommunes(form.elements.region.value);confirmedFields.add('region');markMissing();});form.elements.comuna.addEventListener('change',()=>{confirmedFields.add('comuna');markMissing();});document.querySelector('#detected-fields').addEventListener('input',event=>{if(event.target.matches('[data-detected-field]')){confirmedFields.add(event.target.name);markMissing();}});document.querySelectorAll('[data-multi] input').forEach(input=>input.addEventListener('change',()=>enforceExclusive(input)));form.elements.facilidadPago.forEach(input=>input.addEventListener('change',togglePayment));form.elements.tipoPublicador.forEach(input=>input.addEventListener('change',togglePublisherFields));form.elements.descripcionPublica.addEventListener('input',()=>{if(!updatingPublicDescription)publicDescriptionModified=true;});form.elements.tituloPublico.addEventListener('input',()=>{if(!updatingPublicTitle)publicTitleModified=true;});document.querySelector('#regenerate-description').addEventListener('click',()=>regenerateDescription({confirmOverwrite:true}));document.querySelector('#regenerate-title').addEventListener('click',()=>regenerateTitle({confirmOverwrite:true}));
+form.elements.region.addEventListener('change',()=>{
+  const selectedRegion=form.elements.region.value;
+  populateCommunes(selectedRegion,'');
+  confirmedFields.add('region');
+  clearFieldError(form.elements.region);
+  clearFieldError(form.elements.comuna);
+});
+form.elements.comuna.addEventListener('change',()=>{
+  const commune=form.elements.comuna.value;
+  const inferredRegion=regionForCommune(commune);
+  if(inferredRegion&&form.elements.region.value!==inferredRegion){
+    form.elements.region.value=inferredRegion;
+    populateCommunes(inferredRegion,commune);
+  }
+  confirmedFields.add('comuna');
+  refreshFieldState(form.elements.comuna);
+  refreshFieldState(form.elements.region);
+});
+function handleDetectedFieldEdit(event){
+  const field=event.target.closest?.('[data-detected-field]');
+  if(!field)return;
+  confirmedFields.add(field.name);
+  // La interacción del usuario siempre limpia el mensaje antiguo.
+  // Si el valor sigue inválido, validateStep lo marcará nuevamente al continuar.
+  clearFieldError(field);
+  if(field.name==='precio')field.value=formatCLP(field.value);
+  if(message.classList.contains('is-visible')&&!message.classList.contains('is-success'))setMessage();
+}
+const detectedFields=document.querySelector('#detected-fields');
+detectedFields.addEventListener('input',handleDetectedFieldEdit);
+detectedFields.addEventListener('change',handleDetectedFieldEdit);
+document.querySelectorAll('[data-multi] input').forEach(input=>input.addEventListener('change',()=>enforceExclusive(input)));form.elements.facilidadPago.forEach(input=>input.addEventListener('change',togglePayment));form.elements.tipoPublicador.forEach(input=>input.addEventListener('change',togglePublisherFields));form.elements.descripcionPublica.addEventListener('input',()=>{if(!updatingPublicDescription)publicDescriptionModified=true;});form.elements.tituloPublico.addEventListener('input',()=>{if(!updatingPublicTitle)publicTitleModified=true;});document.querySelector('#regenerate-description').addEventListener('click',()=>regenerateDescription({confirmOverwrite:true}));document.querySelector('#regenerate-title').addEventListener('click',()=>regenerateTitle({confirmOverwrite:true}));
 document.querySelector('#accept-enrichment').addEventListener('click',()=>{if(!enrichmentData)return;enrichmentData={...enrichmentData,status:ENRICHMENT_STATUS.ACCEPTED,text:form.elements.informacionComplementaria.value};updateEnrichmentStatus();});document.querySelector('#edit-enrichment').addEventListener('click',()=>{form.elements.informacionComplementaria.focus();if(enrichmentData)enrichmentData={...enrichmentData,status:ENRICHMENT_STATUS.EDITED};updateEnrichmentStatus();});document.querySelector('#reject-enrichment').addEventListener('click',()=>{if(enrichmentData)enrichmentData={...enrichmentData,status:ENRICHMENT_STATUS.REJECTED};form.elements.informacionComplementaria.value='';updateEnrichmentStatus();});form.elements.informacionComplementaria.addEventListener('input',()=>{if(enrichmentData)enrichmentData={...enrichmentData,status:ENRICHMENT_STATUS.EDITED,text:form.elements.informacionComplementaria.value};updateEnrichmentStatus();});document.querySelector('#broker-logo').addEventListener('change',event=>{const file=event.target.files?.[0];brokerLogoMeta=file?{name:file.name,size:file.size,type:file.type}:null;if(publisherType()==='corredor')renderBrokerProfile();});document.querySelector('#broker-contact').addEventListener('input',()=>{if(publisherType()==='corredor')renderBrokerProfile();});form.elements.aceptaEstandaresCorredor.addEventListener('change',event=>{qualityAcceptedAt=event.target.checked?new Date().toISOString():null;});document.querySelector('#view-broker-listings').addEventListener('click',()=>{document.querySelector('#profile-action-status').textContent='La página de parcelas estará disponible con el perfil profesional.';});document.querySelector('#contact-broker-preview').addEventListener('click',()=>{document.querySelector('#profile-action-status').textContent='El contacto directo se habilitará cuando el perfil sea publicado.';});
-form.addEventListener('input',event=>{if(event.target.matches('input,select,textarea')){event.target.removeAttribute('aria-invalid');if(message.classList.contains('is-visible')&&!message.classList.contains('is-success'))setMessage();}});
+function clearLiveFieldError(event){
+  const field=event.target;
+  if(!field.matches?.('input,select,textarea'))return;
+  if(field.matches('[data-detected-field]'))return;
+  if(fieldIsValid(field))clearFieldError(field);
+  if(message.classList.contains('is-visible')&&!message.classList.contains('is-success'))setMessage();
+}
+form.addEventListener('input',clearLiveFieldError);
+form.addEventListener('change',clearLiveFieldError);
 voiceButton.addEventListener('click',()=>{if(!recognition){setVoiceState('unsupported','No pudimos activar el dictado en este navegador. Puedes continuar escribiendo o abrir esta página en Google Chrome o Microsoft Edge.');return;}if(voiceState==='listening'){pauseRequested=true;setVoiceState('processing','Pausando y conservando la transcripción…');recognition.stop();return;}try{pauseRequested=false;finishRequested=false;recognition.start();}catch{setVoiceState('unsupported','No pudimos activar el dictado en este navegador. Puedes continuar escribiendo o abrir esta página en Google Chrome o Microsoft Edge.');}});finishVoiceButton.addEventListener('click',()=>{if(voiceState==='listening'){finishRequested=true;pauseRequested=false;setVoiceState('processing','Terminando y conservando la transcripción…');recognition.stop();}else if(voiceState==='paused')setVoiceState('finished','Dictado terminado. El texto permanece editable.');});
 photoInput.addEventListener('change',()=>queueFiles(photoInput.files,photoInput));cameraInput.addEventListener('change',()=>queueFiles(cameraInput.files,cameraInput));photoDrop.addEventListener('click',event=>{if(event.target!==photoInput&&!isOptimizingPhotos)photoInput.click();});photoDrop.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&!isOptimizingPhotos){event.preventDefault();photoInput.click();}});['dragenter','dragover'].forEach(type=>photoDrop.addEventListener(type,event=>{event.preventDefault();if(!isOptimizingPhotos)photoDrop.classList.add('is-dragover');}));['dragleave','drop'].forEach(type=>photoDrop.addEventListener(type,event=>{event.preventDefault();photoDrop.classList.remove('is-dragover');if(type==='drop'&&!isOptimizingPhotos)queueFiles(event.dataTransfer.files);}));
 mapsLink.addEventListener('input',()=>{locationEvaluationReady=true;const valid=isValidGoogleMapsLink(mapsLink.value),help=document.querySelector('#maps-link-help');if(valid&&!hasPrivateCoordinates(gpsCoordinates)){locationSource='google_maps_link';locationConfirmedAt||=new Date().toISOString();}else if(!valid&&locationSource==='google_maps_link'){locationSource='';locationConfirmedAt=null;}help.textContent=!mapsLink.value.trim()?'Opcional. La ubicación exacta se mantendrá privada.':valid?'Enlace reconocido. La ubicación exacta se mantendrá privada.':'Este enlace no parece ser de Google Maps. Puedes corregirlo o continuar sin ubicación.';updateLocationWarning();});
@@ -263,7 +437,7 @@ form.elements.cantidadParcelas?.addEventListener('input', () => {
   const warning = document.querySelector('#extra-parcel-warning');
   if (warning) warning.hidden = extra === 0;
 });
-ownerAmount.addEventListener('input',()=>{const value=parseCLP(ownerAmount.value);ownerAmount.value=value?value.toLocaleString('es-CL'):'';updateOwnerPrice();});form.elements.precio.addEventListener('input',()=>{const value=parseCLP(form.elements.precio.value);form.elements.precio.value=value?value.toLocaleString('es-CL'):'';if(tasadorSession?.result?.range?.market){const market=Number(tasadorSession.result.range.market),difference=Number((((value-market)/market)*100).toFixed(1));tasadorSession.result={...tasadorSession.result,difference,position:positionFor(value,market)};renderEstimator(tasadorSession.result);}});ownerAcceptance.addEventListener('change',()=>{document.querySelector('#partner-alternative').hidden=ownerAcceptance.checked;});document.querySelector('#keep-partner').addEventListener('click',()=>{ownerAcceptance.checked=true;document.querySelector('#partner-alternative').hidden=true;setMessage();});document.querySelector('#switch-to-broker').addEventListener('click',()=>{form.querySelector('input[name="tipoPublicador"][value="corredor"]').checked=true;form.elements.representanteNombre.value||=form.elements.nombreDueno.value;form.elements.correoCorredor.value||=form.elements.correoDueno.value;form.elements.telefonoCorredor.value||=form.elements.telefonoDueno.value;changedFromOwnerToBroker=true;ownerAcceptance.checked=false;togglePublisherFields();renderCommercialModel();setMessage('Conservamos todos tus datos. Ahora elige un plan para corredores.',true);});
+ownerAmount.addEventListener('input',()=>{ownerAmount.value=formatCLP(ownerAmount.value);updateOwnerPrice();});form.elements.precio.addEventListener('input',()=>{const value=parseCLP(form.elements.precio.value);form.elements.precio.value=formatCLP(value);if(tasadorSession?.result?.range?.market){const market=Number(tasadorSession.result.range.market),difference=Number((((value-market)/market)*100).toFixed(1));tasadorSession.result={...tasadorSession.result,difference,position:positionFor(value,market)};renderEstimator(tasadorSession.result);}});ownerAcceptance.addEventListener('change',()=>{document.querySelector('#partner-alternative').hidden=ownerAcceptance.checked;});document.querySelector('#keep-partner').addEventListener('click',()=>{ownerAcceptance.checked=true;document.querySelector('#partner-alternative').hidden=true;setMessage();});document.querySelector('#switch-to-broker').addEventListener('click',()=>{form.querySelector('input[name="tipoPublicador"][value="corredor"]').checked=true;form.elements.representanteNombre.value||=form.elements.nombreDueno.value;form.elements.correoCorredor.value||=form.elements.correoDueno.value;form.elements.telefonoCorredor.value||=form.elements.telefonoDueno.value;changedFromOwnerToBroker=true;ownerAcceptance.checked=false;togglePublisherFields();renderCommercialModel();setMessage('Conservamos todos tus datos. Ahora elige un plan para corredores.',true);});
 document.querySelector('#open-estimator').addEventListener('click',async()=>{const panel=document.querySelector('#estimator'),loading=document.querySelector('#estimator-loading'),result=document.querySelector('#estimator-result'),button=document.querySelector('#open-estimator'),data=parcelData();estimatorOriginalAmount=parseCLP(form.elements.precio.value);if(!estimatorOriginalAmount||!Number(data.superficie)||!data.comuna){setMessage('Completa comuna, superficie y precio antes de comprobar el valor.');return;}panel.hidden=false;loading.hidden=false;result.replaceChildren();button.disabled=true;setMessage();try{tasadorSession=await runBasicValuation({...data,superficie_m2:Number(data.superficie),precio_ingresado:estimatorOriginalAmount,lat:gpsCoordinates?.latitude??null,lng:gpsCoordinates?.longitude??null,consentimiento_ubicacion:Boolean(gpsCoordinates)},createValuationSession({...tasadorSession,originalPrice:estimatorOriginalAmount}));renderEstimator(tasadorSession.result);localStorage.setItem(CURRENT_STORAGE_KEY,JSON.stringify(serializeDraft()));}catch(error){appendText(result,'p',error.message||'No fue posible consultar el Tasador TPL. Puedes continuar con tu precio.','tpl-valuator-notice');}finally{loading.hidden=true;button.disabled=false;}});
 const visitDialog=document.querySelector('#visit-dialog'),visitForm=document.querySelector('#visit-request-form'),visitStatus=document.querySelector('#visit-request-status');document.querySelector('#schedule-visit').addEventListener('click',()=>{currentResponsible=responsibleData();document.querySelector('#visit-responsible-copy').textContent=`Tu solicitud será atendida por ${currentResponsible.responsable_nombre}.`;visitStatus.textContent='';if(typeof visitDialog.showModal==='function')visitDialog.showModal();else visitDialog.setAttribute('open','');});document.querySelector('#close-visit-dialog').addEventListener('click',()=>{if(typeof visitDialog.close==='function')visitDialog.close();else visitDialog.removeAttribute('open');});visitForm.addEventListener('submit',event=>{event.preventDefault();if(!visitForm.checkValidity()){visitForm.reportValidity();return;}currentResponsible=responsibleData();const values=Object.fromEntries(new FormData(visitForm).entries()),request=createVisitRequest({nombre:values.visitanteNombre,telefono:values.visitanteTelefono,correo:values.visitanteCorreo,fechaPreferida:values.fechaPreferida,horario:values.horario,mensaje:values.mensajeVisita},currentResponsible);visitRequests.push(request);try{localStorage.setItem(CURRENT_STORAGE_KEY,JSON.stringify(serializeDraftWithSubmission()));visitStatus.textContent=`Solicitud guardada localmente y asociada a ${currentResponsible.responsable_nombre}.`;visitForm.reset();}catch{visitStatus.textContent='No pudimos guardar la solicitud localmente. Tus datos siguen visibles para que puedas intentarlo nuevamente.';}});
 
@@ -300,6 +474,7 @@ async function submitPublication(event) {
     if (lastSubmission?.status === 'publicado') { renderSubmissionSuccess(lastSubmission); return; }
     if (lastSubmission?.status === 'pendiente_revision') { renderSubmissionSuccess(lastSubmission); return; }
     if (!validateSubmission()) return;
+    trackPublicationStart();
 
   // NUEVO: Verificación de Pago de Planes Flow.cl y Parcelas Extra
   const type = publisherType();
@@ -329,6 +504,7 @@ async function submitPublication(event) {
 
   if (window.TPL_PAYMENTS_ENABLED === true && amountToPay > 0) {
     isSubmitting = true;
+    window.isSubmittingPublish = true;
     saveButton.disabled = true;
     saveButton.textContent = 'Redirigiendo a Flow.cl para continuar...';
     try {
@@ -356,6 +532,7 @@ async function submitPublication(event) {
     } catch (err) {
       console.error(err);
       isSubmitting = false;
+      window.isSubmittingPublish = false;
       saveButton.disabled = false;
       saveButton.textContent = 'Publicar';
       setMessage('Error al conectar con Flow. Intenta nuevamente.');
@@ -364,6 +541,7 @@ async function submitPublication(event) {
   }
 
   isSubmitting=true;
+  window.isSubmittingPublish=true;
   saveButton.disabled=true;
   saveButton.textContent='Enviando publicación.';
   saveButton.setAttribute('aria-busy','true');
@@ -379,6 +557,7 @@ async function submitPublication(event) {
     renderSubmissionSuccess(lastSubmission);
   }catch(error){
     isSubmitting=false;
+    window.isSubmittingPublish=false;
     if(error?.recoveryDraft){lastSubmission=error.recoveryDraft.submission;localStorage.setItem(CURRENT_STORAGE_KEY,JSON.stringify(error.recoveryDraft));}
     saveButton.disabled=false;
     saveButton.textContent=lastSubmission?.publicationId?'Reintentar publicación':'Publicar';
@@ -477,20 +656,20 @@ form.addEventListener('submit', submitPublication);
 
 // Tracking and Abandonment Injection
 window.addEventListener('beforeunload', (e) => {
-  if (!window.isSubmittingPublish && typeof currentStep !== 'undefined' && currentStep > 1 && currentStep < 6) {
+  if (!isSubmitting && !['pendiente_revision','publicado'].includes(lastSubmission?.status) && typeof currentStep !== 'undefined' && currentStep > 1 && currentStep < 6) {
     e.preventDefault();
     e.returnValue = 'Tienes una publicacion en curso. Seguro que quieres salir sin guardarla?';
   }
 });
 
-const formPub = document.getElementById('publish-form');
-if (formPub) {
-  formPub.addEventListener('submit', () => {
-    window.isSubmittingPublish = true;
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      'event': 'tpl_publish_end',
-      'plan_elegido': 'gratis'
-    });
+// El evento de analítica se registra cuando el envío realmente comienza,
+// no ante un submit inválido que el navegador todavía debe corregir.
+function trackPublicationStart(){
+  window.dataLayer=window.dataLayer||[];
+  window.dataLayer.push({
+    event:'tpl_publish_start',
+    publisher_type:publisherType()||'sin_definir',
+    plan_elegido:selectedBrokerPlan()||commercialModelForTracking()
   });
 }
+function commercialModelForTracking(){return publisherType()==='dueno'?'partner':'sin_plan';}

@@ -69,7 +69,10 @@ export const submissionAdapter={
    throw error;
   }
   const submittedAt=result.creado_en||new Date().toISOString();
-  const submission={...checkpoint.submission,status:'pendiente_revision',submittedAt,temporaryCode:result.codigo_publico,publicationId:result.id,photosProcessed:result.fotos_procesadas,photosUploaded:result.fotos_subidas,photosReused:result.fotos_reutilizadas,visualAnalysis:result.analisis_visual};
-  return {...checkpoint,estado:'pendiente_revision',fecha_envio:submittedAt,codigo_temporal:result.codigo_publico,enviado:true,submission};
+  const visualAnalysis=result.analisis_visual||{status:'not_requested'};
+  const needsVisualReview=visualAnalysis.status==='completed'&&Boolean(visualAnalysis.suggestions);
+  const finalStatus=needsVisualReview?'revision_ia_pendiente':'pendiente_revision';
+  const submission={...checkpoint.submission,status:finalStatus,submittedAt,temporaryCode:result.codigo_publico,publicationId:result.id,photosProcessed:result.fotos_procesadas,photosUploaded:result.fotos_subidas,photosReused:result.fotos_reutilizadas,visualAnalysis};
+  return {...checkpoint,estado:finalStatus,fecha_envio:submittedAt,codigo_temporal:result.codigo_publico,enviado:true,submission};
  }
 };

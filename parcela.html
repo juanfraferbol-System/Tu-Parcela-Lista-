@@ -331,6 +331,10 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   gtag('js', new Date());
   gtag('config', 'AW-TU_ID_DE_GOOGLE_ADS');
 </script>
+
+<style id="tpl-backed-value-detail-styles">
+.detail-tpl-backed-badge{display:flex;align-items:center;gap:10px;margin-top:10px;padding:11px 13px;border-radius:13px;border:1px solid #b9e8cc;background:linear-gradient(135deg,#f2fff7,#e7f8ee);color:#145c37;text-align:left;max-width:360px}.detail-tpl-backed-badge[hidden]{display:none}.detail-tpl-backed-badge>span{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#16844b;color:#fff;font-weight:900;flex:0 0 auto}.detail-tpl-backed-badge strong{display:block;font-size:.82rem;line-height:1.25}.detail-tpl-backed-badge small{display:block;margin-top:2px;color:#39775a;font-size:.72rem}
+</style>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -400,6 +404,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <div class="detail-price-box">
         <div class="detail-main-price" id="detail-price-text">$0</div>
+        <div id="detail-tpl-backed-badge" class="detail-tpl-backed-badge" hidden><span>✓</span><div><strong>Valor respaldado por Tu Parcela Lista</strong><small>Precio recomendado por el Tasador TPL</small></div></div><div id="detail-promotion-badge" class="detail-tpl-backed-badge" hidden><span>🔥</span><div><strong id="detail-promotion-title">Venta urgente</strong><small id="detail-promotion-copy">El propietario indicó que necesita vender pronto.</small></div></div>
         
       </div>
     </header>
@@ -688,13 +693,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <!-- Lógica Dinámica de la Ficha -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
       // 1. Extraer ID del terreno de la URL
       const params = new URLSearchParams(window.location.search);
       const parcelaId = params.get("id");
 
-      // Buscar parcela
-      const p = parcelas.find(item => item.id === parcelaId);
+      // Buscar parcela: primero en Supabase y, si no está disponible, en el catálogo local.
+      let inventario = Array.isArray(window.parcelas) ? window.parcelas : (typeof parcelas !== "undefined" && Array.isArray(parcelas) ? parcelas : []);
+      if (typeof window.apiGetParcelas === "function") {
+        try {
+          inventario = await window.apiGetParcelas();
+          window.SERVER_PARCELAS = inventario;
+        } catch (error) {
+          console.error("No fue posible cargar la ficha desde Supabase; se usará el catálogo local.", error);
+        }
+      }
+      const p = inventario.find(item => String(item.id) === String(parcelaId));
 
       const DOM = {
         error: document.getElementById("error-container"),
@@ -703,6 +717,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         title: document.getElementById("detail-title-text"),
         location: document.getElementById("detail-location-text"),
         price: document.getElementById("detail-price-text"),
+        tplBackedBadge: document.getElementById("detail-tpl-backed-badge"),
         
 
 
@@ -877,6 +892,15 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
       DOM.location.innerText = `${p.comuna || "Biobío"}, Región del Biobío, Chile`;
       DOM.price.innerText = p.precio;
       DOM.sidebarPrice.innerText = p.precio;
+      const isTplBacked = p?.valorRespaldadoTPL === true || p?.distintivos?.valorRespaldadoTPL === true || p?.tasacion?.valorRespaldadoTPL === true;
+      if (DOM.tplBackedBadge) DOM.tplBackedBadge.hidden = !isTplBacked;
+      const promotionBadge=document.getElementById('detail-promotion-badge');
+      const promotionTitle=document.getElementById('detail-promotion-title');
+      const promotionCopy=document.getElementById('detail-promotion-copy');
+      const hasPromotion=Boolean(p?.urgenteDestacado||p?.ventaUrgente);
+      if(promotionBadge) promotionBadge.hidden=!hasPromotion;
+      if(promotionTitle) promotionTitle.textContent=p?.urgenteDestacado?'Urgente destacado':'Venta urgente';
+      if(promotionCopy) promotionCopy.textContent=p?.urgenteDestacado?'Publicación con mayor exposición contratada.':'El propietario indicó que necesita vender pronto.';
       document.querySelector(".detail-header-layout")?.classList.add("parcela-detail-hero-upgrade");
 
       DOM.specSize.innerText = `${p.tamano} m²`;

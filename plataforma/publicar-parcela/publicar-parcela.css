@@ -284,3 +284,16 @@ footer{padding:22px;text-align:center;color:var(--muted);font-size:.88rem}.sr-on
 .tpl-valuator-notice{padding:12px 14px;border-radius:12px;background:#f8fafc;color:#526271;font-size:.8rem}
 .tpl-valuator-actions{display:flex;flex-wrap:wrap;gap:10px}
 @media(max-width:700px){.tpl-valuator-card{grid-template-columns:1fr}.tpl-valuator-card>.secondary-action{width:100%}.tpl-valuator-range{grid-template-columns:1fr}.tpl-valuator-actions>*{width:100%}}
+
+/* Mejoras 2026-07-18: dictado premium, validación estable y navegación por módulos */
+.flow-step h1,.flow-step h2{scroll-margin-top:110px}
+.story-field{position:relative;overflow:hidden;border-radius:22px;transition:box-shadow .25s ease,background .25s ease}
+.story-field.is-recording{padding:18px;background:linear-gradient(135deg,rgba(237,250,250,.95),rgba(255,255,255,.98));box-shadow:0 18px 50px rgba(18,101,112,.16),0 0 0 1px rgba(29,151,164,.18)}
+.story-field.is-recording::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,transparent,#2aa7b8,#75d0bd,#2aa7b8,transparent);background-size:220% 100%;animation:tplVoiceSweep 1.8s linear infinite}
+.story-field.is-recording textarea{border-color:#69bfc7;box-shadow:0 0 0 4px rgba(42,167,184,.10)}
+.story-field.is-recording .voice-status{display:flex;align-items:center;gap:9px;color:#0d6e78;font-weight:800}
+.story-field.is-recording .voice-status::before{content:"";width:10px;height:10px;border-radius:50%;background:#e04b4b;box-shadow:0 0 0 0 rgba(224,75,75,.45);animation:tplVoicePulse 1.25s ease-out infinite}
+@keyframes tplVoiceSweep{to{background-position:-220% 0}}
+@keyframes tplVoicePulse{70%{box-shadow:0 0 0 10px rgba(224,75,75,0)}100%{box-shadow:0 0 0 0 rgba(224,75,75,0)}}
+.data-grid label:not(.is-missing) small{display:none!important}
+.data-grid label.is-missing small{display:block!important}
