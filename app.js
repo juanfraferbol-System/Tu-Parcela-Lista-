@@ -3167,3 +3167,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+/* TPL Index v17 — encabezado móvil inteligente y mejoras de interacción. */
+(() => {
+  const initTplIndexV17 = () => {
+    const body = document.body;
+    const locationBar = document.querySelector('.location-filter-bar');
+    let ticking = false;
+
+    const updateHeader = () => {
+      const condensed = window.scrollY > 70;
+      body.classList.toggle('tpl-header-condensed', condensed);
+      ticking = false;
+    };
+
+    const requestUpdate = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(updateHeader);
+    };
+
+    updateHeader();
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+
+    /* Al seleccionar una comuna en móvil, la centra dentro de la barra horizontal. */
+    locationBar?.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button || window.innerWidth > 1000) return;
+      window.requestAnimationFrame(() => {
+        button.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      });
+    });
+
+    /* Evita que enlaces con ancla queden ocultos debajo de las dos barras sticky. */
+    document.addEventListener('click', (event) => {
+      const anchor = event.target.closest('a[href^="#"]');
+      if (!anchor) return;
+      const selector = anchor.getAttribute('href');
+      if (!selector || selector === '#') return;
+      const target = document.querySelector(selector);
+      if (!target) return;
+      event.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState(null, '', selector);
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTplIndexV17, { once: true });
+  } else {
+    initTplIndexV17();
+  }
+})();
