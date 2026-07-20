@@ -36,7 +36,34 @@ const sentence=s=>s?String(s).charAt(0).toUpperCase()+String(s).slice(1):'';
 
 function initLocations(){const r=$('#region');Object.keys(REGIONS).forEach(name=>r.add(new Option(name,name)));r.addEventListener('change',()=>fillCommunes(r.value));}
 function fillCommunes(region,selected=''){const c=$('#comuna');c.innerHTML='<option value="">Selecciona</option>';(REGIONS[region]||[]).forEach(name=>c.add(new Option(name,name)));c.disabled=!region;if(selected)c.value=selected;}
-function setType(type){state.type=type;document.body.dataset.propertyType=type;$('#detailsTitle').textContent=type==='casa'?'Completa las características de la casa':'Completa las características de la parcela o campo';generateCopy();updatePreview();saveDraft();}
+function normalizePropertyType(type){
+  const value=String(type||'').trim().toLowerCase();
+
+  if(['parcela','campo','terreno','parcela o campo'].includes(value)){
+    return 'parcela';
+  }
+
+  if(value==='casa'){
+    return 'casa';
+  }
+
+  return '';
+}
+
+function setType(type){
+  const normalizedType=normalizePropertyType(type);
+
+  state.type=normalizedType;
+  document.body.dataset.propertyType=normalizedType;
+
+  $('#detailsTitle').textContent=normalizedType==='casa'
+    ?'Completa las características de la casa'
+    :'Completa las características de la parcela o campo';
+
+  generateCopy();
+  updatePreview();
+  saveDraft();
+}
 function clearError(name){const e=$(`[data-error-for="${name}"]`);if(e)e.textContent='';const input=form.elements[name]||$(`#${name}`);if(input?.classList)input.classList.remove('input-error');}
 function error(name,msg){const e=$(`[data-error-for="${name}"]`);if(e)e.textContent=msg;const input=form.elements[name]||$(`#${name}`);if(input?.classList)input.classList.add('input-error');}
 function validate(section){let ok=true;const require=(name,msg)=>{const el=form.elements[name]||$(`#${name}`);clearError(name);if(!el?.value?.trim()){error(name,msg);ok=false;}};
@@ -351,7 +378,7 @@ function calculateListingQuality(d){let score=0;const reasons=[];if(d.ubicacion)
 function dataObject(){const raw=Object.fromEntries(new FormData(form).entries()),urgency=URGENCY_CONFIG[raw.urgencia]||null,plan=selectedPlanObject();const d={
  version:'publicador-tpl-v15-redaccion-inteligente',
  formulario:raw,
- propiedad:{tipo:state.type,subtipo:propertyLabel(),region:raw.region||'',comuna:raw.comuna||'',localidad:raw.localidad||'',superficieTerreno:number(val('superficie'))||number(val('casaTerreno')),superficieConstruida:number(val('casaSuperficie')),precio:number(val('precioVenta')),precioM2:0,titulo:$('#tituloEditable').value||state.generated.title,descripcion:$('#descripcionEditable').value||state.generated.description,descripcionComercial:$('#descripcionEditable').value||state.generated.description,descripcionTecnica:state.generated.technicalDescription||'',estiloRedaccion:state.generated.style||'tpl_profesional'},
+ propiedad:{tipo:raw.tipo||state.type,subtipo:propertyLabel(),region:raw.region||'',comuna:raw.comuna||'',localidad:raw.localidad||'',superficieTerreno:number(val('superficie'))||number(val('casaTerreno')),superficieConstruida:number(val('casaSuperficie')),precio:number(val('precioVenta')),precioM2:0,titulo:$('#tituloEditable').value||state.generated.title,descripcion:$('#descripcionEditable').value||state.generated.description,descripcionComercial:$('#descripcionEditable').value||state.generated.description,descripcionTecnica:state.generated.technicalDescription||'',estiloRedaccion:state.generated.style||'tpl_profesional'},
  ubicacion:state.coordinates?{...state.coordinates,enlaceGoogleMaps:val('googleMapsLink'),publicaAproximada:$('#publicApproximate').checked}:null,
  documentacion:{rol:val('rol'),condominio:val('condominio'),subdivision:val('subdivision'),usoSuelo:val('usoSuelo'),factibilidadConstruccion:val('construccion'),regularizacionCasa:val('regularizacion')},
  terreno:{topografia:val('topografia'),suelo:val('condicionSuelo'),vegetacion:val('vegetacion'),vista:val('vistaPrincipal'),orientacion:val('orientacion'),privacidad:val('privacidad'),forma:val('formaTerreno'),frenteMetros:number(val('frente')),naturaleza:checked('naturaleza')},
