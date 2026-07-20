@@ -43,7 +43,14 @@ async function submitToSupabase(payload,photos=[]){
  const supabase=supabaseConfig();
  if(!validPublicConfig(supabase))return null;
  const form=new FormData();
- form.append('payload',JSON.stringify(publicPayload(payload)));
+const payloadFinal = publicPayload(payload);
+
+console.log('=== PAYLOAD ENVIADO ===', payloadFinal);
+console.log('tipo raíz:', payloadFinal.tipo);
+console.log('tipo propiedad:', payloadFinal.propiedad?.tipo);
+console.log('tipo formulario:', payloadFinal.formulario?.tipo);
+
+form.append('payload', JSON.stringify(payloadFinal));
  form.append('idempotency_key',uuid());
  form.append('cover_index','0');
  const files=photos.map(preferredPhotoFile).filter(Boolean);
