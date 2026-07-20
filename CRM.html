@@ -59,12 +59,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section class="metrics" aria-label="Resumen de publicaciones">
       <button type="button" data-state="pendiente_revision"><strong id="count-pending">0</strong><span>Pendientes</span></button>
       <button type="button" data-state="requiere_cambios"><strong id="count-changes">0</strong><span>Requieren corrección</span></button>
-      <button type="button" data-state="aprobada"><strong id="count-approved">0</strong><span>Aprobadas</span></button>
+      <button type="button" data-state="aprobada"><strong id="count-approved">0</strong><span>Publicadas</span></button>
       <button type="button" data-state="rechazada"><strong id="count-rejected">0</strong><span>Rechazadas</span></button>
     </section>
 
     <form id="filters" class="filters" aria-label="Filtros de publicaciones">
-      <label>Estado<select name="estado"><option value="">Todos</option><option value="pendiente_revision">Pendientes</option><option value="requiere_cambios">Requieren corrección</option><option value="aprobada">Aprobadas</option><option value="rechazada">Rechazadas</option></select></label>
+      <label>Estado<select name="estado"><option value="">Todos</option><option value="pendiente_revision">Pendientes</option><option value="requiere_cambios">Requieren corrección</option><option value="aprobada">Publicadas</option><option value="rechazada">Rechazadas</option><option value="pausada">Pausadas</option><option value="vendida">Vendidas</option><option value="archivada">Archivadas</option></select></label>
       <label>Desde<input type="date" name="desde"></label><label>Hasta<input type="date" name="hasta"></label>
       <label>Corredor<input name="corredor" placeholder="Nombre o corredora"></label>
       <label>Comuna<input name="comuna" placeholder="Ej.: Florida"></label>
