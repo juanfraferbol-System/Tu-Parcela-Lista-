@@ -1,0 +1,3 @@
+-- Migración de compatibilidad.
+-- Esta versión ya fue aplicada en el proyecto remoto antes de Cerebro TPL v2.
+-- Se conserva localmente para mantener alineado el historial de migraciones de Supabase.

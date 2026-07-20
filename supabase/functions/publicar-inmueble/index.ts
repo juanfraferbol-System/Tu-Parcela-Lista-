@@ -87,7 +87,20 @@ Deno.serve(async (req) => {
     ];
     for (const [label, value] of required) if (!clean(value)) return json(400, { ok:false, error:`Falta completar: ${label}.` });
 
-    const codigo = payload.codigo || `TPL-${new Date().getUTCFullYear()}-${crypto.randomUUID().slice(0,6).toUpperCase()}`;
+   const codigoRecibido = String(payload.codigo || '').trim();
+
+const codigoValido =
+  /^TPL-PUB-[0-9]{4}-[0-9]{6}$/.test(codigoRecibido);
+
+const numeroAleatorio = Math.floor(Math.random() * 1_000_000)
+  .toString()
+  .padStart(6, '0');
+
+const codigo = codigoValido
+  ? codigoRecibido
+  : `TPL-PUB-${new Date().getUTCFullYear()}-${numeroAleatorio}`;
+
+
     const files = formData.getAll('photos').filter((x): x is File => x instanceof File);
     if (!files.length) return json(400, { ok:false, error:'Debes agregar al menos una fotografía.' });
     if (files.length > 12) return json(400, { ok:false, error:'Puedes subir hasta 12 fotografías.' });
@@ -99,48 +112,146 @@ Deno.serve(async (req) => {
       if (file.size > 12*1024*1024) return json(400,{ok:false,error:`La foto ${file.name} supera 12 MB.`});
       const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
       const path = `${codigo}/${String(i+1).padStart(2,'0')}-${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage.from('publicaciones-unificadas').upload(path, file, { contentType:file.type, upsert:false });
+      const { error } = await supabase.storage.from('publicaciones-parcela').upload(path, file, { contentType:file.type, upsert:false });
       if (error) throw error;
-      const { data } = supabase.storage.from('publicaciones-unificadas').getPublicUrl(path);
+      const { data } = supabase.storage.from('publicaciones-parcela').getPublicUrl(path);
       uploaded.push(data.publicUrl);
     }
 
-    const row = {
-      codigo_publico: codigo,
-      tipo: payload.tipo,
-      titulo: payload.titulo,
-      descripcion: payload.descripcion,
-      region: payload.region,
-      comuna: payload.comuna,
-      localidad: payload.localidad || null,
-      precio: payload.precio,
-      superficie_terreno_m2: payload.superficieTerreno,
-      superficie_construida_m2: payload.superficieConstruida,
-      habitaciones: payload.tipo === 'casa' ? payload.habitaciones : null,
-      banos: payload.tipo === 'casa' ? payload.banos : null,
-      material: payload.tipo === 'casa' ? payload.material || null : null,
-      rol: payload.tipo === 'parcela' ? payload.rol || null : null,
-      agua: payload.tipo === 'parcela' ? payload.agua || null : null,
-      luz: payload.tipo === 'parcela' ? payload.luz || null : null,
-      distancia_ruta_principal_km: payload.tipo === 'parcela' ? payload.distanciaRutaPrincipalKm : null,
-      urgencia: payload.urgencia || null,
-      estado_propiedad: payload.estadoPropiedad || null,
-      nombre_contacto: payload.nombre,
-      telefono_contacto: payload.telefono,
-      correo_contacto: payload.correo,
-      tipo_publicador: payload.publicador || null,
-      fotos: uploaded,
-      cotizacion: originalPayload.plan || originalPayload.cotizacion || {},
-      plan_publicacion: payload.plan,
-      tasacion: payload.tasacion,
-      latitud_privada: payload.ubicacion.lat,
-      longitud_privada: payload.ubicacion.lng,
-      ubicacion_fuente: payload.ubicacion.source || null,
-      ubicacion_publica_aproximada: payload.ubicacion.publica_aproximada,
-      payload_original: originalPayload
-    };
+    const planesValidos = ['inicio', 'profesional', 'gold', 'platinum'];
 
-    const { data, error } = await supabase.from('publicaciones_unificadas').insert(row).select('id,codigo_publico,creado_en').single();
+const planRecibido = String(payload.plan || '').trim().toLowerCase();
+
+const planContratado = planesValidos.includes(planRecibido)
+  ? planRecibido
+  : 'inicio';
+
+ const row = {
+  codigo_publico: codigo,
+  idempotency_key: crypto.randomUUID(),
+
+  estado: 'pendiente_revision',
+  tipo_publicador: payload.tipoPublicador === 'corredor'
+  ? 'corredor'
+  : 'dueno',
+
+  contacto_nombre: payload.nombre,
+  contacto_email: payload.correo,
+  contacto_telefono: payload.telefono || null,
+  contacto_organizacion: null,
+
+  titulo_publico: payload.titulo,
+  descripcion_publica: payload.descripcion,
+  descripcion_origen_privada:
+    originalPayload.propiedad?.descripcionTecnica ||
+    originalPayload.propiedad?.descripcion ||
+    payload.descripcion ||
+    null,
+
+  precio_publicacion: payload.precio || null,
+  monto_liquido: payload.precio || null,
+  superficie_m2:
+    payload.superficieTerreno ||
+    payload.superficieConstruida ||
+    null,
+
+  region: payload.region,
+  comuna: payload.comuna,
+  sector: payload.localidad || 'Sin especificar',
+
+  ubicacion_publica_aproximada:
+    payload.ubicacion.publica_aproximada
+      ? 'aproximada'
+      : 'privada',
+
+  latitud_privada: payload.ubicacion.lat,
+  longitud_privada: payload.ubicacion.lng,
+
+  rol: payload.rol || null,
+  agua: payload.agua || null,
+  luz: payload.luz || null,
+  acceso: clean(
+    originalPayload.terreno?.acceso ||
+    originalPayload.formulario?.acceso
+  ) || null,
+
+  topografia: clean(
+    originalPayload.terreno?.topografia ||
+    originalPayload.formulario?.topografia
+  ) || null,
+
+  naturaleza: Array.isArray(originalPayload.terreno?.naturaleza)
+    ? originalPayload.terreno.naturaleza
+    : [],
+
+  cuerpos_agua: Array.isArray(originalPayload.terreno?.cuerposAgua)
+    ? originalPayload.terreno.cuerposAgua
+    : [],
+
+  servicios: Array.isArray(originalPayload.servicios?.seleccionados)
+    ? originalPayload.servicios.seleccionados
+    : [],
+
+  ciudad_principal: clean(
+    originalPayload.formulario?.ciudadPrincipal
+  ) || null,
+
+  distancia_ciudad: clean(
+    originalPayload.formulario?.distanciaCiudad
+  ) || null,
+
+  facilidad_pago: Boolean(
+    originalPayload.comercial?.facilidadPago
+  ),
+
+  detalle_facilidad_pago: clean(
+    originalPayload.comercial?.detalleFacilidadPago
+  ) || null,
+
+ plan_seleccionado: planContratado,
+
+  modelo_comercial: originalPayload.comercial || {},
+
+  datos_formulario: {
+    ...originalPayload,
+    tipo: payload.tipo,
+    imagen_principal: uploaded[0] || null,
+    imagenes: uploaded,
+    tasacion: payload.tasacion || {},
+    ubicacion_fuente: payload.ubicacion.source || null,
+    distancia_ruta_principal_km:
+      payload.distanciaRutaPrincipalKm || null
+  },
+
+  plan_contratado: planContratado,
+
+  analisis_ia_incluido: false,
+  analisis_ia_consentimiento: false,
+
+  version_actual: 1,
+
+  tipo_precio_actual: "precio_publicado_solicitado",
+  precio_propietario_solicitado: payload.precio || null,
+  precio_publico: payload.precio || null,
+
+  consentimiento_uso_ubicacion:
+    Boolean(payload.ubicacion.lat && payload.ubicacion.lng),
+
+  consentimiento_uso_ubicacion_en:
+    payload.ubicacion.lat && payload.ubicacion.lng
+      ? new Date().toISOString()
+      : null,
+
+  distancia_ruta_principal_km:
+    payload.distanciaRutaPrincipalKm || null
+};
+
+const { data, error } = await supabase
+  .from('publicaciones')
+  .insert(row)
+  .select('id,codigo_publico,creado_en')
+  .single();
+  
     if (error) throw error;
     return json(200, { ok:true, ...data, fotos_subidas:uploaded.length });
   } catch (error) {
