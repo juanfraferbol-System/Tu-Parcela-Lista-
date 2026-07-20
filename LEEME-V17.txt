@@ -1,0 +1,25 @@
+TU PARCELA LISTA — INDEX MÓVIL V17
+
+Archivos para reemplazar/agregar:
+1. index.html                         -> reemplazar en la raíz
+2. app.js                             -> reemplazar en la raíz
+3. css/index-mobile-v17.css           -> agregar dentro de /css
+4. css/styles.min.css                 -> se incluye sin alterar su contenido
+
+La nueva hoja CSS se carga después de styles.min.css para aplicar mejoras sin destruir estilos anteriores.
+
+Mejoras principales:
+- Navbar y barra de comunas unidas y sticky.
+- Encabezado compacto al desplazarse.
+- Hero considerablemente más bajo con imágenes visibles en móvil.
+- Botones principales más compactos.
+- Filtros horizontales en móvil.
+- Dos parcelas por fila en la mayoría de teléfonos.
+- Tarjetas y diálogos de detalle más compactos.
+- Menos espacios verticales en secciones posteriores.
+- Corrección de anclas ocultas bajo encabezados sticky.
+
+Comandos sugeridos:
+git add index.html app.js css/index-mobile-v17.css
+git commit -m "Optimizar index movil y encabezado sticky v17"
+git push origin HEAD:main

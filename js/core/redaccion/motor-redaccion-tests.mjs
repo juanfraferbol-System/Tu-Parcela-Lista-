@@ -16,3 +16,6 @@ const house=motor.buildHouse({region:'Región del Biobío',comuna:'Concepción',
 assert.match(house.description,/84 m² construidos/);
 assert.match(house.description,/3 dormitorios/);
 console.log('Motor de Redacción TPL: pruebas correctas');
+const largeLand=motor.buildLand({region:'Región del Biobío',comuna:'Cañete',superficie:43000});
+assert.match(largeLand.title,/43[.]000 m²/);
+assert.match(largeLand.description,/43[.]000 m²/);

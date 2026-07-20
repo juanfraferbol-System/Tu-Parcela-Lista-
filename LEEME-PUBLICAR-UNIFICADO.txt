@@ -1,0 +1,36 @@
+TU PARCELA LISTA — PUBLICAR UNIFICADO
+
+Cambios principales
+1. El módulo público continúa en /plataforma/publicar/.
+2. El navegador ahora envía a la Edge Function unificada: publicar-inmueble.
+3. publicar-inmueble acepta el payload completo y anidado del Publicador actual.
+4. Se eliminaron rutas antiguas a /plataforma/publicar-parcela/ en la navegación principal.
+5. La clave de Supabase para resolver Google Maps se toma desde publicador-config.js y ya no queda duplicada en app.js.
+6. El código de confirmación muestra el código realmente devuelto por Supabase.
+7. Se agregó prueba para confirmar que 43.000 m² se conserva en título y descripción.
+
+Archivos que debes reemplazar
+- plataforma/publicar/app.js
+- plataforma/publicar/integration-service.js
+- plataforma/publicar/publicador-config.js
+- js/core/config.js
+- js/site-polish.js
+- js/tpl-launch.js
+- js/categoria.js
+- supabase/functions/publicar-inmueble/index.ts
+- js/core/redaccion/motor-redaccion-tests.mjs (solo prueba)
+
+Después despliega la función en el Supabase correcto:
+npx supabase link --project-ref qxavbqhyqaqalpzbhwmh
+npx supabase functions deploy publicar-inmueble
+
+Luego sube el sitio:
+git add plataforma/publicar js/core/config.js js/site-polish.js js/tpl-launch.js js/categoria.js supabase/functions/publicar-inmueble/index.ts
+git commit -m "Unificar modulo Publicar con Supabase"
+git push origin HEAD:main
+
+Prueba final
+- Publicar una parcela de 43.000 m².
+- Verificar que el título y descripción indiquen 43.000 m².
+- En F12 > Network debe aparecer POST a /functions/v1/publicar-inmueble con estado 200.
+- En Supabase debe crearse una fila en publicaciones_unificadas.

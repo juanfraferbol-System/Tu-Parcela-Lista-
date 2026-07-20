@@ -1,0 +1,30 @@
+TPL CORE - INTEGRACIÓN PUBLICADOR → SUPABASE (V1)
+
+QUÉ CAMBIA
+- El tasador sigue dentro de Publicar y solamente ayuda a definir el precio.
+- La tasación queda incluida dentro de la publicación final.
+- Al enviar, el Publicador usa la Edge Function publicar-parcela ya existente.
+- Las fotografías se envían una sola vez a Supabase.
+- Cuando Supabase responde correctamente, no se duplica la publicación en el CRM/localStorage de prueba.
+- Si falta configuración, el sistema mantiene el respaldo local y no rompe el formulario.
+
+ARCHIVOS PARA REEMPLAZAR
+Copia la carpeta plataforma/publicar sobre la misma carpeta de tu proyecto.
+
+PASO OBLIGATORIO
+Abre plataforma/publicar/publicador-config.js y pega solamente la ANON KEY o PUBLISHABLE KEY pública de Supabase en anonKey.
+No pegues service_role ni secret keys.
+
+DESPUÉS
+1. Guarda los archivos.
+2. Abre Git Bash en el proyecto.
+3. Ejecuta:
+   git add plataforma/publicar
+   git commit -m "Conectar publicador con Supabase"
+   git push origin main
+4. Espera el despliegue de Vercel.
+5. Publica una propiedad de prueba con una foto.
+6. Comprueba en Supabase la tabla publicaciones y el bucket publicaciones-pendientes.
+
+NOTA
+La Edge Function publicar-parcela debe estar desplegada y TPL_ALLOWED_ORIGINS debe permitir https://parcelalista.cl y https://www.parcelalista.cl (el código ya contempla ambos dominios).
