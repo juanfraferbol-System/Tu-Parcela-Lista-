@@ -5,7 +5,7 @@
 
   Prioridad:
   1. submissionEndpoint personalizado, si está configurado.
-  2. Edge Function `publicar-parcela` de Supabase.
+  2. Edge Function unificada `publicar-inmueble` de Supabase.
   3. Modo local de respaldo, si todavía no existe configuración pública.
 
   Nunca incluir service_role ni secretos de Flow en el navegador.
@@ -48,7 +48,7 @@ async function submitToSupabase(payload,photos=[]){
  form.append('cover_index','0');
  const files=photos.map(preferredPhotoFile).filter(Boolean);
  files.forEach(file=>form.append('photos',file,file.name||'foto.webp'));
- const endpoint=`${supabase.url}/functions/v1/publicar-parcela`;
+ const endpoint=`${supabase.url}/functions/v1/publicar-inmueble`;
  const response=await fetch(endpoint,{method:'POST',headers:{apikey:supabase.anonKey,Authorization:`Bearer ${supabase.anonKey}`},body:form});
  const publication=await readResponse(response);
  return {mode:'remote',provider:'supabase',publication,mediaUploaded:true,flowConfigured:false};

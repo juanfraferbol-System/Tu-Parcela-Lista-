@@ -13,9 +13,57 @@ const json = (status:number, body:Record<string,unknown>) => new Response(JSON.s
 
 const clean = (value:unknown) => String(value ?? '').trim();
 const numberOrNull = (value:unknown) => {
-  const n = Number(value);
+  const n = Number(String(value ?? '').replace(/[^0-9.-]/g, ''));
   return Number.isFinite(n) && n > 0 ? n : null;
 };
+const pick = (...values:unknown[]) => values.find(value => value !== undefined && value !== null && clean(value) !== '');
+
+function normalizePayload(payload:Record<string, any>) {
+  const form = payload.formulario || {};
+  const property = payload.propiedad || {};
+  const contact = payload.contacto || {};
+  const services = payload.servicios || {};
+  const house = payload.casa || {};
+  const commercial = payload.comercial || {};
+  const location = payload.ubicacion || {};
+  const documentation = payload.documentacion || {};
+  const plan = payload.plan || {};
+
+  const tipo = clean(pick(payload.tipo, property.tipo, form.tipo)).toLowerCase();
+  return {
+    tipo,
+    codigo: clean(pick(payload.codigo_temporal, payload.codigo, payload.codigo_publico)),
+    titulo: clean(pick(payload.titulo, property.titulo, form.titulo)),
+    descripcion: clean(pick(payload.descripcionFinal, property.descripcionComercial, property.descripcion, form.descripcionFinal)),
+    region: clean(pick(payload.region, property.region, form.region)),
+    comuna: clean(pick(payload.comuna, property.comuna, form.comuna)),
+    localidad: clean(pick(payload.localidad, property.localidad, form.localidad)),
+    precio: numberOrNull(pick(payload.precio, property.precio, form.precioVenta)) || 0,
+    superficieTerreno: numberOrNull(pick(payload.superficie, property.superficieTerreno, form.superficie, form.casaTerreno)),
+    superficieConstruida: numberOrNull(pick(payload.casaSuperficie, property.superficieConstruida, form.casaSuperficie)),
+    habitaciones: numberOrNull(pick(payload.habitaciones, house.habitaciones, form.habitaciones)),
+    banos: numberOrNull(pick(payload.banos, house.banos, form.banos)),
+    material: clean(pick(payload.material, house.material, form.material)),
+    rol: clean(pick(payload.rol, documentation.rol, form.rol)),
+    agua: clean(pick(payload.agua, services.agua, form.agua, form.aguaCasa)),
+    luz: clean(pick(payload.luz, services.electricidad, form.luz)),
+    distanciaRutaPrincipalKm: numberOrNull(pick(payload.distanciaRutaPrincipalKm, services.distanciaRutaPrincipalKm, form.distanciaRutaPrincipalKm)),
+    urgencia: clean(pick(payload.urgencia, commercial.urgencia, form.urgencia)),
+    estadoPropiedad: clean(pick(payload.estadoPropiedad, house.estado, form.estadoCasa)),
+    nombre: clean(pick(payload.nombre, contact.nombre, form.nombre)),
+    telefono: clean(pick(payload.telefono, contact.telefono, form.telefono)),
+    correo: clean(pick(payload.correo, payload.email, contact.email, form.email)).toLowerCase(),
+    publicador: clean(pick(payload.publicador, contact.tipo, form.anunciante)),
+    plan: clean(pick(payload.plan_publicacion, plan.id, form.planSeleccionado)) || 'inicio',
+    tasacion: payload.tasacion || {},
+    ubicacion: {
+      lat: numberOrNull(pick(location.lat, location.latitude)),
+      lng: numberOrNull(pick(location.lng, location.longitude)),
+      source: clean(pick(location.source, location.fuente)),
+      publica_aproximada: location.publicaAproximada !== false && location.publica_aproximada !== false
+    }
+  };
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -25,17 +73,22 @@ Deno.serve(async (req) => {
     const url = Deno.env.get('SUPABASE_URL');
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     if (!url || !serviceKey) return json(500, { ok:false, error:'Configuración del servidor incompleta.' });
+
     const supabase = createClient(url, serviceKey, { auth:{ persistSession:false } });
-    const form = await req.formData();
-    const payload = JSON.parse(clean(form.get('payload')) || '{}');
-    const tipo = clean(payload.tipo);
-    if (!['casa','parcela'].includes(tipo)) return json(400, { ok:false, error:'Debes elegir Casa o Parcela.' });
+    const formData = await req.formData();
+    const originalPayload = JSON.parse(clean(formData.get('payload')) || '{}');
+    const payload = normalizePayload(originalPayload);
 
-    const required = ['titulo','descripcionFinal','region','comuna','precio','nombre','telefono','correo'];
-    for (const field of required) if (!clean(payload[field])) return json(400, { ok:false, error:`Falta completar: ${field}.` });
+    if (!['casa','parcela'].includes(payload.tipo)) return json(400, { ok:false, error:'Debes elegir Casa o Parcela.' });
+    const required:Array<[string, unknown]> = [
+      ['título', payload.titulo], ['descripción', payload.descripcion], ['región', payload.region],
+      ['comuna', payload.comuna], ['precio', payload.precio], ['nombre', payload.nombre],
+      ['teléfono', payload.telefono], ['correo', payload.correo]
+    ];
+    for (const [label, value] of required) if (!clean(value)) return json(400, { ok:false, error:`Falta completar: ${label}.` });
 
-    const codigo = clean(payload.codigo_temporal) || `TPL-${new Date().getUTCFullYear()}-${crypto.randomUUID().slice(0,6).toUpperCase()}`;
-    const files = form.getAll('photos').filter((x): x is File => x instanceof File);
+    const codigo = payload.codigo || `TPL-${new Date().getUTCFullYear()}-${crypto.randomUUID().slice(0,6).toUpperCase()}`;
+    const files = formData.getAll('photos').filter((x): x is File => x instanceof File);
     if (!files.length) return json(400, { ok:false, error:'Debes agregar al menos una fotografía.' });
     if (files.length > 12) return json(400, { ok:false, error:'Puedes subir hasta 12 fotografías.' });
 
@@ -54,37 +107,37 @@ Deno.serve(async (req) => {
 
     const row = {
       codigo_publico: codigo,
-      tipo,
-      titulo: clean(payload.titulo),
-      descripcion: clean(payload.descripcionFinal),
-      region: clean(payload.region),
-      comuna: clean(payload.comuna),
-      localidad: clean(payload.localidad) || null,
-      precio: Number(payload.precio) || 0,
-      superficie_terreno_m2: tipo === 'parcela' ? numberOrNull(payload.superficie) : null,
-      superficie_construida_m2: tipo === 'casa' ? numberOrNull(payload.casaSuperficie) : null,
-      habitaciones: tipo === 'casa' ? numberOrNull(payload.habitaciones) : null,
-      banos: tipo === 'casa' ? numberOrNull(payload.banos) : null,
-      material: tipo === 'casa' ? clean(payload.material) || null : null,
-      rol: tipo === 'parcela' ? clean(payload.rol) || null : null,
-      agua: tipo === 'parcela' ? clean(payload.agua) || null : null,
-      luz: tipo === 'parcela' ? clean(payload.luz) || null : null,
-      distancia_ruta_principal_km: tipo === 'parcela' ? numberOrNull(payload.distanciaRutaPrincipalKm) : null,
-      urgencia: clean(payload.urgencia) || null,
-      estado_propiedad: clean(payload.estadoPropiedad) || null,
-      nombre_contacto: clean(payload.nombre),
-      telefono_contacto: clean(payload.telefono),
-      correo_contacto: clean(payload.correo).toLowerCase(),
-      tipo_publicador: clean(payload.publicador) || null,
+      tipo: payload.tipo,
+      titulo: payload.titulo,
+      descripcion: payload.descripcion,
+      region: payload.region,
+      comuna: payload.comuna,
+      localidad: payload.localidad || null,
+      precio: payload.precio,
+      superficie_terreno_m2: payload.superficieTerreno,
+      superficie_construida_m2: payload.superficieConstruida,
+      habitaciones: payload.tipo === 'casa' ? payload.habitaciones : null,
+      banos: payload.tipo === 'casa' ? payload.banos : null,
+      material: payload.tipo === 'casa' ? payload.material || null : null,
+      rol: payload.tipo === 'parcela' ? payload.rol || null : null,
+      agua: payload.tipo === 'parcela' ? payload.agua || null : null,
+      luz: payload.tipo === 'parcela' ? payload.luz || null : null,
+      distancia_ruta_principal_km: payload.tipo === 'parcela' ? payload.distanciaRutaPrincipalKm : null,
+      urgencia: payload.urgencia || null,
+      estado_propiedad: payload.estadoPropiedad || null,
+      nombre_contacto: payload.nombre,
+      telefono_contacto: payload.telefono,
+      correo_contacto: payload.correo,
+      tipo_publicador: payload.publicador || null,
       fotos: uploaded,
-      cotizacion: payload.cotizacion || {},
-      plan_publicacion: clean(payload.cotizacion?.plan) || 'inicio',
-      tasacion: payload.tasacion || {},
-      latitud_privada: numberOrNull(payload.ubicacion?.lat),
-      longitud_privada: numberOrNull(payload.ubicacion?.lng),
-      ubicacion_fuente: clean(payload.ubicacion?.source) || null,
-      ubicacion_publica_aproximada: payload.ubicacion?.publica_aproximada !== false,
-      payload_original: payload
+      cotizacion: originalPayload.plan || originalPayload.cotizacion || {},
+      plan_publicacion: payload.plan,
+      tasacion: payload.tasacion,
+      latitud_privada: payload.ubicacion.lat,
+      longitud_privada: payload.ubicacion.lng,
+      ubicacion_fuente: payload.ubicacion.source || null,
+      ubicacion_publica_aproximada: payload.ubicacion.publica_aproximada,
+      payload_original: originalPayload
     };
 
     const { data, error } = await supabase.from('publicaciones_unificadas').insert(row).select('id,codigo_publico,creado_en').single();

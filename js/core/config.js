@@ -16,7 +16,7 @@
       home: 'index.html',
       parcela: 'parcela.html',
       cotizador: 'cotizador.html',
-      publicar: 'plataforma/publicar-parcela/',
+      publicar: 'plataforma/publicar/',
       crm: 'CRM.html'
     },
     selectors: {

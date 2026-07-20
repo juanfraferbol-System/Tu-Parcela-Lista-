@@ -120,7 +120,7 @@
     const params = new URLSearchParams(location.search);
     if (/\/parcela(?:\.html)?$/.test(path)) track('parcela_view', { parcela_codigo: params.get('id') || localStorage.getItem('selectedParcelaId') || '', origen: sessionStorage.getItem('tpl_origen') }, { etapa: 'vio_parcela' });
     if (path.includes('cotizador')) track('cotizador_iniciado', { parcela_codigo: localStorage.getItem('selectedParcelaId') || '', origen: sessionStorage.getItem('tpl_origen') }, { etapa: 'inicio_cotizacion' });
-    if (path.includes('publicar-parcela')) track('publicacion_iniciada', { paso: 1, origen: sessionStorage.getItem('tpl_origen') });
+    if (path.includes('/publicar')) track('publicacion_iniciada', { paso: 1, origen: sessionStorage.getItem('tpl_origen') });
 
     document.addEventListener('click', (event) => {
       const target = event.target.closest('a,button,.casa-card,.extra-card-compact,.fundacion-card-premium');

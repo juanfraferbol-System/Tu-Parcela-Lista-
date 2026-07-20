@@ -122,7 +122,7 @@
       { label: "Proyecto completo", text: "Elige parcela + casa y cotiza todo en un solo lugar", href: "index.html#decision-flow" },
       { label: "Vida de campo", text: "Más espacio para vivir, descansar y compartir en familia", href: "como-comprar.html" },
       { label: "Casas", text: "Compara modelos y encuentra la casa que se adapta a ti", href: "index.html#casas-section" },
-      { label: "Publica", text: "¿Tienes un terreno? Prepara tu anuncio paso a paso", href: "plataforma/publicar-parcela/" }
+      { label: "Publica", text: "¿Tienes un terreno? Prepara tu anuncio paso a paso", href: "plataforma/publicar/" }
     ];
     const banner = document.createElement("section");
     banner.className = "tpl-info-banner";

@@ -256,6 +256,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// Exportar global para que publicar-parcela.js pueda usarlo
+// Exportar global para que módulo Publicar pueda usarlo
 window.calcularCategoriasParcela = calcularCategoriasParcela;
 window.extractNumber = extractNumber;
