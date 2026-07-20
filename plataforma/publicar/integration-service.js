@@ -23,7 +23,9 @@ function supabaseConfig(){
 function validPublicConfig(value){
  return Boolean(value.url&&/^https:\/\/[^/]+\.supabase\.co$/i.test(value.url)&&value.anonKey.length>=20&&!/service[_-]?role/i.test(value.anonKey));
 }
-function uuid(){return globalThis.crypto?.randomUUID?.()||`${Date.now()}-${Math.random().toString(16).slice(2)}-4${Math.random().toString(16).slice(2,5)}-8${Math.random().toString(16).slice(2,5)}-${Math.random().toString(16).slice(2,14)}`.slice(0,36);}
+function uuid(){return globalThis.crypto?.randomUUID?.()||'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16);});}
+function submissionKey(){const key='tpl_publicador_idempotency_key';let value=sessionStorage.getItem(key);if(!value){value=uuid();sessionStorage.setItem(key,value);}return value;}
+function clearSubmissionKey(){sessionStorage.removeItem('tpl_publicador_idempotency_key');}
 async function readResponse(response){
  let data={};
  try{data=await response.json();}catch{}
@@ -51,13 +53,14 @@ console.log('tipo propiedad:', payloadFinal.propiedad?.tipo);
 console.log('tipo formulario:', payloadFinal.formulario?.tipo);
 
 form.append('payload', JSON.stringify(payloadFinal));
- form.append('idempotency_key',uuid());
- form.append('cover_index','0');
+ form.append('idempotency_key',submissionKey());
+ form.append('cover_index',String(Number(payload?.medios?.portadaIndice)||0));
  const files=photos.map(preferredPhotoFile).filter(Boolean);
  files.forEach(file=>form.append('photos',file,file.name||'foto.webp'));
  const endpoint=`${supabase.url}/functions/v1/publicar-inmueble`;
  const response=await fetch(endpoint,{method:'POST',headers:{apikey:supabase.anonKey,Authorization:`Bearer ${supabase.anonKey}`},body:form});
  const publication=await readResponse(response);
+ clearSubmissionKey();
  return {mode:'remote',provider:'supabase',publication,mediaUploaded:true,flowConfigured:false};
 }
 async function uploadPhotos(photos,publicationCode){
