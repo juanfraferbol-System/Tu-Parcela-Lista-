@@ -1,10 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Inicializar Supabase
+  const crmConfig = window.TPL_CRM_CONFIG;
+  if (!crmConfig?.supabaseUrl || !crmConfig?.supabaseAnonKey) {
+    throw new Error('Falta crm-config.js o la configuración oficial de Supabase.');
+  }
+
   const supabase = window.supabase.createClient(
-    'https://qxavbqhyqaqalpzbhwmh.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA'
-  );
-  window.tplCrmSupabase = supabase;
+    crmConfig.supabaseUrl,
+    crmConfig.supabaseAnonKey
+  );  window.tplCrmSupabase = supabase;
 
   const DOM = {
     loginContainer: document.getElementById("login-container"),
@@ -48,6 +52,18 @@ document.addEventListener("DOMContentLoaded", () => {
   let publicacionesCache = [];
   let itemToProcess = null; // ID de la publicacion
   let newStatusProcess = null; // "Aprobada", "Corregir", "Rechazada"
+
+  const escapeHTML = (value) => String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+
+  const safeDate = (value) => {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? 'Sin fecha' : date.toLocaleDateString('es-CL');
+  };
 
   // 1. Inicialización y Auth
   const checkAuth = async () => {
@@ -137,9 +153,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const createRow = (tipo, fecha, desc, estado, accion) => `
         <tr>
           <td><span class="badge ${tipo.toLowerCase()}">${tipo}</span></td>
-          <td>${new Date(fecha).toLocaleDateString('es-CL')}</td>
-          <td>${desc}</td>
-          <td>${estado}</td>
+          <td>${safeDate(fecha)}</td>
+          <td>${escapeHTML(desc)}</td>
+          <td>${escapeHTML(estado)}</td>
           <td>${accion}</td>
         </tr>
       `;
@@ -151,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
         resProyectos.data.forEach(p => html += createRow('Cotización', p.creado_en, `Cotización de: $${Number(p.total||0).toLocaleString('es-CL')}`, 'Huérfana', `<button class="btn-action">Revisar</button>`));
       }
       if (resPubs.data?.length) {
-        resPubs.data.forEach(p => html += createRow('Parcela', p.creado_en, `Revisar: ${p.propiedad}`, 'Pendiente', `<button class="btn-action" onclick="window.verDetalle('${p.id}')">Revisar</button>`));
+        resPubs.data.forEach(p => html += createRow('Parcela', p.creado_en, `Revisar: ${escapeHTML(p.propiedad)}`, 'Pendiente', `<button class="btn-action" onclick="window.verDetalle('${p.id}')">Revisar</button>`));
       }
 
       if (!html) html = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#64748b;">No hay tareas operativas pendientes. ¡Todo al día!</td></tr>';
@@ -221,12 +237,12 @@ document.addEventListener("DOMContentLoaded", () => {
     
     DOM.tableBody.innerHTML = filtradas.map(p => `
       <tr>
-        <td>${new Date(p.creado_en).toLocaleDateString('es-CL')}</td>
-        <td><strong>${p.propiedad}</strong><br><small style="color:var(--text-muted)">${p.codigo_publico}</small></td>
-        <td>${p.corredor || 'No indicado'}</td>
-        <td>${p.comuna}</td>
-        <td>${p.plan}</td>
-        <td><span class="${getBadgeClass(p.estado)}">${p.estado.replace('_', ' ')}</span></td>
+        <td>${safeDate(p.creado_en)}</td>
+        <td><strong>${escapeHTML(p.propiedad)}</strong><br><small style="color:var(--text-muted)">${escapeHTML(p.codigo_publico)}</small></td>
+        <td>${escapeHTML(p.corredor || 'No indicado')}</td>
+        <td>${escapeHTML(p.comuna)}</td>
+        <td>${escapeHTML(p.plan)}</td>
+        <td><span class="${getBadgeClass(p.estado)}">${escapeHTML(String(p.estado || '').replace('_', ' '))}</span></td>
         <td>
           <button class="btn-action" onclick="window.verDetalle('${p.id}')">Ver Detalle</button>
         </td>
