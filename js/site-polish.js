@@ -270,6 +270,10 @@
   }
 
   function initProjectExperience() {
+    // La ficha de parcela ya tiene sus propias acciones de selección y cotización.
+    // Evita inyectar después del footer la bandeja global con imágenes sin estilos.
+    const currentPath = window.location.pathname.toLowerCase();
+    if (currentPath.endsWith("/parcela.html") || currentPath.endsWith("parcela.html")) return;
     if (!document.body || document.querySelector(".tpl-project-tray")) return;
 
     const tray = document.createElement("aside");
@@ -339,9 +343,9 @@
         const id = new URL(link.href, location.href).searchParams.get("id");
         if (!id) return;
         const tools = document.createElement("div");
-        tools.className = "tpl-card-tools";
-        tools.innerHTML = `<button type="button" data-tpl-favorite="${id}" aria-label="Guardar en favoritos">♡</button><button type="button" data-tpl-compare="${id}" aria-label="Agregar a comparación">⇄</button>`;
-        card.appendChild(tools);
+        tools.className = "tpl-card-tools tpl-card-tools-grid";
+        tools.innerHTML = `<button type="button" data-tpl-favorite="${id}" aria-label="Guardar en favoritos" title="Guardar en favoritos">♡</button>`;
+        (card.querySelector(".card-image-wrapper, .card-gallery-container, .card-image") || card).appendChild(tools);
       });
       const detailTarget = document.querySelector(".detail-header-layout, .detail-main-info");
       const detailId = new URLSearchParams(location.search).get("id");
