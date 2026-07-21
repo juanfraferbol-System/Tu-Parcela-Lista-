@@ -1122,3 +1122,6 @@ footer.main-footer {
 }
 
 .activate-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.activate-actions .btn-activate-project{width:100%}@media(max-width:640px){.activate-actions{grid-template-columns:1fr}}
+
+/* TPL V22: precio visible de planes de instalación */
+.installation-plan-price{margin-top:auto;padding-top:14px;border-top:1px solid rgba(15,52,96,.14);display:grid;gap:3px}.installation-plan-price strong{font-size:1.2rem;color:#0f3460}.installation-plan-price small{color:#5d6775;font-weight:700}

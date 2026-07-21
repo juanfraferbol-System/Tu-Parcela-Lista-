@@ -4,14 +4,14 @@ const fundaciones = [
     id: "Instalacion_+_base_pilotes_madera",
     nombre: "Instalación Pilotes de madera + Casa Full",
     tipoCalculo: "mt2",
-    valor: 50000,
+    valor: 60000,
     empresa: "nogales"
   },
   {
     id: "Instalacion_+_base_radier",
     nombre: "Instalación radier y Casa Full",
     tipoCalculo: "mt2",
-    valor: 80000,
+    valor: 95000,
     empresa: "nogales"
   },
 
@@ -20,7 +20,7 @@ const fundaciones = [
       id: "Instalacion completa radier + llave en mano full + piso ceramico",
     nombre: "Instalacion completa llave en mano full",
     tipoCalculo: "mt2",
-    valor: 120000,
+    valor: 140000,
     empresa: "nogales"
   },
 

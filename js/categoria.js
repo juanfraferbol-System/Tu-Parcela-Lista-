@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         card.innerHTML = `
           ${badgeRazon}
-          <a href="index.html?p=${p.id}" style="text-decoration:none; color:inherit; display:block;">
+          <a href="parcela.html?id=${encodeURIComponent(p.id)}" aria-label="Ver ficha completa de ${p.nombre}" style="text-decoration:none; color:inherit; display:block;">
             <div class="card-image-wrapper">
               <img src="${img}" alt="${p.nombre}" loading="lazy" style="width:100%; height:200px; object-fit:cover;">
             </div>

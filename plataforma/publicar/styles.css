@@ -170,3 +170,14 @@ body:not([data-property-type="casa"]) .house-fields{display:none!important}
  .section-actions{flex-direction:column}.section-actions .btn{width:100%}
  .preview-topline{left:12px;right:12px;top:12px}.site-listing-preview .preview-image{height:215px}.preview-placeholder{padding:24px 14px}.preview-placeholder strong{font-size:1.55rem}
 }
+
+/* Tasador TPL de Casa · Piloto V1 */
+.house-valuation-note{
+  border:1px solid rgba(10,72,128,.2);
+  border-left:5px solid #0a4880;
+  background:linear-gradient(135deg,rgba(10,72,128,.07),rgba(245,190,35,.10));
+  border-radius:16px;
+  padding:16px 18px;
+}
+.house-valuation-note h3{color:#0a4880;margin-bottom:5px}
+.house-valuation-note p{margin:0;color:#43546a}

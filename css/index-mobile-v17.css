@@ -155,3 +155,27 @@ body.tpl-header-condensed .mobile-brand-name{font-size:.96rem!important}
 }
 
 @media(prefers-reduced-motion:reduce){.navbar,.navbar-inner,.brand-logo-img,.nav-toggle{transition:none!important}}
+
+
+/* INDEX V18 móvil: bandera y cabecera siempre visibles */
+@media(max-width:1000px){
+  :root{--tpl-mobile-header:68px!important}
+  .navbar .logo-container img[alt="Chile"]{display:block!important;width:20px!important;min-width:20px!important;height:auto!important;object-fit:contain!important}
+  .navbar .logo-container{gap:4px!important;min-width:75px!important}
+  .mobile-brand-name{display:block!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap!important;font-size:.98rem!important}
+  .location-filter-bar{top:var(--tpl-mobile-header)!important;margin-top:0!important}
+  .extras-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}
+  .extra-card{min-height:215px!important;padding:13px!important;border-radius:16px!important}
+  .extra-icon-scene{width:92px;height:77px;border-radius:15px}
+  .extra-icon-main{left:10px;top:10px;width:43px;height:43px}
+  .extra-icon-support{right:7px;top:25px;width:34px;height:34px}
+  .extra-icon-scene small{left:9px;bottom:6px;font-size:.59rem}
+  .summary-total-final{padding:15px!important;border-radius:15px!important}
+}
+@media(max-width:420px){
+  .navbar .brand-logo-img{height:40px!important;max-width:44px!important}
+  .navbar .logo-container img[alt="Chile"]{display:block!important;width:18px!important;min-width:18px!important}
+  .mobile-brand-name{font-size:.88rem!important}
+  .extras-grid{grid-template-columns:1fr!important}
+  .extra-card{min-height:0!important}
+}

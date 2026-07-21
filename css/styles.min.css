@@ -752,3 +752,32 @@ h1, h2, h3, .buy-kicker, .publish-eyebrow {
   .hero,.hero-life-masonry{padding-top:26px!important;padding-bottom:26px!important}
   .section-casas,.section-cotizador,.promos-section,#quienes-somos,#contacto{padding-top:34px!important;padding-bottom:34px!important}
 }
+
+
+/* === INDEX V18: CABECERA FIJA, EXTRAS VISUALES Y TOTAL FINAL === */
+:root{--tpl-desktop-header:86px;--tpl-location-bar:46px}
+html,body{margin-top:0!important;padding-top:0!important}
+.navbar{position:sticky!important;top:0!important;z-index:1500!important;margin:0!important;background:rgba(255,255,255,.98)!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.location-filter-bar{position:sticky!important;top:var(--tpl-desktop-header)!important;z-index:1450!important;margin:0!important;padding:4px 0!important;background:rgba(255,255,255,.98)!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 8px 20px rgba(0,63,122,.07)!important}
+#contenido-principal{margin-top:0!important;padding-top:0!important}
+.extras-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:16px}
+.extra-card{position:relative;overflow:hidden;min-height:230px;padding:18px!important;border:1px solid #dbe7ef!important;border-radius:20px!important;background:linear-gradient(180deg,#fff 0%,#f7fbfd 100%)!important;box-shadow:0 10px 26px rgba(0,63,122,.07)!important;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease!important}
+.extra-card:hover{transform:translateY(-4px);border-color:#69c5cf!important;box-shadow:0 16px 34px rgba(0,63,122,.13)!important}
+.extra-card.selected{border-color:#008b95!important;background:linear-gradient(180deg,#f5feff 0%,#eaf9fa 100%)!important}
+.extra-card-header{min-height:92px!important;align-items:flex-start!important}
+.extra-icon-scene{position:relative;width:108px;height:86px;border-radius:18px;background:linear-gradient(135deg,#eaf6fb,#dff5f4);border:1px solid rgba(0,63,122,.09);overflow:hidden;box-shadow:inset 0 1px 0 #fff}
+.extra-icon-main{position:absolute;left:14px;top:12px;display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:#003f7a;color:#fff;box-shadow:0 8px 16px rgba(0,63,122,.22)}
+.extra-icon-main svg{width:28px;height:28px;stroke-width:2.2}
+.extra-icon-support{position:absolute;right:10px;top:28px;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#00a5ad;color:#fff;border:3px solid #f4fcfd;box-shadow:0 7px 15px rgba(0,139,149,.22)}
+.extra-icon-support svg{width:21px;height:21px;stroke-width:2.2}
+.extra-icon-scene small{position:absolute;left:12px;bottom:7px;color:#315b70;font-size:.66rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.extra-icon-scene.is-active{background:linear-gradient(135deg,#e2f7f8,#cfedef);border-color:#74cbd1}
+.extra-card-body h4{font-size:1.03rem!important;line-height:1.3!important;color:#12344a!important}
+.extra-card-body p{font-size:.84rem!important;line-height:1.45!important;color:#62788a!important}
+.extra-price-tag{display:inline-flex;margin-top:5px;padding:6px 9px;border-radius:999px;background:#eaf4f9;color:#003f7a!important;font-size:.8rem!important;font-weight:800!important}
+.summary-total-final{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:15px!important;margin:18px 0 14px!important;padding:18px!important;border:none!important;border-radius:18px!important;background:linear-gradient(135deg,#003f7a,#007f8b)!important;color:#fff!important;box-shadow:0 12px 26px rgba(0,63,122,.2)!important}
+.summary-total-final .total-label{font-size:.88rem!important;font-weight:700!important;color:#dff8fb!important}
+.summary-total-final .total-amount{font-size:clamp(1.45rem,2.2vw,2rem)!important;font-weight:900!important;color:#fff!important;white-space:nowrap}
+
+/* TPL V19 - recorrido de compra parcela > casa > precio */
+.tpl-purchase-path{padding:28px 0;background:#f4f9fb;border-top:1px solid #dcecf1;border-bottom:1px solid #dcecf1}.tpl-purchase-path-inner{display:grid;grid-template-columns:minmax(260px,.85fr) minmax(520px,1.4fr);gap:40px;align-items:center}.tpl-purchase-path-copy>span{font-size:.76rem;font-weight:900;letter-spacing:.14em;color:#007f8b}.tpl-purchase-path-copy h2{margin:8px 0 10px;color:#073d66;font-size:clamp(1.45rem,2.5vw,2.05rem);line-height:1.12}.tpl-purchase-path-copy p{margin:0;color:#526675;line-height:1.55}.tpl-purchase-steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.tpl-purchase-steps li{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid #d8e7ec;border-radius:16px;padding:16px;box-shadow:0 8px 22px rgba(7,61,102,.06)}.tpl-purchase-steps b{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:#073d66;color:#fff;flex:none}.tpl-purchase-steps strong,.tpl-purchase-steps small{display:block}.tpl-purchase-steps strong{color:#073d66;font-size:.95rem}.tpl-purchase-steps small{color:#677986;line-height:1.35;margin-top:4px}.card-actions{display:grid!important;grid-template-columns:.72fr 1.28fr!important;gap:8px!important}.btn-card.btn-add-house{border:0;background:linear-gradient(135deg,#007f8b,#073d66);color:#fff;cursor:pointer;font-weight:800}.btn-card.btn-add-house:hover{transform:translateY(-1px);filter:brightness(1.04)}.btn-select-house{font-size:.95rem!important}.section-casas .container>div:nth-child(2) p{font-weight:600}.cotizacion-summary-card{scroll-margin-top:150px}@media(max-width:850px){.tpl-purchase-path-inner{grid-template-columns:1fr;gap:20px}.tpl-purchase-steps{grid-template-columns:1fr}.tpl-purchase-path{padding:22px 0}.card-actions{grid-template-columns:1fr!important}}

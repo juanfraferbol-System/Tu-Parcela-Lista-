@@ -93,7 +93,7 @@ function keyLandHighlights(){const all=[];const nature=checked('naturaleza');if(
 function keyHouseHighlights(){const all=[];const extras=checked('extrasCasa');if(extras.includes('Piscina'))all.push('piscina');if(extras.includes('Vista panorámica'))all.push('vista panorámica');if(extras.includes('Acceso a río o lago'))all.push('acceso a río o lago');if(extras.includes('Bosque o entorno nativo'))all.push('entorno nativo');if(extras.includes('Quincho'))all.push('quincho');if(val('estadoCasa')==='Nueva'||val('estadoCasa')==='Excelente')all.push(val('estadoCasa').toLowerCase());return all.slice(0,2);}
 function redactionInput(){return{
  region:val('region'),comuna:val('comuna'),sector:val('localidad'),localidad:val('localidad'),tipoTerreno:val('tipoTerreno'),superficie:number(val('superficie')),rol:val('rol'),subdivision:val('subdivision'),usoSuelo:val('usoSuelo'),construccion:val('construccion'),topografia:val('topografia'),condicionSuelo:val('condicionSuelo'),vegetacion:val('vegetacion'),naturaleza:checked('naturaleza'),vistaPrincipal:val('vistaPrincipal'),agua:val('agua'),luz:val('luz'),acceso:val('acceso'),distanciaRutaPrincipalKm:number(val('distanciaRutaPrincipalKm')),
- tipoCasa:val('tipoCasa'),superficieConstruida:number(val('casaSuperficie')),superficieTerreno:number(val('casaTerreno')),habitaciones:val('habitaciones'),banos:val('banos'),pisos:val('pisos'),material:val('material'),estado:val('estadoCasa'),regularizacion:val('regularizacion'),aguaCasa:val('aguaCasa'),sanitario:val('sanitarioCasa'),calefaccion:val('calefaccion'),estacionamientos:val('estacionamientos'),extras:checked('extrasCasa')
+ tipoCasa:val('tipoCasa'),superficieConstruida:number(val('casaSuperficie')),superficieTerreno:number(val('casaTerreno')),habitaciones:val('habitaciones'),banos:val('banos'),pisos:val('pisos'),material:val('material'),estado:val('estadoCasa'),regularizacion:val('regularizacion'),anioCasa:number(val('anioCasa')),calidadCasa:val('calidadCasa'),remodelacionCasa:val('remodelacionCasa'),anioRemodelacionCasa:number(val('anioRemodelacionCasa')),centroUrbanoCasa:val('centroUrbanoCasa'),minutosCentroCasa:number(val('minutosCentroCasa')),kmCentroCasa:Number(val('kmCentroCasa'))||0,caminoCasa:val('caminoCasa'),aislacionCasa:val('aislacionCasa'),ventanasCasa:val('ventanasCasa'),aguaCasa:val('aguaCasa'),sanitario:val('sanitarioCasa'),calefaccion:val('calefaccion'),estacionamientos:val('estacionamientos'),extras:checked('extrasCasa')
 };}
 function generateLandCopy(){const input=redactionInput();if(window.TPL?.redaccion?.buildLand)return window.TPL.redaccion.buildLand(input);return{title:'',description:'',technicalDescription:''};}
 function generateHouseCopy(){const input=redactionInput();input.agua=input.aguaCasa;return window.TPL?.redaccion?.buildHouse?window.TPL.redaccion.buildHouse(input):{title:'',description:'',technicalDescription:''};}
@@ -304,6 +304,16 @@ function calculateComparableValuation({type,asking,area,location,region}){
 function calculateValuation(){
  const inputs=valuationInputs();
  if(!inputs.area)return {error:'Indica primero la superficie de la propiedad para poder calcular una referencia.'};
+ if(inputs.type==='casa'&&window.TPLHouseValuation?.calculate){
+   return window.TPLHouseValuation.calculate({
+     area:inputs.area,asking:inputs.asking,location:inputs.location,region:inputs.region,
+     material:val('material'),quality:val('calidadCasa'),condition:val('estadoCasa'),year:number(val('anioCasa')),
+     regularization:val('regularizacion'),remodeling:val('remodelacionCasa'),remodelingYear:number(val('anioRemodelacionCasa')),
+     urbanReference:val('centroUrbanoCasa'),minutesToCenter:number(val('minutosCentroCasa')),kmToCenter:Number(val('kmCentroCasa'))||0,
+     road:val('caminoCasa'),insulation:val('aislacionCasa'),windows:val('ventanasCasa'),water:val('aguaCasa'),sanitary:val('sanitarioCasa'),
+     heating:val('calefaccion'),parking:val('estacionamientos'),extras:checked('extrasCasa')
+   });
+ }
  if(inputs.type!=='casa'&&TPL_VALUATION_RULES.enabledRegions.includes(inputs.region))return calculateLandRuleValuation(inputs);
  return calculateComparableValuation(inputs);
 }
@@ -383,7 +393,7 @@ function dataObject(){const raw=Object.fromEntries(new FormData(form).entries())
  documentacion:{rol:val('rol'),condominio:val('condominio'),subdivision:val('subdivision'),usoSuelo:val('usoSuelo'),factibilidadConstruccion:val('construccion'),regularizacionCasa:val('regularizacion')},
  terreno:{topografia:val('topografia'),suelo:val('condicionSuelo'),vegetacion:val('vegetacion'),vista:val('vistaPrincipal'),orientacion:val('orientacion'),privacidad:val('privacidad'),forma:val('formaTerreno'),frenteMetros:number(val('frente')),naturaleza:checked('naturaleza')},
  servicios:{agua:val('agua')||val('aguaCasa'),electricidad:val('luz'),sanitario:val('sanitarioCasa'),calefaccion:val('calefaccion'),acceso:val('acceso'),distanciaRutaPrincipalKm:number(val('distanciaRutaPrincipalKm')),cierre:val('cierre'),porton:val('porton')},
- casa:{tipo:val('tipoCasa'),habitaciones:val('habitaciones'),banos:val('banos'),pisos:val('pisos'),material:val('material'),estado:val('estadoCasa'),anio:val('anioCasa'),estacionamientos:val('estacionamientos'),extras:checked('extrasCasa')},
+ casa:{tipo:val('tipoCasa'),habitaciones:val('habitaciones'),banos:val('banos'),pisos:val('pisos'),material:val('material'),estado:val('estadoCasa'),anio:val('anioCasa'),calidad:val('calidadCasa'),remodelacion:val('remodelacionCasa'),anioRemodelacion:val('anioRemodelacionCasa'),centroUrbano:val('centroUrbanoCasa'),minutosCentro:number(val('minutosCentroCasa')),kmCentro:Number(val('kmCentroCasa'))||0,camino:val('caminoCasa'),aislacion:val('aislacionCasa'),ventanas:val('ventanasCasa'),regularizacion:val('regularizacion'),agua:val('aguaCasa'),sanitario:val('sanitarioCasa'),calefaccion:val('calefaccion'),estacionamientos:val('estacionamientos'),extras:checked('extrasCasa')},
  comercial:{urgencia:raw.urgencia||'',urgenciaEtiqueta:urgency?.label||'',urgenciaPuntaje:urgency?.score||0,plazoVenta:raw.plazoVenta||'',tiempoEnVenta:raw.tiempoEnVenta||'',negociacionPrecio:raw.negociacionPrecio||'',disponibilidadVisitas:raw.disponibilidadVisitas||'',protocoloSugerido:urgency?.protocol||'',estrategiaPrecio:urgency?.strategy||''},
  contacto:{tipo:raw.anunciante||'',nombre:raw.nombre||'',telefono:raw.telefono||'',email:raw.email||''},
  plan:{id:state.plan,nombre:plan?.name||'',precioTexto:plan?.price||'',tarifa:plan?.fee||'',comision:plan?.commission||'',recomendado:state.recommendedPlan,coincideConUrgencia:state.plan===state.recommendedPlan},
