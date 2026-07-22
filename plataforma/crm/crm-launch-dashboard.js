@@ -240,11 +240,35 @@
       funnelRes
     ];
 
-    const failed = responses.find((result) => result.error);
-    const status = byId('launch-dashboard-status');
+   const responseNames = [
+  "clientes",
+  "crm_tareas",
+  "proyectos",
+  "crm_eventos",
+  "publicaciones",
+  "crm_resumen_embudo"
+];
 
-    if (failed) {
-      console.error('Error cargando dashboard CRM:', failed.error);
+const failedIndex = responses.findIndex(
+  (result) => result?.error
+);
+
+const failed =
+  failedIndex >= 0 ? responses[failedIndex] : null;
+
+const status = byId("launch-dashboard-status");
+
+if (failed) {
+  console.error(
+    `Error cargando ${responseNames[failedIndex]}:`,
+    {
+      code: failed.error?.code || "",
+      message: failed.error?.message || "",
+      details: failed.error?.details || "",
+      hint: failed.error?.hint || "",
+      error: failed.error
+    }
+  );
 
       if (status) {
         status.textContent =
