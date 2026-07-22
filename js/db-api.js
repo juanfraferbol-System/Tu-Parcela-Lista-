@@ -4,15 +4,27 @@
 const SUPABASE_URL = 'https://qxavbqhyqaqalpzbhwmh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
 
-let tplDbSupabase = null;
+let tplDbSupabase = window.tplSupabase || window.tplCrmSupabase || null;
 
-if (typeof window.supabase !== 'undefined' && SUPABASE_URL && SUPABASE_ANON_KEY) {
-  tplDbSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-} else {
+if (!tplDbSupabase && typeof window.supabase !== 'undefined' && SUPABASE_URL && SUPABASE_ANON_KEY) {
+  tplDbSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storageKey: 'sb-qxavbqhyqaqalpzbhwmh-auth-token'
+    },
+    global: {
+      headers: { 'X-Client-Info': 'tu-parcela-lista-web' }
+    }
+  });
+} else if (!tplDbSupabase) {
   console.warn('⚠️ Supabase no está disponible. Se utilizará el inventario local de parcelas.js.');
 }
 
-window.tplSupabase = tplDbSupabase;
+if (tplDbSupabase) {
+  window.tplSupabase = tplDbSupabase;
+}
 
 function getLocalParcelas() {
   if (Array.isArray(window.PARCELAS_DB)) return window.PARCELAS_DB;

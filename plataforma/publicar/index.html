@@ -9,8 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="styles.css?v=20260721-house-audit-v11">
-<link rel="stylesheet" href="../../css/tpl-lead-advisor.css?v=20260721-context-v4">
+  <link rel="stylesheet" href="styles.css?v=20260718-smart-fields-v3">
+<link rel="stylesheet" href="../../css/tpl-lead-advisor.css?v=20260720-2">
 </head>
 <body>
 <header class="site-header">
@@ -124,19 +124,17 @@
             <label class="field"><span>Estado de conservación</span><select id="estadoCasa" name="estadoCasa"><option value="">Selecciona</option><option>Nueva</option><option>Excelente</option><option>Muy buena</option><option>Buena</option><option>Necesita mejoras</option><option>Para remodelar</option></select></label>
             <label class="field"><span>Regularización</span><select id="regularizacion" name="regularizacion"><option value="">Selecciona</option><option>Recepción final</option><option>Totalmente regularizada</option><option>Regularizada parcialmente</option><option>En trámite</option><option>Sin regularizar</option><option>No lo sé</option></select></label>
             <label class="field"><span>Año aproximado</span><input id="anioCasa" name="anioCasa" inputmode="numeric" maxlength="4" placeholder="Ej. 2018"></label>
-            <label class="field"><span>Año de última remodelación</span><input id="anioRemodelacion" name="anioRemodelacion" inputmode="numeric" maxlength="4" placeholder="Ej. 2022"></label>
-            <label class="field"><span>Calidad de terminaciones</span><select id="calidadTerminaciones" name="calidadTerminaciones"><option value="">Selecciona</option><option>Económicas</option><option>Estándar</option><option>Buenas</option><option>Premium</option><option>Lujo</option></select></label>
-            <label class="field"><span>Estado de cocina</span><select id="estadoCocina" name="estadoCocina"><option value="">Selecciona</option><option>Nueva o remodelada</option><option>Muy buen estado</option><option>Funcional</option><option>Necesita mejoras</option><option>Sin equipamiento</option></select></label>
-            <label class="field"><span>Estado de baños</span><select id="estadoBanos" name="estadoBanos"><option value="">Selecciona</option><option>Nuevos o remodelados</option><option>Muy buen estado</option><option>Funcionales</option><option>Necesitan mejoras</option></select></label>
-            <label class="field"><span>Ventanas</span><select id="tipoVentanas" name="tipoVentanas"><option value="">Selecciona</option><option>Termopanel PVC</option><option>Termopanel aluminio</option><option>Vidrio simple aluminio</option><option>Vidrio simple madera</option><option>Mixtas</option></select></label>
-            <label class="field"><span>Aislación térmica</span><select id="aislacionTermica" name="aislacionTermica"><option value="">Selecciona</option><option>Alta</option><option>Estándar</option><option>Básica</option><option>Sin información</option></select></label>
-            <div class="field-group span-2"><h3>Antecedentes para tasación de la casa</h3><p>Estos datos serán analizados por un tasador específico de viviendas, separado del tasador de parcelas.</p></div>
-            <label class="field"><span>Avalúo fiscal total</span><div class="with-suffix"><b>$</b><input id="avaluoFiscalCasa" name="avaluoFiscalCasa" inputmode="numeric" placeholder="Ej. 48.000.000"></div></label>
-            <label class="field"><span>Contribuciones trimestrales</span><div class="with-suffix"><b>$</b><input id="contribucionesCasa" name="contribucionesCasa" inputmode="numeric" placeholder="Ej. 120.000"></div></label>
-            <label class="field"><span>Gastos comunes mensuales</span><div class="with-suffix"><b>$</b><input id="gastosComunesCasa" name="gastosComunesCasa" inputmode="numeric" placeholder="0 si no aplica"></div></label>
-            <label class="field"><span>Situación de ocupación</span><select id="ocupacionCasa" name="ocupacionCasa"><option value="">Selecciona</option><option>Desocupada</option><option>Habitada por propietario</option><option>Arrendada</option><option>Segunda vivienda</option></select></label>
-            <label class="field"><span>Orientación principal</span><select id="orientacionCasa" name="orientacionCasa"><option value="">Selecciona</option><option>Norte</option><option>Nororiente</option><option>Norponiente</option><option>Oriente</option><option>Poniente</option><option>Sur</option><option>No lo sé</option></select></label>
-            <label class="field"><span>Recepción final disponible</span><select id="recepcionFinalCasa" name="recepcionFinalCasa"><option value="">Selecciona</option><option>Sí</option><option>No</option><option>En trámite</option><option>No lo sé</option></select></label>
+            <label class="field"><span>Calidad constructiva</span><select id="calidadCasa" name="calidadCasa"><option value="">Selecciona</option><option>Económica</option><option>Estándar</option><option>Buena</option><option>Premium</option></select></label>
+            <label class="field"><span>Remodelación</span><select id="remodelacionCasa" name="remodelacionCasa"><option value="">Sin remodelación informada</option><option>Parcial</option><option>Importante</option><option>Integral</option></select></label>
+            <label class="field"><span>Año de remodelación</span><input id="anioRemodelacionCasa" name="anioRemodelacionCasa" inputmode="numeric" maxlength="4" placeholder="Ej. 2023"></label>
+            <div class="field-group span-2"><h3>Conectividad para el tasador de casa</h3><p>Usaremos una sola referencia urbana para no duplicar el efecto de cercanía.</p></div>
+            <label class="field"><span>Centro urbano o Plaza de Armas de referencia</span><input id="centroUrbanoCasa" name="centroUrbanoCasa" placeholder="Ej. Plaza de Armas de Yumbel"></label>
+            <label class="field"><span>Tiempo aproximado al centro</span><div class="with-suffix"><input id="minutosCentroCasa" name="minutosCentroCasa" type="number" min="0" max="300" step="1" inputmode="numeric" placeholder="Ej. 18"><b>min</b></div></label>
+            <label class="field"><span>Distancia aproximada al centro</span><div class="with-suffix"><input id="kmCentroCasa" name="kmCentroCasa" type="number" min="0" max="500" step="0.1" inputmode="decimal" placeholder="Ej. 12"><b>km</b></div><small>Solo se usa si no indicas minutos.</small></label>
+            <label class="field"><span>Camino principal hasta la vivienda</span><select id="caminoCasa" name="caminoCasa"><option value="">Selecciona</option><option>Pavimentado</option><option>Ripio en buen estado</option><option>Ripio transitable</option><option>Tierra en buen estado</option><option>Acceso difícil</option></select></label>
+            <label class="field"><span>Aislación térmica</span><select id="aislacionCasa" name="aislacionCasa"><option value="">No informado</option><option>Buena</option><option>Estándar</option><option>Deficiente</option></select></label>
+            <label class="field"><span>Ventanas</span><select id="ventanasCasa" name="ventanasCasa"><option value="">No informado</option><option>Termopanel</option><option>Vidrio simple en buen estado</option><option>Vidrio simple antiguo</option></select></label>
+            <div class="field-group span-2 house-valuation-note"><h3>Tasador TPL de Casa · Piloto</h3><p>La vivienda se calcula por separado. El tasador de parcelas existente no se modifica y el valor del terreno no se suma en esta etapa.</p></div>
             <div class="field-group span-2"><h3>Servicios y equipamiento</h3></div>
             <label class="field"><span>Agua</span><select id="aguaCasa" name="aguaCasa"><option value="">Selecciona</option><option>Red pública</option><option>APR</option><option>Pozo</option><option>Vertiente</option><option>Mixta</option></select></label>
             <label class="field"><span>Sistema sanitario</span><select id="sanitarioCasa" name="sanitarioCasa"><option value="">Selecciona</option><option>Alcantarillado</option><option>Fosa séptica</option><option>Planta de tratamiento</option><option>Pozo negro</option><option>No lo sé</option></select></label>
@@ -268,11 +266,11 @@
       <div id="valuationModalError" class="valuation-modal-error" hidden></div>
     </section>
   </div>
-<script src="publicador-config.js?v=20260720-core1"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script><script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script><script defer src="../../js/core/event-bus.js?v=20260718-core22"></script><script defer src="../../js/core/property-model.js?v=20260718-core22"></script><script defer src="../../js/core/intelligence-engine.js?v=20260718-core22"></script><script defer src="../../js/core/redaccion/motor-redaccion.js?v=20260719-redaccion1"></script><script defer src="../../js/core/orchestrator.js?v=20260718-core22"></script><script defer src="valuation-data.js?v=20260718-smart-fields-v3"></script><script defer src="photo-optimizer.js?v=20260718-photo1"></script><script defer src="crm-automation-engine.js?v=20260718-crm1"></script><script defer src="valuation-crm-service.js?v=20260719-crm-tasador1"></script><script defer src="integration-service.js?v=20260718-crm1"></script><script defer src="app.js?v=20260721-house-fields-v16"></script>
+<script src="publicador-config.js?v=20260720-core1"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script><script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script><script defer src="../../js/core/event-bus.js?v=20260718-core22"></script><script defer src="../../js/core/property-model.js?v=20260718-core22"></script><script defer src="../../js/core/intelligence-engine.js?v=20260718-core22"></script><script defer src="../../js/core/redaccion/motor-redaccion.js?v=20260719-redaccion1"></script><script defer src="../../js/core/orchestrator.js?v=20260718-core22"></script><script defer src="valuation-data.js?v=20260718-smart-fields-v3"></script><script defer src="house-valuation.js?v=20260721-house-v1"></script><script defer src="photo-optimizer.js?v=20260718-photo1"></script><script defer src="crm-automation-engine.js?v=20260718-crm1"></script><script defer src="valuation-crm-service.js?v=20260719-crm-tasador1"></script><script defer src="integration-service.js?v=20260718-crm1"></script><script defer src="app.js?v=20260721-house-v1"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../../js/db-api.js"></script>
 <script src="../../js/tpl-launch.js"></script>
-<script defer src="../../js/tpl-lead-advisor.js?v=20260721-context-v4"></script>
+<script defer src="../../js/tpl-lead-advisor.js?v=20260720-2"></script>
 </body>
 </html>

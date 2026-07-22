@@ -1,14 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
+  if (window.__TPL_CRM_INITIALIZED__) return;
+  window.__TPL_CRM_INITIALIZED__ = true;
+
   // Inicializar Supabase
   const crmConfig = window.TPL_CRM_CONFIG;
-  if (!crmConfig?.supabaseUrl || !crmConfig?.supabaseAnonKey) {
-    throw new Error('Falta crm-config.js o la configuración oficial de Supabase.');
-  }
 
-  const supabase = window.supabase.createClient(
+if (
+  !crmConfig?.supabaseUrl ||
+  !crmConfig?.supabaseAnonKey ||
+  !window.supabase?.createClient
+) {
+  console.error("CRM: falta la configuración de Supabase.");
+  return;
+}
+
+const supabase =
+  window.tplCrmSupabase ||
+  window.tplSupabase ||
+  window.supabase.createClient(
     crmConfig.supabaseUrl,
-    crmConfig.supabaseAnonKey
-  );  window.tplCrmSupabase = supabase;
+    crmConfig.supabaseAnonKey,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: "sb-qxavbqhyqaqalpzbhwmh-auth-token"
+      }
+    }
+  );
+
+window.tplSupabase = supabase;
+window.tplCrmSupabase = supabase;
 
   const DOM = {
     loginContainer: document.getElementById("login-container"),
@@ -39,19 +62,18 @@ document.addEventListener("DOMContentLoaded", () => {
     modalContent: document.getElementById("modal-content"),
     modalActions: document.getElementById("modal-actions"),
     feedbackTitle: document.getElementById("feedback-title"),
+    feedbackMotivo: document.getElementById("feedback-motivo"),
+    feedbackError: document.getElementById("feedback-error"),
     
     // Formularios y Botones
-    inputFeedback: document.getElementById("input-feedback"),
     btnConfirmFeedback: document.getElementById("btn-confirm-feedback"),
     btnCancelFeedback: document.getElementById("btn-cancel-feedback"),
-    btnCloseModal: document.getElementById("btn-close-modal"),
-    btnCloseDetalle: document.getElementById("btn-close-detalle")
+    btnCloseDetalle: document.getElementById("btn-close-modal")
   };
 
   let sessionUser = null;
   let publicacionesCache = [];
-  let itemToProcess = null; // ID de la publicacion
-  let newStatusProcess = null; // "Aprobada", "Corregir", "Rechazada"
+  let currentAction = null;
 
   const escapeHTML = (value) => String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -86,40 +108,66 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const showLogin = (msg = "") => {
-    DOM.loginContainer.style.display = "flex";
-    DOM.appContainer.style.display = "none";
-    if(msg) DOM.loginMsg.innerText = msg;
+    if (DOM.loginContainer) DOM.loginContainer.style.display = "flex";
+    if (DOM.appContainer) DOM.appContainer.style.display = "none";
+    if (DOM.loginMsg) DOM.loginMsg.innerText = msg;
   };
 
   const showDashboard = () => {
-    DOM.loginContainer.style.display = "none";
-    DOM.appContainer.style.display = "flex";
-    DOM.userName.innerText = sessionUser.nombre;
+    if (DOM.loginContainer) DOM.loginContainer.style.display = "none";
+    if (DOM.appContainer) DOM.appContainer.style.display = "flex";
+    if (DOM.userName) DOM.userName.innerText = sessionUser.nombre;
     loadData();
   };
 
-  DOM.loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = DOM.loginEmail.value.trim();
-    const password = DOM.loginPassword.value;
-    if (!email || !password) return;
-    
+DOM.loginForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = DOM.loginEmail?.value.trim();
+  const password = DOM.loginPassword?.value;
+
+  if (!email || !password) {
+    DOM.loginMsg.innerText = "Ingresa tu correo y contraseña.";
+    return;
+  }
+
+  if (DOM.btnLogin) {
     DOM.btnLogin.disabled = true;
     DOM.btnLogin.innerText = "Verificando...";
-    DOM.loginMsg.innerText = "";
-    
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    
-    if (error) {
-      DOM.loginMsg.innerText = "Credenciales incorrectas.";
-      DOM.btnLogin.disabled = false;
-      DOM.btnLogin.innerText = "Ingresar";
-    } else {
-      checkAuth();
-    }
+  }
+  if (DOM.loginMsg) DOM.loginMsg.innerText = "";
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
   });
 
-  DOM.btnLogout.addEventListener("click", async () => {
+  if (error) {
+    console.error("Error de ingreso:", error);
+    const message = String(error.message || "").toLowerCase();
+    if (DOM.loginMsg) {
+      DOM.loginMsg.innerText = message.includes("email not confirmed")
+        ? "Debes confirmar el correo antes de ingresar."
+        : message.includes("invalid login credentials")
+          ? "Correo o contraseña incorrectos."
+          : `No fue posible ingresar: ${error.message}`;
+    }
+    if (DOM.btnLogin) {
+      DOM.btnLogin.disabled = false;
+      DOM.btnLogin.innerText = "Ingresar";
+    }
+    return;
+  }
+
+  await checkAuth();
+  if (DOM.btnLogin) {
+    DOM.btnLogin.disabled = false;
+    DOM.btnLogin.innerText = "Ingresar";
+  }
+});
+
+
+  DOM.btnLogout?.addEventListener("click", async () => {
     await supabase.auth.signOut();
     window.location.reload();
   });
@@ -250,15 +298,15 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join('');
   };
 
-  DOM.filterEstado.addEventListener("change", loadTable);
+  DOM.filterEstado?.addEventListener("change", loadTable);
   document.getElementById('search-input')?.addEventListener('input', renderTable);
-  DOM.btnRefresh.addEventListener("click", loadData);
+  DOM.btnRefresh?.addEventListener("click", loadData);
 
   // 3. Detalle y Moderación
   window.verDetalle = async (id) => {
     DOM.modalContent.innerHTML = `<p>Cargando detalle...</p>`;
     DOM.modalActions.innerHTML = '';
-    DOM.modalDetalle.classList.add('active');
+    DOM.modalDetalle?.classList.add('active');
     
     const { data, error } = await supabase.rpc('crm_detalle_publicacion', { p_publicacion_id: id });
     if (error || !data) {
@@ -349,8 +397,11 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   };
 
-  const closeModalDetalle = () => DOM.modalDetalle.classList.remove('active');
-  DOM.btnCloseDetalle.addEventListener("click", closeModalDetalle);
+const closeModalDetalle = () => {
+  DOM.modalDetalle?.classList.remove('active');
+};
+
+DOM.btnCloseDetalle?.addEventListener('click', closeModalDetalle);
 
   // Edición Directa
   window.actualizarDatos = async (id) => {
@@ -396,45 +447,58 @@ document.addEventListener("DOMContentLoaded", () => {
     DOM.feedbackTitle.innerText = title;
     DOM.feedbackMotivo.value = "";
     DOM.feedbackError.innerText = "";
-    DOM.modalFeedback.classList.add("active");
+    DOM.modalFeedback?.classList.add("active");
   };
 
   window.rechazar = (id) => openFeedback(id, 'rechazar', 'Rechazar Publicación');
   window.solicitarCambios = (id) => openFeedback(id, 'requiere_cambios', 'Solicitar Corrección');
 
   const closeFeedback = () => {
-    DOM.modalFeedback.classList.remove("active");
+    DOM.modalFeedback?.classList.remove("active");
     currentAction = null;
   };
   
-  DOM.btnCloseFeedback.addEventListener("click", closeFeedback);
-  DOM.btnCancelFeedback.addEventListener("click", closeFeedback);
+DOM.btnCancelFeedback?.addEventListener("click", closeFeedback);
 
-  DOM.btnConfirmFeedback.addEventListener("click", async () => {
-    const motivo = DOM.feedbackMotivo.value.trim();
-    if (!motivo) {
+DOM.btnConfirmFeedback?.addEventListener("click", async () => {
+
+  const motivo = DOM.feedbackMotivo?.value.trim();
+
+  if (!currentAction) {
+    if (DOM.feedbackError) DOM.feedbackError.innerText = "No hay una acción seleccionada.";
+    return;
+  }
+
+  if (!motivo) {
+    if (DOM.feedbackError) {
       DOM.feedbackError.innerText = "Debes ingresar un motivo.";
-      return;
     }
-    
-    DOM.btnConfirmFeedback.disabled = true;
-    
-    const { error } = await supabase.rpc('crm_moderar_publicacion', {
-      p_publicacion_id: currentAction.id,
-      p_accion: currentAction.action,
-      p_motivo: motivo
-    });
-    
-    DOM.btnConfirmFeedback.disabled = false;
-    
-    if (!error) {
-      closeFeedback();
-      closeModalDetalle();
-      loadData();
-    } else {
-      DOM.feedbackError.innerText = "Error de red al procesar.";
-    }
+    return;
+  }
+
+  DOM.btnConfirmFeedback.disabled = true;
+
+  const { error } = await supabase.rpc("crm_moderar_publicacion", {
+    p_publicacion_id: currentAction.id,
+    p_accion: currentAction.action,
+    p_motivo: motivo
   });
+
+  DOM.btnConfirmFeedback.disabled = false;
+
+  if (error) {
+    console.error(error);
+
+    if (DOM.feedbackError) {
+      DOM.feedbackError.innerText = error.message;
+    }
+
+    return;
+  }
+
+  closeFeedback();
+  closeModalDetalle();
+  loadData();
 
   // Iniciar
   checkAuth();
@@ -500,7 +564,7 @@ async function loadContratistas() {
   if (!domContratistas.tableBody) return;
   domContratistas.tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Cargando contratistas...</td></tr>';
   
-  const { data, error } = await window.tplCrmSupabase.from('contratistas').select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase.from('contratistas').select('*').order('created_at', { ascending: false });
   
   if (error) {
     console.error("Error al cargar contratistas:", error);
@@ -553,7 +617,7 @@ function renderContratistas() {
 
 window.updatePartnerStatus = async function(id, newStatus) {
   try {
-    const { error } = await window.tplCrmSupabase.from('contratistas').update({ estado_verificacion: newStatus }).eq('id', id);
+    const { error } = await supabase.from('contratistas').update({ estado_verificacion: newStatus }).eq('id', id);
     if (error) {
       alert('Error al actualizar estado');
       console.error(error);
@@ -572,7 +636,7 @@ async function loadCotizaciones() {
   if (!domCotizaciones.tableBody) return;
   domCotizaciones.tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Cargando cotizaciones...</td></tr>';
   
-  const { data:projectRows, error } = await window.tplCrmSupabase.from('proyectos').select('id,creado_en,estado,total,modalidad,parcela_id,clientes(nombre,telefono),publicaciones(comuna)').order('creado_en', { ascending: false });
+  const { data:projectRows, error } = await supabase.from('proyectos').select('id,creado_en,estado,total,modalidad,parcela_id,clientes(nombre,telefono),publicaciones(comuna)').order('creado_en', { ascending: false });
   const data=(projectRows||[]).map(project=>({id:project.id,created_at:project.creado_en,estado:project.estado,parcela_id:project.parcela_id,parcela_comuna:project.publicaciones?.comuna||'',cliente_nombre:project.clientes?.nombre||'',cliente_telefono:project.clientes?.telefono||'',requiere_instalacion:project.modalidad==='llave_en_mano',total:project.total}));
   
   if (error) {
@@ -583,7 +647,7 @@ async function loadCotizaciones() {
   
   // Si no tenemos contratistas cargados aún, los necesitamos para el Smart Match
   if (contratistasCache.length === 0) {
-    const res = await window.tplCrmSupabase.from('contratistas').select('*').eq('estado_verificacion', 'verificado');
+    const res = await supabase.from('contratistas').select('*').eq('estado_verificacion', 'verificado');
     if (!res.error) contratistasCache = res.data;
   }
   
@@ -653,11 +717,11 @@ if (domCotizaciones.filterEstado) domCotizaciones.filterEstado.addEventListener(
 
 async function loadTasadorPanel(){
  const status=document.getElementById('tasador-admin-status'),tbody=document.getElementById('table-body-tasaciones');
- if(!window.tplCrmSupabase||!tbody)return;
+ if(!supabase||!tbody)return;
  status.hidden=true;tbody.innerHTML='<tr><td colspan="7" class="launch-empty">Cargando tasaciones…</td></tr>';
  const [valuationResponse,configResponse]=await Promise.all([
-  window.tplCrmSupabase.from('tasaciones').select('id,creada_en,precio_ingresado,valor_minimo,valor_mercado,valor_maximo,confianza,cobertura,decision_usuario,resumen_factores,datos_entrada').order('creada_en',{ascending:false}).limit(200),
-  window.tplCrmSupabase.from('configuracion_tasador').select('version,algoritmo,parametros').eq('estado','activa').maybeSingle()
+  supabase.from('tasaciones').select('id,creada_en,precio_ingresado,valor_minimo,valor_mercado,valor_maximo,confianza,cobertura,decision_usuario,resumen_factores,datos_entrada').order('creada_en',{ascending:false}).limit(200),
+  supabase.from('configuracion_tasador').select('version,algoritmo,parametros').eq('estado','activa').maybeSingle()
  ]);
  if(valuationResponse.error){status.hidden=false;status.textContent='El esquema del Tasador TPL todavía no está desplegado o tu sesión no tiene permisos.';tbody.innerHTML='<tr><td colspan="7" class="launch-empty">Sin datos disponibles.</td></tr>';return;}
  const rows=valuationResponse.data||[];
@@ -682,4 +746,6 @@ document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
     if (targetId === 'view-cotizaciones' && cotizacionesCache.length === 0) loadCotizaciones();
     if (targetId === 'view-tasador') loadTasadorPanel();
   });
+});
+
 });
