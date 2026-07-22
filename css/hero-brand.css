@@ -1,0 +1,223 @@
+:root {
+  --tpl-blue: #075889;
+  --tpl-blue-deep: #032f50;
+  --tpl-teal: #079a95;
+  --tpl-green: #77b82a;
+  --tpl-yellow: #ffc400;
+  --tpl-white: #ffffff;
+}
+
+.tpl-brand-hero {
+  position: relative;
+  min-height: min(760px, calc(100vh - 110px));
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(125deg, var(--tpl-blue-deep), var(--tpl-blue));
+}
+
+.tpl-brand-hero__media {
+  position: absolute;
+  inset: 0 0 0 42%;
+  z-index: -3;
+  background-image: url('../assets/hero-nueva-etapa.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.tpl-brand-hero__shade {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(90deg, rgba(2, 31, 52, .99) 0%, rgba(3, 47, 80, .96) 35%, rgba(3, 47, 80, .68) 56%, rgba(3, 47, 80, .08) 82%),
+    linear-gradient(0deg, rgba(2, 23, 37, .28), transparent 55%);
+}
+
+.tpl-brand-hero__content {
+  width: 100%;
+  padding-top: clamp(48px, 7vw, 96px);
+  padding-bottom: clamp(48px, 7vw, 96px);
+}
+
+.tpl-brand-hero__copy {
+  width: min(660px, 55vw);
+  color: var(--tpl-white);
+}
+
+.tpl-brand-hero__logo {
+  width: 118px;
+  height: 118px;
+  display: block;
+  object-fit: contain;
+  border-radius: 26px;
+  margin-bottom: 14px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, .24);
+}
+
+.tpl-brand-hero__signature {
+  margin: 0 0 18px;
+  color: rgba(255, 255, 255, .86);
+  font-size: .84rem;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.tpl-brand-hero h1 {
+  margin: 0;
+  max-width: 650px;
+  color: #fff;
+  font-family: Outfit, sans-serif;
+  font-size: clamp(3rem, 6.2vw, 6.25rem);
+  font-weight: 850;
+  line-height: .94;
+  letter-spacing: -.065em;
+  text-wrap: balance;
+}
+
+.tpl-brand-hero h1 em {
+  color: var(--tpl-green);
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 700;
+  letter-spacing: -.03em;
+}
+
+.tpl-brand-hero__lead {
+  max-width: 590px;
+  margin: 24px 0 30px;
+  color: rgba(255, 255, 255, .9);
+  font-size: clamp(1.03rem, 1.5vw, 1.28rem);
+  line-height: 1.55;
+}
+
+.tpl-brand-hero__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 650px;
+}
+
+.tpl-brand-hero__action {
+  min-width: 0;
+  min-height: 88px;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 13px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, .35);
+  font-family: Outfit, sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+
+.tpl-brand-hero__action:hover,
+.tpl-brand-hero__action:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 38px rgba(0, 0, 0, .25);
+  outline: none;
+}
+
+.tpl-brand-hero__action--primary {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--tpl-green), #5d9f17);
+}
+
+.tpl-brand-hero__action--secondary {
+  color: #fff;
+  background: rgba(3, 47, 80, .56);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.tpl-brand-hero__action-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .15);
+  border: 1px solid rgba(255, 255, 255, .24);
+}
+
+.tpl-brand-hero__action-icon svg { width: 25px; height: 25px; }
+.tpl-brand-hero__action-copy { min-width: 0; display: grid; gap: 3px; }
+.tpl-brand-hero__action-copy strong { font-size: 1.02rem; line-height: 1.15; }
+.tpl-brand-hero__action-copy small { color: rgba(255,255,255,.78); font-size: .78rem; line-height: 1.25; }
+.tpl-brand-hero__arrow { font-size: 1.35rem; transition: transform .2s ease; }
+.tpl-brand-hero__action:hover .tpl-brand-hero__arrow { transform: translateX(4px); }
+
+.tpl-brand-hero__pillars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  margin-top: 27px;
+  color: rgba(255, 255, 255, .8);
+}
+
+.tpl-brand-hero__pillars span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .84rem;
+}
+
+.tpl-brand-hero__pillars svg { width: 18px; height: 18px; color: var(--tpl-yellow); }
+.tpl-brand-hero__pillars b { font-weight: 650; }
+
+#decision-flow {
+  scroll-margin-top: 120px;
+  padding-top: 26px !important;
+  background: linear-gradient(180deg, #f5f9fb 0%, #fff 100%);
+}
+
+#decision-flow:not(.budget-active) {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#decision-flow:not(.budget-active) #budget-box { display: none !important; }
+#decision-flow.budget-active #budget-box {
+  display: block !important;
+  animation: tplBudgetReveal .42s ease both;
+}
+
+@keyframes tplBudgetReveal {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 980px) {
+  .tpl-brand-hero { min-height: auto; padding-top: 250px; }
+  .tpl-brand-hero__media { inset: 0 0 auto 0; height: 330px; background-position: 62% center; }
+  .tpl-brand-hero__shade {
+    background: linear-gradient(180deg, rgba(3,47,80,.05) 0, rgba(3,47,80,.28) 235px, rgba(3,47,80,.99) 345px, rgba(3,47,80,1) 100%);
+  }
+  .tpl-brand-hero__copy { width: 100%; }
+  .tpl-brand-hero__content { padding-top: 120px; }
+}
+
+@media (max-width: 680px) {
+  .tpl-brand-hero { padding-top: 215px; }
+  .tpl-brand-hero__media { height: 280px; background-position: 66% center; }
+  .tpl-brand-hero__content { padding-top: 100px; padding-bottom: 44px; }
+  .tpl-brand-hero__logo { width: 88px; height: 88px; border-radius: 20px; }
+  .tpl-brand-hero__signature { font-size: .68rem; letter-spacing: .13em; }
+  .tpl-brand-hero h1 { font-size: clamp(2.7rem, 14vw, 4.2rem); }
+  .tpl-brand-hero__lead { margin: 18px 0 24px; font-size: 1rem; }
+  .tpl-brand-hero__actions { grid-template-columns: 1fr; }
+  .tpl-brand-hero__action { min-height: 78px; }
+  .tpl-brand-hero__pillars { gap: 12px 17px; margin-top: 22px; }
+  .tpl-brand-hero__pillars span { font-size: .76rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tpl-brand-hero__action, .tpl-brand-hero__arrow, #decision-flow.budget-active #budget-box { transition: none; animation: none; }
+  html { scroll-behavior: auto; }
+}

@@ -21,7 +21,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- CRM CSS -->
-  <link rel="stylesheet" href="/plataforma/crm/crm.css?v=20260722-2">
+  <link rel="stylesheet" href="/plataforma/crm/crm.css?v=20260722-3">
   
 
 <!-- Google Ads Tracking -->
@@ -69,6 +69,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="#" class="nav-item" data-target="view-tasador"><i data-lucide="calculator"></i> Tasador TPL</a>
         <a href="#" class="nav-item" data-target="view-cotizaciones"><i data-lucide="briefcase"></i> Cotizaciones / Proyectos</a>
         <a href="#" class="nav-item" data-target="view-contratistas"><i data-lucide="users"></i> Red de Partners</a>
+        <a href="#" class="nav-item" data-target="view-partner-postulaciones"><i data-lucide="user-check"></i> Postulaciones Partner <span id="partner-pending-badge" class="nav-badge" hidden>0</span></a>
         <a href="#" class="nav-item" data-target="view-promociones"><i data-lucide="megaphone"></i> Promociones y Ads</a>
       </nav>
       <div class="sidebar-bottom">
@@ -365,6 +366,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
       </div>
 
+      <div id="view-partner-postulaciones" class="dashboard-section" style="display:none;">
+        <section class="partner-admin-head">
+          <div><p class="eyebrow">RED PARTNER</p><h2>Postulaciones y verificación</h2><p>Revisa antecedentes antes de crear el Partner. Aprobar no activa automáticamente un plan pagado ni un perfil público.</p></div>
+          <button id="btn-refresh-partner-applications" class="btn-secondary"><i data-lucide="refresh-cw"></i> Actualizar</button>
+        </section>
+        <section class="metrics-grid partner-metrics">
+          <article class="metric-card"><span>Pendientes</span><strong id="partner-count-pending">0</strong></article>
+          <article class="metric-card"><span>Solicitan antecedentes</span><strong id="partner-count-info">0</strong></article>
+          <article class="metric-card"><span>Aprobadas</span><strong id="partner-count-approved">0</strong></article>
+          <article class="metric-card"><span>Rechazadas</span><strong id="partner-count-rejected">0</strong></article>
+        </section>
+        <section class="filters-bar partner-filters">
+          <select id="partner-application-filter">
+            <option value="pendiente">Pendientes</option><option value="antecedentes">Antecedentes solicitados</option>
+            <option value="aprobada">Aprobadas</option><option value="rechazada">Rechazadas</option><option value="">Todas</option>
+          </select>
+          <input id="partner-application-search" type="search" placeholder="Buscar empresa, responsable o correo">
+        </section>
+        <section class="table-container">
+          <table class="data-table"><thead><tr><th>Postulación</th><th>Empresa</th><th>Servicio y cobertura</th><th>Plan solicitado</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
+          <tbody id="partner-applications-body"><tr><td colspan="7">Cargando postulaciones…</td></tr></tbody></table>
+        </section>
+      </div>
+
     </main>
   </div>
 
@@ -409,5 +434,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script src="/plataforma/crm/crm.js?v=20260722-2"></script>
 <script src="/plataforma/crm/crm-catalogos.js?v=20260722-2"></script>
 <script src="/plataforma/crm/crm-launch-dashboard.js?v=20260722-2" defer></script>
+<script src="/plataforma/crm/crm-automatizacion.js?v=20260722-3" defer></script>
+<script src="/plataforma/crm/crm-partners.js?v=20260722-1" defer></script>
 </body>
 </html>

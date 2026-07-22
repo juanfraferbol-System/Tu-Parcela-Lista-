@@ -1,0 +1,13 @@
+/* Red Partner TPL - refuerzo de formulario y estados */
+.field-help{color:#64748b;font-size:.8rem;display:block;margin-top:6px}
+.legal-consents{margin-top:18px;padding:16px;border:1px solid #dbe5ef;border-radius:14px;background:#f8fbfd}
+.legal-consents a{color:#075985;font-weight:700}
+.plan-notice{margin:18px 0 8px;padding:13px 15px;border-left:4px solid #0f766e;background:#ecfdf5;border-radius:8px;color:#134e4a;font-size:.9rem}
+.form-status{display:none;margin:14px 0;padding:12px 14px;border-radius:10px;font-weight:700}
+.form-status.is-error{display:block;background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.form-status.is-success{display:block;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+.form-status.is-info{display:block;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.input-group input.invalid,.input-group textarea.invalid,.input-group select.invalid{border-color:#dc2626!important;box-shadow:0 0 0 3px rgba(220,38,38,.12)}
+.btn-submit:disabled{opacity:.65;cursor:not-allowed}
+#success-msg strong{display:block;font-size:1.1rem;margin-bottom:6px}
+@media(max-width:680px){.legal-consents{padding:12px}.plan-selector{grid-template-columns:1fr!important}}

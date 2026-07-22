@@ -193,13 +193,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   </style>
 
 <!-- Google Ads Tracking -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-TU_ID_DE_GOOGLE_ADS"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'AW-TU_ID_DE_GOOGLE_ADS');
-</script>
+
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -277,112 +271,75 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <script type="module">
     const SUPABASE_URL = 'https://qxavbqhyqaqalpzbhwmh.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJxeGF2YnFoeXFhcWFscHpiaHdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
+    const allowedImageHosts = new Set(['qxavbqhyqaqalpzbhwmh.supabase.co', location.hostname]);
 
-    async function loadProfile() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const slug = urlParams.get('id');
-
-      if (!slug) {
-        showError();
-        return;
-      }
-
+    function safeImageUrl(value) {
       try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/contratistas?slug=eq.${slug}&select=*`, {
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-          }
+        const url = new URL(value, location.origin);
+        return ['https:', 'http:'].includes(url.protocol) && allowedImageHosts.has(url.hostname) ? url.href : '';
+      } catch { return ''; }
+    }
+    function safePhone(value) {
+      let number = String(value || '').replace(/\D/g, '');
+      if (number && !number.startsWith('56')) number = `56${number}`;
+      return number.slice(0, 15);
+    }
+    async function loadProfile() {
+      const slug = new URLSearchParams(location.search).get('id')?.trim();
+      if (!slug || !/^[a-z0-9-]{3,100}$/i.test(slug)) return showError();
+      try {
+        const fields = 'nombre_comercial,descripcion_servicios,tipo_servicio,especialidades,region,comunas_atendidas,anos_experiencia,disponibilidad,logo_url,galeria_urls,slug,rating,trabajos_realizados,whatsapp,correo,plan_activo';
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/partners_publicos?slug=eq.${encodeURIComponent(slug)}&select=${fields}&limit=1`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
         });
-        
+        if (!response.ok) throw new Error('PROFILE_REQUEST_FAILED');
         const data = await response.json();
-        if (!data || data.length === 0) {
-          showError();
-          return;
-        }
-
-        const partner = data[0];
-
-        // Solo permitir si está verificado y si su plan es profesional o premium
-        if (partner.estado_verificacion !== 'verificado' || partner.plan_elegido === 'gratis') {
-          showError();
-          return;
-        }
-
-        renderProfile(partner);
-
-      } catch (err) {
-        console.error(err);
+        if (!Array.isArray(data) || !data.length) return showError();
+        renderProfile(data[0]);
+      } catch (error) {
+        console.error(error);
         showError();
       }
     }
-
     function renderProfile(partner) {
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('profile-content').classList.remove('hidden');
-
       document.title = `${partner.nombre_comercial} - Red de Partners TPL`;
-      
-      document.getElementById('partner-logo').src = partner.logo_url || 'https://via.placeholder.com/120?text=Logo';
-      document.getElementById('partner-name').textContent = partner.nombre_comercial;
-      document.getElementById('partner-rating').textContent = `${partner.rating} (${partner.trabajos_realizados} trabajos)`;
-      document.getElementById('partner-desc').textContent = partner.descripcion_servicios;
-      
-      // Botones
+      const logo = safeImageUrl(partner.logo_url);
+      const logoNode = document.getElementById('partner-logo');
+      if (logo) logoNode.src = logo; else logoNode.removeAttribute('src');
+      document.getElementById('partner-name').textContent = partner.nombre_comercial || 'Partner TPL';
+      document.getElementById('partner-rating').textContent = `${Number(partner.rating || 0).toFixed(1)} (${Number(partner.trabajos_realizados || 0)} trabajos)`;
+      document.getElementById('partner-desc').textContent = partner.descripcion_servicios || '';
+      const number = safePhone(partner.whatsapp);
       const waBtn = document.getElementById('btn-whatsapp');
-      if (partner.whatsapp) {
-        let number = partner.whatsapp.replace(/\D/g,'');
-        if(!number.startsWith('56')) number = '56' + number;
-        waBtn.href = `https://wa.me/${number}?text=Hola, vengo desde Tu Parcela Lista y me gustaría cotizar servicios de ${partner.tipo_servicio}.`;
-      } else {
-        waBtn.style.display = 'none';
-      }
-
-      if (partner.correo) {
-        document.getElementById('btn-email').href = `mailto:${partner.correo}?subject=Cotización desde Tu Parcela Lista`;
-      }
-
-      // Listas
-      populateList('list-coverage', [partner.region].concat(partner.comunas_atendidas.split(',').map(s=>s.trim())));
-      populateList('list-specialties', partner.especialidades.split(',').map(s=>s.trim()));
-      
-      document.getElementById('exp-years').textContent = `${partner.anos_experiencia} años de experiencia`;
-      document.getElementById('jobs-done').textContent = `${partner.trabajos_realizados} trabajos derivados por TPL`;
-
-      // Galeria
-      const galleryCard = document.getElementById('gallery-card');
-      const galleryGrid = document.getElementById('gallery-grid');
-      
-      if (partner.galeria_urls && partner.galeria_urls.length > 0) {
-        partner.galeria_urls.forEach(url => {
-          const img = document.createElement('img');
-          img.src = url;
-          img.loading = "lazy";
-          galleryGrid.appendChild(img);
-        });
-      } else {
-        galleryCard.style.display = 'none';
-      }
+      if (number) waBtn.href = `https://wa.me/${number}?text=${encodeURIComponent(`Hola, vengo desde Tu Parcela Lista y me gustaría cotizar servicios de ${partner.tipo_servicio || 'tu empresa'}.`)}`;
+      else waBtn.style.display = 'none';
+      const emailButton = document.getElementById('btn-email');
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(partner.correo || '')) emailButton.href = `mailto:${partner.correo}?subject=${encodeURIComponent('Cotización desde Tu Parcela Lista')}`;
+      else emailButton.style.display = 'none';
+      populateList('list-coverage', [partner.region, ...(partner.comunas_atendidas || [])]);
+      populateList('list-specialties', partner.especialidades || []);
+      document.getElementById('exp-years').textContent = `${Number(partner.anos_experiencia || 0)} años de experiencia`;
+      document.getElementById('jobs-done').textContent = `${Number(partner.trabajos_realizados || 0)} trabajos derivados por TPL`;
+      const gallery = (partner.galeria_urls || []).map(safeImageUrl).filter(Boolean).slice(0, 12);
+      const card = document.getElementById('gallery-card');
+      const grid = document.getElementById('gallery-grid');
+      if (!gallery.length) card.style.display = 'none';
+      else gallery.forEach(url => { const img=document.createElement('img'); img.src=url; img.loading='lazy'; img.alt=`Trabajo de ${partner.nombre_comercial}`; grid.appendChild(img); });
     }
-
-    function populateList(ulId, items) {
-      const ul = document.getElementById(ulId);
-      ul.innerHTML = '';
-      const uniqueItems = [...new Set(items)].filter(Boolean);
-      uniqueItems.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = item;
-        ul.appendChild(li);
+    function populateList(id, items) {
+      const list = document.getElementById(id);
+      list.replaceChildren();
+      [...new Set((items || []).map(value => String(value).trim()).filter(Boolean))].forEach(value => {
+        const item = document.createElement('li'); item.textContent = value; list.appendChild(item);
       });
     }
-
     function showError() {
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('error-state').style.display = 'block';
     }
-
-    // Inicializar
     loadProfile();
   </script>
 </body>

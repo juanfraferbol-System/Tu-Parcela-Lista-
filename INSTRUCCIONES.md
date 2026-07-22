@@ -1,54 +1,41 @@
-# CRM TPL — Etapa 2
+# TPL Partners Seguro — Etapa 1
 
-Esta etapa completa el ciclo de vida administrativo de una publicación sin cambiar la compatibilidad del catálogo actual.
+## Orden de instalación
 
-## Estados
+1. Haz una copia de seguridad de los archivos actuales.
+2. Reemplaza:
+   - `plataforma/partners/index.html`
+   - `plataforma/partners/partners-logic.js`
+   - `plataforma/partners/perfil.html`
+   - `plataforma/crm/index.html`
+   - `plataforma/crm/crm.css`
+   - `js/partners-injector.js`
+3. Agrega:
+   - `plataforma/partners/partners.css`
+   - `plataforma/crm/crm-partners.js`
+4. En Supabase SQL Editor ejecuta una sola vez:
+   - `supabase/migrations/202607220005_partners_seguridad_base.sql`
+5. Recarga el CRM e inicia sesión con un administrador activo.
 
-- `aprobada`: publicación visible en el catálogo; en el CRM se muestra como **Publicada**.
-- `pausada`: retirada temporalmente del catálogo.
-- `vendida`: cerrada por venta y retirada del catálogo.
-- `archivada`: conservada únicamente como historial administrativo.
+## Pruebas mínimas
 
-## Acciones nuevas
+1. Abre `/plataforma/partners/` y completa una postulación de prueba.
+2. Verifica que aparezca un código `TPL-PAR-...`.
+3. En el CRM abre **Postulaciones Partner**.
+4. Revisa la postulación y pulsa **Aprobar**.
+5. Confirma que la aprobación crea un Partner interno, pero no activa un plan pagado ni lo publica.
+6. Verifica que `/plataforma/partners/perfil.html?id=...` solo muestre Partners que un administrador haya dejado verificados, visibles, con plan activo y pago vigente.
 
-- Publicada → Pausar.
-- Publicada → Marcar como vendida.
-- Pausada → Reactivar.
-- Pausada → Marcar como vendida.
-- Pausada, vendida o rechazada → Archivar.
+## Reglas incorporadas
 
-Todas las acciones exigen motivo, confirmación administrativa y generan historial, versión y notificación en cola.
+- Las postulaciones públicas ya no escriben directamente en `contratistas`.
+- El plan elegido se guarda como solicitado, nunca como pagado.
+- Los archivos se guardan en un bucket privado.
+- Se exige aceptación de términos, privacidad y autorización de contacto.
+- Se cierran las políticas RLS públicas históricas de contratistas y asignaciones.
+- El perfil público consulta una vista limitada y no utiliza `select=*`.
+- La aparición de Partners en parcelas usa el catálogo público seguro.
 
-## Instalación
+## Importante
 
-Descomprime este paquete sobre la raíz del proyecto y acepta reemplazar `CRM.html` y `js/crm-admin.js`.
-
-Ejecuta las migraciones en orden:
-
-```bash
-npx supabase@latest db push
-```
-
-Luego publica los archivos web:
-
-```bash
-git add CRM.html js/crm-admin.js supabase/migrations/202607200004_estados_ciclo_vida_publicaciones.sql supabase/migrations/202607200005_crm_ciclo_vida_publicaciones.sql
-git commit -m "Completar ciclo de vida de publicaciones en CRM"
-git push origin main
-```
-
-No es necesario volver a desplegar una Edge Function en esta etapa.
-
-## Verificación
-
-1. Abre una publicación aprobada/publicada.
-2. Prueba **Pausar publicación**.
-3. Confirma que desaparece del catálogo público.
-4. Prueba **Reactivar publicación**.
-5. Confirma que vuelve a aparecer.
-6. Marca una publicación de prueba como vendida.
-7. Revisa que cada acción aparezca en el historial.
-
-## Nota sobre los CRM existentes
-
-`CRM.html` queda como panel oficial de moderación y ciclo de vida de publicaciones. No se redirigió todavía `plataforma/crm/`, porque contiene además clientes, cotizaciones y contratistas. Esa consolidación debe hacerse en una etapa posterior para no ocultar funciones operativas.
+La Etapa 1 no incorpora todavía checkout ni renovación automática. La activación de planes pagados debe realizarse en la siguiente etapa, después de conectar el proveedor de pagos.

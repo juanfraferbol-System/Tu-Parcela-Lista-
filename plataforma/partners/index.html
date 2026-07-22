@@ -18,7 +18,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta content="parcelas chile, parcelas bio bio, parcelas quillón, parcelas florida, parcelas nacimiento, casas prefabricadas, terrenos chile, parcela con casa" name="keywords"/>
 <meta content="Tu Parcela Lista" name="author"/>
 <meta content="index,follow" name="robots"/>
-<link href="https://parcelalista.cl/" rel="canonical"/>
+<link href="https://www.parcelalista.cl/plataforma/partners/" rel="canonical"/>
 <meta content="#003f7a" name="theme-color"/>
 <meta content="website" property="og:type"/>
 <meta content="es_CL" property="og:locale"/>
@@ -41,8 +41,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
-<link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/><link href="../../css/styles.min.css?v=20260715-4" rel="stylesheet"/>
+<link href="../../css/styles.min.css?v=20260715-4" rel="stylesheet"/>
 
 <link href="../../css/v2-base.css" rel="stylesheet"/>
 <link href="../../css/v2-sidebar.css" rel="stylesheet"/>
@@ -60,6 +59,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link href="../../css/tpl-minimal.css?v=20260710-1" rel="stylesheet"/>
 <link href="../../css/site-polish.css?v=20260710" rel="stylesheet"/>
 <link href="../../css/modern-aesthetics.css?v=2" rel="stylesheet"/>
+<link href="partners.css?v=20260722-1" rel="stylesheet"/>
 <script defer="" src="https://unpkg.com/lucide@latest"></script>
 
 
@@ -408,7 +408,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </ul>
         </label>
         <label class="plan-card">
-          <input type="radio" name="plan" value="premium_empresa">
+          <input type="radio" name="plan" value="premium">
           <h3>Premium</h3>
           <div class="price" style="font-size:1.1rem;">$120.000 / mes</div>
           <ul>
@@ -452,13 +452,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <div class="input-group">
           <label>Logo de Empresa o Fotografía Personal</label>
-          <input type="file" id="logo_file" accept="image/*" required>
+          <input type="file" id="logo_file" accept="image/jpeg,image/png,image/webp" required>
         </div>
         
         <div class="input-group">
           <label>Imágenes de Trabajos (Opcional)</label>
-          <input type="file" id="gallery_files" accept="image/*" multiple>
-          <small style="color: #64748b; font-size: 0.8rem; display: block; margin-top: 4px;">Puedes subir hasta 5 fotos para tu galería</small>
+          <input type="file" id="gallery_files" accept="image/jpeg,image/png,image/webp" multiple>
+          <small class="field-help">Máximo 5 imágenes JPG, PNG o WebP de hasta 5 MB cada una.</small>
         </div>
       </div>
 
@@ -531,13 +531,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <input type="checkbox" id="trabaja_bajo_marca_tpl">
         <label for="trabaja_bajo_marca_tpl">Me interesa trabajar temporalmente bajo la marca "Tu Parcela Lista" (Marca Blanca)</label>
       </div>
-
+      <div class="legal-consents" aria-label="Consentimientos obligatorios">
+        <div class="checkbox-group">
+          <input type="checkbox" id="acepta_terminos" required>
+          <label for="acepta_terminos">Acepto los <a href="/terminos.html" target="_blank" rel="noopener">Términos de la Red Partner</a>.</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="acepta_privacidad" required>
+          <label for="acepta_privacidad">Acepto la <a href="/politica-privacidad.html" target="_blank" rel="noopener">Política de Privacidad</a> y el tratamiento de mis datos.</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="autoriza_contacto" required>
+          <label for="autoriza_contacto">Autorizo a Tu Parcela Lista a contactarme para revisar esta postulación.</label>
+        </div>
+      </div>
+      <p class="plan-notice">El plan seleccionado queda como <strong>solicitado</strong>. Los planes pagados solo se activan después de la aprobación y confirmación del pago.</p>
+      <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
       <button type="submit" class="btn-submit" id="btn-submit">Enviar Postulación</button>
     </form>
   </div>
 </div>
 
-<script src="partners-logic.js" type="module"></script>
+<script src="partners-logic.js?v=20260722-1" type="module"></script>
 <script src="../../js/config-negocio.js"></script>
 <script src="../../js/launch-control.js"></script>
 <script src="../../js/script.js" defer></script>

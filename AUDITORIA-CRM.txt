@@ -1,0 +1,35 @@
+AUDITORÍA CRM - TU PARCELA LISTA
+Fecha: 2026-07-21
+Proyecto oficial Supabase: qxavbqhyqaqalpzbhwmh
+URL oficial: https://qxavbqhyqaqalpzbhwmh.supabase.co
+
+ARCHIVOS ENTREGADOS
+- plataforma/crm/index.html
+- plataforma/crm/crm.js
+- plataforma/crm/crm-config.js
+- plataforma/crm/crm-launch-dashboard.js
+- js/db-api.js
+- js/crm-supabase.js
+
+MEJORAS APLICADAS
+1. Eliminada la carga duplicada de Supabase en el HTML del CRM.
+2. Unificada la instancia global mediante window.tplSupabase y window.tplCrmSupabase.
+3. Agregada protección contra inicialización duplicada del CRM.
+4. Corregidos listeners y referencias DOM inconsistentes.
+5. Corregida la gestión de currentAction en moderación.
+6. Unificado el cierre del modal de detalle.
+7. Mejorados los mensajes de autenticación.
+8. Actualizado cache busting a v=20260721-4.
+9. Eliminado el bloque de Google Ads con identificador placeholder.
+10. Verificado que los IDs usados por crm.js y crm-launch-dashboard.js existen en index.html.
+11. Verificado que todas las URLs activas encontradas apuntan al proyecto oficial.
+12. Validada la sintaxis de todos los JavaScript modificados.
+
+PRUEBAS
+- crm-service-tests.mjs: APROBADA.
+- crm-security-tests.mjs: una aserción antigua espera el texto "Enviar enlace de acceso" en un archivo que ahora redirige al CRM oficial. Esta prueba debe actualizarse al flujo unificado actual.
+
+INSTALACIÓN
+Copiar los archivos respetando exactamente sus carpetas.
+Después desplegar y recargar con Ctrl+Shift+R.
+En la pestaña Red del navegador debe aparecer crm.js?v=20260721-4.

@@ -1,0 +1,22 @@
+IMPLEMENTACIÓN: EDICIÓN DE PARCELAS Y CASAS DESDE EL CRM
+
+1. No borres carpetas completas.
+2. Copia y reemplaza estos archivos:
+   plataforma/crm/index.html
+   plataforma/crm/crm.js
+   plataforma/crm/crm.css
+3. Agrega este archivo nuevo:
+   plataforma/crm/crm-catalogos.js
+4. Agrega la migración:
+   supabase/migrations/202607220002_edicion_catalogos_crm.sql
+5. Ejecuta el contenido de esa migración en Supabase > SQL Editor.
+6. Sube los cambios a Git/Vercel.
+7. Recarga el CRM con Ctrl + Shift + R.
+
+RESULTADO
+- La sección Publicaciones pasa a llamarse Parcelas.
+- Cada parcela abre una ficha administrativa editable.
+- Se muestran y editan los campos principales del publicador.
+- Los datos adicionales se conservan en JSON.
+- Nueva sección Casas para crear y editar el catálogo.
+- Se corrigieron las acciones de aprobar y pedir correcciones.

@@ -1,110 +1,75 @@
-// partners-injector.js
-// Fetch and display partners for a given parcela comuna
-
+// Partners públicos recomendados según comuna de la parcela.
 const SUPABASE_URL = 'https://qxavbqhyqaqalpzbhwmh.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJxeGF2YnFoeXFhcWFscHpiaHdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
+
+function normalize(value) {
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+}
+function safeImage(value) {
+  try {
+    const url = new URL(value, location.origin);
+    return ['http:', 'https:'].includes(url.protocol) && [location.hostname, 'qxavbqhyqaqalpzbhwmh.supabase.co'].includes(url.hostname) ? url.href : '';
+  } catch { return ''; }
+}
+function textNode(tag, text, className) {
+  const node = document.createElement(tag);
+  node.textContent = text || '';
+  if (className) node.className = className;
+  return node;
+}
 
 async function fetchAndRenderPartners(comuna) {
   if (!comuna) return;
-
   const section = document.getElementById('partners-section');
   const grid = document.getElementById('partners-grid');
   const label = document.getElementById('partners-comuna-label');
-  
   if (!section || !grid || !label) return;
 
   try {
-    // Buscar contratistas que estén verificados y cuya cobertura incluya la comuna (usamos ilike para buscar dentro del string)
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/contratistas?estado_verificacion=eq.verificado&comunas_atendidas=ilike.*${comuna}*&select=*`, {
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      }
+    const fields = 'nombre_comercial,descripcion_servicios,tipo_servicio,comunas_atendidas,logo_url,slug,rating,plan_activo';
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/partners_publicos?select=${fields}&order=rating.desc&limit=24`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
     });
-
+    if (!response.ok) throw new Error('PARTNERS_REQUEST_FAILED');
     const partners = await response.json();
-    
-    // Filtrar localmente para evitar falsos positivos y omitir planes gratis si queremos publicarlos solo para Pro/Premium.
-    // El requerimiento decía: "La opción gratuita podrá solamente recibir propuestas de servicios cuando su perfil calce... sin landing pública, sin aparición en búsquedas"
-    const visiblePartners = partners.filter(p => p.plan_elegido === 'profesional' || p.plan_elegido === 'premium');
-
-    if (visiblePartners.length === 0) {
-      return; // Ocultar si no hay partners de pago en la zona
-    }
-
-    // Ordenar (Premium primero, luego Profesional) y por rating
-    visiblePartners.sort((a, b) => {
-      if (a.plan_elegido === 'premium' && b.plan_elegido !== 'premium') return -1;
-      if (b.plan_elegido === 'premium' && a.plan_elegido !== 'premium') return 1;
-      return b.rating - a.rating; // Mayor rating primero
-    });
+    const target = normalize(comuna);
+    const visible = (partners || []).filter(partner => (partner.comunas_atendidas || []).some(item => normalize(item) === target));
+    if (!visible.length) { section.style.display = 'none'; return; }
+    visible.sort((a, b) => (b.plan_activo === 'premium') - (a.plan_activo === 'premium') || Number(b.rating || 0) - Number(a.rating || 0));
 
     label.textContent = comuna;
-    grid.innerHTML = '';
-
-    visiblePartners.forEach(partner => {
-      const isPremium = partner.plan_elegido === 'premium';
-      const badge = isPremium ? '<span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; position: absolute; top: -10px; right: 10px;">PREMIUM</span>' : '';
-      
-      const card = document.createElement('div');
-      card.style.cssText = `
-        background: white; 
-        border: 1px solid #e2e8f0; 
-        border-radius: 16px; 
-        padding: 20px; 
-        display: flex; 
-        flex-direction: column; 
-        gap: 10px; 
-        position: relative;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        transition: transform 0.2s;
-      `;
-      card.onmouseenter = () => card.style.transform = 'translateY(-2px)';
-      card.onmouseleave = () => card.style.transform = 'translateY(0)';
-
-      const logoImg = partner.logo_url || 'https://via.placeholder.com/60?text=Logo';
-      
-      card.innerHTML = `
-        ${badge}
-        <div style="display: flex; gap: 15px; align-items: center;">
-          <img src="${logoImg}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 1px solid #eee;">
-          <div>
-            <h3 style="margin: 0; font-size: 1.1rem; color: #003f7a;">${partner.nombre_comercial}</h3>
-            <div style="color: #f59e0b; font-size: 0.9rem;">★★★★★ <span style="color: #64748b; font-size: 0.8rem;">${partner.rating}</span></div>
-          </div>
-        </div>
-        <p style="margin: 5px 0; font-size: 0.9rem; color: #475569; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-          ${partner.descripcion_servicios || ''}
-        </p>
-        <div style="font-size: 0.85rem; color: #64748b;">
-          <strong>Servicio:</strong> ${partner.tipo_servicio}
-        </div>
-        <div style="margin-top: auto; padding-top: 15px;">
-          <a href="plataforma/partners/perfil.html?id=${partner.slug}" class="btn" style="display: block; width: 100%; text-align: center; background: #00828a; color: white; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: 600;">Ver Perfil y Cotizar</a>
-        </div>
-      `;
-      
-      grid.appendChild(card);
+    grid.replaceChildren();
+    visible.slice(0, 6).forEach(partner => {
+      const card = document.createElement('article');
+      card.className = 'partner-recommendation-card';
+      card.style.cssText = 'background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;position:relative;box-shadow:0 4px 6px rgba(0,0,0,.02)';
+      if (partner.plan_activo === 'premium') {
+        const badge = textNode('span', 'PREMIUM');
+        badge.style.cssText = 'background:#f59e0b;color:white;padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:bold;position:absolute;top:-10px;right:10px';
+        card.appendChild(badge);
+      }
+      const head = document.createElement('div'); head.style.cssText='display:flex;gap:15px;align-items:center';
+      const image = document.createElement('img'); image.width=60; image.height=60; image.alt=`Logo de ${partner.nombre_comercial || 'Partner TPL'}`; image.loading='lazy'; image.style.cssText='width:60px;height:60px;border-radius:50%;object-fit:cover;border:1px solid #eee;background:#f1f5f9';
+      const src=safeImage(partner.logo_url); if(src) image.src=src;
+      const titleWrap=document.createElement('div'); const title=textNode('h3',partner.nombre_comercial||'Partner TPL'); title.style.cssText='margin:0;font-size:1.1rem;color:#003f7a';
+      const rating=textNode('div',`★ ${Number(partner.rating||0).toFixed(1)}`); rating.style.cssText='color:#f59e0b;font-size:.9rem'; titleWrap.append(title,rating); head.append(image,titleWrap);
+      const description=textNode('p',partner.descripcion_servicios||''); description.style.cssText='margin:5px 0;font-size:.9rem;color:#475569;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden';
+      const service=textNode('div',`Servicio: ${partner.tipo_servicio||'Servicios para proyectos'}`); service.style.cssText='font-size:.85rem;color:#64748b';
+      const link=document.createElement('a'); link.href=`/plataforma/partners/perfil.html?id=${encodeURIComponent(partner.slug)}`; link.textContent='Ver perfil y cotizar'; link.style.cssText='display:block;width:100%;text-align:center;background:#00828a;color:white;padding:10px;border-radius:8px;text-decoration:none;font-weight:600;box-sizing:border-box';
+      const footer=document.createElement('div'); footer.style.cssText='margin-top:auto;padding-top:15px'; footer.appendChild(link);
+      card.append(head,description,service,footer); grid.appendChild(card);
     });
-
-    section.style.display = 'block';
-
-  } catch (err) {
-    console.error('Error cargando partners', err);
+    section.style.display='block';
+  } catch (error) {
+    console.error('Error cargando partners', error);
+    section.style.display='none';
   }
 }
 
-// Escuchar cuando la parcela cargue. `parcelas.js` o el inline script cargan `const p`.
-// Podemos intentar buscar la comuna en el DOM.
-document.addEventListener("DOMContentLoaded", () => {
-  // En parcela.html, la comuna está en #detail-location-text u otro lado, pero sabemos que en el objeto 'p' tenemos 'comuna'.
-  // Esperar a que el script de parcela termine de pintar o leer del localStorage/URL.
+document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
-    const locText = document.getElementById("detail-location-text");
-    if (locText && locText.textContent) {
-      // Usualmente dice "Florida, Región del Biobío". Extraemos la primera parte.
-      const comuna = locText.textContent.split(',')[0].trim();
-      fetchAndRenderPartners(comuna);
-    }
-  }, 1000); // 1s delay para asegurar que los scripts principales hayan cargado
+    const locationText = document.getElementById('detail-location-text')?.textContent || '';
+    const comuna = locationText.split(',')[0].trim();
+    if (comuna) fetchAndRenderPartners(comuna);
+  }, 800);
 });

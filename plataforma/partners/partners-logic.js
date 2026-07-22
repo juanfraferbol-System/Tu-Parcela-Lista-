@@ -1,141 +1,162 @@
-// partners-logic.js
-// Supabase logic for Red de Partners TPL Onboarding
-
-// 1. Configuracion de Supabase (Reutilizamos la llave anonima de la app)
+// Red Partner TPL - postulación pública segura
 const SUPABASE_URL = 'https://qxavbqhyqaqalpzbhwmh.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJxeGF2YnFoeXFhcWFscHpiaHdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
+const BUCKET = 'partner-postulaciones';
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_GALLERY = 5;
+const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
-// 2. Interacciones de la UI (Selección de Plan)
-const planCards = document.querySelectorAll('.plan-card');
-planCards.forEach(card => {
+const form = document.getElementById('partner-form');
+const submitButton = document.getElementById('btn-submit');
+const statusBox = document.getElementById('form-status');
+
+function setStatus(message, type = 'info') {
+  statusBox.textContent = message;
+  statusBox.className = `form-status is-${type}`;
+}
+
+function splitValues(value) {
+  return [...new Set(String(value || '').split(',').map(v => v.trim()).filter(Boolean))].slice(0, 20);
+}
+
+function normalizePhone(value) {
+  return String(value || '').replace(/[^\d+]/g, '').slice(0, 16);
+}
+
+function safeExtension(file) {
+  const map = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  return map[file.type] || '';
+}
+
+function validateFile(file, label) {
+  if (!ALLOWED_TYPES.has(file.type)) throw new Error(`${label}: formato no permitido.`);
+  if (file.size > MAX_FILE_SIZE) throw new Error(`${label}: supera el máximo de 5 MB.`);
+}
+
+function validateFormFiles() {
+  const logo = document.getElementById('logo_file').files[0];
+  const gallery = [...document.getElementById('gallery_files').files];
+  if (!logo) throw new Error('Debes seleccionar un logo o fotografía principal.');
+  validateFile(logo, 'Logo');
+  if (gallery.length > MAX_GALLERY) throw new Error(`Puedes subir como máximo ${MAX_GALLERY} imágenes de trabajos.`);
+  gallery.forEach((file, index) => validateFile(file, `Imagen ${index + 1}`));
+  return { logo, gallery };
+}
+
+async function callRpc(name, body) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  const text = await response.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  if (!response.ok) {
+    const raw = data?.message || data?.error || text || 'No fue posible completar la solicitud.';
+    const messages = {
+      POSTULACION_RECIENTE_EXISTENTE: 'Ya existe una postulación reciente con este correo. TPL la revisará antes de recibir una nueva.',
+      CONSENTIMIENTOS_REQUERIDOS: 'Debes aceptar los consentimientos obligatorios.',
+      DESCRIPCION_MUY_CORTA: 'Describe tus servicios con al menos 40 caracteres.',
+      CORREO_INVALIDO: 'Revisa el correo electrónico.',
+      WHATSAPP_INVALIDO: 'Revisa el número de WhatsApp.'
+    };
+    const friendly = Object.entries(messages).find(([key]) => raw.includes(key))?.[1] || 'No fue posible enviar la postulación. Revisa los datos e inténtalo nuevamente.';
+    throw new Error(friendly);
+  }
+  return data;
+}
+
+async function uploadFile(file, applicationId, uploadToken, filename) {
+  const objectPath = `${applicationId}/${uploadToken}/${filename}`;
+  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${objectPath}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': file.type,
+      'x-upsert': 'false'
+    },
+    body: file
+  });
+  if (!response.ok) throw new Error('La postulación fue creada, pero falló la carga de una imagen. Conserva el código y contacta a soporte.');
+  return objectPath;
+}
+
+function buildPayload() {
+  return {
+    nombre_comercial: document.getElementById('nombre_comercial').value.trim(),
+    nombre_responsable: document.getElementById('nombre_responsable').value.trim(),
+    telefono: normalizePhone(document.getElementById('telefono').value),
+    whatsapp: normalizePhone(document.getElementById('whatsapp').value),
+    correo: document.getElementById('correo').value.trim().toLowerCase(),
+    descripcion_servicios: document.getElementById('descripcion_servicios').value.trim(),
+    tipo_servicio: document.getElementById('tipo_servicio').value,
+    especialidades: splitValues(document.getElementById('especialidades').value),
+    region: document.getElementById('region').value,
+    comunas_atendidas: splitValues(document.getElementById('comunas_atendidas').value),
+    anos_experiencia: Number(document.getElementById('anos_experiencia').value || 0),
+    disponibilidad: document.getElementById('disponibilidad').value,
+    emite_factura: document.getElementById('emite_factura').checked,
+    acepta_proyectos_tpl: document.getElementById('acepta_proyectos_tpl').checked,
+    trabaja_bajo_marca_tpl: document.getElementById('trabaja_bajo_marca_tpl').checked,
+    plan_solicitado: document.querySelector('input[name="plan"]:checked')?.value || 'partner',
+    acepta_terminos: document.getElementById('acepta_terminos').checked,
+    acepta_privacidad: document.getElementById('acepta_privacidad').checked,
+    autoriza_contacto: document.getElementById('autoriza_contacto').checked
+  };
+}
+
+for (const card of document.querySelectorAll('.plan-card')) {
   card.addEventListener('click', () => {
-    planCards.forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.plan-card').forEach(item => item.classList.remove('active'));
     card.classList.add('active');
     const radio = card.querySelector('input[type="radio"]');
     if (radio) radio.checked = true;
   });
-});
-
-// Función para subir archivos a Supabase Storage
-async function uploadFileToSupabase(file, bucket, path) {
-  const formData = new FormData();
-  formData.append('file', file);
-  
-  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${path}`, {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-    },
-    body: formData
-  });
-
-  if (!response.ok) {
-    console.error('Error subiendo archivo', response);
-    throw new Error('Fallo al subir archivo');
-  }
-
-  // Devolver URL pública
-  return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
 }
 
-// Función para generar un slug amigable
-function generateSlug(text) {
-  return text.toString().toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '');
-}
+form?.addEventListener('submit', async event => {
+  event.preventDefault();
+  statusBox.className = 'form-status';
+  if (!form.reportValidity()) return;
 
-// 3. Envío del Formulario
-document.getElementById('partner-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const btn = document.getElementById('btn-submit');
-  btn.textContent = 'Enviando postulación...';
-  btn.disabled = true;
+  submitButton.disabled = true;
+  submitButton.textContent = 'Creando postulación segura…';
 
   try {
-    const nombreComercial = document.getElementById('nombre_comercial').value.trim();
-    let slug = generateSlug(nombreComercial) + '-' + Math.floor(Math.random() * 1000);
+    const { logo, gallery } = validateFormFiles();
+    const result = await callRpc('tpl_postular_partner', { p_payload: buildPayload() });
+    const applicationId = result.id;
+    const uploadToken = result.upload_token;
 
-    // 3.1 Subir Logo
-    const logoInput = document.getElementById('logo_file');
-    let logoUrl = null;
-    if (logoInput.files.length > 0) {
-      const file = logoInput.files[0];
-      const ext = file.name.split('.').pop();
-      const path = `${slug}/logo.${ext}`;
-      logoUrl = await uploadFileToSupabase(file, 'logos_partners', path);
+    setStatus(`Postulación ${result.codigo} creada. Subiendo imágenes…`, 'info');
+    const logoPath = await uploadFile(logo, applicationId, uploadToken, `logo.${safeExtension(logo)}`);
+    const galleryPaths = [];
+    for (let index = 0; index < gallery.length; index += 1) {
+      galleryPaths.push(await uploadFile(gallery[index], applicationId, uploadToken, `galeria-${index + 1}.${safeExtension(gallery[index])}`));
     }
 
-    // 3.2 Subir Galería (Opcional)
-    const galleryInput = document.getElementById('gallery_files');
-    const galleryUrls = [];
-    if (galleryInput.files.length > 0) {
-      for (let i = 0; i < galleryInput.files.length; i++) {
-        const file = galleryInput.files[i];
-        const ext = file.name.split('.').pop();
-        const path = `${slug}/galeria_${i}.${ext}`;
-        const url = await uploadFileToSupabase(file, 'logos_partners', path);
-        galleryUrls.push(url);
-      }
-    }
-
-    // 3.3 Construir el Payload
-    const payload = {
-      nombre_comercial: nombreComercial,
-      nombre_responsable: document.getElementById('nombre_responsable').value.trim(),
-      telefono: document.getElementById('telefono').value.trim(),
-      whatsapp: document.getElementById('whatsapp').value.trim(),
-      correo: document.getElementById('correo').value.trim(),
-      descripcion_servicios: document.getElementById('descripcion_servicios').value.trim(),
-      tipo_servicio: document.getElementById('tipo_servicio').value,
-      especialidades: document.getElementById('especialidades').value.trim(),
-      region: document.getElementById('region').value,
-      comunas_atendidas: document.getElementById('comunas_atendidas').value.trim(),
-      anos_experiencia: parseInt(document.getElementById('anos_experiencia').value),
-      disponibilidad: document.getElementById('disponibilidad').value,
-      emite_factura: document.getElementById('emite_factura').checked,
-      acepta_proyectos_tpl: document.getElementById('acepta_proyectos_tpl').checked,
-      trabaja_bajo_marca_tpl: document.getElementById('trabaja_bajo_marca_tpl').checked,
-      plan_elegido: document.querySelector('input[name="plan"]:checked').value,
-      logo_url: logoUrl,
-      galeria_urls: galleryUrls,
-      slug: slug,
-      estado_verificacion: 'pendiente'
-    };
-
-    // 3.4 Insertar en Supabase (Tabla contratistas / partners)
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/contratistas`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify(payload)
+    await callRpc('tpl_confirmar_archivos_partner', {
+      p_id: applicationId,
+      p_token: uploadToken,
+      p_logo_path: logoPath,
+      p_galeria_paths: galleryPaths
     });
 
-    if (response.ok) {
-      document.getElementById('partner-form').style.display = 'none';
-      document.getElementById('success-msg').style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      const errData = await response.json();
-      console.error(errData);
-      alert('Hubo un error al guardar los datos. Por favor, intenta de nuevo.');
-      btn.textContent = 'Enviar Postulación';
-      btn.disabled = false;
-    }
-
-  } catch (err) {
-    console.error(err);
-    alert('Ocurrió un error en la conexión o subida de archivos.');
-    btn.textContent = 'Enviar Postulación';
-    btn.disabled = false;
+    form.style.display = 'none';
+    const success = document.getElementById('success-msg');
+    success.innerHTML = `<strong>Postulación recibida correctamente</strong>Tu código de seguimiento es <b>${result.codigo}</b>. El plan quedó solicitado, no activado. TPL revisará tus antecedentes antes de habilitar cualquier perfil público o cobro.`;
+    success.style.display = 'block';
+    window.scrollTo({ top: document.getElementById('postulacion').offsetTop - 30, behavior: 'smooth' });
+  } catch (error) {
+    console.error(error);
+    setStatus(error.message || 'Ocurrió un error inesperado.', 'error');
+    submitButton.disabled = false;
+    submitButton.textContent = 'Enviar Postulación';
   }
 });

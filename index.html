@@ -42,9 +42,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
-<link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/><link href="css/styles.min.css?v=20260720-18" rel="stylesheet"/>
-<link href="css/index-mobile-v17.css?v=20260720-18" rel="stylesheet"/>
-<link href="css/tpl-card-system-v21.css?v=20260721-22" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/><link href="css/styles.min.css?v=20260715-4" rel="stylesheet"/>
+<link href="css/hero-brand.css?v=20260722-1" rel="stylesheet"/>
+<link href="css/cotizador-funnel.css?v=20260722-1" rel="stylesheet"/>
 
 <!-- <link href="agente/agente.css" rel="stylesheet"/> -->
 
@@ -247,7 +247,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 .tpl-backed-value-badge strong{display:block;font-size:.78rem;line-height:1.2;font-weight:850}.tpl-backed-value-badge small{display:block;margin-top:2px;font-size:.69rem;font-weight:650;color:#39775a}.tpl-backed-value-check{display:grid;place-items:center;width:23px;height:23px;border-radius:50%;background:#16844b;color:#fff;font-weight:900;flex:0 0 auto}
 @media(max-width:640px){.tpl-backed-value-badge{padding:8px 9px}.tpl-backed-value-badge strong{font-size:.73rem}}
 </style>
-<link rel="stylesheet" href="css/tpl-lead-advisor.css?v=20260721-context-v4">
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -315,54 +314,49 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </div>
 <main id="contenido-principal">
-<section class="hero hero-life-masonry" aria-labelledby="hero-title">
-  <div class="hero-bubble b-left-large" style="background-image: url('image/banner-pareja.jpg');"></div>
-  <div class="hero-bubble b-left-small" style="background-image: url('image/banner-leyendo.jpg');"></div>
-  <div class="hero-bubble b-left-oval" style="background-image: url('image/banner-invernadero.jpg');"></div>
-  <div class="hero-bubble b-right-oval" style="background-image: url('image/banner-inversion.jpg');"></div>
-  <div class="hero-bubble b-right-large" style="background-image: url('image/banner-tranquilidad.jpg');"></div>
-  <div class="hero-bubble b-right-small" style="background-image: url('image/banner-espacio.jpg');"></div>
-  <div class="container hero-masonry-content">
-      <span class="hero-life-kicker">TU PARCELA LISTA</span>
-      <h1 id="hero-title">Un gran espacio para tu próximo proyecto</h1>
-      <p>Parcelas para vivir, invertir o construir en familia, Tú Parcela Lista te acompaña en todas las etapas.</p>
+<section class="hero tpl-brand-hero" aria-labelledby="hero-title">
+  <div class="tpl-brand-hero__media" aria-hidden="true"></div>
+  <div class="tpl-brand-hero__shade" aria-hidden="true"></div>
+
+  <div class="container tpl-brand-hero__content">
+    <div class="tpl-brand-hero__copy">
+      <img class="tpl-brand-hero__logo" src="assets/logo-tu-parcela-lista.png" alt="Tu Parcela Lista" width="180" height="180"/>
+      <p class="tpl-brand-hero__signature">Naturaleza · Hogar · Tecnología</p>
+      <h1 id="hero-title">Comienza tu <em>nueva</em> etapa.</h1>
+      <p class="tpl-brand-hero__lead">Encuentra tu parcela ideal, elige tu casa y haz realidad tu proyecto de campo con acompañamiento en cada paso.</p>
+
+      <div class="tpl-brand-hero__actions" aria-label="Elige cómo comenzar">
+        <button class="tpl-brand-hero__action tpl-brand-hero__action--primary" id="opt-parcela" type="button">
+          <span class="tpl-brand-hero__action-icon" aria-hidden="true"><i data-lucide="trees"></i></span>
+          <span class="tpl-brand-hero__action-copy">
+            <strong>Encontrar una parcela</strong>
+            <small>Busca opciones según tu presupuesto</small>
+          </span>
+          <span class="tpl-brand-hero__arrow" aria-hidden="true">→</span>
+        </button>
+
+        <button class="tpl-brand-hero__action tpl-brand-hero__action--secondary" id="opt-combo" type="button">
+          <span class="tpl-brand-hero__action-icon" aria-hidden="true"><i data-lucide="house"></i></span>
+          <span class="tpl-brand-hero__action-copy">
+            <strong>Parcela + Casa</strong>
+            <small>Cotiza tu proyecto completo</small>
+          </span>
+          <span class="tpl-brand-hero__arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+
+      <div class="tpl-brand-hero__pillars" aria-label="Pilares de Tu Parcela Lista">
+        <span><i data-lucide="leaf"></i><b>Naturaleza</b></span>
+        <span><i data-lucide="home"></i><b>Hogar</b></span>
+        <span><i data-lucide="sparkles"></i><b>Tecnología</b></span>
+      </div>
+    </div>
   </div>
 </section>
 
 
 <section class="decision-flow" id="decision-flow" style="position: relative; z-index: 10; padding: 20px 0;">
-<div class="decision-box">
-<span class="decision-eyebrow">COMIENZA AHORA</span>
-<p class="decision-intro">Primero elige una parcela. Después podrás agregar una casa y conocer el precio estimado del proyecto completo.</p>
-<div class="decision-buttons decision-buttons-clean decision-buttons-v5" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; position: relative; z-index: 15;">
-  <button class="tpl-decision-card" id="opt-parcela" type="button" style="padding: 0; border: none; border-radius: 20px; text-align: left; background: url('image/btn_parcela_person.jpg') center/cover no-repeat !important; background-color: #0c2b2e !important; box-shadow: 0 15px 35px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; display: flex; align-items: flex-end; min-height: 240px; cursor: pointer;; z-index: 20;">
-    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 100%) !important; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'"></div>
-    <div style="position: relative; z-index: 2; padding: 24px; width: 100%; display: flex; align-items: flex-start; gap: 16px;">
-      <div style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #fff; width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.4);">
-        <i data-lucide="circle-dollar-sign" style="width: 28px; height: 28px;"></i>
-      </div>
-      <div style="display: flex; flex-direction: column; flex: 1; padding-top: 4px;">
-        <strong style="font-size: 1.9rem; font-family: Outfit, sans-serif; color: #ffffff; line-height: 1.1; margin-bottom: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.4);">Elegir una parcela</strong>
-        <span style="font-size: 1.05rem; color: rgba(255,255,255,0.9); line-height: 1.4; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">Luego podrás comparar casas y cotizar el proyecto completo.</span>
-      </div>
-    </div>
-  </button>
-
-  <button class="tpl-decision-card" id="opt-combo" type="button" style="padding: 0; border: none; border-radius: 20px; text-align: left; background: url('image/btn_casa_modern.jpg') center/cover no-repeat !important; background-color: #0c2b2e !important; box-shadow: 0 15px 35px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; display: flex; align-items: flex-end; min-height: 240px; cursor: pointer;; z-index: 20;">
-    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 100%) !important; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'"></div>
-    <div style="position: relative; z-index: 2; padding: 24px; width: 100%; display: flex; align-items: flex-start; gap: 16px;">
-      <div style="background: var(--tpl-brand, #0c2b2e); color: #fff; width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(12,43,46,0.6);">
-        <i data-lucide="trending-up" style="width: 28px; height: 28px;"></i>
-      </div>
-      <div style="display: flex; flex-direction: column; flex: 1; padding-top: 4px;">
-        <strong style="font-size: 1.9rem; font-family: Outfit, sans-serif; color: #ffffff; line-height: 1.1; margin-bottom: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.4);">Buscar parcela + casa</strong>
-        <span style="font-size: 1.05rem; color: rgba(255,255,255,0.9); line-height: 1.4; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">Encuentra una combinación y revisa el precio total de inmediato.</span>
-      </div>
-    </div>
-  </button>
-</div>
-</div>
-<div class="budget-box" id="budget-box" style="display:none;">
+<div class="budget-box" id="budget-box" data-budget-anchor style="display:none;">
 <div class="budget-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
 <span class="budget-kicker">PORTAL DE BÚSQUEDA</span>
 <h3 id="budget-title">¿Cuál es tu presupuesto total?</h3>
@@ -388,20 +382,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 </section>
 
-<section class="tpl-purchase-path" aria-labelledby="tpl-purchase-path-title">
-  <div class="container tpl-purchase-path-inner">
-    <div class="tpl-purchase-path-copy">
-      <span>ASÍ ARMAS TU PROYECTO</span>
-      <h2 id="tpl-purchase-path-title">De la parcela al precio de tu casa, en tres pasos</h2>
-      <p>No necesitas saber de construcción. Elige el terreno, compara casas y revisa el valor estimado del proyecto completo.</p>
-    </div>
-    <ol class="tpl-purchase-steps">
-      <li><b>1</b><div><strong>Elige tu parcela</strong><small>Revisa ubicación, superficie y condiciones.</small></div></li>
-      <li><b>2</b><div><strong>Agrega una casa</strong><small>Compara modelos, metros cuadrados y habitaciones.</small></div></li>
-      <li><b>3</b><div><strong>Conoce el precio total</strong><small>Ajusta fundación, instalación y extras.</small></div></li>
-    </ol>
-  </div>
-</section>
+
 
 <!-- Cargador de búsqueda por presupuesto -->
 
@@ -518,87 +499,128 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ========================================= -->
 <!-- CATEGORIAS DE PARCELAS -->
 <!-- ========================================= -->
-<section class="parcel-categories-section container" id="experiencias-parcelas" aria-labelledby="experiencias-title">
-  <div class="category-heading">
-    <span class="category-eyebrow">DESCUBRE TU LUGAR IDEAL</span>
-    <h2 id="experiencias-title">Encuentra según tu estilo</h2>
-    <p>Explora parcelas seleccionadas según la experiencia que quieres vivir.</p>
+<section class="parcel-categories-section container" style="margin-top: 60px; margin-bottom: 20px; padding-top: 20px;">
+  <div style="text-align: center; margin-bottom: 32px;">
+    <span style="background:rgba(0,130,138,0.1);color:var(--secondary);padding:6px 16px;border-radius:var(--radius-full);font-weight:700;font-size:0.9rem; letter-spacing: 0.05em; display: inline-block; margin-bottom: 12px;">DESCUBRE TU LUGAR IDEAL</span>
+    <h2 style="font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 800; color: var(--primary); margin: 0; line-height: 1.15;">Encuentra según tu estilo</h2>
+    <p style="color: var(--text-muted); max-width: 600px; margin: 12px auto 0; font-size: 1.05rem;">
+      Explora las parcelas agrupadas por la experiencia que buscas.
+    </p>
   </div>
-
-  <div class="category-grid" role="list">
-    <a href="categoria.html?cat=descanso" class="category-card category-card--rest" role="listitem" aria-label="Explorar parcelas ideales para descanso">
-      <span class="category-badge">Tranquilidad</span>
+  
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; padding-bottom: 20px;">
+    <!-- Tarjeta 1: Descanso -->
+    <a href="categoria.html?cat=descanso" class="category-card" style="background: linear-gradient(to top, rgba(12, 43, 46, 0.9) 0%, rgba(12, 43, 46, 0.2) 60%, rgba(12,43,46,0) 100%), url('image/hammock_rest.jpg') center/cover; text-decoration: none; text-align: left; display: flex;">
       <div class="category-content">
-        <div class="category-icon" aria-hidden="true"><i class="fa-solid fa-leaf"></i></div>
+        <div class="category-icon"><i class="fa-solid fa-leaf"></i></div>
         <h3>Descanso</h3>
-        <p>Refugios tranquilos para desconectarte y vivir rodeado de naturaleza.</p>
-        <span class="category-action">Explorar parcelas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+        <p>Refugios silenciosos</p>
       </div>
     </a>
-
-    <a href="categoria.html?cat=inversion" class="category-card category-card--investment" role="listitem" aria-label="Explorar parcelas con potencial de inversión">
-      <span class="category-badge">Proyección</span>
+    
+    <!-- Tarjeta 2: Inversión -->
+    <a href="categoria.html?cat=inversion" class="category-card" style="background: linear-gradient(to top, rgba(0, 71, 95, 0.9) 0%, rgba(0, 71, 95, 0.2) 60%, rgba(0,71,95,0) 100%), url('image/investment_handshake.jpg') center/cover; text-decoration: none; text-align: left; display: flex;">
       <div class="category-content">
-        <div class="category-icon" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="category-icon"><i class="fa-solid fa-chart-line"></i></div>
         <h3>Inversión</h3>
-        <p>Alternativas con precio competitivo y potencial de valorización.</p>
-        <span class="category-action">Explorar parcelas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+        <p>Alta plusvalía garantizada</p>
       </div>
     </a>
 
-    <a href="categoria.html?cat=nativas" class="category-card category-card--native" role="listitem" aria-label="Explorar parcelas con bosque y naturaleza nativa">
-      <span class="category-badge">Naturaleza</span>
+    <!-- Tarjeta 3: Nativas y Salvajes -->
+    <a href="categoria.html?cat=nativas" class="category-card" style="background: linear-gradient(to top, rgba(31, 61, 35, 0.9) 0%, rgba(31, 61, 35, 0.2) 60%, rgba(31,61,35,0) 100%), url('image/native_forest.jpg') center/cover; text-decoration: none; text-align: left; display: flex;">
       <div class="category-content">
-        <div class="category-icon" aria-hidden="true"><i class="fa-solid fa-tree"></i></div>
-        <h3>Bosque nativo</h3>
-        <p>Entornos naturales, vegetación nativa y una experiencia de campo auténtica.</p>
-        <span class="category-action">Explorar parcelas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+        <div class="category-icon"><i class="fa-solid fa-tree"></i></div>
+        <h3>Nativas y Salvajes</h3>
+        <p>Bosques e inmersión total</p>
       </div>
     </a>
 
-    <a href="categoria.html?cat=agua" class="category-card category-card--water" role="listitem" aria-label="Explorar parcelas con ríos, lagos o vertientes">
-      <span class="category-badge">Agua y paisaje</span>
+    <!-- Tarjeta 4: Con Agua -->
+    <a href="categoria.html?cat=agua" class="category-card" style="background: linear-gradient(to top, rgba(0, 89, 133, 0.9) 0%, rgba(0, 89, 133, 0.2) 60%, rgba(0,89,133,0) 100%), url('image/river_water.jpg') center/cover; text-decoration: none; text-align: left; display: flex;">
       <div class="category-content">
-        <div class="category-icon" aria-hidden="true"><i class="fa-solid fa-water"></i></div>
-        <h3>Con agua</h3>
-        <p>Parcelas vinculadas a ríos, lagos, esteros o vertientes.</p>
-        <span class="category-action">Explorar parcelas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+        <div class="category-icon"><i class="fa-solid fa-water"></i></div>
+        <h3>Con Agua</h3>
+        <p>Ríos, lagos y vertientes</p>
       </div>
     </a>
   </div>
-  <p class="category-disclaimer">Las categorías son orientativas y se calculan según la información disponible de cada propiedad.</p>
 </section>
 
 <style>
-.parcel-categories-section { margin-top:72px; margin-bottom:28px; padding-top:24px; }
-.category-heading { text-align:center; margin-bottom:34px; }
-.category-eyebrow { display:inline-block; margin-bottom:12px; padding:7px 16px; border-radius:999px; background:rgba(0,130,138,.1); color:var(--secondary); font-size:.82rem; font-weight:800; letter-spacing:.08em; }
-.category-heading h2 { margin:0; color:var(--primary); font-size:clamp(2rem,4vw,2.65rem); font-weight:850; line-height:1.12; }
-.category-heading p { max-width:650px; margin:12px auto 0; color:var(--text-muted); font-size:1.05rem; }
-.category-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px; }
-.category-card { position:relative; min-height:310px; display:flex; align-items:flex-end; overflow:hidden; border-radius:24px; padding:24px; color:#fff; text-decoration:none; isolation:isolate; box-shadow:0 12px 28px rgba(12,43,46,.12); transition:transform .28s ease,box-shadow .28s ease; background-position:center; background-size:cover; }
-.category-card::before { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(4,20,22,.06) 15%,rgba(4,20,22,.92) 100%); transition:background .28s ease; }
-.category-card::after { content:""; position:absolute; inset:0; z-index:-1; border:1px solid rgba(255,255,255,.22); border-radius:inherit; pointer-events:none; }
-.category-card--rest { background-image:url('image/hammock_rest.jpg'); }
-.category-card--investment { background-image:url('image/investment_handshake.jpg'); }
-.category-card--native { background-image:url('image/native_forest.jpg'); }
-.category-card--water { background-image:url('image/river_water.jpg'); }
-.category-card:hover,.category-card:focus-visible { transform:translateY(-7px); box-shadow:0 20px 38px rgba(12,43,46,.22); }
-.category-card:hover::before,.category-card:focus-visible::before { background:linear-gradient(180deg,rgba(4,20,22,.02) 8%,rgba(4,20,22,.96) 100%); }
-.category-card:focus-visible { outline:4px solid rgba(0,169,157,.42); outline-offset:4px; }
-.category-badge { position:absolute; top:18px; left:18px; padding:7px 11px; border:1px solid rgba(255,255,255,.32); border-radius:999px; background:rgba(8,34,37,.48); backdrop-filter:blur(10px); font-size:.75rem; font-weight:800; letter-spacing:.03em; }
-.category-content { width:100%; }
-.category-icon { width:48px; height:48px; display:grid; place-items:center; margin-bottom:15px; border:1px solid rgba(255,255,255,.25); border-radius:15px; background:rgba(255,255,255,.16); backdrop-filter:blur(10px); font-size:1.35rem; transition:transform .28s ease; }
-.category-card:hover .category-icon { transform:scale(1.08) rotate(-3deg); }
-.category-content h3 { margin:0 0 7px; color:#fff; font:800 1.45rem/1.15 Outfit,sans-serif; text-shadow:0 2px 10px rgba(0,0,0,.3); }
-.category-content p { min-height:58px; margin:0; color:rgba(255,255,255,.9); font-size:.94rem; line-height:1.45; }
-.category-action { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:17px; padding-top:14px; border-top:1px solid rgba(255,255,255,.22); font-size:.88rem; font-weight:800; }
-.category-action i { transition:transform .25s ease; }
-.category-card:hover .category-action i { transform:translateX(5px); }
-.category-disclaimer { margin:14px 0 0; text-align:center; color:var(--text-muted); font-size:.78rem; }
-@media (max-width:1000px){.category-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
-@media (max-width:600px){.parcel-categories-section{margin-top:52px}.category-grid{grid-template-columns:1fr;gap:14px}.category-card{min-height:235px;padding:20px}.category-content p{min-height:auto}.category-badge{top:15px;left:15px}}
-@media (prefers-reduced-motion:reduce){.category-card,.category-icon,.category-action i{transition:none!important}}
+.category-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 280px;
+  border: none;
+  border-radius: 24px;
+  padding: 24px;
+  text-align: left;
+  color: white;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+}
+
+.category-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.1);
+  pointer-events: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.category-card:hover::before {
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.4);
+}
+
+.category-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: white;
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.category-card:hover .category-icon {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.category-content h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-family: Outfit, sans-serif;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.category-content p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
 
 /* ========================================= */
 /* VISTAS COMPACTA Y LISTA (MINIATURA/LISTA) */
@@ -697,9 +719,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 <div style="text-align:center;margin-bottom:48px;">
 <span style="background:rgba(0,130,138,0.1);color:var(--secondary);padding:6px 16px;border-radius:var(--radius-full);font-weight:700;font-size:0.9rem;">PASO 2</span>
-<h2 style="font-size:2.2rem;font-weight:800;color:var(--primary);margin-top:12px;">Paso 2: elige la casa para esta parcela</h2>
+<h2 style="font-size:2.2rem;font-weight:800;color:var(--primary);margin-top:12px;">Ahora tu casa soñada</h2>
 <p style="color:var(--text-muted);max-width:500px;margin:8px auto 0;">
-        Tu parcela ya está guardada. Selecciona una casa y te llevaremos al precio total del proyecto.
+        Elige el modelo que mejor calza con tu parcela y tu presupuesto.
       </p>
 </div>
 <div class="casas-room-filter">
@@ -759,11 +781,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="container">
     <div style="text-align: center; margin-bottom: 56px;">
       <h2 style="font-family: Outfit, sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--text-high); letter-spacing: -1px; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 12px;">
-        <i data-lucide="calculator" style="color: var(--tpl-primary); width: 32px; height: 32px;"></i> Paso 3: precio estimado de tu proyecto
+        <i data-lucide="calculator" style="color: var(--tpl-primary); width: 32px; height: 32px;"></i> Cotizador de Proyectos
       </h2>
 <span style="background: rgba(0, 130, 138, 0.1); color: var(--secondary); padding: 6px 16px; border-radius: var(--radius-full); font-weight: 700; font-size: 0.9rem;">PASO 3</span>
 <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-top: 12px;">Estás a un paso de lograr tu sueño</h2>
-<p style="color: var(--text-muted); max-width: 500px; margin: 8px auto 0 auto;">Aquí verás parcela + casa + fundación + instalación + extras. Ajusta lo necesario y comparte el resultado por WhatsApp.</p>
+<p style="color: var(--text-muted); max-width: 620px; margin: 8px auto 0 auto;">Primero confirma tu parcela y casa, luego elige la fundación. Los extras quedan al final para que entiendas claramente el valor base antes de personalizar.</p>
+<div class="cotizador-funnel-steps" aria-label="Etapas del cotizador">
+  <span class="is-complete"><b>1</b> Parcela y casa</span>
+  <span><b>2</b> Fundación</span>
+  <span><b>3</b> Extras opcionales</span>
+  <span><b>4</b> Enviar proyecto</span>
+</div>
 </div>
 <div class="cotizador-layout">
 <!-- Panel izquierdo: Opciones e inputs -->
@@ -771,23 +799,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- Opciones de fundaciones -->
 <div class="options-box installation-service-box">
 <div class="installation-step-header">
-<span class="installation-step-kicker">INSTALACIÓN OPCIONAL</span>
-<h3><i data-lucide="wrench"></i> ¿Necesitas fundación y montaje?</h3>
+<span class="installation-step-kicker">PASO 2 · BASE DEL PROYECTO</span>
+<h3><i data-lucide="wrench"></i> Elige fundación y montaje</h3>
 <div class="installation-highlight-copy">
-<strong>Tú eliges.</strong> Continúa con tu constructor o agrega uno de nuestros planes.
+<strong>Compara el valor total de cada alternativa.</strong> También puedes continuar sin instalación y coordinar esta etapa con tu propio equipo.
 </div>
 <label class="installation-service-toggle-card">
 <input type="checkbox" id="installation-service-toggle">
 <span>
-<strong>Agregar fundación y montaje</strong>
-<small>Verás alternativas y valores para la casa seleccionada.</small>
+<strong>Incluir fundación y montaje en la cotización</strong>
+<small>El valor se calcula automáticamente según los metros cuadrados de la casa seleccionada.</small>
 </span>
 </label>
 <div class="installation-plan-status" id="installation-plan-status">
 Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de instalación.
 </div>
 </div>
-<h4 class="installation-plans-title" id="installation-plans-title" hidden>Elige la alternativa que mejor se ajuste</h4>
+<h4 class="installation-plans-title" id="installation-plans-title" hidden>Compara las alternativas y su valor para esta casa</h4>
 <div class="fundaciones-grid installation-plans-grid" id="fundaciones-container" hidden>
 <!-- Planes de instalación inyectados dinámicamente por app.js -->
 </div>
@@ -803,10 +831,10 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
   <div class="options-box deferred-extras-box" id="deferred-extras-box" style="margin-top: 30px;">
   <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; margin-bottom:15px; gap:10px;">
     <div>
-      <span class="installation-step-kicker" style="color:var(--primary); font-weight:700; font-size:0.85rem; letter-spacing:1px;">COMPLETA TU PROYECTO</span>
-      <h3 style="margin:5px 0 0 0;"><i data-lucide="plus-circle"></i> Agrega terminaciones y servicios</h3>
+      <span class="installation-step-kicker" style="color:var(--primary); font-weight:700; font-size:0.85rem; letter-spacing:1px;">PASO 3 · AL FINAL Y SOLO SI LOS NECESITAS</span>
+      <h3 style="margin:5px 0 0 0;"><i data-lucide="plus-circle"></i> Extras opcionales</h3>
       <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 5px; margin-bottom: 0;">
-        Personaliza tu proyecto según las necesidades de tu casa y parcela.
+        Primero revisa el valor base del proyecto. Después agrega terminaciones y servicios sin perder de vista cuánto aumenta el total.
       </p>
     </div>
     <div class="extras-stats" style="background:#f1f5f9; padding:8px 16px; border-radius:20px; font-size:0.9rem; font-weight:600; color:var(--primary);">
@@ -825,7 +853,7 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
   <!-- Botón Pack Llave en Mano -->
   <div class="pack-completo-banner" id="btn-pack-llave" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 24px; border-radius: 20px; border: 2px solid #334155; position: relative; overflow: hidden; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; box-shadow: 0 12px 30px rgba(0,0,0,0.15);">
   <!-- Sello -->
-  <div class="sello-elegido" style="position: absolute; top: 0; right: 24px; background: #f59e0b; color: #fff; font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: 0 0 8px 8px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); z-index: 2;">Ms elegido por nuestros clientes</div>
+  <div class="sello-elegido" style="position: absolute; top: 0; right: 24px; background: #f59e0b; color: #fff; font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: 0 0 8px 8px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); z-index: 2;">Más elegido por nuestros clientes</div>
   
   <div style="display: flex; justify-content: space-between; align-items: center; z-index: 1; flex-wrap: wrap; gap: 16px;">
     <div style="display: flex; align-items: center; gap: 16px;">
@@ -834,7 +862,7 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
       </div>
       <div>
         <h4 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: white;">Mi Proyecto Completo</h4>
-        <p style="margin: 4px 0 0 0; font-size: 0.95rem; color: #94a3b8;">Todo lo esencial para iniciar tu construccin.</p>
+        <p style="margin: 4px 0 0 0; font-size: 0.95rem; color: #94a3b8;">Todo lo esencial para iniciar tu construcción.</p>
       </div>
     </div>
     <div class="pack-btn" style="background: #38bdf8; color: #0f172a; padding: 12px 28px; border-radius: 99px; font-weight: 800; white-space: nowrap; transition: all 0.2s; font-size: 1rem;">
@@ -845,10 +873,10 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
   <div class="pack-accordion" style="display: none; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 8px; padding-top: 16px;">
     <p style="margin: 0 0 12px 0; font-size: 0.9rem; color: #94a3b8; font-weight: 600;">Este pack incluye automáticamente:</p>
     <ul style="list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
-      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Instalacin elǸctrica y empalme</li>
-      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Instalacin sanitaria</li>
-      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Fosa sǸptica y drenaje</li>
-      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Artefactos bǭsicos (Bao y Cocina)</li>
+      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Instalación eléctrica y empalme</li>
+      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Instalación sanitaria</li>
+      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Fosa séptica y drenaje</li>
+      <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Artefactos básicos (Baño y Cocina)</li>
       <li style="display: flex; align-items: center; gap: 8px; color: #f8fafc; font-size: 0.9rem;"><i data-lucide="check-circle-2" style="color: #38bdf8; width: 18px;"></i> Pozo profundo (Base)</li>
     </ul>
   </div>
@@ -900,8 +928,19 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 </div>
 </div>
 <div class="summary-header">
+<div>
+<span class="summary-step-label">PASO 4 · REVISA Y ENVÍA</span>
 <h3><i data-lucide="receipt"></i> Resumen de Cotización</h3>
 </div>
+</div>
+<div class="summary-total-row summary-total-final summary-total-top" aria-live="polite">
+<div>
+<span class="total-label">Total estimado del proyecto</span>
+<small>Se actualiza al cambiar fundación o extras</small>
+</div>
+<span class="total-amount" id="total-amount">$0</span>
+</div>
+<div class="summary-base-note" id="summary-base-note">Selecciona parcela y casa para calcular el proyecto.</div>
 <table class="summary-table">
 <thead>
 <tr>
@@ -913,10 +952,6 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <!-- Ítems inyectados por JS -->
 </tbody>
 </table>
-<div class="summary-total-row summary-total-final">
-<span class="total-label">Total estimado del proyecto</span>
-<span class="total-amount" id="total-amount">$0</span>
-</div>
 <button class="btn-whatsapp-quote pulse" id="whatsapp-btn" type="button">
 <i data-lucide="message-circle"></i> Enviar Cotización por WhatsApp
             </button>
@@ -1083,11 +1118,9 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="js/config-negocio.js"></script>
 <script defer src="js/db-api.js"></script>
-<script defer src="js/core/event-bus.js"></script>
-<script defer src="js/core/orchestrator.js"></script>
 <script defer src="js/tpl-launch.js"></script>
 <script defer src="js/launch-control.js"></script>
-<script defer src="app.js?v=20260721-22"></script>
+<script defer src="app.js?v=20260715-4"></script>
 <script defer src="premium-features.js"></script>
 <script defer src="js/tpl-modals.js"></script>
 <script defer src="js/tpl-utils.js"></script>
@@ -1103,7 +1136,7 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 
 
 <script defer src="tpl-analytics.js"></script>
-<script defer src="js/site-polish.js?v=20260721-21"></script>
+<script defer src="js/site-polish.js"></script>
 <!-- <script defer src="agente/agente.js"></script> -->
 
 <script>
@@ -1132,18 +1165,5 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 })();
 </script>
 <script src="alternativas.js" defer></script>
-<script defer src="js/tpl-lead-advisor.js?v=20260721-context-v4"></script>
-<script>
-(function(){
-  document.addEventListener('click', function(event){
-    const card=event.target.closest('.category-card');
-    if(!card) return;
-    card.setAttribute('aria-current','true');
-    const category=new URL(card.href,location.href).searchParams.get('cat')||'sin-categoria';
-    try { sessionStorage.setItem('tpl_last_experience',category); } catch (_) {}
-    if(typeof window.gtag==='function') window.gtag('event','select_parcel_experience',{experience:category,link_url:card.href});
-  });
-})();
-</script>
 </body>
 </html>

@@ -103,6 +103,13 @@ document.addEventListener("DOMContentLoaded", () => {
     downloadProjectPdfBtn: document.getElementById("download-project-pdf-btn")
   };
 
+  function scrollToBudget() {
+    if (!DOM.budgetBox) return;
+    window.requestAnimationFrame(() => {
+      DOM.budgetBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
+
   let map = null;
   let satelliteLayer = null;
   let satelliteLabelsLayer = null;
@@ -602,75 +609,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return chips.slice(0, 2);
   }
 
-
-  function numericParcelaPrice(p) {
-    return Number(String(p?.precio || p?.valor || "").replace(/[^0-9]/g, "")) || 0;
-  }
-
-  function topIds(items, selector, limit = 3, descending = false) {
-    return new Set(items
-      .filter(item => Number.isFinite(selector(item)) && selector(item) > 0)
-      .slice()
-      .sort((a, b) => descending ? selector(b) - selector(a) : selector(a) - selector(b))
-      .slice(0, limit)
-      .map(item => String(item.id)));
-  }
-
-  function yesValue(value) {
-    return value === true || ["si", "sí", "true", "1"].includes(String(value || "").trim().toLowerCase());
-  }
-
-  function getParcelaRankingSets() {
-    const all = getAllParcelas();
-    const water = all.filter(p => yesValue(p.agua) || hasRiverOrStream(p));
-    const native = all.filter(p => yesValue(p.naturaleza));
-    const payment = all.filter(p => yesValue(p.facilidad));
-    const light = all.filter(p => yesValue(p.luz));
-    return {
-      cheapest: topIds(all, numericParcelaPrice, 3),
-      largest: topIds(all, p => Number(p.tamano || p.superficie || 0), 3, true),
-      water: topIds(water, numericParcelaPrice, 3),
-      native: topIds(native, numericParcelaPrice, 3),
-      payment: topIds(payment, numericParcelaPrice, 3),
-      light: topIds(light, numericParcelaPrice, 3)
-    };
-  }
-
-  function renderParcelaRankingBadges(p) {
-    const id = String(p?.id || "");
-    const sets = getParcelaRankingSets();
-    const badges = [];
-    if (sets.cheapest.has(id)) badges.push(['wallet-cards', 'Top 3 económicas', 'economy']);
-    if (sets.largest.has(id)) badges.push(['maximize-2', 'Top 3 más grandes', 'large']);
-    if (sets.water.has(id)) badges.push(['waves', 'Top 3 con agua', 'water']);
-    if (sets.native.has(id)) badges.push(['trees', 'Bosque nativo', 'native']);
-    if (sets.payment.has(id)) badges.push(['badge-dollar-sign', 'Pago flexible', 'payment']);
-    if (sets.light.has(id)) badges.push(['zap', 'Con luz', 'light']);
-    return badges.slice(0, 2).map(([icon, label, tone]) =>
-      `<span class="tpl-photo-badge tpl-photo-badge-${tone}"><i data-lucide="${icon}"></i>${label}</span>`
-    ).join('');
-  }
-
-  function getCasaRankingSets() {
-    const all = getAllCasas();
-    return {
-      cheapest: topIds(all, c => Number(c.valorCasa || c.precio || 0), 3),
-      largest: topIds(all, c => Number(c.metros || 0), 3, true),
-      family: topIds(all.filter(c => Number(c.habitaciones || 0) >= 4), c => Number(c.valorCasa || c.precio || 0), 3)
-    };
-  }
-
-  function renderCasaRankingBadges(c) {
-    const id = String(c?.id || "");
-    const sets = getCasaRankingSets();
-    const badges = [];
-    if (sets.cheapest.has(id)) badges.push(['wallet-cards', 'Top 3 económicas', 'economy']);
-    if (sets.largest.has(id)) badges.push(['maximize-2', 'Top 3 más amplias', 'large']);
-    if (sets.family.has(id)) badges.push(['users', 'Ideal familias', 'family']);
-    return badges.slice(0, 2).map(([icon, label, tone]) =>
-      `<span class="tpl-photo-badge tpl-photo-badge-${tone}"><i data-lucide="${icon}"></i>${label}</span>`
-    ).join('');
-  }
   function renderParcelaFeatureChips(p, placement = "desktop") {
     const chips = getParcelaFeatureChipItems(p);
     if (!chips.length) return "";
@@ -736,11 +674,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const primaryLabel = pendingChange === "parcela" ? "Agregar parcela" : "Añadir casa";
       const primaryClass = pendingChange === "parcela" ? "btn-add-house btn-add-parcela-project" : "btn-add-house";
       card.innerHTML = `
-        <div class="card-image-wrapper">
+        <div class="card-image-wrapper" style="position:relative;">
         <a class="card-image card-image-link" href="${detailHref}" aria-label="Ver detalles de ${p.nombre}">
-          <div class="tpl-photo-badges">${renderParcelaRankingBadges(p)}</div>
-          ${window.TasadorInteligente && window.TasadorInteligente.isOpportunity(getAllParcelas(), p) ? `<div class="badge-opportunity"><i data-lucide="flame"></i> Oportunidad</div>` : ''}
-          <div class="card-top-icons"></div>
+          ${window.TasadorInteligente && window.TasadorInteligente.isOpportunity(getAllParcelas(), p) ? `<div class="badge-opportunity" style="position:absolute; top:12px; left:12px; background:linear-gradient(135deg, #f59e0b, #d97706); color:white; padding:4px 10px; border-radius:12px; font-size:0.75rem; font-weight:800; z-index:10; box-shadow:0 4px 12px rgba(245,158,11,0.4);"><i data-lucide="flame" style="width:12px;height:12px;margin-right:4px;vertical-align:-2px;"></i> Oportunidad de Inversión</div>` : ''}
+          
+          <div class="card-top-icons" style="position:absolute; top:12px; right:12px; display:flex; gap:8px; z-index:10;"></div>
           <img src="${img}" alt="${p.nombre}" loading="${state.recommendationActive ? "eager" : "lazy"}" fetchpriority="${state.recommendationActive ? "high" : "auto"}" decoding="async" width="800" height="600">
           ${renderParcelaFeatureChips(p, "mobile")}
         </a>
@@ -754,12 +692,12 @@ document.addEventListener("DOMContentLoaded", () => {
           ${renderParcelaFeatureChips(p, "desktop")}
           ${getDistanceBadge(p)}
           <p class="card-description">${p.descripcion || "Parcela disponible para tu proyecto."}</p>
-          <div class="card-location-wrap">
-            <button class="card-location-link" type="button" data-location-id="${p.id}"><i data-lucide="map"></i>Ver ubicación</button>
+          <div style="text-align: center; margin: 16px 0 8px;">
+            <button class="card-location-link" type="button" data-location-id="${p.id}" style="background: transparent; border: 1px solid rgba(0,0,0,0.1); color: var(--tpl-brand, #0c2b2e); font-weight: 600; border-radius: 8px; padding: 8px 16px; font-size: 0.9rem; cursor: pointer; transition: background 0.2s, border-color 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'"><i data-lucide="map" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px;"></i>Ver ubicación en mapa</button>
           </div>
           <div class="card-actions">
-            <a class="btn-card btn-details" href="${detailHref}">Ver ficha</a>
-            <button class="btn-card btn-add-house" type="button" data-id="${p.id}">${pendingChange === "parcela" ? "Usar parcela" : "Agregar casa"}</button>
+            <a class="btn-card btn-details" href="${detailHref}">Más detalles</a>
+            
           </div>
         </div>`;
       DOM.parcelasContainer.appendChild(card);
@@ -1035,7 +973,6 @@ document.addEventListener("DOMContentLoaded", () => {
       card.innerHTML = `
         <div class="casa-img-container casa-gallery">
           <img class="casa-main-img" src="${currentImg}" alt="${c.nombre}">
-          <div class="tpl-photo-badges">${renderCasaRankingBadges(c)}</div>
           <div class="casa-specs-badge">${c.metros} m²</div>
           ${hasGallery ? `<button class="casa-gallery-btn casa-prev" type="button" aria-label="Imagen anterior">‹</button><button class="casa-gallery-btn casa-next" type="button" aria-label="Imagen siguiente">›</button><span class="casa-gallery-counter">${idx + 1}/${imgs.length}</span>` : ""}
         </div>
@@ -1045,12 +982,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="casa-price">${money(c.valorCasa || c.precio)}</div>
           </div>
           <p class="casa-desc">${c.descripcion_breve || "Casa prefabricada lista para cotizar."}</p>
-          <div class="casa-specs-strip"><span><i data-lucide="bed-double"></i>${c.habitaciones} hab</span><span><i data-lucide="bath"></i>${c.banos || 1} baño</span><span><i data-lucide="ruler"></i>${c.metros} m²</span></div>
+          <div class="casa-specs-strip"><span>🛏 ${c.habitaciones} hab</span><span>🚿 ${c.banos || 1} baño</span><span>📐 ${c.metros} m²</span></div>
           <button class="house-plan-button" type="button" data-plano="${plano}" data-title="${c.nombre}" title="Ver plano ampliado">
-            <span class="house-plan-icon"><i data-lucide="scan"></i></span>
+            <span class="house-plan-icon">📐</span>
             <span>Plano</span>
           </button>
-          <button class="btn-select-house" type="button">${getPendingProjectChange() === "casa" ? "Usar esta casa" : "Elegir casa y ver precio total"}</button>
+          <button class="btn-select-house" type="button">${getPendingProjectChange() === "casa" ? "Agregar esta casa" : "Seleccionar casa"}</button>
         </div>`;
 
       card.querySelector(".btn-select-house").addEventListener("click", () => {
@@ -1135,12 +1072,18 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.type = "button";
       btn.className = `fundacion-option installation-plan-card ${state.installationService && state.selectedFundacion?.id === f.id ? "selected active" : ""}`;
       const valor = getFundacionValue(f, state.selectedCasa);
+      const valorM2 = Number(f.valorM2 || f.valor || f.precio || 0);
+      const casaM2 = Number(state.selectedCasa?.metros || state.selectedCasa?.m2 || 0);
+      const priceCopy = state.selectedCasa
+        ? `<div class="installation-plan-price"><small>${money(valorM2)} por m² × ${casaM2} m²</small><strong>${money(valor)}</strong><span>Valor para esta casa</span></div>`
+        : `<div class="installation-plan-price is-pending"><small>Desde ${money(valorM2)} por m²</small><strong>Selecciona una casa</strong><span>para calcular el total</span></div>`;
       btn.innerHTML = `
         <span class="installation-plan-badge">${meta.badge}</span>
         <strong class="installation-plan-title">${meta.title}</strong>
         <small class="installation-plan-tag">${meta.tag}</small>
+        ${priceCopy}
         <p>${meta.desc}</p>
-        <ul>${meta.bullets.map(b => `<li>✓ ${b}</li>`).join("")}</ul><div class="installation-plan-price"><strong>${money(valor)}</strong><small>${money(Number(f.valorM2 || f.valor || f.precio || 0))} por m² · ${Number(state.selectedCasa?.metros || 0)} m²</small></div>`;
+        <ul>${meta.bullets.map(b => `<li>✓ ${b}</li>`).join("")}</ul>`;
       
       btn.onclick = () => {
         state.selectedFundacion = f;
@@ -1152,26 +1095,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function getExtraVisual(id) {
-    const visualMap = {
-      "piso ceramico": { main: "layout-grid", support: "hard-hat", label: "Terminaciones" },
-      "instalacion_electrica": { main: "cable", support: "hard-hat", label: "Electricidad" },
-      "instalacion_sanitaria": { main: "shower-head", support: "wrench", label: "Sanitario" },
-      "pintura": { main: "paint-roller", support: "hard-hat", label: "Terminaciones" },
-      "artefactos_cocina": { main: "cooking-pot", support: "sparkles", label: "Cocina" },
-      "artefactos_bano": { main: "bath", support: "sparkles", label: "Baño" },
-      "fosa_septica": { main: "recycle", support: "shovel", label: "Saneamiento" },
-      "pozo_profundo": { main: "waves", support: "drill", label: "Agua" },
-      "cierre_perimetral": { main: "fence", support: "ruler", label: "Exterior" },
-      "porton": { main: "door-open", support: "key-round", label: "Acceso" },
-      "empalme_electrico": { main: "plug-zap", support: "utility-pole", label: "Conexión" },
-      "maquinaria": { main: "tractor", support: "hard-hat", label: "Maquinaria" },
-      "piscina": { main: "waves", support: "sun", label: "Recreación" },
-      "quincho": { main: "flame", support: "utensils", label: "Exterior" },
-      "terraza": { main: "tree-pine", support: "armchair", label: "Exterior" },
-      "aislacion": { main: "thermometer-sun", support: "house", label: "Aislación" }
+  function getExtraIcon(id) {
+    const iconMap = {
+      "piso ceramico": "fa-border-all",
+      "instalacion_electrica": "fa-bolt",
+      "instalacion_sanitaria": "fa-droplet",
+      "pintura": "fa-paint-roller",
+      "artefactos_cocina": "fa-sink",
+      "artefactos_bano": "fa-bath",
+      "fosa_septica": "fa-trash-can",
+      "pozo_profundo": "fa-water",
+      "cierre_perimetral": "fa-bars-staggered",
+      "porton": "fa-door-open",
+      "empalme_electrico": "fa-plug",
+      "maquinaria": "fa-tractor",
+      "piscina": "fa-person-swimming",
+      "quincho": "fa-fire-burner",
+      "terraza": "fa-umbrella-beach",
+      "aislacion": "fa-temperature-half"
     };
-    return visualMap[id] || { main: "plus", support: "hard-hat", label: "Servicio" };
+    return iconMap[id] || "fa-plus";
   }
 
   function renderExtras() {
@@ -1185,30 +1128,24 @@ document.addEventListener("DOMContentLoaded", () => {
     let activeExtrasCount = 0;
     let activeExtrasTotal = 0;
 
-    const planIndex = state.installationService ? getFundacionPlanIndex() : -1;
-    const includedPatterns = planIndex >= 2
-      ? PREMIUM_INCLUDED_EXTRA_PATTERNS
-      : (planIndex === 1 ? ["instalacion electrica", "instalacion sanitaria"] : []);
-    const isIncludedByPlan = extra => {
-      const text = normalizar(`${extra?.id || ""} ${extra?.nombre || ""} ${extra?.descripcion || ""}`);
-      return includedPatterns.some(pattern => text.includes(normalizar(pattern)));
-    };
-    const includedNames = planIndex >= 2
-      ? getPremiumIncludedExtrasList()
-      : (planIndex === 1 ? ["Instalación eléctrica", "Instalación sanitaria"] : []);
-    if (includedPatterns.length) {
-      extrasOpcionales.forEach(extra => { if (isIncludedByPlan(extra)) state.selectedExtras.delete(extra.id || extra.nombre); });
+    const premiumActive = isPremiumInstallationPlan();
+    
+    if (premiumActive) {
+      removePremiumIncludedExtrasFromSelection();
       const included = document.createElement("div");
       included.className = "premium-included-card";
       included.style.gridColumn = "1 / -1";
-      included.innerHTML = `<span class="premium-included-kicker">✨ Incluido en tu plan</span><strong>Estos trabajos ya forman parte del plan y no se cobran como extras.</strong><ul>${includedNames.map(item => `<li>✅ ${item}</li>`).join("")}</ul>`;
+      included.innerHTML = `
+        <span class="premium-included-kicker">✨ Incluido en tu Plan Premium</span>
+        <strong>Estos trabajos ya forman parte del plan y no se cobran como extras.</strong>
+        <ul>${getPremiumIncludedExtrasList().map(item => `<li>✅ ${item}</li>`).join("")}</ul>`;
       DOM.opcionalesContainer.appendChild(included);
     }
+    
     extrasOpcionales.forEach(e => {
-      if (isIncludedByPlan(e)) return;
+      if (premiumActive && isPremiumIncludedExtra(e)) return;
       
       const id = normalizar(e.id || e.nombre);
-      const visual = getExtraVisual(id);
       const defaultQty = Math.max(1, getDefaultExtraQty(e));
       const isSelected = state.selectedExtras.has(id);
       const currentQty = isSelected ? state.selectedExtras.get(id) : defaultQty;
@@ -1233,10 +1170,8 @@ document.addEventListener("DOMContentLoaded", () => {
       card.setAttribute("data-category", cat);
       card.innerHTML = `
         <div class="extra-card-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <div class="extra-icon-scene ${isSelected ? 'is-active' : ''}" aria-hidden="true">
-            <span class="extra-icon-main"><i data-lucide="${visual.main}"></i></span>
-            <span class="extra-icon-support"><i data-lucide="${visual.support}"></i></span>
-            <small>${visual.label}</small>
+          <div class="extra-icon-box" style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:${isSelected ? 'var(--primary)' : '#f1f5f9'}; color:${isSelected ? 'white' : 'var(--text-muted)'}; font-size:1.2rem; transition:0.2s;">
+            <i class="fa-solid ${getExtraIcon(id)}"></i>
           </div>
           <label class="extra-toggle">
             <input type="checkbox" class="extra-checkbox" ${isSelected ? "checked" : ""}>
@@ -1286,10 +1221,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       DOM.opcionalesContainer.appendChild(card);
     });
-
-    if (window.lucide && typeof window.lucide.createIcons === "function") {
-      window.lucide.createIcons();
-    }
 
     const countInd = document.getElementById("extras-count-indicator");
     const totalInd = document.getElementById("extras-total-indicator");
@@ -1390,9 +1321,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const val = getFundacionValue(state.selectedFundacion, state.selectedCasa);
         total += val;
         const premiumNote = isPremiumInstallationPlan() ? `<small class="summary-premium-note">Incluye: pintura, cerámica, instalación eléctrica, sanitaria, artefactos de cocina y baño.</small>` : "";
-        rows.push([`Servicio de instalación: ${getInstallationPlanDisplayName()}${premiumNote}`, val]);
+        const valorM2Fundacion = Number(state.selectedFundacion.valorM2 || state.selectedFundacion.valor || state.selectedFundacion.precio || 0);
+        const casaM2Fundacion = Number(state.selectedCasa.metros || state.selectedCasa.m2 || 0);
+        rows.push([`Fundación y montaje: ${getInstallationPlanDisplayName()} <small class="summary-calc-note">${money(valorM2Fundacion)} por m² × ${casaM2Fundacion} m²</small>${premiumNote}`, val]);
       } else {
-        rows.push([`Servicio de instalación: No incluido <small style="display:block;color:#64748b;margin-top:4px;">El cliente realizará esta etapa con su propio equipo.</small>`, 0]);
+        rows.push([`Fundación y montaje: No incluido <small style="display:block;color:#64748b;margin-top:4px;">Puedes agregarlo arriba o realizar esta etapa con tu propio equipo.</small>`, 0]);
       }
     }
     (Array.isArray(extrasAutomaticos) ? extrasAutomaticos : []).forEach(e => {
@@ -1424,6 +1357,13 @@ document.addEventListener("DOMContentLoaded", () => {
     
     DOM.summaryItems.innerHTML = rows.map(([name, val]) => `<tr><td>${name}</td><td style="text-align:right; white-space:nowrap;">${val === '' ? '' : (typeof val === 'string' ? val : money(val))}</td></tr>`).join("") || `<tr><td>Selecciona parcela y casa</td><td style="text-align:right;">$0</td></tr>`;
     DOM.totalAmount.textContent = money(total);
+    const baseNote = document.getElementById("summary-base-note");
+    if (baseNote) {
+      const baseTotal = total - extrasSubtotal;
+      baseNote.innerHTML = state.selectedParcela && state.selectedCasa
+        ? `<strong>Proyecto base: ${money(baseTotal)}</strong><span>${extrasSubtotal > 0 ? `Extras agregados: ${money(extrasSubtotal)}` : "Aún no has agregado extras opcionales."}</span>`
+        : "Selecciona parcela y casa para calcular el proyecto.";
+    }
     if (DOM.changeParcelaBtn) DOM.changeParcelaBtn.style.display = state.selectedParcela ? "inline-flex" : "none";
     if (DOM.changeCasaBtn) DOM.changeCasaBtn.style.display = state.selectedCasa ? "inline-flex" : "none";
     updateProjectBar();
@@ -1804,7 +1744,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </button>
           <div class="map-card-actions">
             <a href="parcela.html?id=${encodeURIComponent(p.id)}">Más detalles</a>
-            <button type="button" data-add-house="${p.id}">Elegir y ver casas</button>
+            <button type="button" data-add-house="${p.id}">Sumar casa</button>
           </div>`;
 
         card.querySelector('.map-card-main')?.addEventListener("click", () => {
@@ -2117,7 +2057,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (label) label.textContent = "Buscar parcelas";
         else DOM.budgetGo.textContent = "Buscar parcelas";
       }
-      setTimeout(() => DOM.budgetInput?.focus(), 40);
+      scrollToBudget();
+      setTimeout(() => DOM.budgetInput?.focus(), 520);
     }, true);
 
     DOM.optCombo?.addEventListener("click", (ev) => {
@@ -2136,7 +2077,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (label) label.textContent = "Buscar alternativas";
         else DOM.budgetGo.textContent = "Buscar alternativas";
       }
-      setTimeout(() => DOM.budgetInput?.focus(), 40);
+      scrollToBudget();
+      setTimeout(() => DOM.budgetInput?.focus(), 520);
     }, true);
 
     DOM.budgetInput?.addEventListener("input", () => {
@@ -3249,55 +3191,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-/* TPL Index v17 — encabezado móvil inteligente y mejoras de interacción. */
-(() => {
-  const initTplIndexV17 = () => {
-    const body = document.body;
-    const locationBar = document.querySelector('.location-filter-bar');
-    let ticking = false;
-
-    const updateHeader = () => {
-      const condensed = window.scrollY > 70;
-      body.classList.toggle('tpl-header-condensed', condensed);
-      ticking = false;
-    };
-
-    const requestUpdate = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(updateHeader);
-    };
-
-    updateHeader();
-    window.addEventListener('scroll', requestUpdate, { passive: true });
-
-    /* Al seleccionar una comuna en móvil, la centra dentro de la barra horizontal. */
-    locationBar?.addEventListener('click', (event) => {
-      const button = event.target.closest('button');
-      if (!button || window.innerWidth > 1000) return;
-      window.requestAnimationFrame(() => {
-        button.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      });
-    });
-
-    /* Evita que enlaces con ancla queden ocultos debajo de las dos barras sticky. */
-    document.addEventListener('click', (event) => {
-      const anchor = event.target.closest('a[href^="#"]');
-      if (!anchor) return;
-      const selector = anchor.getAttribute('href');
-      if (!selector || selector === '#') return;
-      const target = document.querySelector(selector);
-      if (!target) return;
-      event.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      history.replaceState(null, '', selector);
-    });
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTplIndexV17, { once: true });
-  } else {
-    initTplIndexV17();
-  }
-})();
