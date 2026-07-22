@@ -1,24 +1,43 @@
-import {hasValidSupabaseConfig,readSupabaseConfig} from './supabase-client.js';
+let crmClient = globalThis.tplSupabase || globalThis.tplCrmSupabase || null;
 
-let crmClient=globalThis.tplCrmSupabase||globalThis.tplSupabase||null;
+export function getCrmSupabaseClient(options = {}) {
+  if (globalThis.tplSupabase || globalThis.tplCrmSupabase) {
+    crmClient = globalThis.tplSupabase || globalThis.tplCrmSupabase;
+    globalThis.tplSupabase = crmClient;
+    globalThis.tplCrmSupabase = crmClient;
+    return crmClient;
+  }
 
-export function getCrmSupabaseClient(options={}){
- const config=readSupabaseConfig(options.config||{});
- if(!hasValidSupabaseConfig(config))return null;
- if(globalThis.tplCrmSupabase||globalThis.tplSupabase){
-  crmClient=globalThis.tplCrmSupabase||globalThis.tplSupabase;
+  if (typeof globalThis.TPL_getSupabaseClient === 'function') {
+    crmClient = globalThis.TPL_getSupabaseClient();
+    return crmClient;
+  }
+
+  if (crmClient) return crmClient;
+
+  const config = options.config || globalThis.TPL_CRM_CONFIG || {};
+  const url = config.supabaseUrl || config.url;
+  const anonKey = config.supabaseAnonKey || config.anonKey;
+  const factory = options.createClient || globalThis.supabase?.createClient;
+
+  if (!url || !anonKey || typeof factory !== 'function') return null;
+
+  crmClient = factory(url, anonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
+      storageKey: config.storageKey || 'sb-qxavbqhyqaqalpzbhwmh-auth-token'
+    },
+    global: { headers: { 'X-Client-Info': 'tu-parcela-lista-crm-module' } }
+  });
+
+  globalThis.tplSupabase = crmClient;
+  globalThis.tplCrmSupabase = crmClient;
   return crmClient;
- }
- if(crmClient)return crmClient;
- const factory=options.createClient||globalThis.supabase?.createClient;
- if(typeof factory!=='function')return null;
- crmClient=factory(config.url,config.anonKey,{
-  auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce',storageKey:'sb-qxavbqhyqaqalpzbhwmh-auth-token'},
-  global:{headers:{'X-Client-Info':'tu-parcela-lista-crm-fase-1'}}
- });
- globalThis.tplSupabase=crmClient;
- globalThis.tplCrmSupabase=crmClient;
- return crmClient;
 }
 
-export function resetCrmSupabaseClient(){crmClient=null;}
+export function resetCrmSupabaseClient() {
+  crmClient = null;
+}

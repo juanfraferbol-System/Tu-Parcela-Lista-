@@ -4,7 +4,7 @@
 const SUPABASE_URL = 'https://qxavbqhyqaqalpzbhwmh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4YXZicWh5cWFxYWxwemJod21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
 
-let tplDbSupabase = window.tplSupabase || window.tplCrmSupabase || null;
+let tplDbSupabase = window.tplSupabase || window.tplCrmSupabase || window.TPL_getSupabaseClient?.() || null;
 
 if (!tplDbSupabase && typeof window.supabase !== 'undefined' && SUPABASE_URL && SUPABASE_ANON_KEY) {
   tplDbSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -24,6 +24,7 @@ if (!tplDbSupabase && typeof window.supabase !== 'undefined' && SUPABASE_URL && 
 
 if (tplDbSupabase) {
   window.tplSupabase = tplDbSupabase;
+  window.tplCrmSupabase = window.tplCrmSupabase || tplDbSupabase;
 }
 
 function getLocalParcelas() {

@@ -16,6 +16,8 @@
     `<tr><td colspan="${cols}" class="launch-empty">${message}</td></tr>`;
 
   let currentClients = [];
+  let dashboardLoading = false;
+  let authListenerRegistered = false;
 
   function setMetric(id, value) {
     const node = byId(id);
@@ -175,6 +177,7 @@
   }
 
   async function loadDashboard() {
+    if (dashboardLoading) return;
     const client = getClient();
 
     if (!client) {
@@ -183,6 +186,7 @@
     }
 
     if (!byId('launch-daily-panel')) return;
+    dashboardLoading = true;
 
     const now = Date.now();
     const dayAgo = new Date(now - 86400000).toISOString();
@@ -276,6 +280,7 @@ if (failed) {
         status.hidden = false;
       }
 
+      dashboardLoading = false;
       return;
     }
 
@@ -369,6 +374,7 @@ if (failed) {
     renderOpportunities(clients);
     renderTasks(tasks, clients);
     renderActivity(events);
+    dashboardLoading = false;
   }
 
   function pickClient() {
@@ -566,11 +572,12 @@ if (failed) {
         return;
       }
 
-      client.auth.onAuthStateChange((_event, session) => {
-        if (session) {
-          setTimeout(loadDashboard, 200);
-        }
-      });
+      if (!authListenerRegistered) {
+        authListenerRegistered = true;
+        client.auth.onAuthStateChange((_event, session) => {
+          if (session) setTimeout(loadDashboard, 200);
+        });
+      }
 
       const {
         data: { session },

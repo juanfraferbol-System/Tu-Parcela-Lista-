@@ -1,37 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-  if (window.__TPL_CRM_INITIALIZED__) return;
-  window.__TPL_CRM_INITIALIZED__ = true;
+  // Cliente Supabase único para todos los módulos del CRM.
+  const supabase = window.TPL_getSupabaseClient?.();
 
-  // Inicializar Supabase
-  const crmConfig = window.TPL_CRM_CONFIG;
-
-if (
-  !crmConfig?.supabaseUrl ||
-  !crmConfig?.supabaseAnonKey ||
-  !window.supabase?.createClient
-) {
-  console.error("CRM: falta la configuración de Supabase.");
-  return;
-}
-
-const supabase =
-  window.tplCrmSupabase ||
-  window.tplSupabase ||
-  window.supabase.createClient(
-    crmConfig.supabaseUrl,
-    crmConfig.supabaseAnonKey,
-    {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storageKey: "sb-qxavbqhyqaqalpzbhwmh-auth-token"
-      }
-    }
-  );
-
-window.tplSupabase = supabase;
-window.tplCrmSupabase = supabase;
+  if (!supabase) {
+    console.error('CRM: Supabase no está disponible o falta crm-config.js.');
+    return;
+  }
 
   const DOM = {
     loginContainer: document.getElementById("login-container"),
@@ -66,14 +40,17 @@ window.tplCrmSupabase = supabase;
     feedbackError: document.getElementById("feedback-error"),
     
     // Formularios y Botones
+    inputFeedback: document.getElementById("input-feedback"),
     btnConfirmFeedback: document.getElementById("btn-confirm-feedback"),
     btnCancelFeedback: document.getElementById("btn-cancel-feedback"),
+    btnCloseModal: document.getElementById("btn-close-modal"),
     btnCloseDetalle: document.getElementById("btn-close-modal")
   };
 
   let sessionUser = null;
   let publicacionesCache = [];
-  let currentAction = null;
+  let itemToProcess = null; // ID de la publicacion
+  let newStatusProcess = null; // "Aprobada", "Corregir", "Rechazada"
 
   const escapeHTML = (value) => String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -116,7 +93,7 @@ window.tplCrmSupabase = supabase;
   const showDashboard = () => {
     if (DOM.loginContainer) DOM.loginContainer.style.display = "none";
     if (DOM.appContainer) DOM.appContainer.style.display = "flex";
-    if (DOM.userName) DOM.userName.innerText = sessionUser.nombre;
+    if (DOM.userName) DOM.userName.innerText = sessionUser?.nombre || "Administrador";
     loadData();
   };
 
@@ -131,11 +108,9 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
     return;
   }
 
-  if (DOM.btnLogin) {
-    DOM.btnLogin.disabled = true;
-    DOM.btnLogin.innerText = "Verificando...";
-  }
-  if (DOM.loginMsg) DOM.loginMsg.innerText = "";
+  DOM.btnLogin.disabled = true;
+  DOM.btnLogin.innerText = "Verificando...";
+  DOM.loginMsg.innerText = "";
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -144,26 +119,13 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
 
   if (error) {
     console.error("Error de ingreso:", error);
-    const message = String(error.message || "").toLowerCase();
-    if (DOM.loginMsg) {
-      DOM.loginMsg.innerText = message.includes("email not confirmed")
-        ? "Debes confirmar el correo antes de ingresar."
-        : message.includes("invalid login credentials")
-          ? "Correo o contraseña incorrectos."
-          : `No fue posible ingresar: ${error.message}`;
-    }
-    if (DOM.btnLogin) {
-      DOM.btnLogin.disabled = false;
-      DOM.btnLogin.innerText = "Ingresar";
-    }
+    DOM.loginMsg.innerText = "Credenciales incorrectas o acceso no autorizado.";
+    DOM.btnLogin.disabled = false;
+    DOM.btnLogin.innerText = "Ingresar";
     return;
   }
 
   await checkAuth();
-  if (DOM.btnLogin) {
-    DOM.btnLogin.disabled = false;
-    DOM.btnLogin.innerText = "Ingresar";
-  }
 });
 
 
@@ -174,9 +136,16 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
 
   // 2. Carga de Datos
   const loadData = async () => {
-    loadPendientesOperativos();
-    loadMetrics();
-    loadTable();
+    const results = await Promise.allSettled([
+      loadPendientesOperativos(),
+      loadMetrics(),
+      loadTable()
+    ]);
+    results.forEach((result) => {
+      if (result.status === 'rejected') {
+        console.error('CRM: error cargando módulo:', result.reason);
+      }
+    });
   };
 
   const loadPendientesOperativos = async () => {
@@ -188,7 +157,7 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
       document.getElementById('metric-pendientes-clientes').innerText = resClientes.count || 0;
       
       // Proyectos/Cotizaciones
-      const resProyectos = await supabase.from('proyectos').select('id, total, creado_en', { count: 'exact' }).eq('estado', 'cotizacion_generada').limit(5);
+      const resProyectos = await supabase.from('proyectos').select('id, total, creado_en, estado', { count: 'exact' }).in('estado', ['cotizacion_generada', 'cotizacion_enviada']).limit(5);
       document.getElementById('metric-pendientes-cotizaciones').innerText = resProyectos.count || 0;
 
       // Publicaciones por revisar
@@ -298,15 +267,15 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
     `).join('');
   };
 
-  DOM.filterEstado?.addEventListener("change", loadTable);
+  DOM.filterEstado.addEventListener("change", loadTable);
   document.getElementById('search-input')?.addEventListener('input', renderTable);
-  DOM.btnRefresh?.addEventListener("click", loadData);
+  DOM.btnRefresh.addEventListener("click", loadData);
 
   // 3. Detalle y Moderación
   window.verDetalle = async (id) => {
     DOM.modalContent.innerHTML = `<p>Cargando detalle...</p>`;
     DOM.modalActions.innerHTML = '';
-    DOM.modalDetalle?.classList.add('active');
+    DOM.modalDetalle.classList.add('active');
     
     const { data, error } = await supabase.rpc('crm_detalle_publicacion', { p_publicacion_id: id });
     if (error || !data) {
@@ -401,7 +370,7 @@ const closeModalDetalle = () => {
   DOM.modalDetalle?.classList.remove('active');
 };
 
-DOM.btnCloseDetalle?.addEventListener('click', closeModalDetalle);
+DOM.btnCloseDetalle?.addEventListener("click", closeModalDetalle);
 
   // Edición Directa
   window.actualizarDatos = async (id) => {
@@ -447,14 +416,14 @@ DOM.btnCloseDetalle?.addEventListener('click', closeModalDetalle);
     DOM.feedbackTitle.innerText = title;
     DOM.feedbackMotivo.value = "";
     DOM.feedbackError.innerText = "";
-    DOM.modalFeedback?.classList.add("active");
+    DOM.modalFeedback.classList.add("active");
   };
 
   window.rechazar = (id) => openFeedback(id, 'rechazar', 'Rechazar Publicación');
   window.solicitarCambios = (id) => openFeedback(id, 'requiere_cambios', 'Solicitar Corrección');
 
   const closeFeedback = () => {
-    DOM.modalFeedback?.classList.remove("active");
+    DOM.modalFeedback.classList.remove("active");
     currentAction = null;
   };
   
@@ -463,11 +432,6 @@ DOM.btnCancelFeedback?.addEventListener("click", closeFeedback);
 DOM.btnConfirmFeedback?.addEventListener("click", async () => {
 
   const motivo = DOM.feedbackMotivo?.value.trim();
-
-  if (!currentAction) {
-    if (DOM.feedbackError) DOM.feedbackError.innerText = "No hay una acción seleccionada.";
-    return;
-  }
 
   if (!motivo) {
     if (DOM.feedbackError) {
@@ -564,7 +528,7 @@ async function loadContratistas() {
   if (!domContratistas.tableBody) return;
   domContratistas.tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Cargando contratistas...</td></tr>';
   
-  const { data, error } = await supabase.from('contratistas').select('*').order('created_at', { ascending: false });
+  const { data, error } = await window.tplCrmSupabase.from('contratistas').select('*').order('created_at', { ascending: false });
   
   if (error) {
     console.error("Error al cargar contratistas:", error);
@@ -617,7 +581,7 @@ function renderContratistas() {
 
 window.updatePartnerStatus = async function(id, newStatus) {
   try {
-    const { error } = await supabase.from('contratistas').update({ estado_verificacion: newStatus }).eq('id', id);
+    const { error } = await window.tplCrmSupabase.from('contratistas').update({ estado_verificacion: newStatus }).eq('id', id);
     if (error) {
       alert('Error al actualizar estado');
       console.error(error);
@@ -636,7 +600,7 @@ async function loadCotizaciones() {
   if (!domCotizaciones.tableBody) return;
   domCotizaciones.tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Cargando cotizaciones...</td></tr>';
   
-  const { data:projectRows, error } = await supabase.from('proyectos').select('id,creado_en,estado,total,modalidad,parcela_id,clientes(nombre,telefono),publicaciones(comuna)').order('creado_en', { ascending: false });
+  const { data:projectRows, error } = await window.tplCrmSupabase.from('proyectos').select('id,creado_en,estado,total,modalidad,parcela_id,clientes(nombre,telefono),publicaciones(comuna)').order('creado_en', { ascending: false });
   const data=(projectRows||[]).map(project=>({id:project.id,created_at:project.creado_en,estado:project.estado,parcela_id:project.parcela_id,parcela_comuna:project.publicaciones?.comuna||'',cliente_nombre:project.clientes?.nombre||'',cliente_telefono:project.clientes?.telefono||'',requiere_instalacion:project.modalidad==='llave_en_mano',total:project.total}));
   
   if (error) {
@@ -647,7 +611,7 @@ async function loadCotizaciones() {
   
   // Si no tenemos contratistas cargados aún, los necesitamos para el Smart Match
   if (contratistasCache.length === 0) {
-    const res = await supabase.from('contratistas').select('*').eq('estado_verificacion', 'verificado');
+    const res = await window.tplCrmSupabase.from('contratistas').select('*').eq('estado_verificacion', 'verificado');
     if (!res.error) contratistasCache = res.data;
   }
   
@@ -717,11 +681,11 @@ if (domCotizaciones.filterEstado) domCotizaciones.filterEstado.addEventListener(
 
 async function loadTasadorPanel(){
  const status=document.getElementById('tasador-admin-status'),tbody=document.getElementById('table-body-tasaciones');
- if(!supabase||!tbody)return;
+ if(!window.tplCrmSupabase||!tbody)return;
  status.hidden=true;tbody.innerHTML='<tr><td colspan="7" class="launch-empty">Cargando tasaciones…</td></tr>';
  const [valuationResponse,configResponse]=await Promise.all([
-  supabase.from('tasaciones').select('id,creada_en,precio_ingresado,valor_minimo,valor_mercado,valor_maximo,confianza,cobertura,decision_usuario,resumen_factores,datos_entrada').order('creada_en',{ascending:false}).limit(200),
-  supabase.from('configuracion_tasador').select('version,algoritmo,parametros').eq('estado','activa').maybeSingle()
+  window.tplCrmSupabase.from('tasaciones').select('id,creada_en,precio_ingresado,valor_minimo,valor_mercado,valor_maximo,confianza,cobertura,decision_usuario,resumen_factores,datos_entrada').order('creada_en',{ascending:false}).limit(200),
+  window.tplCrmSupabase.from('configuracion_tasador').select('version,algoritmo,parametros').eq('estado','activa').maybeSingle()
  ]);
  if(valuationResponse.error){status.hidden=false;status.textContent='El esquema del Tasador TPL todavía no está desplegado o tu sesión no tiene permisos.';tbody.innerHTML='<tr><td colspan="7" class="launch-empty">Sin datos disponibles.</td></tr>';return;}
  const rows=valuationResponse.data||[];
