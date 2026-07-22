@@ -43,7 +43,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
 <link href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" rel="stylesheet"/><link href="css/styles.min.css?v=20260715-4" rel="stylesheet"/>
-<link href="css/hero-brand.css?v=20260722-2" rel="stylesheet"/>
+<link href="css/hero-brand.css?v=20260722-3" rel="stylesheet"/>
 <link href="css/cotizador-funnel.css?v=20260722-1" rel="stylesheet"/>
 
 <!-- <link href="agente/agente.css" rel="stylesheet"/> -->
@@ -315,71 +315,121 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 <main id="contenido-principal">
 <section class="hero tpl-brand-hero" aria-labelledby="hero-title">
-  <div class="tpl-brand-hero__media" aria-hidden="true"></div>
-  <div class="tpl-brand-hero__shade" aria-hidden="true"></div>
+  <div class="tpl-brand-hero__decor tpl-brand-hero__decor--one" aria-hidden="true"></div>
+  <div class="tpl-brand-hero__decor tpl-brand-hero__decor--two" aria-hidden="true"></div>
 
   <div class="container tpl-brand-hero__content">
     <div class="tpl-brand-hero__copy">
-      <img class="tpl-brand-hero__logo" src="assets/logo-tu-parcela-lista.png" alt="Tu Parcela Lista" width="180" height="180"/>
-      <p class="tpl-brand-hero__signature">Naturaleza · Hogar · Tecnología</p>
-      <h1 id="hero-title">Comienza tu <em>nueva</em> etapa.</h1>
-      <p class="tpl-brand-hero__lead">Encuentra tu parcela ideal, elige tu casa y haz realidad tu proyecto de campo con acompañamiento en cada paso.</p>
-
-      <div class="tpl-brand-hero__actions" aria-label="Elige cómo comenzar">
-        <button class="tpl-brand-hero__action tpl-brand-hero__action--primary" id="opt-parcela" type="button">
-          <span class="tpl-brand-hero__action-icon" aria-hidden="true"><i data-lucide="trees"></i></span>
-          <span class="tpl-brand-hero__action-copy">
-            <strong>Encontrar una parcela</strong>
-            <small>Busca opciones según tu presupuesto</small>
-          </span>
-          <span class="tpl-brand-hero__arrow" aria-hidden="true">→</span>
-        </button>
-
-        <button class="tpl-brand-hero__action tpl-brand-hero__action--secondary" id="opt-combo" type="button">
-          <span class="tpl-brand-hero__action-icon" aria-hidden="true"><i data-lucide="house"></i></span>
-          <span class="tpl-brand-hero__action-copy">
-            <strong>Parcela + Casa</strong>
-            <small>Cotiza tu proyecto completo</small>
-          </span>
-          <span class="tpl-brand-hero__arrow" aria-hidden="true">→</span>
-        </button>
+      <div class="tpl-brand-hero__brand">
+        <img class="tpl-brand-hero__logo" src="assets/logo-tu-parcela-lista.png" alt="Tu Parcela Lista" width="180" height="180"/>
+        <div>
+          <strong>Tu Parcela Lista</strong>
+          <span>Todo para tu proyecto de campo</span>
+        </div>
       </div>
 
-      <div class="tpl-brand-hero__pillars" aria-label="Pilares de Tu Parcela Lista">
-        <span><i data-lucide="leaf"></i><b>Naturaleza</b></span>
-        <span><i data-lucide="home"></i><b>Hogar</b></span>
-        <span><i data-lucide="sparkles"></i><b>Tecnología</b></span>
+      <p class="tpl-brand-hero__eyebrow"><i data-lucide="sparkles"></i> Una plataforma, todos conectados</p>
+      <h1 id="hero-title">Unimos parcelas, casas y familias.</h1>
+      <p class="tpl-brand-hero__lead">Conectamos a dueños de parcelas, empresas de casas y personas que quieren comenzar una nueva etapa.</p>
+
+      <div class="tpl-brand-hero__benefits" aria-label="Beneficios de Tu Parcela Lista">
+        <span><i data-lucide="badge-check"></i> Publicaciones verificadas</span>
+        <span><i data-lucide="handshake"></i> Empresas confiables</span>
+        <span><i data-lucide="heart-handshake"></i> Acompañamiento real</span>
       </div>
+    </div>
+
+    <div class="tpl-ecosystem" aria-label="Cómo funciona Tu Parcela Lista">
+      <div class="tpl-ecosystem__orbit" aria-hidden="true"></div>
+
+      <article class="tpl-ecosystem__node tpl-ecosystem__node--owner">
+        <span class="tpl-ecosystem__icon tpl-ecosystem__icon--orange"><i data-lucide="land-plot"></i></span>
+        <div><strong>Dueños de parcelas</strong><small>Publican sus terrenos</small></div>
+      </article>
+
+      <article class="tpl-ecosystem__node tpl-ecosystem__node--company">
+        <span class="tpl-ecosystem__icon tpl-ecosystem__icon--blue"><i data-lucide="house-plug"></i></span>
+        <div><strong>Empresas de casas</strong><small>Ofrecen sus modelos</small></div>
+      </article>
+
+      <article class="tpl-ecosystem__node tpl-ecosystem__node--family">
+        <span class="tpl-ecosystem__icon tpl-ecosystem__icon--rose"><i data-lucide="family"></i></span>
+        <div><strong>Personas y familias</strong><small>Encuentran su lugar</small></div>
+      </article>
+
+      <div class="tpl-ecosystem__center">
+        <span class="tpl-ecosystem__center-ring">
+          <img src="assets/logo-tu-parcela-lista.png" alt="" width="180" height="180"/>
+        </span>
+        <strong>Tu Parcela Lista</strong>
+        <small>Conectamos todo tu proyecto</small>
+      </div>
+
+      <div class="tpl-ecosystem__services" aria-label="Servicios conectados">
+        <span><i data-lucide="map-pinned"></i><small>Parcela</small></span>
+        <span><i data-lucide="home"></i><small>Casa</small></span>
+        <span><i data-lucide="calculator"></i><small>Cotización</small></span>
+        <span><i data-lucide="hard-hat"></i><small>Servicios</small></span>
+      </div>
+
+      <svg class="tpl-ecosystem__lines" viewBox="0 0 760 520" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M165 130 C250 135, 260 220, 335 245" />
+        <path d="M595 115 C505 130, 500 205, 425 242" />
+        <path d="M620 365 C520 350, 500 300, 430 280" />
+        <path d="M380 310 C380 350, 380 370, 380 410" />
+      </svg>
     </div>
   </div>
 </section>
 
+<section class="decision-flow tpl-guided-search" id="decision-flow" aria-labelledby="budget-title">
+  <div class="budget-box tpl-guided-search__card" id="budget-box" data-budget-anchor>
+    <div class="tpl-guided-search__intro">
+      <span class="budget-kicker">BÚSQUEDA PERSONALIZADA</span>
+      <h2 id="budget-title">Para no perder tiempo, ¿cuál es tu presupuesto?</h2>
+      <p id="budget-help">Responde tres preguntas rápidas y encontraremos las alternativas que mejor calzan contigo.</p>
+    </div>
 
-<section class="decision-flow" id="decision-flow" style="position: relative; z-index: 10; padding: 20px 0;">
-<div class="budget-box" id="budget-box" data-budget-anchor style="display:none;">
-<div class="budget-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
-<span class="budget-kicker">PORTAL DE BÚSQUEDA</span>
-<h3 id="budget-title">¿Cuál es tu presupuesto total?</h3>
-<p id="budget-help">Te mostraremos opciones cercanas a tu presupuesto.</p>
-<input id="budget-input" inputmode="numeric" placeholder="Ej: 15.000.000" type="text"/>
-<div class="combo-fields hidden" id="combo-fields">
-<select aria-label="Cantidad de habitaciones" id="combo-room-input">
-<option value="all">Cualquier cantidad de habitaciones</option>
-<option value="1">1 habitación</option>
-<option value="2">2 habitaciones</option>
-<option value="3">3 habitaciones</option>
-<option value="4">4 habitaciones</option>
-<option value="5">5 habitaciones</option>
-<option value="6">6 habitaciones</option>
-</select>
-<input id="combo-meters-input" placeholder="Metros cuadrados deseados, ej: 72" type="number"/>
-</div>
-<button id="budget-go" type="button">
-      <span>Buscar</span>
-      <b aria-hidden="true">→</b>
-    </button>
-<p class="budget-trust">Resultados claros · Sin compromiso · Acompañamiento TPL</p>
-</div>
+    <label class="tpl-budget-field" for="budget-input">
+      <span>Mi presupuesto total es</span>
+      <span class="tpl-budget-input-wrap"><b>$</b><input id="budget-input" inputmode="numeric" placeholder="15.000.000" type="text" autocomplete="off"/></span>
+    </label>
+
+    <fieldset class="tpl-guided-group">
+      <legend>¿Qué proyecto quieres comenzar?</legend>
+      <div class="tpl-segmented" id="project-type-options">
+        <button class="tpl-choice is-active" type="button" data-project-type="parcela" aria-pressed="true"><i data-lucide="trees"></i><span><strong>Solo parcela</strong><small>Encuentra el terreno ideal</small></span></button>
+        <button class="tpl-choice" type="button" data-project-type="combo" aria-pressed="false"><i data-lucide="house"></i><span><strong>Parcela + casa</strong><small>Proyecto completo</small></span></button>
+      </div>
+    </fieldset>
+
+    <fieldset class="tpl-guided-group">
+      <legend>¿Qué valoras más?</legend>
+      <div class="tpl-priority-grid" id="search-priority-options">
+        <button class="tpl-priority" type="button" data-priority="gps" aria-pressed="false"><i data-lucide="map-pin"></i><span><strong>Cercanía</strong><small>Más cerca de ti</small></span></button>
+        <button class="tpl-priority is-active" type="button" data-priority="economic" aria-pressed="true"><i data-lucide="badge-dollar-sign"></i><span><strong>Mejor precio</strong><small>Las más económicas</small></span></button>
+        <button class="tpl-priority" type="button" data-priority="nature" aria-pressed="false"><i data-lucide="leaf"></i><span><strong>Naturaleza</strong><small>Entorno y tranquilidad</small></span></button>
+        <button class="tpl-priority" type="button" data-priority="surprise" aria-pressed="false"><i data-lucide="sparkles"></i><span><strong>Sorpréndeme</strong><small>Opciones variadas</small></span></button>
+      </div>
+    </fieldset>
+
+    <fieldset class="tpl-guided-group tpl-family-group" id="family-profile-group" hidden>
+      <legend>¿Quién disfrutará este proyecto?</legend>
+      <div class="tpl-family-grid" id="family-profile-options">
+        <button class="tpl-family is-active" type="button" data-family="couple" aria-pressed="true"><span aria-hidden="true">♥</span><strong>Pareja o persona sola</strong><small>Casas de 1 o 2 dormitorios</small></button>
+        <button class="tpl-family" type="button" data-family="children" aria-pressed="false"><span aria-hidden="true">👨‍👩‍👧</span><strong>Familia con hijos</strong><small>Casas de 3 dormitorios</small></button>
+        <button class="tpl-family" type="button" data-family="large" aria-pressed="false"><span aria-hidden="true">🏡</span><strong>Familia grande</strong><small>Casas de 4 o más dormitorios</small></button>
+      </div>
+    </fieldset>
+
+    <div class="combo-fields hidden" id="combo-fields" aria-hidden="true">
+      <select id="combo-room-input" aria-label="Cantidad de habitaciones"><option value="all">Cualquier cantidad</option></select>
+      <input id="combo-meters-input" type="number" value="0" aria-label="Metros cuadrados deseados"/>
+    </div>
+
+    <button class="tpl-guided-submit" id="budget-go" type="button"><span>Encontrar mis mejores opciones</span><b aria-hidden="true">→</b></button>
+    <p class="budget-trust">Resultados claros · Sin compromiso · Acompañamiento TPL</p>
+  </div>
 </section>
 
 

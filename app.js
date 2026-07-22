@@ -9,7 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
     budget: 0,
     wantedRooms: "all",
     wantedMeters: 0,
+    searchPreference: "economic",
+    familyProfile: "couple",
     recommendationActive: false,
+    homeGridLimit: 40,
     selectedParcela: null,
     selectedCasa: null,
     selectedFundacion: null,
@@ -46,6 +49,10 @@ document.addEventListener("DOMContentLoaded", () => {
     budgetTitle: document.getElementById("budget-title"),
     budgetHelp: document.getElementById("budget-help"),
     comboFields: document.getElementById("combo-fields"),
+    projectTypeOptions: document.getElementById("project-type-options"),
+    priorityOptions: document.getElementById("search-priority-options"),
+    familyGroup: document.getElementById("family-profile-group"),
+    familyOptions: document.getElementById("family-profile-options"),
 
     searchInput: document.getElementById("search-input"),
     searchBtn: document.getElementById("search-btn"),
@@ -384,7 +391,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getActiveFilterTitle() {
     const f = state.activeFilters;
-    if (state.recommendationActive && state.mode === "parcela") return `Parcelas cercanas a tu presupuesto de ${money(state.budget)}`;
+    if (state.recommendationActive && state.mode === "parcela") {
+      const labels = { gps: "más cercanas a ti", economic: "más económicas", nature: "rodeadas de naturaleza", surprise: "seleccionadas para sorprenderte" };
+      return `Parcelas ${labels[state.searchPreference] || "recomendadas"} dentro de tu presupuesto`;
+    }
     if (f.gps) return "Parcelas cercanas a mí";
     if (f.water) return "Parcelas con agua";
     if (f.river) return "Parcelas con luz";
@@ -394,7 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (f.commune && f.commune !== "all") return `Parcelas en ${f.commune}`;
     if (f.economic) return "Parcelas ordenadas desde menor precio";
     if (f.text) return `Resultados de búsqueda para “${f.text}”`;
-    return "Parcelas disponibles";
+    return "40 parcelas seleccionadas para comenzar";
   }
 
   function updateSearchHeading(list) {
@@ -416,27 +426,51 @@ document.addEventListener("DOMContentLoaded", () => {
     if (f.commune && f.commune !== "all") active.push(f.commune);
     if (f.text) active.push("búsqueda");
 
-    DOM.searchSubtitle.textContent = active.length
-      ? ""
-      : "Explora todas las alternativas disponibles o usa el panel de filtros para encontrar tu parcela ideal.";
+    DOM.searchSubtitle.textContent = state.recommendationActive
+      ? `Presupuesto ${money(state.budget)} · ${state.mode === "combo" ? "Parcela + casa" : "Solo parcela"}. Mostramos las opciones que mejor coinciden con tu selección.`
+      : active.length
+        ? `Resultados obtenidos desde el catálogo completo según ${active.join(", ")}.`
+        : "Mostramos una vitrina inicial de hasta 40 parcelas. Usa la búsqueda o los filtros para consultar el catálogo completo.";
   }
 
   function getRecommendedParcelas() {
     const budget = Number(state.budget || 0);
-    const all = getAllParcelas().filter(p => parseClp(p.precio) > 0);
+    let all = getAllParcelas().filter(p => parseClp(p.precio) > 0);
 
-    // Siempre muestra las 5 alternativas más cercanas al presupuesto.
-    // Así, aunque no exista una parcela exacta dentro de un rango, el cliente nunca queda sin opciones.
-    return all
-      .map(p => ({ ...p, __diff: Math.abs(parseClp(p.precio) - budget) }))
-      .sort((a, b) => a.__diff - b.__diff)
-      .slice(0, 5);
+    const scored = all.map((p, index) => {
+      const price = parseClp(p.precio);
+      const budgetDiff = Math.abs(price - budget);
+      let preferenceScore = 0;
+      if (state.searchPreference === "economic") preferenceScore = price;
+      if (state.searchPreference === "nature") {
+        const text = normalizar(`${p.naturaleza || ""} ${p.descripcion || ""} ${p.caracteristicas || ""}`);
+        preferenceScore = /(bosque|nativ|naturaleza|rio|río|estero|laguna|tranquil|vista|cordillera)/.test(text) ? -100000000 : 0;
+      }
+      if (state.searchPreference === "gps" && state.userCoords && p.lat && p.lng) {
+        preferenceScore = distanceKm(state.userCoords.lat, state.userCoords.lng, Number(p.lat), Number(p.lng)) * 100000;
+      }
+      if (state.searchPreference === "surprise") {
+        const seed = String(p.id || index).split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+        preferenceScore = (seed % 17) * 100000;
+      }
+      return { ...p, __score: budgetDiff + preferenceScore };
+    });
+
+    return scored.sort((a, b) => a.__score - b.__score).slice(0, 5);
   }
 
   function getFilteredParcelas() {
+    const hasCatalogQuery = Boolean(
+      state.activeFilters.text || state.activeFilters.gps || state.activeFilters.economic ||
+      state.activeFilters.size || state.activeFilters.payment || state.activeFilters.water ||
+      state.activeFilters.river || state.activeFilters.native ||
+      (state.activeFilters.commune && state.activeFilters.commune !== "all") ||
+      (state.activeFilters.region && state.activeFilters.region !== "all")
+    );
     let list = state.recommendationActive && state.mode === "parcela"
       ? getRecommendedParcelas()
       : [...getAllParcelas()];
+    if (!state.recommendationActive && !hasCatalogQuery) list = list.slice(0, state.homeGridLimit || 40);
 
     const text = normalizar(state.activeFilters.text);
     if (text) {
@@ -479,9 +513,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const budget = state.budget || 0;
     let casasBase = getAllCasas();
 
-    if (state.wantedRooms !== "all" && state.wantedRooms) {
-      casasBase = casasBase.filter(c => Number(c.habitaciones) === Number(state.wantedRooms));
-    }
+    if (state.familyProfile === "couple") casasBase = casasBase.filter(c => Number(c.habitaciones) >= 1 && Number(c.habitaciones) <= 2);
+    if (state.familyProfile === "children") casasBase = casasBase.filter(c => Number(c.habitaciones) === 3);
+    if (state.familyProfile === "large") casasBase = casasBase.filter(c => Number(c.habitaciones) >= 4);
+    if (state.wantedRooms !== "all" && state.wantedRooms) casasBase = casasBase.filter(c => Number(c.habitaciones) === Number(state.wantedRooms));
     if (state.wantedMeters) {
       casasBase = casasBase.sort((a, b) => Math.abs(Number(a.metros) - state.wantedMeters) - Math.abs(Number(b.metros) - state.wantedMeters));
     }
@@ -646,13 +681,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderParcelas(customList) {
     if (!DOM.parcelasContainer) return;
-    const list = customList || getFilteredParcelas();
+    const filters = state.activeFilters || {};
+    const hasCatalogQuery = Boolean(
+      filters.text || filters.gps || filters.economic || filters.size || filters.payment ||
+      filters.water || filters.river || filters.native ||
+      (filters.commune && filters.commune !== "all") ||
+      (filters.region && filters.region !== "all")
+    );
+    const sourceList = customList || getFilteredParcelas();
+    const list = (!state.recommendationActive && !hasCatalogQuery)
+      ? sourceList.slice(0, state.homeGridLimit || 40)
+      : sourceList;
     const renderKey = list.map(p => p.id).join("|");
     if (state.lastParcelasRenderKey !== renderKey) {
       state.lastParcelasRenderKey = renderKey;
-      state.parcelasRenderLimit = 15;
+      state.parcelasRenderLimit = state.recommendationActive ? 5 : Math.min(40, list.length);
     }
-    const visibleList = list.slice(0, state.parcelasRenderLimit || 15);
+    const visibleList = list.slice(0, state.parcelasRenderLimit || (state.recommendationActive ? 5 : 40));
     DOM.parcelasContainer.innerHTML = "";
     DOM.parcelasContainer.className = "parcelas-grid";
     DOM.parcelasContainer.style.display = "grid";
@@ -691,7 +736,6 @@ document.addEventListener("DOMContentLoaded", () => {
           ${renderTplBackedValueBadge(p, "card")}
           ${renderParcelaFeatureChips(p, "desktop")}
           ${getDistanceBadge(p)}
-          <p class="card-description">${p.descripcion || "Parcela disponible para tu proyecto."}</p>
           <div style="text-align: center; margin: 16px 0 8px;">
             <button class="card-location-link" type="button" data-location-id="${p.id}" style="background: transparent; border: 1px solid rgba(0,0,0,0.1); color: var(--tpl-brand, #0c2b2e); font-weight: 600; border-radius: 8px; padding: 8px 16px; font-size: 0.9rem; cursor: pointer; transition: background 0.2s, border-color 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'"><i data-lucide="map" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px;"></i>Ver ubicación en mapa</button>
           </div>
@@ -709,7 +753,7 @@ document.addEventListener("DOMContentLoaded", () => {
       more.innerHTML = `<button class="parcelas-load-more" type="button">Ver más parcelas</button>`;
       DOM.parcelasContainer.appendChild(more);
       const loadMore = () => {
-        state.parcelasRenderLimit = Math.min(list.length, (state.parcelasRenderLimit || 15) + 15);
+        state.parcelasRenderLimit = Math.min(list.length, (state.parcelasRenderLimit || 40) + 20);
         renderParcelas(list);
       };
       more.querySelector("button")?.addEventListener("click", loadMore);
@@ -2081,6 +2125,38 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => DOM.budgetInput?.focus(), 520);
     }, true);
 
+    const setPressedChoice = (container, selector, activeButton) => {
+      container?.querySelectorAll(selector).forEach(button => {
+        const active = button === activeButton;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+    };
+
+    DOM.projectTypeOptions?.addEventListener("click", event => {
+      const button = event.target.closest("[data-project-type]");
+      if (!button) return;
+      state.mode = button.dataset.projectType === "combo" ? "combo" : "parcela";
+      setPressedChoice(DOM.projectTypeOptions, "[data-project-type]", button);
+      const combo = state.mode === "combo";
+      if (DOM.familyGroup) DOM.familyGroup.hidden = !combo;
+      DOM.decisionFlow?.classList.toggle("combo-mode", combo);
+    });
+
+    DOM.priorityOptions?.addEventListener("click", event => {
+      const button = event.target.closest("[data-priority]");
+      if (!button) return;
+      state.searchPreference = button.dataset.priority || "economic";
+      setPressedChoice(DOM.priorityOptions, "[data-priority]", button);
+    });
+
+    DOM.familyOptions?.addEventListener("click", event => {
+      const button = event.target.closest("[data-family]");
+      if (!button) return;
+      state.familyProfile = button.dataset.family || "couple";
+      setPressedChoice(DOM.familyOptions, "[data-family]", button);
+    });
+
     DOM.budgetInput?.addEventListener("input", () => {
       const raw = String(DOM.budgetInput.value || "").replace(/\D/g, "");
       DOM.budgetInput.value = raw ? Number(raw).toLocaleString("es-CL") : "";
@@ -2145,10 +2221,20 @@ document.addEventListener("DOMContentLoaded", () => {
       ev?.stopImmediatePropagation?.();
 
       state.budget = Number(String(DOM.budgetInput?.value || 0).replace(/\D/g, ""));
-      state.wantedRooms = DOM.roomInput?.value || "all";
-      state.wantedMeters = Number(DOM.metersInput?.value || 0);
+      state.wantedRooms = "all";
+      state.wantedMeters = 0;
 
       if (!state.mode || state.mode === "normal") state.mode = "parcela";
+
+      if (state.searchPreference === "gps" && !state.userCoords && navigator.geolocation) {
+        try {
+          const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 7000 }));
+          state.userCoords = { lat: position.coords.latitude, lng: position.coords.longitude };
+        } catch (_) {
+          state.searchPreference = "economic";
+          showFriendlyMessage("No pudimos obtener tu ubicación. Ordenaremos las opciones por precio para que puedas continuar.");
+        }
+      }
 
       if (!state.budget) {
         showFriendlyMessage("Ingresa un presupuesto válido para mostrarte alternativas cercanas.");
@@ -2211,6 +2297,9 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       DOM.casasSection?.classList.add("active");
+      const comboTitle = document.querySelector("#combo-proposals-section h2, #combo-proposals-section h3");
+      const familyLabels = { couple: "pareja o persona sola", children: "familia con hijos", large: "familia grande" };
+      if (comboTitle) comboTitle.textContent = `Parcela + casa para ${familyLabels[state.familyProfile] || "tu familia"}`;
       renderComboProposals(matches);
       renderCasas(matches.map(m => m.casa).filter((c, i, arr) => arr.findIndex(x => x.id === c.id) === i));
       scrollTo(DOM.comboProposalsSection || DOM.casasSection);
