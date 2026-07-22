@@ -21,10 +21,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- CRM CSS -->
-  <link rel="stylesheet" href="/plataforma/crm/crm.css?v=20260722-1">
+  <link rel="stylesheet" href="/plataforma/crm/crm.css?v=20260722-2">
   
-  <!-- Supabase -->
-
 
 <!-- Google Ads Tracking -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-TU_ID_DE_GOOGLE_ADS"></script>
@@ -66,7 +64,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="sidebar-brand">TPL Admin</div>
       <nav class="sidebar-nav">
         <a href="#" class="nav-item active" data-target="view-pendientes"><i data-lucide="bell"></i> Pendientes Operativos</a>
-        <a href="#" class="nav-item" data-target="view-solicitudes"><i data-lucide="inbox"></i> Publicaciones</a>
+        <a href="#" class="nav-item" data-target="view-solicitudes"><i data-lucide="map-pinned"></i> Parcelas</a>
+        <a href="#" class="nav-item" data-target="view-casas"><i data-lucide="house"></i> Casas</a>
         <a href="#" class="nav-item" data-target="view-tasador"><i data-lucide="calculator"></i> Tasador TPL</a>
         <a href="#" class="nav-item" data-target="view-cotizaciones"><i data-lucide="briefcase"></i> Cotizaciones / Proyectos</a>
         <a href="#" class="nav-item" data-target="view-contratistas"><i data-lucide="users"></i> Red de Partners</a>
@@ -232,6 +231,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
 
       
+      <!-- VISTA CASAS -->
+      <div id="view-casas" class="dashboard-section" style="display:none;">
+        <section class="filters-bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div style="margin-right:auto;">
+            <h2 style="margin:0;">Catálogo de casas</h2>
+            <p style="margin:4px 0 0;color:#64748b;">Crea, completa y edita las casas disponibles en los cotizadores.</p>
+          </div>
+          <button id="btn-new-house" class="btn-primary"><i data-lucide="plus"></i> Nueva casa</button>
+          <button id="btn-refresh-casas"><i data-lucide="refresh-cw"></i> Actualizar</button>
+        </section>
+        <p id="catalog-status" class="catalog-status" hidden></p>
+        <section class="table-container">
+          <table class="data-table">
+            <thead><tr><th>Imagen</th><th>Casa</th><th>Superficie</th><th>Habitaciones</th><th>Baños</th><th>Precio base</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tbody id="table-body-casas"><tr><td colspan="8">Abre esta sección para cargar las casas.</td></tr></tbody>
+          </table>
+        </section>
+      </div>
+
       <div id="view-tasador" class="dashboard-section" style="display:none;">
         <section class="tasador-admin-heading">
           <div><span class="eyebrow">Estimaciones referenciales</span><h2>Tasador TPL – Tu Parcela Lista</h2><p>Revisa cobertura, confianza y decisiones sin exponer coordenadas ni datos privados.</p></div>
@@ -354,7 +372,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div id="modal-detalle" class="modal-overlay">
     <div class="modal-box modal-lg">
       <div class="modal-header">
-        <h2>Revisión de Publicación</h2>
+        <h2>Ficha administrativa</h2>
         <button class="modal-close" id="btn-close-modal"><i data-lucide="x"></i></button>
       </div>
       <div class="modal-body" id="modal-content">
@@ -387,10 +405,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script src="/plataforma/crm/crm-config.js?v=20260722-1"></script>
-<script src="/plataforma/crm/crm.js?v=20260722-1"></script>
-<script src="/plataforma/crm/crm-launch-dashboard.js?v=20260722-1" defer></script>
-</body>
-</html>
+<script src="/plataforma/crm/crm-config.js?v=20260722-2"></script>
+<script src="/plataforma/crm/crm.js?v=20260722-2"></script>
+<script src="/plataforma/crm/crm-catalogos.js?v=20260722-2"></script>
+<script src="/plataforma/crm/crm-launch-dashboard.js?v=20260722-2" defer></script>
 </body>
 </html>

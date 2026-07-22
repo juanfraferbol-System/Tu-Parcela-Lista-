@@ -1,11 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Cliente Supabase único para todos los módulos del CRM.
-  const supabase = window.TPL_getSupabaseClient?.();
+  // Inicializar Supabase
+  const crmConfig = window.TPL_CRM_CONFIG;
 
-  if (!supabase) {
-    console.error('CRM: Supabase no está disponible o falta crm-config.js.');
-    return;
-  }
+if (
+  !crmConfig?.supabaseUrl ||
+  !crmConfig?.supabaseAnonKey ||
+  !window.supabase?.createClient
+) {
+  console.error("CRM: falta la configuración de Supabase.");
+  return;
+}
+
+const supabase =
+  window.tplCrmSupabase ||
+  window.tplSupabase ||
+  window.supabase.createClient(
+    crmConfig.supabaseUrl,
+    crmConfig.supabaseAnonKey,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: "sb-qxavbqhyqaqalpzbhwmh-auth-token"
+      }
+    }
+  );
+
+window.tplSupabase = supabase;
+window.tplCrmSupabase = supabase;
 
   const DOM = {
     loginContainer: document.getElementById("login-container"),
@@ -85,15 +108,15 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const showLogin = (msg = "") => {
-    if (DOM.loginContainer) DOM.loginContainer.style.display = "flex";
-    if (DOM.appContainer) DOM.appContainer.style.display = "none";
-    if (DOM.loginMsg) DOM.loginMsg.innerText = msg;
+    DOM.loginContainer.style.display = "flex";
+    DOM.appContainer.style.display = "none";
+    if(msg) DOM.loginMsg.innerText = msg;
   };
 
   const showDashboard = () => {
-    if (DOM.loginContainer) DOM.loginContainer.style.display = "none";
-    if (DOM.appContainer) DOM.appContainer.style.display = "flex";
-    if (DOM.userName) DOM.userName.innerText = sessionUser?.nombre || "Administrador";
+    DOM.loginContainer.style.display = "none";
+    DOM.appContainer.style.display = "flex";
+    DOM.userName.innerText = sessionUser.nombre;
     loadData();
   };
 
@@ -129,23 +152,16 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
 });
 
 
-  DOM.btnLogout?.addEventListener("click", async () => {
+  DOM.btnLogout.addEventListener("click", async () => {
     await supabase.auth.signOut();
     window.location.reload();
   });
 
   // 2. Carga de Datos
   const loadData = async () => {
-    const results = await Promise.allSettled([
-      loadPendientesOperativos(),
-      loadMetrics(),
-      loadTable()
-    ]);
-    results.forEach((result) => {
-      if (result.status === 'rejected') {
-        console.error('CRM: error cargando módulo:', result.reason);
-      }
-    });
+    loadPendientesOperativos();
+    loadMetrics();
+    loadTable();
   };
 
   const loadPendientesOperativos = async () => {
@@ -157,7 +173,7 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
       document.getElementById('metric-pendientes-clientes').innerText = resClientes.count || 0;
       
       // Proyectos/Cotizaciones
-      const resProyectos = await supabase.from('proyectos').select('id, total, creado_en, estado', { count: 'exact' }).in('estado', ['cotizacion_generada', 'cotizacion_enviada']).limit(5);
+      const resProyectos = await supabase.from('proyectos').select('id, total, creado_en', { count: 'exact' }).eq('estado', 'cotizacion_generada').limit(5);
       document.getElementById('metric-pendientes-cotizaciones').innerText = resProyectos.count || 0;
 
       // Publicaciones por revisar
@@ -400,7 +416,8 @@ DOM.btnCloseDetalle?.addEventListener("click", closeModalDetalle);
     
     const { error } = await supabase.rpc('crm_moderar_publicacion', {
       p_publicacion_id: id,
-      p_accion: 'aprobar'
+      p_accion: 'aprobar',
+      p_confirmar: true
     });
     
     if (!error) {
@@ -420,7 +437,7 @@ DOM.btnCloseDetalle?.addEventListener("click", closeModalDetalle);
   };
 
   window.rechazar = (id) => openFeedback(id, 'rechazar', 'Rechazar Publicación');
-  window.solicitarCambios = (id) => openFeedback(id, 'requiere_cambios', 'Solicitar Corrección');
+  window.solicitarCambios = (id) => openFeedback(id, 'solicitar_correcciones', 'Solicitar Corrección');
 
   const closeFeedback = () => {
     DOM.modalFeedback.classList.remove("active");
@@ -442,11 +459,26 @@ DOM.btnConfirmFeedback?.addEventListener("click", async () => {
 
   DOM.btnConfirmFeedback.disabled = true;
 
-  const { error } = await supabase.rpc("crm_moderar_publicacion", {
+  const moderationPayload = {
     p_publicacion_id: currentAction.id,
     p_accion: currentAction.action,
     p_motivo: motivo
-  });
+  };
+
+  if (currentAction.action === "solicitar_correcciones") {
+    moderationPayload.p_campos_correccion = [
+      "titulo_publico",
+      "descripcion_publica",
+      "precio_publicacion",
+      "superficie_m2",
+      "region",
+      "comuna",
+      "sector"
+    ];
+    moderationPayload.p_mensaje = motivo;
+  }
+
+  const { error } = await supabase.rpc("crm_moderar_publicacion", moderationPayload);
 
   DOM.btnConfirmFeedback.disabled = false;
 
@@ -494,7 +526,8 @@ navItems.forEach(item => {
     // Actualizar el título de la barra superior
     const topbarTitle = document.getElementById('topbar-title');
     if (topbarTitle) {
-      if (targetId === 'view-solicitudes') topbarTitle.textContent = 'Moderación de Publicaciones';
+      if (targetId === 'view-solicitudes') topbarTitle.textContent = 'Parcelas y publicaciones';
+      if (targetId === 'view-casas') topbarTitle.textContent = 'Catálogo de casas';
       if (targetId === 'view-tasador') topbarTitle.textContent = 'Tasador TPL';
       if (targetId === 'view-cotizaciones') topbarTitle.textContent = 'Cotizaciones y Smart Match';
       if (targetId === 'view-contratistas') topbarTitle.textContent = 'Gestión de Contratistas';
