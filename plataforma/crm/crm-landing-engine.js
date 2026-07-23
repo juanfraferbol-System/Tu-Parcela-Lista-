@@ -174,11 +174,12 @@
             <label>CTA secundario<input name="ctaSecondary" value="${esc(landing.ctaSecondary || 'Hablar por WhatsApp')}"></label>
             <label>WhatsApp<input name="whatsapp" value="${esc(landing.whatsapp)}"></label>
             <label>Video URL<input name="videoUrl" value="${esc(landing.videoUrl)}"></label>
-            <label class="wide">Enlace de Google Maps<input name="mapUrl" type="url" value="${esc(landing.mapUrl)}" placeholder="https://www.google.com/maps/…"></label>
-            <label>Latitud pública<input name="mapLatitude" type="number" min="-90" max="90" step="any" value="${esc(landing.mapLatitude)}" placeholder="-39.253"></label>
-            <label>Longitud pública<input name="mapLongitude" type="number" min="-180" max="180" step="any" value="${esc(landing.mapLongitude)}" placeholder="-71.796"></label>
+            <p class="wide"><strong>Ubicación del mapa</strong><br><small>Las coordenadas tienen prioridad sobre cualquier enlace.</small></p>
+            <label>Latitud del punto<input name="mapLatitude" type="number" min="-90" max="90" step="any" value="${esc(landing.mapLatitude)}" placeholder="-39.25332"></label>
+            <label>Longitud del punto<input name="mapLongitude" type="number" min="-180" max="180" step="any" value="${esc(landing.mapLongitude)}" placeholder="-71.79639"></label>
             <label>Zoom del mapa<input name="mapZoom" type="number" min="11" max="19" step="1" value="${esc(landing.mapZoom || 16)}"></label>
-            <p class="wide">La Landing usa primero latitud y longitud. Si están vacías, intenta obtenerlas desde el enlace de Google Maps.</p>
+            <label class="wide">Enlace de Google Maps — respaldo opcional<input name="mapUrl" type="url" value="${esc(landing.mapUrl)}" placeholder="Solo se utilizará si no existen coordenadas"></label>
+            <p class="wide">Origen actual: ${esc(landing.mapCoordinateSource || 'configuración de la Landing')}. El enlace nunca reemplaza una latitud y longitud válidas.</p>
             <label class="wide">Título SEO<input name="seoTitle" maxlength="180" value="${esc(landing.seoTitle)}"></label>
             <label class="wide">Descripción SEO<textarea name="seoDescription" rows="2" maxlength="320">${esc(landing.seoDescription)}</textarea></label>
             <label class="landing-check"><input type="checkbox" name="formEnabled" ${landing.formEnabled ? 'checked' : ''}> Formulario activo</label>
@@ -202,6 +203,9 @@
     const mapLatitude = values.mapLatitude === '' ? null : Number(values.mapLatitude);
     const mapLongitude = values.mapLongitude === '' ? null : Number(values.mapLongitude);
     const mapZoom = values.mapZoom === '' ? 16 : Number(values.mapZoom);
+    const previousLatitude = old.mapLatitude == null ? null : Number(old.mapLatitude);
+    const previousLongitude = old.mapLongitude == null ? null : Number(old.mapLongitude);
+    const mapCoordinatesChanged = mapLatitude !== previousLatitude || mapLongitude !== previousLongitude;
     return {
       ...old,
       title: values.title.trim(),
@@ -221,6 +225,10 @@
       mapLatitude: Number.isFinite(mapLatitude) ? mapLatitude : null,
       mapLongitude: Number.isFinite(mapLongitude) ? mapLongitude : null,
       mapZoom: Number.isFinite(mapZoom) ? mapZoom : 16,
+      mapPrecision: mapCoordinatesChanged ? 'exacta' : (old.mapPrecision || 'configurada'),
+      mapCoordinateSource: mapCoordinatesChanged
+        ? 'landing_config'
+        : (old.mapCoordinateSource || 'landing_config'),
       seoTitle: values.seoTitle.trim(),
       seoDescription: values.seoDescription.trim(),
       formEnabled: form.formEnabled.checked,

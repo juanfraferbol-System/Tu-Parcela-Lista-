@@ -1,8 +1,20 @@
 (() => {
   'use strict';
 
-  const LATITUDE_KEYS = ['mapLatitude', 'latitude', 'lat'];
-  const LONGITUDE_KEYS = ['mapLongitude', 'longitude', 'lng'];
+  const LATITUDE_KEYS = [
+    'mapLatitude',
+    'latitud_publica',
+    'latitudPublica',
+    'latitude',
+    'lat'
+  ];
+  const LONGITUDE_KEYS = [
+    'mapLongitude',
+    'longitud_publica',
+    'longitudPublica',
+    'longitude',
+    'lng'
+  ];
 
   function finiteCoordinate(value) {
     if (value === null || value === undefined || value === '') return null;
