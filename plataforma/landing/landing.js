@@ -64,15 +64,45 @@
     : '#contacto';
   const safeMapUrl = (() => {
     try {
-      const url = new URL(String(landing.mapUrl || ''), location.origin);
+      const rawUrl = String(landing.mapUrl || '').trim();
+      if (!rawUrl) return '';
+      const url = new URL(rawUrl, location.origin);
       return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
     } catch {
       return '';
     }
   })();
+  const mapQuery = (() => {
+    if (safeMapUrl) {
+      try {
+        const url = new URL(safeMapUrl);
+        const coordinates = decodeURIComponent(url.href).match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+        if (coordinates) return `${coordinates[1]},${coordinates[2]}`;
+        const query = url.searchParams.get('q')
+          || url.searchParams.get('query')
+          || url.searchParams.get('ll');
+        if (query) return query;
+        const place = decodeURIComponent(url.pathname).match(/\/maps\/place\/([^/]+)/)?.[1];
+        if (place) return place.replace(/\+/g, ' ');
+      } catch {}
+    }
+    return String(landing.location || '').trim();
+  })();
+  const mapEmbedUrl = (() => {
+    if (!mapQuery && !safeMapUrl) return '';
+    try {
+      const url = new URL(safeMapUrl || location.origin);
+      if (/\/maps\/embed/i.test(url.pathname)) return url.href;
+    } catch {}
+    return `https://www.google.com/maps?q=${encodeURIComponent(mapQuery || landing.location)}&z=15&output=embed`;
+  })();
+  const mapNavigationUrl = safeMapUrl
+    || (mapQuery ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}` : '');
   const safeVideoUrl = (() => {
     try {
-      const url = new URL(String(landing.videoUrl || ''), location.origin);
+      const rawUrl = String(landing.videoUrl || '').trim();
+      if (!rawUrl) return '';
+      const url = new URL(rawUrl, location.origin);
       return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
     } catch {
       return '';
@@ -130,6 +160,11 @@
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       <path d="M20 11.5a8.5 8.5 0 0 1-12.6 7.45L3 20l1.15-4.2A8.5 8.5 0 1 1 20 11.5Z"></path>
       <path d="M8.4 8.1c.35 2.2 2.1 4 4.35 4.45"></path>
+    </svg>`;
+  const mapPinIcon = `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"></path>
+      <circle cx="12" cy="10" r="2.5"></circle>
     </svg>`;
   const configuredFeatures = Array.isArray(landing.features) && landing.features.length
     ? landing.features
@@ -199,17 +234,18 @@
       <a class="hero-scroll" href="#historia" aria-label="Conocer la historia de esta propiedad"><span></span>DESCUBRIR</a>
     </section>
     <section id="historia" class="section intro editorial-story">
-      <div class="editorial-heading">
-        <span class="editorial-number">01</span>
-        <div>
-          <span class="kicker">HISTORIA DEL PROYECTO</span>
-          <h2>Un lugar para vivir, invertir y disfrutar</h2>
-        </div>
-      </div>
       <div class="editorial-copy">
+        <div class="editorial-overline"><span class="editorial-number">01</span><span class="kicker">HISTORIA DEL PROYECTO</span></div>
+        <h2>Un lugar para vivir, invertir y disfrutar</h2>
         <p>${esc(landing.description)}</p>
         <div class="editorial-signature"><span></span><strong>${esc(landing.location || 'Sur de Chile')}</strong><small>Una propiedad presentada para descubrir con calma.</small></div>
       </div>
+      <aside class="editorial-context" aria-label="Resumen de la propiedad">
+        <span class="editorial-context-kicker">EN SÍNTESIS</span>
+        <div class="editorial-context-item">${mapPinIcon}<p><small>Ubicación</small><strong>${esc(landing.location || 'Información disponible')}</strong></p></div>
+        <div class="editorial-context-item editorial-context-price"><span>$</span><p><small>Valor publicado</small><strong>${esc(landing.price || 'Consultar')}</strong></p></div>
+        <p class="editorial-context-note">Información comercial proporcionada para presentar el proyecto de forma clara y cercana.</p>
+      </aside>
     </section>
     <section id="beneficios" class="features-section" aria-labelledby="features-title">
       <div class="features-heading">
@@ -246,17 +282,31 @@
       </div>
       <div class="gallery">${gallery}</div>
     </section>
-    ${safeMapUrl ? `
+    ${mapEmbedUrl ? `
       <section class="section landing-location" aria-labelledby="landing-location-title">
-        <div class="location-copy">
-          <span class="section-index">${safeVideoUrl ? '05' : '04'}</span>
-          <span class="kicker">UBICACIÓN Y ENTORNO</span>
-          <h2 id="landing-location-title">Conoce el sector</h2>
-          <p>${esc(landing.location || 'Ubicación informada por el propietario o representante.')}</p>
+        <div class="location-heading">
+          <div>
+            <span class="section-index">${safeVideoUrl ? '05' : '04'}</span>
+            <span class="kicker">UBICACIÓN Y ENTORNO</span>
+            <h2 id="landing-location-title">Explora el sector sin salir de la página</h2>
+          </div>
+          <p>Revisa caminos, referencias y el entorno general antes de coordinar tu visita.</p>
         </div>
-        <a href="${esc(safeMapUrl)}" target="_blank" rel="noopener noreferrer">
-          <span>Explorar ubicación</span><small>Abrir en Google Maps</small>${arrowIcon}
-        </a>
+        <div class="premium-map">
+          <iframe
+            src="${esc(mapEmbedUrl)}"
+            title="Mapa de ${esc(landing.title)}"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen></iframe>
+          <div class="premium-map-status"><span></span>UBICACIÓN DEL PROYECTO</div>
+          <div class="premium-map-card">
+            <span class="premium-map-pin">${mapPinIcon}</span>
+            <div><small>SECTOR</small><strong>${esc(landing.location || 'Ubicación informada')}</strong><p>Explora el mapa o abre la ruta cuando estés listo para visitar.</p></div>
+            ${mapNavigationUrl ? `<a href="${esc(mapNavigationUrl)}" target="_blank" rel="noopener noreferrer">Abrir ruta ${arrowIcon}</a>` : ''}
+          </div>
+        </div>
+        <p class="map-disclaimer">La ubicación mostrada corresponde a la información proporcionada por el propietario o representante.</p>
       </section>` : ''}
     <section id="contacto" class="contact">
       <div class="contact-copy">
