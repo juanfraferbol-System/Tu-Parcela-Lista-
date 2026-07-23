@@ -421,10 +421,19 @@ DOM.btnCloseDetalle?.addEventListener("click", closeModalDetalle);
     });
     
     if (!error) {
+      const { error: photosError } = await supabase.functions.invoke('publicar-fotos-aprobadas', {
+        body: { publicacion_id: id }
+      });
+      if (photosError) {
+        console.error('La publicación fue aprobada, pero faltó publicar sus fotografías:', photosError);
+        alert('La publicación quedó aprobada, pero las fotografías no pudieron pasar al catálogo público. Reintenta la aprobación de fotos antes de difundirla.');
+      } else {
+        showFriendlyMessage('Publicación aprobada y fotografías publicadas.');
+      }
       closeModalDetalle();
       loadData();
     } else {
-      alert("Error al aprobar.");
+      alert("Error al aprobar: " + error.message);
     }
   };
 
@@ -545,6 +554,7 @@ const domContratistas = {
   tableBody: document.getElementById("table-body-contratistas"),
   filterEstado: document.getElementById("filter-estado-contratista"),
   btnRefresh: document.getElementById("btn-refresh-contratistas"),
+  btnNew: document.getElementById("btn-new-contratista"),
 };
 
 const domCotizaciones = {
@@ -555,6 +565,51 @@ const domCotizaciones = {
 
 let contratistasCache = [];
 let cotizacionesCache = [];
+
+
+async function createContratistaManual() {
+  const nombre = prompt('Nombre comercial o empresa del contratista:')?.trim();
+  if (!nombre) return;
+  const responsable = prompt('Nombre del responsable:')?.trim() || nombre;
+  const telefono = prompt('WhatsApp o teléfono (ej. 56912345678):')?.replace(/[^0-9+]/g, '').trim();
+  if (!telefono) return alert('Debes indicar un teléfono o WhatsApp.');
+  const correo = prompt('Correo electrónico:')?.trim().toLowerCase() || null;
+  const servicio = prompt('Servicio principal (cercos, fosa séptica, construcción, electricidad, etc.):')?.trim();
+  if (!servicio) return alert('Debes indicar el servicio principal.');
+  const region = prompt('Región de cobertura:')?.trim() || 'Región del Biobío';
+  const comunasTexto = prompt('Comunas atendidas, separadas por coma:')?.trim() || '';
+  const comunas = comunasTexto.split(',').map(x => x.trim()).filter(Boolean);
+  const payload = {
+    nombre_empresa: nombre,
+    nombre_comercial: nombre,
+    nombre_responsable: responsable,
+    telefono,
+    whatsapp: telefono,
+    correo,
+    descripcion_servicios: servicio,
+    tipo_servicio: servicio,
+    especialidades: [servicio],
+    region,
+    comunas_atendidas: comunas,
+    ubicacion_base: region,
+    anos_experiencia: 0,
+    disponibilidad: 'Por confirmar',
+    plan_elegido: 'gratis',
+    plan_solicitado: 'gratis',
+    plan_activo: 'gratis',
+    estado_verificacion: 'pendiente',
+    visible_publicamente: false,
+    estado: 'Activo'
+  };
+  const { error } = await window.tplCrmSupabase.from('contratistas').insert(payload);
+  if (error) {
+    console.error(error);
+    alert('No fue posible crear el contratista: ' + error.message);
+    return;
+  }
+  showFriendlyMessage('Contratista creado en estado pendiente.');
+  await loadContratistas();
+}
 
 // Cargar Contratistas
 async function loadContratistas() {
@@ -708,6 +763,7 @@ function renderCotizaciones() {
 
 // Event Listeners para recargar
 if (domContratistas.btnRefresh) domContratistas.btnRefresh.addEventListener('click', loadContratistas);
+if (domContratistas.btnNew) domContratistas.btnNew.addEventListener('click', createContratistaManual);
 if (domContratistas.filterEstado) domContratistas.filterEstado.addEventListener('change', renderContratistas);
 if (domCotizaciones.btnRefresh) domCotizaciones.btnRefresh.addEventListener('click', loadCotizaciones);
 if (domCotizaciones.filterEstado) domCotizaciones.filterEstado.addEventListener('change', renderCotizaciones);
