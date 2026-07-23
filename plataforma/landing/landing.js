@@ -72,7 +72,9 @@
       return '';
     }
   })();
+  const mapCoordinates = window.TPLLandingMap?.resolveCoordinates(landing) || null;
   const mapQuery = (() => {
+    if (mapCoordinates) return `${mapCoordinates.latitude},${mapCoordinates.longitude}`;
     if (safeMapUrl) {
       try {
         const url = new URL(safeMapUrl);
@@ -96,7 +98,8 @@
     } catch {}
     return `https://www.google.com/maps?q=${encodeURIComponent(mapQuery || landing.location)}&z=15&output=embed`;
   })();
-  const mapNavigationUrl = safeMapUrl
+  const mapNavigationUrl = window.TPLLandingMap?.navigationUrl(mapCoordinates, safeMapUrl)
+    || safeMapUrl
     || (mapQuery ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}` : '');
   const safeVideoUrl = (() => {
     try {
@@ -282,7 +285,7 @@
       </div>
       <div class="gallery">${gallery}</div>
     </section>
-    ${mapEmbedUrl ? `
+    ${(mapCoordinates || mapEmbedUrl) ? `
       <section class="section landing-location" aria-labelledby="landing-location-title">
         <div class="location-heading">
           <div>
@@ -293,20 +296,28 @@
           <p>Revisa caminos, referencias y el entorno general antes de coordinar tu visita.</p>
         </div>
         <div class="premium-map">
-          <iframe
-            src="${esc(mapEmbedUrl)}"
-            title="Mapa de ${esc(landing.title)}"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen></iframe>
-          <div class="premium-map-status"><span></span>UBICACIÓN DEL PROYECTO</div>
+          ${mapCoordinates
+            ? `<div
+                id="landing-premium-map"
+                class="premium-map-canvas"
+                role="region"
+                aria-label="Mapa con la ubicación de ${esc(landing.title)}"></div>`
+            : `<iframe
+                src="${esc(mapEmbedUrl)}"
+                title="Mapa de referencia de ${esc(landing.title)}"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen></iframe>`}
+          <div class="premium-map-status"><span></span>${mapCoordinates ? 'PUNTO DE LA PROPIEDAD' : 'UBICACIÓN DE REFERENCIA'}</div>
           <div class="premium-map-card">
             <span class="premium-map-pin">${mapPinIcon}</span>
             <div><small>SECTOR</small><strong>${esc(landing.location || 'Ubicación informada')}</strong><p>Explora el mapa o abre la ruta cuando estés listo para visitar.</p></div>
             ${mapNavigationUrl ? `<a href="${esc(mapNavigationUrl)}" target="_blank" rel="noopener noreferrer">Abrir ruta ${arrowIcon}</a>` : ''}
           </div>
         </div>
-        <p class="map-disclaimer">La ubicación mostrada corresponde a la información proporcionada por el propietario o representante.</p>
+        <p class="map-disclaimer">${mapCoordinates
+          ? 'El marcador corresponde a las coordenadas públicas informadas para la propiedad.'
+          : 'La vista corresponde a una referencia del sector; falta configurar un punto público para esta propiedad.'}</p>
       </section>` : ''}
     <section id="contacto" class="contact">
       <div class="contact-copy">
@@ -437,6 +448,33 @@
           </div>
         </div>
       </div>` : ''}`;
+
+  if (mapCoordinates) {
+    const mapContainer = document.getElementById('landing-premium-map');
+    try {
+      const initializedMap = window.TPLLandingMap?.init(mapContainer, landing);
+      if (!initializedMap && mapContainer && mapEmbedUrl) {
+        mapContainer.outerHTML = `
+          <iframe
+            src="${esc(mapEmbedUrl)}"
+            title="Mapa de referencia de ${esc(landing.title)}"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen></iframe>`;
+      }
+    } catch (error) {
+      console.error('TPL Landing: no fue posible iniciar el mapa.', error);
+      if (mapContainer && mapEmbedUrl) {
+        mapContainer.outerHTML = `
+          <iframe
+            src="${esc(mapEmbedUrl)}"
+            title="Mapa de referencia de ${esc(landing.title)}"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen></iframe>`;
+      }
+    }
+  }
 
   function status(message, type = '') {
     const element = document.getElementById('landing-form-status');

@@ -174,7 +174,11 @@
             <label>CTA secundario<input name="ctaSecondary" value="${esc(landing.ctaSecondary || 'Hablar por WhatsApp')}"></label>
             <label>WhatsApp<input name="whatsapp" value="${esc(landing.whatsapp)}"></label>
             <label>Video URL<input name="videoUrl" value="${esc(landing.videoUrl)}"></label>
-            <label class="wide">Mapa / ubicación<input name="mapUrl" value="${esc(landing.mapUrl)}"></label>
+            <label class="wide">Enlace de Google Maps<input name="mapUrl" type="url" value="${esc(landing.mapUrl)}" placeholder="https://www.google.com/maps/…"></label>
+            <label>Latitud pública<input name="mapLatitude" type="number" min="-90" max="90" step="any" value="${esc(landing.mapLatitude)}" placeholder="-39.253"></label>
+            <label>Longitud pública<input name="mapLongitude" type="number" min="-180" max="180" step="any" value="${esc(landing.mapLongitude)}" placeholder="-71.796"></label>
+            <label>Zoom del mapa<input name="mapZoom" type="number" min="11" max="19" step="1" value="${esc(landing.mapZoom || 16)}"></label>
+            <p class="wide">La Landing usa primero latitud y longitud. Si están vacías, intenta obtenerlas desde el enlace de Google Maps.</p>
             <label class="wide">Título SEO<input name="seoTitle" maxlength="180" value="${esc(landing.seoTitle)}"></label>
             <label class="wide">Descripción SEO<textarea name="seoDescription" rows="2" maxlength="320">${esc(landing.seoDescription)}</textarea></label>
             <label class="landing-check"><input type="checkbox" name="formEnabled" ${landing.formEnabled ? 'checked' : ''}> Formulario activo</label>
@@ -195,6 +199,9 @@
   function configuration(form) {
     const old = record.draft || record.published || {};
     const values = Object.fromEntries(new FormData(form));
+    const mapLatitude = values.mapLatitude === '' ? null : Number(values.mapLatitude);
+    const mapLongitude = values.mapLongitude === '' ? null : Number(values.mapLongitude);
+    const mapZoom = values.mapZoom === '' ? 16 : Number(values.mapZoom);
     return {
       ...old,
       title: values.title.trim(),
@@ -211,6 +218,9 @@
       whatsapp: values.whatsapp.replace(/\D/g, ''),
       videoUrl: values.videoUrl.trim(),
       mapUrl: values.mapUrl.trim(),
+      mapLatitude: Number.isFinite(mapLatitude) ? mapLatitude : null,
+      mapLongitude: Number.isFinite(mapLongitude) ? mapLongitude : null,
+      mapZoom: Number.isFinite(mapZoom) ? mapZoom : 16,
       seoTitle: values.seoTitle.trim(),
       seoDescription: values.seoDescription.trim(),
       formEnabled: form.formEnabled.checked,
