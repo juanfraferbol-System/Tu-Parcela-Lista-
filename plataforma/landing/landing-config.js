@@ -31,6 +31,32 @@
       'Aguas termales para disfrutar todo el año',
       'Rol propio, agua y energía eléctrica'
     ],
+    features: [
+      {
+        title: 'Vista al volcán Villarrica',
+        text: 'Un entorno natural privilegiado para disfrutar desde tu futuro proyecto.'
+      },
+      {
+        title: 'Acceso al río',
+        text: 'El condominio dispone de acceso al río para sus residentes.'
+      },
+      {
+        title: 'Aguas termales',
+        text: 'Un atributo especial para disfrutar el sector durante todo el año.'
+      },
+      {
+        title: 'Rol propio',
+        text: 'La parcela dispone de rol individual informado por su propietario o representante.'
+      },
+      {
+        title: 'Agua disponible',
+        text: 'El proyecto informa disponibilidad de agua para el desarrollo de la propiedad.'
+      },
+      {
+        title: 'Energía eléctrica',
+        text: 'Disponibilidad de energía eléctrica informada para el proyecto.'
+      }
+    ],
     description: 'Una oportunidad patrimonial única para construir una residencia de alto estándar, segunda vivienda o proyecto turístico en uno de los sectores con mayor demanda del sur de Chile.',
     ctaPrimary: 'Agendar visita',
     ctaSecondary: 'Hablar por WhatsApp',
@@ -42,6 +68,22 @@
     adsReady: false,
     seoTitle: 'Parcela Premium en Caburgua con vista al Volcán Villarrica',
     seoDescription: 'Parcela de 5.000 m² en condominio privado de Caburgua, con acceso al río, aguas termales, rol propio, agua y luz.',
+    tplBranding: {
+      enabled: true,
+      badgeText: 'Proyecto gestionado mediante TPL Business',
+      supportText: 'Tecnología, registro de consultas y gestión comercial por Tu Parcela Lista.',
+      footerText: 'Tecnología y gestión comercial por Tu Parcela Lista',
+      ctaText: 'Quiero una landing como esta',
+      ctaUrl: '/tecnologia.html',
+      modalTitle: 'Respaldo tecnológico y comercial',
+      modalContent: [
+        'La información del proyecto es proporcionada por el propietario o representante.',
+        'Las consultas y solicitudes son gestionadas mediante TPL Business.',
+        'Las solicitudes pueden registrarse para seguimiento comercial.',
+        'Tu Parcela Lista entrega la infraestructura tecnológica y comercial.'
+      ],
+      footerTheme: 'corporate'
+    },
     updatedAt: '2026-07-23T00:00:00.000Z'
   }];
 
