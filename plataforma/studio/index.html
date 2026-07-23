@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>TPL Studio AI | Centro de contenido</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/plataforma/studio/studio.css?v=20260722-1">
+</head>
+<body>
+  <aside class="studio-sidebar">
+    <a class="brand" href="/plataforma/crm/"><span>TPL</span> Studio AI</a>
+    <nav>
+      <button class="nav-item active" data-view="crear"><i data-lucide="wand-sparkles"></i> Crear campaña</button>
+      <button class="nav-item" data-view="storyboard"><i data-lucide="clapperboard"></i> Storyboard</button>
+      <button class="nav-item" data-view="cola"><i data-lucide="list-video"></i> Cola de producción</button>
+      <button class="nav-item" data-view="biblioteca"><i data-lucide="folder-kanban"></i> Biblioteca</button>
+    </nav>
+    <a class="back-link" href="/plataforma/crm/"><i data-lucide="arrow-left"></i> Volver al CRM</a>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div><span class="eyebrow">Automatización de marketing</span><h1 id="view-title">Crear campaña</h1></div>
+      <span class="status-pill"><span></span> MVP operativo</span>
+    </header>
+
+    <section class="view active" id="view-crear">
+      <div class="hero-card">
+        <div><span class="eyebrow">Una entrada, muchos resultados</span><h2>Convierte una parcela, casa o proyecto en un kit completo de marketing.</h2><p>TPL prepara el guion, las escenas, la narración y los formatos. El proveedor de video se conecta después sin rehacer la lógica.</p></div>
+        <div class="hero-stat"><strong id="asset-count">0</strong><span>recursos preparados</span></div>
+      </div>
+
+      <form id="campaign-form" class="panel form-grid">
+        <div class="section-heading"><div><span class="step">1</span><h2>Datos del proyecto</h2></div><p>Usa información real y evita prompts genéricos.</p></div>
+        <label>Nombre del proyecto<input id="project-name" required placeholder="Ej. Parcela El Roble + Casa 54 m²"></label>
+        <label>Tipo de proyecto<select id="project-type"><option value="parcela_casa">Parcela + casa</option><option value="parcela">Solo parcela</option><option value="casa">Solo casa</option><option value="partner">Servicio de partner</option></select></label>
+        <label>Comuna<input id="commune" placeholder="Ej. Nacimiento"></label>
+        <label>Precio o inversión<input id="price" placeholder="$39.990.000"></label>
+        <label>Superficie de terreno<input id="land-size" placeholder="5.000 m²"></label>
+        <label>Casa / superficie construida<input id="house-size" placeholder="54 m², 3 dormitorios"></label>
+        <label class="wide">Propuesta de valor<textarea id="value-proposition" rows="3" placeholder="Qué hace especial este proyecto: bosque nativo, acceso, cercanía, forma de pago..."></textarea></label>
+        <label class="wide">Servicios, extras o características<textarea id="features" rows="3" placeholder="Paneles solares, fosa séptica, electricidad, terraza, quincho..."></textarea></label>
+        <label class="wide">Imágenes disponibles (una URL o ruta por línea)<textarea id="images" rows="3" placeholder="image/proyecto/portada.webp"></textarea></label>
+
+        <div class="section-heading wide"><div><span class="step">2</span><h2>Formatos a producir</h2></div><p>Se reutiliza el mismo storyboard.</p></div>
+        <div class="format-grid wide" id="formats">
+          <label class="format-card"><input type="checkbox" value="video_30" checked><span><i data-lucide="video"></i><strong>Video 30 s</strong><small>Presentación comercial</small></span></label>
+          <label class="format-card"><input type="checkbox" value="reel" checked><span><i data-lucide="smartphone"></i><strong>Reel / TikTok</strong><small>Vertical 9:16</small></span></label>
+          <label class="format-card"><input type="checkbox" value="facebook"><span><i data-lucide="megaphone"></i><strong>Facebook</strong><small>Texto y llamado</small></span></label>
+          <label class="format-card"><input type="checkbox" value="instagram"><span><i data-lucide="image"></i><strong>Instagram</strong><small>Copy y carrusel</small></span></label>
+          <label class="format-card"><input type="checkbox" value="pdf"><span><i data-lucide="file-text"></i><strong>Ficha PDF</strong><small>Resumen descargable</small></span></label>
+          <label class="format-card"><input type="checkbox" value="seo"><span><i data-lucide="search"></i><strong>SEO / Blog</strong><small>Título y contenido</small></span></label>
+        </div>
+
+        <div class="section-heading wide"><div><span class="step">3</span><h2>Estilo de comunicación</h2></div></div>
+        <label>Tono<select id="tone"><option value="emocional">Emocional y cercano</option><option value="premium">Premium y elegante</option><option value="inversion">Inversión y plusvalía</option><option value="tecnico">Técnico y confiable</option></select></label>
+        <label>Audiencia<select id="audience"><option value="familias">Familias que buscan vida de campo</option><option value="inversionistas">Inversionistas</option><option value="primera_vivienda">Primera vivienda</option><option value="emprendedores">Emprendedores rurales</option></select></label>
+        <label class="wide">Llamado a la acción<input id="cta" value="Cotiza tu proyecto en parcelalista.cl"></label>
+        <div class="form-actions wide"><button type="button" class="btn-secondary" id="load-example">Cargar ejemplo</button><button class="btn-primary" type="submit"><i data-lucide="sparkles"></i> Preparar kit automático</button></div>
+      </form>
+    </section>
+
+    <section class="view" id="view-storyboard">
+      <div class="panel">
+        <div class="section-heading"><div><h2>Storyboard generado</h2><p id="storyboard-summary">Aún no has preparado una campaña.</p></div><div class="inline-actions"><button id="copy-script" class="btn-secondary">Copiar guion</button><button id="export-json" class="btn-secondary">Exportar JSON</button></div></div>
+        <div id="storyboard-empty" class="empty-state"><i data-lucide="clapperboard"></i><h3>Tu historia aparecerá aquí</h3><p>Completa los datos del proyecto y TPL ordenará las escenas automáticamente.</p></div>
+        <div id="storyboard-list" class="storyboard-list"></div>
+        <div id="narration-box" class="narration-box" hidden><span class="eyebrow">Narración sugerida</span><p id="narration-text"></p></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-cola">
+      <div class="metrics-grid"><article><strong id="queue-total">0</strong><span>Producciones</span></article><article><strong id="queue-ready">0</strong><span>Preparadas</span></article><article><strong id="queue-pending">0</strong><span>Pendientes de IA</span></article></div>
+      <div class="panel"><div class="section-heading"><div><h2>Cola de producción</h2><p>Los trabajos quedan listos para enviarse al proveedor de IA cuando se conecte.</p></div><button id="clear-queue" class="btn-secondary">Limpiar cola</button></div><div id="queue-list" class="queue-list"></div></div>
+    </section>
+
+    <section class="view" id="view-biblioteca">
+      <div class="panel"><div class="section-heading"><div><h2>Biblioteca de campañas</h2><p>Historial local de kits preparados en esta etapa.</p></div></div><div id="library-list" class="library-grid"></div></div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/plataforma/studio/studio.js?v=20260722-1"></script>
+</body>
+</html>

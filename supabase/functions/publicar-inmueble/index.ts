@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
     if (existing) return json(200, { ok:true, ...existing, duplicate_prevented:true });
 
-    if (!['casa','parcela'].includes(payload.tipo)) return json(400, { ok:false, error:'Debes elegir Casa o Parcela.' });
+    if (!['casa','parcela','parcela_con_casa'].includes(payload.tipo)) return json(400, { ok:false, error:'Debes elegir Casa, Parcela o Parcela con casa.' });
     const required:Array<[string, unknown]> = [
       ['título', payload.titulo], ['descripción', payload.descripcion], ['región', payload.region],
       ['comuna', payload.comuna], ['precio', payload.precio], ['nombre', payload.nombre],
@@ -187,6 +187,11 @@ Deno.serve(async (req) => {
       datos_formulario: {
         ...originalPayload,
         tipo: payload.tipo,
+        superficie_terreno_m2: payload.superficieTerreno || null,
+        superficie_construida_m2: payload.superficieConstruida || null,
+        habitaciones: payload.habitaciones || null,
+        banos: payload.banos || null,
+        material: payload.material || null,
         tipo_publicador_normalizado: payload.publicador,
         plan_original: payload.plan.original,
         plan_crm: payload.plan.crm,

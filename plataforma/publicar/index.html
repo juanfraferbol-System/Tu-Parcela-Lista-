@@ -1,22 +1,28 @@
 <!doctype html>
 <html lang="es">
 <head>
+  <meta name="robots" content="index,follow">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Publica tu propiedad | Tu Parcela Lista</title>
-  <meta name="description" content="Asistente inteligente para publicar parcelas, campos y casas en Tu Parcela Lista.">
+  <title>Publica tu parcela, campo o casa | Tu Parcela Lista</title>
+  <meta name="description" content="Publica una parcela, campo o casa mediante el asistente de Tu Parcela Lista y llega a compradores interesados.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link rel="stylesheet" href="styles.css?v=20260718-smart-fields-v3">
 <link rel="stylesheet" href="../../css/tpl-lead-advisor.css?v=20260720-2">
+  <link rel="stylesheet" href="../../css/tpl-header-unified.css">
+  <link rel="canonical" href="https://www.parcelalista.cl/plataforma/publicar/">
 </head>
 <body>
 <header class="site-header">
   <div class="header-inner">
     <a class="brand" href="../../index.html" aria-label="Volver al inicio"><img src="assets/logo_compartir.png" alt="Tu Parcela Lista"></a>
-    <span class="mobile-brand-name" aria-hidden="true">Tu Parcela Lista</span>
+    <div class="tpl-mobile-primary-actions" aria-label="Acciones principales">
+  <a class="tpl-mobile-publish" href="index.html">Publicar</a>
+  <a class="tpl-mobile-partners" href="../partners/index.html">Partners</a>
+</div>
     <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button>
     <nav class="main-nav" id="mainNav" aria-label="Navegación principal">
       <a href="../../index.html">Inicio</a><a href="../../index.html#parcelas-anchor">Parcelas</a><a href="../../index.html#casas-section">Casas</a><a href="../../index.html#mejores-alternativas">Mejores alternativas</a><a href="../../como-comprar.html">Cómo comprar</a><a href="../partners/index.html">Red de Partners</a><a href="../../index.html#quienes-somos">Quiénes somos</a><a href="../../index.html#contacto">Contacto</a>
@@ -57,8 +63,9 @@
       <section class="form-section observable" id="tipo" data-step="tipo">
         <header class="section-heading"><span>01</span><div><p class="eyebrow">Comencemos</p><h2>¿Qué deseas publicar?</h2><p>Los campos cambiarán automáticamente según el tipo de propiedad.</p></div></header>
         <div class="property-types" role="radiogroup">
-          <label class="property-card property-card-land"><input type="radio" name="tipo" value="parcela"><img src="assets/decision-campo-fondo.webp" alt="Campo y parcela"><span class="property-shade"></span><span class="property-copy"><small>Terreno rural</small><strong>Parcela o campo</strong><em>Terrenos, parcelas, fundos y campos.</em></span><span class="property-check">✓</span></label>
-          <label class="property-card property-card-house"><input type="radio" name="tipo" value="casa"><img src="assets/btn_casa_modern.jpg" alt="Casa moderna en el campo"><span class="property-shade"></span><span class="property-copy"><small>Vivienda</small><strong>Casa</strong><em>Casa urbana, rural o casa con terreno.</em></span><span class="property-check">✓</span></label>
+          <label class="property-card property-card-land"><input type="radio" name="tipo" value="parcela"><img src="assets/decision-campo-fondo.webp" alt="Campo y parcela"><span class="property-shade"></span><span class="property-copy"><small>Terreno rural</small><strong>Parcela o campo</strong><em>Terreno sin vivienda principal.</em></span><span class="property-check">✓</span></label>
+          <label class="property-card property-card-land-house"><input type="radio" name="tipo" value="parcela_con_casa"><img src="assets/btn_casa_modern.jpg" alt="Parcela con casa"><span class="property-shade"></span><span class="property-copy"><small>Propiedad completa</small><strong>Parcela con casa</strong><em>Terreno y vivienda se venden juntos.</em></span><span class="property-check">✓</span></label>
+          <label class="property-card property-card-house"><input type="radio" name="tipo" value="casa"><img src="assets/btn_casa_modern.jpg" alt="Casa"><span class="property-shade"></span><span class="property-copy"><small>Vivienda</small><strong>Casa</strong><em>Vivienda sin ofrecerse como parcela.</em></span><span class="property-check">✓</span></label>
         </div>
         <p class="field-error" data-error-for="tipo"></p>
         <div class="section-actions"><button type="button" class="btn primary next-section" data-next="datos">Comenzar publicación</button></div>
@@ -188,9 +195,31 @@
           <div class="urgency-details">
             <label class="field"><span>¿En qué plazo esperas vender?</span><select id="plazoVenta" name="plazoVenta"><option value="">Selecciona</option><option>No tengo plazo</option><option>Durante los próximos 6 meses</option><option>Durante los próximos 3 meses</option><option>Durante el próximo mes</option></select></label>
             <label class="field"><span>¿Hace cuánto intentas vender?</span><select id="tiempoEnVenta" name="tiempoEnVenta"><option value="">Selecciona</option><option>Aún no la he publicado</option><option>Menos de 3 meses</option><option>Entre 3 y 6 meses</option><option>Más de 6 meses</option></select></label>
-            <label class="field"><span>Disposición a negociar</span><select id="negociacionPrecio" name="negociacionPrecio"><option value="">Selecciona</option><option>El precio es fijo</option><option>Puedo escuchar ofertas razonables</option><option>Tengo margen para negociar</option><option>Evaluaré propuestas para vender pronto</option></select></label>
+            <label class="field"><span>¿Cómo prefieres negociar?</span><select id="negociacionPrecio" name="negociacionPrecio"><option value="">Selecciona</option><option value="precio_fijo">El precio es fijo</option><option value="ofertas">Sí, puedo evaluar ofertas</option><option value="mejoras">Prefiero mantener el precio, pero puedo incluir mejoras</option><option value="ofertas_y_mejoras">Puedo evaluar ofertas o incluir mejoras</option></select></label>
             <label class="field"><span>Disponibilidad para visitas</span><select id="disponibilidadVisitas" name="disponibilidadVisitas"><option value="">Selecciona</option><option>Con coordinación previa</option><option>Durante la semana</option><option>Fines de semana</option><option>Tengo alta disponibilidad</option><option>Necesito que TPL coordine todo</option></select></label>
           </div>
+          <section class="owner-improvements" id="ownerImprovements" hidden aria-labelledby="ownerImprovementsTitle">
+            <div class="owner-improvements-heading">
+              <div><p class="eyebrow">Negociación con valor agregado</p><h3 id="ownerImprovementsTitle">¿Qué mejoras podrías ofrecer para facilitar la venta?</h3><p>Estas opciones se mostrarán como beneficios disponibles para negociar. No serán un compromiso definitivo hasta incorporarlas formalmente a una reserva o contrato.</p></div>
+              <span class="owner-improvements-badge">Beneficio TPL</span>
+            </div>
+            <div class="improvement-options">
+              <label><input type="checkbox" name="mejorasOfrecidas" value="empalme_electrico"><span><strong>Empalme eléctrico</strong><small>Gestionar o aportar a la instalación.</small></span></label>
+              <label><input type="checkbox" name="mejorasOfrecidas" value="cerco_perimetral"><span><strong>Cerco perimetral</strong><small>Construir o completar el cierre.</small></span></label>
+              <label><input type="checkbox" name="mejorasOfrecidas" value="porton_acceso"><span><strong>Portón de acceso</strong><small>Instalar acceso principal.</small></span></label>
+              <label><input type="checkbox" name="mejorasOfrecidas" value="camino_acceso"><span><strong>Mejorar camino</strong><small>Ripio, estabilizado o limpieza del acceso.</small></span></label>
+              <label><input type="checkbox" name="mejorasOfrecidas" value="agua"><span><strong>Solución de agua</strong><small>Pozo, puntera, estanque o aporte.</small></span></label>
+              <label><input type="checkbox" name="mejorasOfrecidas" value="limpieza_terreno"><span><strong>Limpieza del terreno</strong><small>Despeje o retiro de residuos.</small></span></label>
+              <label><input type="checkbox" name="mejorasOfrecidas" value="topografia"><span><strong>Estudio topográfico</strong><small>Levantamiento para planificar el proyecto.</small></span></label>
+              <label><input type="checkbox" name="mejorasOfrecidas" value="aporte_fosa"><span><strong>Aporte para fosa séptica</strong><small>Financiar una parte o totalidad según acuerdo.</small></span></label>
+            </div>
+            <div class="owner-improvements-details">
+              <label class="field"><span>Monto máximo referencial</span><select id="montoMaximoMejoras" name="montoMaximoMejoras"><option value="">Sin definir todavía</option><option value="500000">Hasta $500.000</option><option value="1000000">Hasta $1.000.000</option><option value="2000000">Hasta $2.000.000</option><option value="3000000">Hasta $3.000.000</option><option value="personalizado">Otro monto</option></select></label>
+              <label class="field"><span>Momento de ejecución</span><select id="momentoMejoras" name="momentoMejoras"><option value="">A definir en la negociación</option><option value="antes_promesa">Antes de firmar la promesa</option><option value="antes_compraventa">Antes de la compraventa</option><option value="despues_compraventa">Después de la compraventa</option><option value="aporte_monetario">Como aporte monetario al comprador</option></select></label>
+              <label class="field span-2"><span>Condiciones o detalle</span><textarea id="detalleMejoras" name="detalleMejoras" rows="3" placeholder="Ej. Instalaré el empalme una vez firmada la compraventa, sujeto a factibilidad técnica y hasta un máximo acordado."></textarea></label>
+            </div>
+            <div class="detected-needs" id="detectedPartnerNeeds" hidden></div>
+          </section>
           <div class="urgency-recommendation" id="urgencyRecommendation" hidden></div>
           <p class="field-error" data-error-for="urgencia"></p>
         </section>

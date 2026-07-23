@@ -11,15 +11,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Detalle de Terreno | Tu Parcela Lista</title>
+<title>Parcelas y campos en venta | Tu Parcela Lista</title>
 <!-- ========================================= -->
 <!-- SEO -->
 <!-- ========================================= -->
-<meta content="Encuentra parcelas con Rol Propio, agua y luz. Elige tu terreno, selecciona una casa prefabricada y cotiza online en ParcelaLista.cl." name="description"/>
+<meta name="description" content="Revisa ubicación, superficie, precio, fotografías y opciones de casa para parcelas y campos publicados en Tu Parcela Lista.">
 <meta content="parcelas chile, parcelas bio bio, parcelas quillón, parcelas florida, parcelas nacimiento, casas prefabricadas, terrenos chile" name="keywords"/>
 <meta content="ParcelaLista.cl" name="author"/>
-<meta content="index,follow" name="robots"/>
-<link href="https://parcelalista.cl/" rel="canonical"/>
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://www.parcelalista.cl/parcela.html">
 <meta content="#0B5FA5" name="theme-color"/>
 <!-- ========================================= -->
 <!-- OPEN GRAPH (WhatsApp - Facebook - LinkedIn) -->
@@ -29,9 +29,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta content="ParcelaLista.cl" property="og:site_name"/>
 <meta content="🏡 Encuentra tu parcela ideal | ParcelaLista.cl" property="og:title"/>
 <meta content="Parcelas con Rol Propio + Casas Prefabricadas. Cotiza online y encuentra tu proyecto ideal." property="og:description"/>
-<meta content="https://parcelalista.cl/" property="og:url"/>
-<meta content="https://parcelalista.cl/image/logo_compartir.png" property="og:image"/>
-<meta content="https://parcelalista.cl/image/logo_compartir.png" property="og:image:secure_url"/>
+<meta content="https://www.parcelalista.cl/" property="og:url"/>
+<meta content="https://www.parcelalista.cl/image/logo_compartir.png" property="og:image"/>
+<meta content="https://www.parcelalista.cl/image/logo_compartir.png" property="og:image:secure_url"/>
 <meta content="image/png" property="og:image:type"/>
 <meta content="1200" property="og:image:width"/>
 <meta content="630" property="og:image:height"/>
@@ -41,7 +41,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta content="summary_large_image" name="twitter:card"/>
 <meta content="🏡 ParcelaLista.cl" name="twitter:title"/>
 <meta content="Parcelas con Rol Propio + Casas Prefabricadas. Cotiza online." name="twitter:description"/>
-<meta content="https://parcelalista.cl/image/logo_compartir.png" name="twitter:image"/>
+<meta content="https://www.parcelalista.cl/image/logo_compartir.png" name="twitter:image"/>
 <!-- ========================================= -->
 <!-- FAVICON -->
 <!-- ========================================= -->
@@ -58,15 +58,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- CSS -->
 <link href="parcela.css?v=20260721-12" rel="stylesheet"/>
 <!-- CSS globales del index desvinculados para evitar conflictos en esta ficha -->
-<!-- Google Ads Tracking -->
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=AW-TU_ID_DE_GOOGLE_ADS"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'AW-TU_ID_DE_GOOGLE_ADS');
-</script>
 <link rel="stylesheet" href="css/tpl-lead-advisor.css?v=20260721-context-v4">
+  <link rel="stylesheet" href="css/tpl-header-unified.css">
 </head>
 <body class="parcela-page">
 <!-- Google Tag Manager (noscript) -->
@@ -81,7 +74,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <img alt="Tu Parcela Lista" class="brand-logo-img" src="image/logo-tu-parcela-lista.png" style="height: 75px; width: auto;"/>
 <img alt="Chile" height="24" src="https://flagcdn.com/h24/cl.png" srcset="https://flagcdn.com/h48/cl.png 2x"/>
 </a>
-<span aria-hidden="true" class="mobile-brand-name">Tu Parcela Lista</span>
+<div class="tpl-mobile-primary-actions" aria-label="Acciones principales">
+  <a class="tpl-mobile-publish" href="plataforma/publicar/index.html">Publicar</a>
+  <a class="tpl-mobile-partners" href="plataforma/partners/index.html">Partners</a>
+</div>
 <nav>
 <ul class="nav-links" id="nav-links">
 <li><a href="index.html">Inicio</a></li>
@@ -233,6 +229,31 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </article>
 </div>
 </div>
+<!-- Beneficios y modalidad de negociación ofrecidos por el propietario -->
+<section class="owner-benefits-card" id="owner-benefits-card" hidden aria-labelledby="owner-benefits-title">
+  <div class="owner-benefits-icon"><i data-lucide="gift"></i></div>
+  <div class="owner-benefits-content"><span>CONDICIÓN FLEXIBLE</span><h2 id="owner-benefits-title">Beneficios disponibles en la negociación</h2><p id="owner-benefits-summary"></p><ul id="owner-benefits-list"></ul><small>Las condiciones definitivas deben quedar incorporadas por escrito en la reserva, promesa o compraventa.</small></div>
+  <button type="button" id="owner-benefits-propose"><i data-lucide="messages-square"></i> Proponer precio o mejora</button>
+</section>
+<div class="buyer-proposal-modal" id="buyer-proposal-modal" hidden>
+  <div class="buyer-proposal-backdrop" data-close-proposal></div>
+  <section class="buyer-proposal-dialog" role="dialog" aria-modal="true" aria-labelledby="buyer-proposal-title">
+    <button type="button" class="buyer-proposal-close" data-close-proposal aria-label="Cerrar">×</button>
+    <span class="buyer-proposal-eyebrow">PROPUESTA DEL COMPRADOR</span><h2 id="buyer-proposal-title">¿Cómo te gustaría negociar?</h2>
+    <div class="buyer-proposal-types">
+      <label><input type="radio" name="buyerProposalType" value="precio"><span><strong>Proponer otro precio</strong><small>Enviar una oferta monetaria al propietario.</small></span></label>
+      <label><input type="radio" name="buyerProposalType" value="mejora"><span><strong>Mantener el precio y solicitar una mejora</strong><small>Ej. empalme, cerco, portón o camino.</small></span></label>
+      <label><input type="radio" name="buyerProposalType" value="mixta"><span><strong>Combinar precio y mejora</strong><small>Crear una propuesta flexible.</small></span></label>
+    </div>
+    <label class="buyer-proposal-field" id="buyer-offer-price-wrap" hidden><span>Precio que deseas ofrecer</span><input id="buyer-offer-price" inputmode="numeric" placeholder="$ 18.000.000"></label>
+    <label class="buyer-proposal-field" id="buyer-request-improvement-wrap" hidden><span>Mejora solicitada</span><select id="buyer-request-improvement"><option value="">Selecciona</option><option>Empalme eléctrico</option><option>Cerco perimetral</option><option>Portón de acceso</option><option>Mejoramiento del camino</option><option>Solución de agua</option><option>Limpieza del terreno</option><option>Aporte para fosa séptica</option><option>Otra mejora</option></select></label>
+    <label class="buyer-proposal-field"><span>Nombre</span><input id="buyer-proposal-name" autocomplete="name"></label>
+    <label class="buyer-proposal-field"><span>Teléfono o WhatsApp</span><input id="buyer-proposal-phone" inputmode="tel" autocomplete="tel"></label>
+    <label class="buyer-proposal-field"><span>Comentarios y condiciones</span><textarea id="buyer-proposal-notes" rows="3" placeholder="Ej. Solicito que el empalme quede instalado antes de la entrega, sujeto a factibilidad técnica."></textarea></label>
+    <button type="button" class="buyer-proposal-submit" id="buyer-proposal-submit">Enviar propuesta por WhatsApp</button>
+    <p class="buyer-proposal-note">TPL registrará la intención. La propuesta no será vinculante hasta su aceptación formal.</p>
+  </section>
+</div>
 <!-- Ficha Técnica Rápida -->
 <div class="specs-strip">
 <div class="spec-card">
@@ -368,6 +389,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <button class="lightbox-arrow lightbox-arrow-right" id="lightbox-next-btn"><i data-lucide="chevron-right"></i></button>
 </div>
 <!-- Carga del Modelo de datos -->
+<script defer src="js/tpl-seo.js?v=20260722-1"></script>
 <script defer="" src="parcelas.js?v=20260710-1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config-negocio.js"></script>
@@ -474,6 +496,8 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
         lucide.createIcons();
         return;
       }
+
+      window.TPLSEO?.applyParcel?.(p);
 
       // Si el usuario viene desde cotizador.html para cambiar parcela,
       // mostramos una invitación clara para reemplazar la parcela actual y volver al cotizador.
@@ -589,7 +613,7 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
 
       // 2. Poblar datos del DOM
       document.title = `${p.nombre} | Detalle Terreno | Tu Parcela Lista`;
-      const canonicalUrl = `https://parcelalista.cl/parcela/${encodeURIComponent(p.id)}`;
+      const canonicalUrl = `https://www.parcelalista.cl/parcela/${encodeURIComponent(p.id)}`;
       const canonical = document.querySelector('link[rel="canonical"]');
       const metaDescription = document.querySelector('meta[name="description"]');
       const ogTitle = document.querySelector('meta[property="og:title"]');
@@ -622,6 +646,28 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
       DOM.specLuz.innerText = p.luz === "si" ? "Luz Factible" : "No disponible";
       DOM.specAgua.innerText = p.agua === "si" ? "Agua factible" : "Por confirmar";
       DOM.desc.innerText = p.descripcion;
+
+      // Modalidad flexible: ofertas, mejoras ofrecidas y propuesta del comprador.
+      const negotiation=p?.comercial?.negociacion||p?.negociacion||{};
+      const negotiationMode=negotiation.modalidad||p?.negociacionPrecio||p?.comercial?.negociacionPrecio||'';
+      const improvements=Array.isArray(negotiation.mejorasOfrecidas)?negotiation.mejorasOfrecidas:(Array.isArray(p?.mejorasOfrecidas)?p.mejorasOfrecidas:[]);
+      const acceptsOffers=negotiation.aceptaOfertas===true||['ofertas','ofertas_y_mejoras'].includes(negotiationMode);
+      const acceptsImprovements=negotiation.aceptaMejoras===true||['mejoras','ofertas_y_mejoras'].includes(negotiationMode)||improvements.length>0;
+      const benefitsCard=document.getElementById('owner-benefits-card');
+      if(benefitsCard&&(acceptsOffers||acceptsImprovements)){
+        benefitsCard.hidden=false;
+        const summary=document.getElementById('owner-benefits-summary');
+        if(summary)summary.textContent=acceptsOffers&&acceptsImprovements?'El propietario puede evaluar ofertas o incorporar mejoras para facilitar la compra.':acceptsOffers?'El propietario está dispuesto a evaluar ofertas razonables.':'El propietario prefiere mantener el precio, pero puede incorporar mejoras según acuerdo.';
+        const list=document.getElementById('owner-benefits-list');
+        if(list){const items=improvements.map(item=>typeof item==='string'?item:(item.nombre||item.id)).filter(Boolean);list.innerHTML=items.length?items.map(item=>`<li><i data-lucide="circle-check"></i><span>${String(item).replaceAll('_',' ')}</span></li>`).join(''):'<li><i data-lucide="sparkles"></i><span>Mejoras disponibles para definir durante la negociación</span></li>';}
+      }
+      const proposalModal=document.getElementById('buyer-proposal-modal');
+      const openProposal=()=>{if(proposalModal){proposalModal.hidden=false;document.body.style.overflow='hidden';}};
+      const closeProposal=()=>{if(proposalModal){proposalModal.hidden=true;document.body.style.overflow='';}};
+      document.getElementById('owner-benefits-propose')?.addEventListener('click',openProposal);
+      proposalModal?.querySelectorAll('[data-close-proposal]').forEach(el=>el.addEventListener('click',closeProposal));
+      proposalModal?.querySelectorAll('input[name="buyerProposalType"]').forEach(input=>input.addEventListener('change',()=>{const type=input.value;document.getElementById('buyer-offer-price-wrap').hidden=!['precio','mixta'].includes(type);document.getElementById('buyer-request-improvement-wrap').hidden=!['mejora','mixta'].includes(type);}));
+      document.getElementById('buyer-proposal-submit')?.addEventListener('click',()=>{const type=proposalModal?.querySelector('input[name="buyerProposalType"]:checked')?.value||'';const name=document.getElementById('buyer-proposal-name')?.value.trim()||'';const phone=document.getElementById('buyer-proposal-phone')?.value.trim()||'';if(!type||!name||!phone){alert('Selecciona el tipo de propuesta e ingresa tu nombre y teléfono.');return;}const offer=document.getElementById('buyer-offer-price')?.value.trim()||'';const improvement=document.getElementById('buyer-request-improvement')?.value||'';const notes=document.getElementById('buyer-proposal-notes')?.value.trim()||'';const typeLabel=type==='precio'?'Propuesta de precio':type==='mejora'?'Solicitud de mejora':'Propuesta combinada';const msg=`Hola Tu Parcela Lista, quiero enviar una propuesta por ${p.nombre}.\n\nTipo: ${typeLabel}\n${offer?`Precio ofrecido: ${offer}\n`:''}${improvement?`Mejora solicitada: ${improvement}\n`:''}Nombre: ${name}\nTeléfono: ${phone}\n${notes?`Condiciones: ${notes}\n`:''}ID propiedad: ${p.id}`;window.open(`https://api.whatsapp.com/send?phone=56988508361&text=${encodeURIComponent(msg)}`,'_blank','noopener');closeProposal();});
 
       // Ventajas y aspectos a considerar: se muestran solo cuando el usuario los solicita.
       const radarStrengths = document.getElementById("tpl-radar-strengths");
@@ -929,5 +975,7 @@ document.addEventListener("keydown", (e) => {
   </script>
 <script defer="" src="js/site-polish.js?v=20260721-12"></script>
 <script defer="" src="js/tpl-lead-advisor.js?v=20260721-context-v4"></script>
+
+
 </body>
 </html>

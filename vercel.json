@@ -1,4 +1,14 @@
 {
+  "rewrites": [
+    {
+      "source": "/caburgua-premium",
+      "destination": "/plataforma/landing/index.html"
+    },
+    {
+      "source": "/caburgua-premium/",
+      "destination": "/plataforma/landing/index.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/publicar",

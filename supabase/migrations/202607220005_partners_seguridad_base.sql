@@ -13,10 +13,16 @@ drop policy if exists "Admin asignaciones" on public.asignaciones_proyectos;
 alter table public.contratistas enable row level security;
 alter table public.asignaciones_proyectos enable row level security;
 
+drop policy if exists "CRM administra contratistas"
+on public.contratistas;
+
 create policy "CRM administra contratistas"
 on public.contratistas for all to authenticated
 using (public.es_administrador_activo())
 with check (public.es_administrador_activo());
+
+drop policy if exists "CRM administra asignaciones"
+on public.asignaciones_proyectos;
 
 create policy "CRM administra asignaciones"
 on public.asignaciones_proyectos for all to authenticated
@@ -238,6 +244,9 @@ where estado_verificacion='verificado' and visible_publicamente=true and estado=
   and plan_activo in ('ideal','empresa','premium') and plan_estado='activo';
 
 grant select on public.partners_publicos to anon,authenticated;
+
+drop policy if exists "Público lee partners aprobados"
+on public.contratistas;
 
 create policy "Público lee partners aprobados"
 on public.contratistas for select to anon,authenticated

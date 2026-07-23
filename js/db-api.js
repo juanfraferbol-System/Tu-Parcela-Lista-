@@ -67,6 +67,15 @@ function normalizeImages(db, principal) {
   return output.length ? output : ['image/placeholder-parcela.jpg'];
 }
 
+
+function getPublicationType(db) {
+  return String(db.tipo_inmueble ?? db.tipo ?? db.datos_formulario?.tipo ?? '').trim().toLowerCase();
+}
+
+function isParcelaConCasa(db) {
+  return getPublicationType(db) === 'parcela_con_casa';
+}
+
 function mapPublicacionToParcela(db) {
   const precioNumero = firstFiniteNumber(db.precio_publicacion, db.precio, db.valor);
   const tamano = firstFiniteNumber(db.superficie_m2, db.tamano_m2, db.tamano, db.superficie);
@@ -92,6 +101,8 @@ function mapPublicacionToParcela(db) {
 
   return {
     ...db,
+    tipoInmueble: getPublicationType(db) || 'parcela',
+    esParcelaConCasa: isParcelaConCasa(db),
     id: String(db.identificador_legacy ?? db.codigo_publico ?? db.id ?? db.slug ?? crypto.randomUUID()),
     nombre: db.titulo_publico ?? db.titulo ?? db.nombre ?? 'Parcela disponible',
     precio: precioNumero
@@ -139,7 +150,7 @@ async function apiGetParcelas() {
     if (error) throw error;
     if (!Array.isArray(data) || data.length === 0) return parcelasLocales;
 
-    const remotas = data.map(mapPublicacionToParcela).sort((a, b) => (b.prioridadPromocion || 0) - (a.prioridadPromocion || 0) || Number(b.valorRespaldadoTPL) - Number(a.valorRespaldadoTPL));
+    const remotas = data.filter(row => !isParcelaConCasa(row) && getPublicationType(row) !== 'casa').map(mapPublicacionToParcela).sort((a, b) => (b.prioridadPromocion || 0) - (a.prioridadPromocion || 0) || Number(b.valorRespaldadoTPL) - Number(a.valorRespaldadoTPL));
     const idsRemotos = new Set(remotas.map(item => String(item.id)));
     const localesNoDuplicadas = parcelasLocales.filter(item => !idsRemotos.has(String(item.id)));
 
@@ -148,6 +159,24 @@ async function apiGetParcelas() {
   } catch (err) {
     console.error('Error al obtener parcelas de Supabase:', err);
     return parcelasLocales;
+  }
+}
+
+
+/** Obtiene exclusivamente propiedades donde terreno y vivienda se venden juntos. */
+async function apiGetParcelasConCasa() {
+  if (!tplDbSupabase) return [];
+  try {
+    const { data, error } = await tplDbSupabase
+      .from('publicaciones_publicas')
+      .select('*')
+      .eq('tipo_inmueble', 'parcela_con_casa')
+      .order('actualizado_en', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(mapPublicacionToParcela);
+  } catch (err) {
+    console.error('Error al obtener parcelas con casa:', err);
+    return [];
   }
 }
 
@@ -189,5 +218,6 @@ async function apiSaveLead(payload) {
 }
 
 window.apiGetParcelas = apiGetParcelas;
+window.apiGetParcelasConCasa = apiGetParcelasConCasa;
 window.apiSaveLead = apiSaveLead;
 window.tplMapPublicacionToParcela = mapPublicacionToParcela;

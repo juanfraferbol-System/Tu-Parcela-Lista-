@@ -1,3 +1,11 @@
 User-agent: *
 Allow: /
-Sitemap: https://parcelalista.cl/sitemap.xml
+Disallow: /plataforma/crm/
+Disallow: /tuparcelalistamanager/
+Disallow: /admin-crm.html
+Disallow: /admin-publicaciones.html
+Disallow: /CMR.html
+Disallow: /CRM.html
+Disallow: /pago-exitoso.html
+
+Sitemap: https://www.parcelalista.cl/sitemap.xml

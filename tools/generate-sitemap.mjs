@@ -1,0 +1,12 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
+const source=fs.readFileSync(path.join(root,"parcelas.js"),"utf8");
+const ids=[...source.matchAll(/\bid\s*:\s*["']([^"']+)["']/g)].map(m=>m[1]).filter((v,i,a)=>a.indexOf(v)===i);
+const fixed=["/","/como-comprar.html","/cotizador.html","/tecnologia.html","/plataforma/publicar/","/plataforma/partners/",...['descanso','inversion','nativas','agua'].map(c=>`/categoria.html?cat=${c}`)];
+const urls=[...fixed,...ids.map(id=>`/parcela.html?id=${encodeURIComponent(id)}`)];
+const esc=s=>s.replace(/&/g,"&amp;");
+const xml=['<?xml version="1.0" encoding="UTF-8"?>','<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',...urls.map((u,i)=>`  <url><loc>${esc('https://www.parcelalista.cl'+u)}</loc><changefreq>${i===0?'daily':'weekly'}</changefreq><priority>${i===0?'1.0':'0.8'}</priority></url>`),'</urlset>',''].join('\n');
+fs.writeFileSync(path.join(root,'sitemap.xml'),xml);
+console.log(`Sitemap generado con ${urls.length} URLs.`);

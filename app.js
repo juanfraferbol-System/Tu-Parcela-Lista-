@@ -679,6 +679,25 @@ document.addEventListener("DOMContentLoaded", () => {
     return `<div class="distance-badge">📍 ${km.toFixed(1)} km · ${mins} min aprox.</div>`;
   }
 
+
+  function renderParcelasConCasa(list = []) {
+    const section = document.getElementById('parcelas-con-casa');
+    const container = document.getElementById('parcelas-con-casa-container');
+    if (!section || !container) return;
+    if (!list.length) { section.hidden = true; container.innerHTML = ''; return; }
+    section.hidden = false;
+    container.innerHTML = list.map(p => {
+      const img = getParcelaCardImage(p);
+      const href = `parcela.html?id=${encodeURIComponent(p.id)}`;
+      const construida = Number(p.superficie_construida_m2 || p.datos_formulario?.superficie_construida_m2 || 0);
+      const habitaciones = Number(p.habitaciones || p.datos_formulario?.habitaciones || 0);
+      return `<article class="parcela-card parcela-con-casa-card">
+        <a class="card-image card-image-link" href="${href}"><img src="${img}" alt="${p.nombre}" loading="lazy" decoding="async" width="800" height="600"><span class="tpl-land-house-badge">Parcela con casa</span></a>
+        <div class="card-body"><h3 class="card-title">${p.nombre}</h3><div class="card-meta">🌳 ${Number(p.tamano||0).toLocaleString('es-CL')} m² de terreno${construida?` · 🏠 ${construida.toLocaleString('es-CL')} m² construidos`:''}${habitaciones?` · ${habitaciones} dorm.`:''}</div><div class="card-price card-price-clean">${p.precio}</div><div class="card-actions"><a class="btn-card btn-details" href="${href}">Ver propiedad</a></div></div>
+      </article>`;
+    }).join('');
+  }
+
   function renderParcelas(customList) {
     if (!DOM.parcelasContainer) return;
     const filters = state.activeFilters || {};
@@ -3082,6 +3101,10 @@ document.addEventListener("DOMContentLoaded", () => {
   populateComunas();
   addMapToolbarButtons();
   
+  if (typeof window.apiGetParcelasConCasa === 'function') {
+    window.apiGetParcelasConCasa().then(renderParcelasConCasa);
+  }
+
   if (typeof window.apiGetParcelas === 'function') {
     window.apiGetParcelas().then(data => {
       window.SERVER_PARCELAS = data;

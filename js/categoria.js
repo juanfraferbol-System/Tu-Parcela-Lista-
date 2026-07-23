@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Inyectar Configuración
-    document.title = `${config.titulo} | Tu Parcela Lista`;
+    window.TPLSEO?.applyCategory?.(config, cat);
     document.getElementById("hero-section").style.backgroundImage = `linear-gradient(to right, rgba(12,43,46,0.95), rgba(12,43,46,0.6)), url('${config.imagenHero}')`;
     document.getElementById("hero-title").textContent = config.titulo;
     document.getElementById("hero-subtitle").textContent = config.subtitulo;
