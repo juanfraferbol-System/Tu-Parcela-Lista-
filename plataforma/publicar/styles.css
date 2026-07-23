@@ -189,3 +189,36 @@ body:not([data-property-type="casa"]) .house-fields{display:none!important}
 /* TPL: selector de tres categorías */
 .property-type-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:850px){.property-type-grid{grid-template-columns:1fr}}
+/* Tasador v2: desglose y advertencias accesibles */
+.valuation-components {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.valuation-components span {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #dbe7e9;
+  border-radius: 12px;
+  background: #f7fbfb;
+  color: #334155;
+}
+.valuation-cautions {
+  margin: 18px 0 0;
+  padding: 14px 18px 14px 36px;
+  border: 1px solid #f4d99b;
+  border-radius: 14px;
+  background: #fffbeb;
+  color: #713f12;
+}
+.valuation-modal-error small {
+  display: block;
+  margin: 8px 0 14px;
+  color: #64748b;
+}
+@media (max-width: 640px) {
+  .valuation-components { grid-template-columns: 1fr; }
+}

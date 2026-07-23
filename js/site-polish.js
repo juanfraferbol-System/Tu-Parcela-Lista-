@@ -189,6 +189,8 @@
       </section>`;
     document.body.appendChild(modal);
     const slot = modal.querySelector(".tpl-extras-gate-slot");
+    const originalParent = extrasBox.parentNode;
+    const originalNextSibling = extrasBox.nextSibling;
     let pendingAction = null;
     let bypassGate = false;
 
@@ -210,7 +212,12 @@
       modal.classList.remove("active");
       modal.setAttribute("aria-hidden", "true");
       document.body.classList.remove("tpl-extras-open");
-      extrasBox.hidden = true;
+      if (originalNextSibling && originalNextSibling.parentNode === originalParent) {
+        originalParent.insertBefore(extrasBox, originalNextSibling);
+      } else {
+        originalParent.appendChild(extrasBox);
+      }
+      extrasBox.hidden = false;
     };
     const proceed = function () {
       const button = pendingAction;

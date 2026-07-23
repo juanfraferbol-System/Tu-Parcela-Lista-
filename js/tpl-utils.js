@@ -33,12 +33,6 @@
   };
 
   TPL.getGlobalArray = (name) => {
-    try {
-      // Soporta variables declaradas con const/let en scripts clásicos.
-      // Se mantiene por compatibilidad con parcelas.js y casas.js actuales.
-      const value = eval(`typeof ${name} !== "undefined" ? ${name} : undefined`);
-      if (Array.isArray(value)) return value;
-    } catch (error) {}
     const value = window[name] || globalThis[name];
     return Array.isArray(value) ? value : [];
   };
@@ -51,17 +45,9 @@
     return [];
   };
 
-  TPL.parcelasList = () => {
-    const main = TPL.getFirstArray(['parcelas', 'parcelasDisponibles', 'parcelasData']);
-    if (main.length) return main;
-    return [
-      ...TPL.getFirstArray(['parcelasPortal', 'parcelasPropias']),
-      ...TPL.getFirstArray(['parcelasDuenos', 'parcelasDueños', 'parcelasExternas'])
-    ].filter(Boolean);
-  };
-
-  TPL.casasList = () => TPL.getFirstArray(['casas', 'casasPrefabricadas', 'modelosCasas', 'casasData', 'catalogoCasas']);
-  TPL.fundacionesList = () => TPL.getFirstArray(['fundaciones', 'fundacionesInstalacion', 'fundacionesData']);
+  TPL.parcelasList = () => TPL.getGlobalArray('SERVER_PARCELAS');
+  TPL.casasList = () => TPL.getGlobalArray('SERVER_CASAS');
+  TPL.fundacionesList = () => TPL.getGlobalArray('SERVER_FUNDACIONES');
 
   TPL.parcelaPrice = (p) => TPL.parseMoney(p?.precio || p?.valor || p?.valorParcela);
   TPL.casaPrice = (c) => Number(c?.valorCasa || c?.precio || c?.valor || 0);

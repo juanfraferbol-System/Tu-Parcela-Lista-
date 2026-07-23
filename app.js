@@ -154,14 +154,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getDefaultExtraQty(extra) {
-    const id = normalizar(extra.id || extra.nombre);
+    const id = extraKey(extra);
     if (id.includes("cierre") || id.includes("cerco") || id.includes("perimetral")) {
       return estimatePerimeterFromM2(getParcelaM2(state.selectedParcela));
     }
     if (extra.tipoCalculo === "mt2" && extra.tipoCalculo2 === "casa") {
       return Number(state.selectedCasa?.metros || extra.defaultQty || 0);
     }
-    return Number(extra.defaultQty || 0);
+    return clampExtraQty(extra, Number(extra.defaultQty || 0));
+  }
+
+  function extraKey(extraOrValue) {
+    const value = typeof extraOrValue === "object"
+      ? (extraOrValue?.extraId || extraOrValue?.id || extraOrValue?.nombre)
+      : extraOrValue;
+    return normalizar(value).trim().replace(/[\s_+/-]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+
+  function clampExtraQty(extra, qty) {
+    const min = Math.max(0, Number(extra?.minQty ?? extra?.cantidad_minima ?? 1) || 1);
+    const maxValue = Number(extra?.maxQty ?? extra?.cantidad_maxima);
+    const max = Number.isFinite(maxValue) && maxValue >= min ? maxValue : Number.POSITIVE_INFINITY;
+    return Math.min(max, Math.max(min, Number(qty) || min));
   }
 
   const PREMIUM_INCLUDED_EXTRA_PATTERNS = [
@@ -171,38 +185,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function isPremiumInstallationPlan(fundacion = state.selectedFundacion) {
     if (!fundacion || !state.installationService) return false;
-    const planIndex = Array.isArray(fundaciones) ? fundaciones.findIndex(f => String(f.id) === String(fundacion.id)) : -1;
+    return getFundacionPlanCode(fundacion) === "premium";
+  }
+
+  function getFundacionPlanCode(fundacion = state.selectedFundacion) {
+    if (!fundacion) return "";
+    if (fundacion.planCode) return String(fundacion.planCode);
     const text = normalizar(`${fundacion.id || ""} ${fundacion.nombre || ""}`);
-    return planIndex === 2 || text.includes("premium") || text.includes("llave en mano") || text.includes("ceramico");
+    if (text.includes("llave en mano") || text.includes("ceramico")) return "premium";
+    if (text.includes("radier")) return "radier_full";
+    return "base";
+  }
+
+  function getFundacionExtraRule(extra, fundacion = state.selectedFundacion) {
+    const rules = Array.isArray(fundacion?.extraRules) ? fundacion.extraRules : [];
+    const targetId = String(extra?.extraId || "");
+    return rules.find(rule => String(rule.extra_id) === targetId) || null;
   }
 
   function isPremiumIncludedExtra(extra) {
+    const rule = getFundacionExtraRule(extra);
+    if (rule) return rule.estado === "incluido";
+    if (Array.isArray(state.selectedFundacion?.extraRules) && state.selectedFundacion.extraRules.length) return false;
+    if (!isPremiumInstallationPlan()) return false;
+    // Respaldo transitorio para instalaciones donde aún no se aplicó la migración.
     const text = normalizar(`${extra?.id || ""} ${extra?.nombre || ""} ${extra?.descripcion || ""}`);
     return PREMIUM_INCLUDED_EXTRA_PATTERNS.some(pattern => text.includes(normalizar(pattern)));
   }
 
   function getPremiumIncludedExtrasList() {
-    return ["Pintura interior y exterior", "Cerámica / piso cerámico", "Instalación eléctrica", "Instalación sanitaria", "Artefactos de cocina", "Artefactos de baño"];
-  }
-
-  function removePremiumIncludedExtrasFromSelection() {
-    if (!state.selectedExtras || !Array.isArray(extrasOpcionales)) return;
-    extrasOpcionales.forEach(extra => {
-      const id = extra.id || extra.nombre;
-      if (isPremiumIncludedExtra(extra)) state.selectedExtras.delete(id);
-    });
-  }
-
-  function getFundacionPlanIndex(fundacion = state.selectedFundacion) {
-    return Array.isArray(fundaciones) ? fundaciones.findIndex(f => String(f.id) === String(fundacion?.id)) : -1;
+    const rules = Array.isArray(state.selectedFundacion?.extraRules) ? state.selectedFundacion.extraRules : [];
+    if (rules.length) {
+      return rules
+        .filter(rule => rule.estado === "incluido")
+        .sort((a, b) => Number(a.orden || 0) - Number(b.orden || 0))
+        .map(rule => (Array.isArray(extrasOpcionales) ? extrasOpcionales : []).find(extra => String(extra.extraId) === String(rule.extra_id))?.nombre)
+        .filter(Boolean);
+    }
+    return isPremiumInstallationPlan()
+      ? ["Pintura interior y exterior", "Cerámica / piso cerámico", "Instalación eléctrica", "Instalación sanitaria", "Artefactos de cocina", "Artefactos de baño"]
+      : [];
   }
 
   function getInstallationPlanDisplayName(fundacion = state.selectedFundacion) {
     if (!fundacion) return "No incluido";
-    const idx = getFundacionPlanIndex(fundacion);
-    if (idx === 0) return "Pilotes + montaje";
-    if (idx === 1) return "Radier + montaje Full";
-    if (idx === 2) return "Fundación + terminaciones";
+    const code = getFundacionPlanCode(fundacion);
+    if (code === "base") return "Pilotes + montaje";
+    if (code === "radier_full") return "Radier + montaje Full";
+    if (code === "premium") return "Fundación + terminaciones";
     return fundacion.nombre || "Plan de instalación";
   }
 
@@ -246,8 +276,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (state.selectedCasa) total += Number(state.selectedCasa.valorCasa || state.selectedCasa.precio || 0);
     if (state.selectedCasa && state.installationService && state.selectedFundacion) total += getFundacionValue(state.selectedFundacion, state.selectedCasa);
     state.selectedExtras?.forEach?.((qty, id) => {
-      const extra = (Array.isArray(extrasOpcionales) ? extrasOpcionales : []).find(x => (x.id || x.nombre) === id);
-      if (extra) total += Number(extra.valor || extra.precio || 0) * Number(qty || 1);
+      const extra = (Array.isArray(extrasOpcionales) ? extrasOpcionales : []).find(x => extraKey(x) === extraKey(id));
+      if (extra && !isPremiumIncludedExtra(extra)) {
+        total += Number(extra.valor || extra.precio || 0) * clampExtraQty(extra, qty);
+      }
     });
     return total;
   }
@@ -366,11 +398,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getAllParcelas() {
-    return Array.isArray(window.SERVER_PARCELAS) ? window.SERVER_PARCELAS : (Array.isArray(parcelas) ? parcelas : []);
+    return Array.isArray(window.SERVER_PARCELAS) ? window.SERVER_PARCELAS : [];
   }
 
   function getAllCasas() {
-    return Array.isArray(casas) ? casas : [];
+    return Array.isArray(window.SERVER_CASAS) ? window.SERVER_CASAS : [];
   }
 
   function getParcelaCardImage(p) {
@@ -1104,12 +1136,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getFundacionPlanMeta(index, f) {
-    const metas = [
-      { badge: "Económico", title: "Pilotes + montaje", tag: "Menor inversión inicial", desc: "Base simple para terrenos aptos.", bullets: ["Pilotes de madera", "Montaje de la casa"] },
-      { badge: "Recomendado", title: "Radier + montaje Full", tag: "⭐ Equilibrio y firmeza", desc: "Base sólida y montaje completo.", bullets: ["Radier afinado", "Montaje Full"] },
-      { badge: "Llave en mano", title: "Fundación + terminaciones", tag: "Proyecto más completo", desc: "Para avanzar con menos coordinaciones.", bullets: ["Fundación especial", "Terminaciones principales incluidas"] }
-    ];
-    return metas[index] || { badge: `Plan ${index + 1}`, title: f.nombre || "Plan de instalación", tag: "Servicio opcional", desc: "Plan de instalación para tu proyecto.", bullets: ["Equipo especializado", "Coordinación según zona"] };
+    const metas = {
+      base: { badge: "Económico", title: "Pilotes + montaje", tag: "Menor inversión inicial", desc: "Base simple para terrenos aptos.", bullets: ["Pilotes de madera", "Montaje de la casa"] },
+      radier_full: { badge: "Recomendado", title: "Radier + montaje Full", tag: "Equilibrio y firmeza", desc: "Base sólida y montaje completo.", bullets: ["Radier afinado", "Montaje Full"] },
+      premium: { badge: "Llave en mano", title: "Fundación + terminaciones", tag: "Proyecto más completo", desc: "Para avanzar con menos coordinaciones.", bullets: ["Fundación especial", "Terminaciones principales incluidas"] }
+    };
+    return metas[getFundacionPlanCode(f)] || { badge: `Plan ${index + 1}`, title: f.nombre || "Plan de instalación", tag: "Servicio opcional", desc: "Plan de instalación para tu proyecto.", bullets: ["Equipo especializado", "Coordinación según zona"] };
   }
 
   function syncInstallationUI() {
@@ -1152,6 +1184,7 @@ document.addEventListener("DOMContentLoaded", () => {
         state.selectedFundacion = f;
         state.installationService = true;
         renderFundaciones();
+        renderExtras();
         updateCotizacionSummary();
       };
       DOM.fundacionesContainer.appendChild(btn);
@@ -1191,27 +1224,27 @@ document.addEventListener("DOMContentLoaded", () => {
     let activeExtrasCount = 0;
     let activeExtrasTotal = 0;
 
-    const premiumActive = isPremiumInstallationPlan();
+    const includedExtras = state.installationService ? getPremiumIncludedExtrasList() : [];
+    const planHasIncludedExtras = includedExtras.length > 0;
     
-    if (premiumActive) {
-      removePremiumIncludedExtrasFromSelection();
+    if (planHasIncludedExtras) {
       const included = document.createElement("div");
       included.className = "premium-included-card";
       included.style.gridColumn = "1 / -1";
       included.innerHTML = `
-        <span class="premium-included-kicker">✨ Incluido en tu Plan Premium</span>
+        <span class="premium-included-kicker">Incluido en tu plan de instalación</span>
         <strong>Estos trabajos ya forman parte del plan y no se cobran como extras.</strong>
-        <ul>${getPremiumIncludedExtrasList().map(item => `<li>✅ ${item}</li>`).join("")}</ul>`;
+        <ul>${includedExtras.map(item => `<li>✓ ${item}</li>`).join("")}</ul>`;
       DOM.opcionalesContainer.appendChild(included);
     }
     
     extrasOpcionales.forEach(e => {
-      if (premiumActive && isPremiumIncludedExtra(e)) return;
+      if (planHasIncludedExtras && isPremiumIncludedExtra(e)) return;
       
-      const id = normalizar(e.id || e.nombre);
-      const defaultQty = Math.max(1, getDefaultExtraQty(e));
+      const id = extraKey(e);
+      const defaultQty = clampExtraQty(e, getDefaultExtraQty(e));
       const isSelected = state.selectedExtras.has(id);
-      const currentQty = isSelected ? state.selectedExtras.get(id) : defaultQty;
+      const currentQty = clampExtraQty(e, isSelected ? state.selectedExtras.get(id) : defaultQty);
       const unitLabel = e.tipoCalculo === "mt2" ? "m²" : (e.tipoCalculo === "metro" ? "ml" : (e.tipoCalculo || "unidad"));
       
       const pricePerUnit = e.valor || e.precio || 0;
@@ -1267,7 +1300,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const btnPlus = card.querySelector(".plus");
       
       const sync = (selected, qty = currentQty) => {
-        qty = Math.max(1, qty);
+        qty = clampExtraQty(e, qty);
         if (selected) state.selectedExtras.set(id, qty); 
         else state.selectedExtras.delete(id);
         
@@ -1308,14 +1341,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnLlave = document.getElementById("btn-pack-llave");
     if (btnLlave) {
       btnLlave.onclick = () => {
-        const packKeys = ["piso ceramico", "instalacion_electrica", "instalacion_sanitaria", "pintura", "fosa_septica"];
+        const packKeys = ["instalacion_electrica", "empalme_electrico", "instalacion_sanitaria", "fosa_septica", "artefactos_cocina", "artefactos_bano", "pozo_profundo"];
         let added = false;
         packKeys.forEach(k => {
-          const normKey = normalizar(k);
+          const normKey = extraKey(k);
           if (!state.selectedExtras.has(normKey)) {
-            const extra = extrasOpcionales.find(e => normalizar(e.id || e.nombre) === normKey);
+            const extra = extrasOpcionales.find(e => extraKey(e) === normKey);
             if (extra) {
-              state.selectedExtras.set(normKey, Math.max(1, getDefaultExtraQty(extra)));
+              state.selectedExtras.set(normKey, clampExtraQty(extra, getDefaultExtraQty(extra)));
               added = true;
             }
           }
@@ -1405,13 +1438,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     state.selectedExtras.forEach((qty, id) => {
-      const e = extrasOpcionales.find(x => normalizar(x.id || x.nombre) === normalizar(id));
+      const e = extrasOpcionales.find(x => extraKey(x) === extraKey(id));
       if (!e) return;
-      const val = Number(e.valor || e.precio || 0) * qty;
+      if (isPremiumIncludedExtra(e)) return;
+      const safeQty = clampExtraQty(e, qty);
+      const val = Number(e.valor || e.precio || 0) * safeQty;
       extrasSubtotal += val;
       const unitLabel = e.tipoCalculo === "mt2" ? "m²" : (e.tipoCalculo === "metro" ? "ml" : (e.tipoCalculo || "unidad"));
       total += val;
-      rows.push([`<span style="padding-left:15px; font-size:0.9rem;">${e.nombre} — ${qty} ${unitLabel}</span>`, val]);
+      rows.push([`<span style="padding-left:15px; font-size:0.9rem;">${e.nombre} — ${safeQty} ${unitLabel}</span>`, val]);
     });
 
     if (hasExtras) {
@@ -1442,21 +1477,57 @@ document.addEventListener("DOMContentLoaded", () => {
   function getExtrasText() {
     if (!state.selectedExtras || !state.selectedExtras.size) return "Sin adicionales seleccionados";
     return [...state.selectedExtras.entries()].map(([id, qty]) => {
-      const e = (Array.isArray(extrasOpcionales) ? extrasOpcionales : []).find(x => (x.id || x.nombre) === id);
+      const e = (Array.isArray(extrasOpcionales) ? extrasOpcionales : []).find(x => extraKey(x) === extraKey(id));
       if (!e) return `• ${id}: ${qty}`;
+      if (isPremiumIncludedExtra(e)) return null;
       const unitLabel = e.tipoCalculo === "mt2" ? "m²" : (e.tipoCalculo === "metro" ? "ml" : (e.tipoCalculo || "unidad"));
-      return `• ${e.nombre}: ${qty} ${unitLabel}`;
-    }).join("\n");
+      return `• ${e.nombre}: ${clampExtraQty(e, qty)} ${unitLabel}`;
+    }).filter(Boolean).join("\n") || "Sin adicionales seleccionados";
+  }
+
+  function getCotizacionItems() {
+    const items = [];
+    if (state.installationService && state.selectedFundacion && state.selectedCasa) {
+      const unitPrice = Number(state.selectedFundacion.valorM2 || state.selectedFundacion.valor || state.selectedFundacion.precio || 0);
+      const qty = Number(state.selectedCasa.metros || state.selectedCasa.m2 || 0);
+      items.push({
+        id: state.selectedFundacion.extraId || state.selectedFundacion.id,
+        tipo: "fundacion",
+        nombre: getInstallationPlanDisplayName(),
+        cantidad: qty,
+        unidad: "m²",
+        precio: unitPrice,
+        subtotal: unitPrice * qty,
+        snapshot: { planCode: getFundacionPlanCode(), catalogo: state.selectedFundacion.nombre || "" }
+      });
+    }
+    (Array.isArray(extrasAutomaticos) ? extrasAutomaticos : []).forEach(extra => {
+      const qty = clampExtraQty(extra, getDefaultExtraQty(extra));
+      const price = Number(extra.valor || extra.precio || 0);
+      items.push({ id: extra.extraId || extra.id, tipo: "extra_automatico", nombre: extra.nombre, cantidad: qty, unidad: extra.tipoCalculo || "unidad", precio: price, subtotal: price * qty });
+    });
+    state.selectedExtras.forEach((qty, id) => {
+      const extra = (Array.isArray(extrasOpcionales) ? extrasOpcionales : []).find(item => extraKey(item) === extraKey(id));
+      if (!extra || isPremiumIncludedExtra(extra)) return;
+      const safeQty = clampExtraQty(extra, qty);
+      const price = Number(extra.valor || extra.precio || 0);
+      items.push({ id: extra.extraId || extra.id, tipo: "extra", nombre: extra.nombre, cantidad: safeQty, unidad: extra.tipoCalculo || "unidad", precio: price, subtotal: price * safeQty });
+    });
+    return items;
   }
 
   function getCotizacionData() {
     const parcela = state.selectedParcela || null;
     const casa = state.selectedCasa || null;
     const fundacion = state.selectedFundacion || null;
+    const items = getCotizacionItems();
+    const totalNum = parseClp(parcela?.precio) + Number(casa?.valorCasa || casa?.precio || 0) + items.reduce((sum, item) => sum + Number(item.subtotal || 0), 0);
     return {
       parcela,
       casa,
       fundacion,
+      items,
+      totalNum,
       total: DOM.totalAmount?.textContent || "$0",
       rowsText: getCotizacionRowsText(),
       extrasText: getExtrasText(),
@@ -2013,7 +2084,6 @@ document.addEventListener("DOMContentLoaded", () => {
       state.installationService = !!DOM.installationServiceToggle.checked;
       if (state.installationService && !state.selectedFundacion) state.selectedFundacion = getCheapestFundacion();
       if (!state.installationService) state.selectedFundacion = null;
-      if (isPremiumInstallationPlan()) removePremiumIncludedExtrasFromSelection();
       renderFundaciones();
       renderExtras();
       updateCotizacionSummary();
@@ -2492,10 +2562,10 @@ document.addEventListener("DOMContentLoaded", () => {
             p_cliente_nombre: 'Cliente Web Anonimo',
             p_cliente_email: 'anonimo@tuparcelalista.cl',
             p_cliente_telefono: '',
-            p_parcela_id: state.selectedParcela ? (state.selectedParcela.uuid || null) : null,
+            p_parcela_id: state.selectedParcela ? (state.selectedParcela.publicacionId || null) : null,
             p_casa_codigo: state.selectedCasa ? state.selectedCasa.id.toString() : null,
             p_total: data.totalNum || 0,
-            p_extras: []
+            p_extras: data.items
           })
         });
         if (res.ok) {
@@ -2547,10 +2617,10 @@ document.addEventListener("DOMContentLoaded", () => {
               p_cliente_nombre: cliente.nombre || 'Cliente Web Activacion',
               p_cliente_email: cliente.email || 'activacion@tuparcelalista.cl',
               p_cliente_telefono: cliente.telefono || '',
-              p_parcela_id: state.selectedParcela ? (state.selectedParcela.uuid || null) : null,
+              p_parcela_id: state.selectedParcela ? (state.selectedParcela.publicacionId || null) : null,
               p_casa_codigo: state.selectedCasa ? state.selectedCasa.id.toString() : null,
               p_total: data.totalNum || 0,
-              p_extras: []
+              p_extras: data.items
             })
           });
           if (res.ok) {
@@ -2805,7 +2875,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (name) name.textContent = parcela.nombre || "Parcela seleccionada";
     if (meta) meta.textContent = `${parcela.comuna || "Chile"} · ${superficie} m² · ${parcela.precio || "Consultar"}`;
     if (distance) distance.textContent = "Activa tu ubicación para calcular distancia.";
-    if (directions) directions.href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(parcela.lat + "," + parcela.lng)}`;
+    if (directions) directions.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parcela.lat + "," + parcela.lng)}`;
     if (waze) waze.href = `https://waze.com/ul?ll=${encodeURIComponent(parcela.lat + "," + parcela.lng)}&navigate=yes`;
     if (detail) detail.href = `parcela.html?id=${encodeURIComponent(parcela.id)}`;
 
@@ -3101,20 +3171,29 @@ document.addEventListener("DOMContentLoaded", () => {
   populateComunas();
   addMapToolbarButtons();
   
-  if (typeof window.apiGetParcelasConCasa === 'function') {
-    window.apiGetParcelasConCasa().then(renderParcelasConCasa);
-  }
-
-  if (typeof window.apiGetParcelas === 'function') {
-    window.apiGetParcelas().then(data => {
-      window.SERVER_PARCELAS = data;
+  if (window.TPLCatalog?.ready) {
+    window.TPLCatalog.ready.then(({ parcelas, casas, extras, fundaciones }) => {
+      window.SERVER_PARCELAS = parcelas;
+      window.SERVER_CASAS = casas;
+      window.extrasOpcionales = extras;
+      window.fundaciones = fundaciones;
       hydrateFromUrlOrStorage();
       renderParcelas();
+      renderCasas();
+      renderFundaciones();
+      renderExtras();
+      renderProjectPromos();
       populateComunas(); 
+      return window.apiGetParcelasConCasa?.();
+    }).then((combined) => {
+      if (combined) renderParcelasConCasa(combined);
+    }).catch((error) => {
+      console.error('No fue posible cargar el catálogo público desde Supabase:', error);
+      const container = document.getElementById('parcelas-container');
+      if (container) container.innerHTML = '<p class="tpl-catalog-error">No pudimos cargar las propiedades. Recarga la página para intentarlo nuevamente.</p>';
     });
   } else {
-    hydrateFromUrlOrStorage();
-    renderParcelas();
+    console.error('TPLCatalog no está disponible.');
   }
   renderCasas();
   renderFundaciones();

@@ -216,6 +216,8 @@
           ${field('casa-banos', 'Baños', h.banos, 'number', 'min="0" step="1" required')}
           ${field('casa-precio', 'Precio base', h.precio_base, 'number', 'min="0" step="1" required')}
           ${field('casa-tipo', 'Tipo de construcción', h.tipo_construccion)}
+          ${field('casa-empresa', 'Empresa', h.empresa)}
+          ${field('casa-tiempo', 'Tiempo de entrega', h.tiempo_entrega)}
           ${field('casa-plano', 'URL del plano', h.plano_url)}
           ${field('casa-imagen', 'URL imagen principal', h.imagen_principal_url)}
           ${field('casa-imagenes', 'Imágenes adicionales (separadas por comas)', Array.isArray(h.imagenes) ? h.imagenes.join(', ') : '')}
@@ -236,6 +238,7 @@
       codigo: val('casa-codigo') || null, nombre: val('casa-nombre'), descripcion: val('casa-descripcion') || null,
       superficie_m2: numberOrNull('casa-superficie'), habitaciones: numberOrNull('casa-habitaciones'), banos: numberOrNull('casa-banos'),
       precio_base: numberOrNull('casa-precio'), tipo_construccion: val('casa-tipo') || null, plano_url: val('casa-plano') || null,
+      empresa: val('casa-empresa') || null, tiempo_entrega: val('casa-tiempo') || null,
       imagen_principal_url: val('casa-imagen') || null, imagenes: csv('casa-imagenes'), activa: bool('casa-activa'), destacada: bool('casa-destacada')
     };
     if (!payload.nombre || payload.superficie_m2 == null || payload.habitaciones == null || payload.banos == null || payload.precio_base == null) {
@@ -249,11 +252,77 @@
     await loadHouses();
   }
 
+  async function loadExtras() {
+    const client = getClient();
+    const body = document.getElementById('table-body-extras');
+    if (!client || !body) return;
+    body.innerHTML = '<tr><td colspan="6">Cargando catálogo…</td></tr>';
+    const { data, error } = await client.rpc('crm_listar_extras_admin');
+    if (error) {
+      console.error('Error cargando extras:', error);
+      body.innerHTML = '<tr><td colspan="6" class="error-msg">Aplica primero la migración del catálogo canónico.</td></tr>';
+      return;
+    }
+    body.innerHTML = (data || []).map((item) => `<tr>
+      <td><strong>${esc(item.nombre)}</strong><br><small>${esc(item.codigo || '')}</small></td>
+      <td>${esc(item.categoria)}</td><td>${esc(item.tipo_calculo)}</td><td>${money(item.precio_base)}</td>
+      <td><span class="badge ${item.activo ? 'aprobada' : 'rechazada'}">${item.activo ? 'Activo' : 'Inactivo'}</span></td>
+      <td><button class="btn-action" data-edit-extra="${esc(item.id)}">Editar</button></td>
+    </tr>`).join('') || '<tr><td colspan="6">No hay extras registrados.</td></tr>';
+    body.querySelectorAll('[data-edit-extra]').forEach((button) => button.addEventListener('click', () => {
+      const item = (data || []).find((row) => row.id === button.dataset.editExtra);
+      openExtraEditor(item);
+    }));
+  }
+
+  function openExtraEditor(item = null) {
+    const modal = document.getElementById('modal-detalle');
+    const content = document.getElementById('modal-content');
+    const actions = document.getElementById('modal-actions');
+    if (!modal || !content || !actions) return;
+    const x = item || { categoria: 'opcional', tipo_calculo: 'unidad', activo: true, cantidad_default: 1, cantidad_minima: 1, cantidad_maxima: 1 };
+    modal.classList.add('active');
+    content.innerHTML = `<form class="catalog-form"><div class="catalog-section-title"><h3>${item ? 'Editar' : 'Nuevo'} extra o fundación</h3></div><div class="catalog-grid">
+      ${field('extra-codigo','Código',x.codigo,'text','required')}${field('extra-nombre','Nombre',x.nombre,'text','required')}
+      ${field('extra-categoria','Categoría (opcional/fundacion)',x.categoria)}${field('extra-calculo','Tipo de cálculo',x.tipo_calculo)}
+      ${field('extra-precio','Precio base',x.precio_base,'number','min="0" required')}${field('extra-unidad','Unidad',x.unidad)}
+      ${field('extra-empresa','Empresa',x.empresa)}${field('extra-aplica','Aplica a (casa/parcela)',x.aplica_a)}
+      ${field('extra-default','Cantidad predeterminada',x.cantidad_default,'number','min="0"')}${field('extra-min','Cantidad mínima',x.cantidad_minima,'number','min="0"')}
+      ${field('extra-max','Cantidad máxima',x.cantidad_maxima,'number','min="0"')}${textarea('extra-descripcion','Descripción',x.descripcion,4)}
+      <div class="catalog-span-2 catalog-check-row">${checkbox('extra-activo','Activo',x.activo)}</div>
+    </div></form>`;
+    actions.innerHTML = '<button type="button" class="btn-secondary" id="btn-close-extra">Cerrar</button><button type="button" class="btn-primary" id="btn-save-extra">Guardar</button>';
+    document.getElementById('btn-close-extra')?.addEventListener('click', () => modal.classList.remove('active'));
+    document.getElementById('btn-save-extra')?.addEventListener('click', () => saveExtra(item?.id || null));
+  }
+
+  async function saveExtra(id) {
+    const client = getClient();
+    const button = document.getElementById('btn-save-extra');
+    const payload = {
+      codigo: val('extra-codigo'), nombre: val('extra-nombre'), descripcion: val('extra-descripcion') || null,
+      categoria: val('extra-categoria') || 'opcional', tipo_calculo: val('extra-calculo') || 'unidad',
+      precio_base: numberOrNull('extra-precio'), unidad: val('extra-unidad') || null, empresa: val('extra-empresa') || null,
+      aplica_a: val('extra-aplica') || null, cantidad_default: numberOrNull('extra-default') ?? 1,
+      cantidad_minima: numberOrNull('extra-min') ?? 1, cantidad_maxima: numberOrNull('extra-max') ?? 1, activo: bool('extra-activo')
+    };
+    if (!client || !button || !payload.codigo || !payload.nombre || payload.precio_base == null) return alert('Completa código, nombre y precio.');
+    button.disabled = true;
+    const { error } = await client.rpc('crm_guardar_extra_admin', { p_extra_id: id, p_datos: payload });
+    button.disabled = false;
+    if (error) return alert(`No se pudo guardar: ${error.message}`);
+    document.getElementById('modal-detalle')?.classList.remove('active');
+    await loadExtras();
+  }
+
   function init() {
     window.verDetalle = openParcelEditor;
     document.getElementById('btn-refresh-casas')?.addEventListener('click', loadHouses);
     document.getElementById('btn-new-house')?.addEventListener('click', () => openHouseEditor());
     document.querySelector('[data-target="view-casas"]')?.addEventListener('click', loadHouses);
+    document.getElementById('btn-refresh-extras')?.addEventListener('click', loadExtras);
+    document.getElementById('btn-new-extra')?.addEventListener('click', () => openExtraEditor());
+    document.querySelector('[data-target="view-extras"]')?.addEventListener('click', loadExtras);
   }
 
   document.addEventListener('DOMContentLoaded', init);

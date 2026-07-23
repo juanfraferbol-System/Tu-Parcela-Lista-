@@ -6,7 +6,7 @@ const LEGAL_NOTICE='Tasador TPL entrega una estimación comercial referencial ba
 
 function allowedOrigins(){
  const configured=String(Deno.env.get('TPL_ALLOWED_ORIGINS')||'').split(',').map(value=>value.trim()).filter(Boolean);
- return new Set(['https://parcelalista.cl','https://www.parcelalista.cl','http://127.0.0.1:8765','http://localhost:8765',...configured]);
+ return new Set(['https://parcelalista.cl','https://www.parcelalista.cl','http://127.0.0.1:8765','http://localhost:8765','http://127.0.0.1:5500','http://localhost:5500','http://127.0.0.1:8000','http://localhost:8000',...configured]);
 }
 
 function corsHeaders(origin:string){return {'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Max-Age':'86400','Vary':'Origin'};}

@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const LANDING_CODE = 'land-caburgua';
+  let records = [];
   let record = null;
   const esc = (value) => String(value ?? '').replace(
     /[&<>'"]/g,
@@ -94,7 +94,8 @@
   async function load() {
     status('Cargando configuración…');
     try {
-      record = await repository().getAdmin(LANDING_CODE);
+      records = await repository().listAdmin();
+      record = records[0] || null;
       render();
       status('');
     } catch (error) {
@@ -107,36 +108,42 @@
 
   function render() {
     const root = document.getElementById('landing-list');
-    if (!root || !record) return;
-    const landing = record.draft || record.published || {};
-    const stateLabel = {
-      borrador: 'Borrador',
-      publicada: 'Publicada',
-      archivada: 'Archivada'
-    }[record.status] || record.status;
-
-    root.innerHTML = `
+    if (!root) return;
+    if (!records.length) {
+      root.innerHTML = '<p>No existen Landings preparadas todavía.</p>';
+      return;
+    }
+    root.innerHTML = records.map((item) => {
+      const landing = item.draft || item.published || {};
+      const stateLabel = {
+        borrador: 'Borrador',
+        publicada: 'Publicada',
+        archivada: 'Archivada'
+      }[item.status] || item.status;
+      return `
       <article class="landing-card">
         <div class="landing-card-image" style="background-image:url('${esc(landing.heroImage)}')">
-          <span class="landing-state ${esc(record.status)}">${esc(stateLabel)}</span>
+          <span class="landing-state ${esc(item.status)}">${esc(stateLabel)}</span>
           <div class="landing-score good"><strong>${score(landing)}</strong><span>/100</span></div>
         </div>
         <div class="landing-card-body">
           <span class="eyebrow">${esc(landing.template || 'parcela-premium')}</span>
           <h3>${esc(landing.title || 'Landing sin título')}</h3>
-          <p>Última actualización: ${esc(formatDate(record.updatedAt))}</p>
-          <p>Modificada por: ${esc(record.updatedBy || 'Sin usuario registrado')}</p>
+          <p>Última actualización: ${esc(formatDate(item.updatedAt))}</p>
+          <p>Código: ${esc(item.code)}</p>
           <div class="landing-actions">
-            <button data-landing-edit>Editar</button>
-            <a href="/plataforma/landing/?id=${encodeURIComponent(record.code)}&preview=1" target="_blank" rel="noopener">Vista previa</a>
+            <button data-landing-edit="${esc(item.code)}">Editar</button>
+            <a href="/plataforma/landing/?id=${encodeURIComponent(item.code)}&preview=1" target="_blank" rel="noopener">Vista previa</a>
             <a href="${esc(landing.publicUrl || '/caburgua-premium')}" target="_blank" rel="noopener">Vista pública</a>
-            <button class="business-primary" data-landing-publish>Publicar cambios</button>
+            <button class="business-primary" data-landing-publish="${esc(item.code)}">Publicar cambios</button>
           </div>
         </div>
       </article>`;
+    }).join('');
   }
 
-  function editor() {
+  function editor(code) {
+    record = records.find((item) => item.code === code) || null;
     if (!record) return;
     const landing = record.draft || record.published || {};
     let modal = document.getElementById('landing-modal');
@@ -228,6 +235,7 @@
       const draft = configuration(form);
       const result = await repository().saveDraft(record.code, draft);
       record = { ...record, draft, updatedAt: result.updatedAt, updatedBy: result.updatedBy };
+      records = records.map((item) => item.code === record.code ? record : item);
       node.textContent = 'Cambios guardados.';
       node.className = 'wide landing-engine-status success';
       render();
@@ -241,8 +249,9 @@
     }
   }
 
-  async function publish() {
-    const button = document.querySelector('[data-landing-publish]');
+  async function publish(code) {
+    record = records.find((item) => item.code === code) || null;
+    const button = document.querySelector(`[data-landing-publish="${CSS.escape(code)}"]`);
     if (!record || !button) return;
     button.disabled = true;
     button.textContent = 'Publicando…';
@@ -250,6 +259,7 @@
     try {
       const result = await repository().publish(record.code);
       record = await repository().getAdmin(record.code);
+      records = records.map((item) => item.code === record.code ? record : item);
       render();
       status(`Publicado correctamente. Versión ${result.version}.`, 'success');
     } catch (error) {
@@ -265,8 +275,10 @@
   }
 
   function handleClick(event) {
-    if (event.target.closest('[data-landing-edit]')) editor();
-    if (event.target.closest('[data-landing-publish]')) publish();
+    const edit = event.target.closest('[data-landing-edit]');
+    const publishButton = event.target.closest('[data-landing-publish]');
+    if (edit) editor(edit.dataset.landingEdit);
+    if (publishButton) publish(publishButton.dataset.landingPublish);
     if (event.target.closest('[data-landing-close]') || event.target.id === 'landing-modal') close();
   }
 

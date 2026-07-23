@@ -390,10 +390,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </div>
 <!-- Carga del Modelo de datos -->
 <script defer src="js/tpl-seo.js?v=20260722-1"></script>
-<script defer="" src="parcelas.js?v=20260710-1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config-negocio.js"></script>
-<script src="js/db-api.js"></script>
+<script src="js/db-api.js?v=20260723-catalog-v2"></script>
 <script src="js/core/event-bus.js"></script>
 <script src="js/core/orchestrator.js"></script>
 <script src="js/tpl-launch.js"></script>
@@ -406,15 +405,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       const params = new URLSearchParams(window.location.search);
       const parcelaId = params.get("id");
 
-      // Buscar parcela: primero en Supabase y, si no está disponible, en el catálogo local.
-      let inventario = Array.isArray(window.parcelas) ? window.parcelas : (typeof parcelas !== "undefined" && Array.isArray(parcelas) ? parcelas : []);
-      if (typeof window.apiGetParcelas === "function") {
-        try {
-          inventario = await window.apiGetParcelas();
-          window.SERVER_PARCELAS = inventario;
-        } catch (error) {
-          console.error("No fue posible cargar la ficha desde Supabase; se usará el catálogo local.", error);
-        }
+      // La ficha utiliza exclusivamente el catálogo canónico de Supabase.
+      let inventario = [];
+      try {
+        const catalogo = await window.TPLCatalog.ready;
+        inventario = catalogo.parcelas;
+      } catch (error) {
+        console.error("No fue posible cargar la ficha desde Supabase.", error);
+        document.getElementById("error-container")?.removeAttribute("hidden");
+        return;
       }
       const p = inventario.find(item => String(item.id) === String(parcelaId));
 
@@ -707,7 +706,14 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
       });
 
       // Coordenadas y Mapas
-      DOM.googleMapsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=driving`;
+      const mapLat = Number(p.lat);
+      const mapLng = Number(p.lng);
+      if (Number.isFinite(mapLat) && Number.isFinite(mapLng) && (mapLat !== 0 || mapLng !== 0)) {
+        DOM.googleMapsBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${mapLat},${mapLng}`)}`;
+        DOM.googleMapsBtn.hidden = false;
+      } else {
+        DOM.googleMapsBtn.hidden = true;
+      }
 
       // Mapa visible en la ficha de parcela: referencia aproximada con localidades y caminos.
       if (DOM.detailMap && window.L && p.lat && p.lng) {

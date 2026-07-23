@@ -32,6 +32,10 @@
   }
 
   const repository = {
+    async listAdmin() {
+      return rpc('tpl_listar_landings_admin', {});
+    },
+
     async getPublished(identifier) {
       const result = await rpc('tpl_obtener_landing_publica', {
         p_identificador: String(identifier || '').trim()

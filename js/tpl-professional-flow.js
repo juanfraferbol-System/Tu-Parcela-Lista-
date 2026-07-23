@@ -335,6 +335,7 @@
     // app.js también renderiza promos; esta capa final asegura 5 promociones económicas.
     setTimeout(renderPromosFinal, 200);
     setTimeout(renderPromosFinal, 900);
+    window.addEventListener('tpl:catalog-ready', renderPromosFinal, { once: true });
   }
 
   if (document.readyState === "loading") {

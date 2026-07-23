@@ -37,8 +37,14 @@ function calculate(input={}){
  let total=adjustments.reduce((s,x)=>s+x.pct,0); total=Math.max(RULES.maxNegative,Math.min(RULES.maxPositive,total));
  const base=Math.round(area*baseM2); const ideal=Math.round(base*(1+total)/10000)*10000;
  const quick=Math.round(ideal*.92/10000)*10000,patient=Math.round(ideal*1.09/10000)*10000,asking=num(input.asking),diff=asking&&ideal?((asking-ideal)/ideal*100):0;
- const completeness=[input.material,input.quality,input.condition,input.year,input.regularization,input.minutesToCenter||input.kmToCenter,input.road].filter(Boolean).length;
- return {quick,ideal,patient,reference:ideal,low:quick,high:patient,asking,diff,area,location:input.location,region:input.region,base,basePriceM2:baseM2,totalPct:total,adjustments,score:Math.min(92,42+completeness*7),method:'tpl-house-rules-pilot-v1',houseOnly:true,urbanReference:input.urbanReference||'',note:'Valor estimado solo de la construcción. No incluye el terreno ni modifica el tasador de parcelas.'};
+ const auditedFields=[input.material,input.quality,input.condition,input.year,input.regularization,input.remodeling,input.minutesToCenter||input.kmToCenter,input.road,input.insulation,input.windows,input.water,input.sanitary,input.heating,input.parking,input.bedrooms,input.bathrooms,input.floors];
+ const completeness=auditedFields.filter(value=>value!==null&&value!==undefined&&value!=='').length;
+ const fieldCoverage={present:completeness,total:auditedFields.length,pct:Math.round(completeness/auditedFields.length*100),label:completeness>=14?'Completa':completeness>=9?'Suficiente':'Inicial'};
+ const cautions=[];
+ if(!input.water||!input.sanitary)cautions.push('Agua y solución sanitaria mejoran la calidad del informe, pero no alteran el precio sin una regla comercial aprobada.');
+ if(!input.bedrooms||!input.bathrooms)cautions.push('Dormitorios y baños fueron auditados como cobertura; aún no cuentan con ponderación monetaria propia.');
+ cautions.push('Valor estimado solo de la construcción. No incluye el terreno.');
+ return {quick,ideal,patient,reference:ideal,low:quick,high:patient,asking,diff,area,location:input.location,region:input.region,base,basePriceM2:baseM2,totalPct:total,adjustments,score:Math.min(92,35+Math.round(fieldCoverage.pct*.57)),coverage:'reglas_construccion',fieldCoverage,cautions,method:'tpl-house-rules-pilot-v2',houseOnly:true,urbanReference:input.urbanReference||'',note:'Valor estimado solo de la construcción. No incluye el terreno ni modifica el tasador de parcelas.'};
 }
 window.TPLHouseValuation={RULES,calculate};
 })();

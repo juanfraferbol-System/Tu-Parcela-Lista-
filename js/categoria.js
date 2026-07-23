@@ -183,14 +183,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById("btn-cta").textContent = config.textoCta;
 
-    // Obtener parcelas
-    // Asumimos que parcelas.js está cargado en window.parcelas.
-    // También validaremos si app.js expone window.getAllParcelas().
+    // Obtener parcelas exclusivamente desde el catálogo canónico.
     let listaOriginal = [];
-    if (typeof window.getAllParcelas === 'function') {
-      listaOriginal = window.getAllParcelas();
-    } else if (typeof parcelas !== 'undefined') {
-      listaOriginal = parcelas;
+    try {
+      listaOriginal = (await window.TPLCatalog.ready).parcelas;
+    } catch (error) {
+      console.error('No fue posible cargar la categoría desde Supabase:', error);
+      document.getElementById("categoria-parcelas-grid").innerHTML =
+        '<p>No pudimos cargar las propiedades. Recarga la página para intentarlo nuevamente.</p>';
+      return;
     }
 
     // Calcular contexto

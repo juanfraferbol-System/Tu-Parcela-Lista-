@@ -1,5 +1,5 @@
 // cotizador.js - Premium client-side logic for Tu Parcela Lista Cotizador
-// Handles selection of parcel and house from localStorage, rendering custom card UIs, and dynamic calculation.
+// Handles the user's selection IDs in localStorage. Commercial catalog data is loaded from Supabase.
 /**
  * Utility to format numbers as Chilean Pesos (CLP) or general currency.
  */
@@ -691,7 +691,15 @@ function updateSummary() {
 /**
  * Initialize Cotizador Page setup.
  */
-function initCotizador() {
+async function initCotizador() {
+  try {
+    await window.TPLCatalog.ready;
+  } catch (error) {
+    console.error('[TPL] No fue posible cargar el catálogo del cotizador', error);
+    const section = document.getElementById('cotizador-page');
+    if (section) section.innerHTML = '<div class="container" role="alert"><h2>No pudimos cargar el cotizador</h2><p>Intenta recargar la página. Si el problema continúa, contáctanos.</p></div>';
+    return;
+  }
   const storedId = localStorage.getItem('selectedParcelaId');
   const storedCasaId = localStorage.getItem('selectedCasaId');
   if (false && !storedId) {
