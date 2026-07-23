@@ -1,111 +1,274 @@
 (() => {
   'use strict';
-  const BUSINESS_KEY = 'tpl_business_v1';
-  const LANDING_KEY = 'tpl_landing_engine_v1';
-  const esc = (v) => String(v ?? '').replace(/[&<>'"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-  const seed = (window.TPL_PUBLIC_LANDINGS || []).map((landing) => ({
-    ...landing,
-    updatedAt: landing.updatedAt || new Date().toISOString()
-  }));
-  let state = load();
-  function load(){
-    try {
-      const stored=JSON.parse(localStorage.getItem(LANDING_KEY)||'[]');
-      const merged=new Map(seed.map((landing)=>[landing.id,structuredClone(landing)]));
-      if(Array.isArray(stored))stored.forEach((landing)=>{
-        if(!landing?.id)return;
-        merged.set(landing.id,{...(merged.get(landing.id)||{}),...landing});
+
+  const LANDING_CODE = 'land-caburgua';
+  let record = null;
+  const esc = (value) => String(value ?? '').replace(
+    /[&<>'"]/g,
+    (character) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[character])
+  );
+
+  function repository() {
+    if (!window.TPLLandingRepository) {
+      throw new Error('El repositorio de Landing no está disponible.');
+    }
+    return window.TPLLandingRepository;
+  }
+
+  function status(message, type = '') {
+    const node = document.getElementById('landing-engine-status');
+    if (!node) return;
+    node.textContent = message;
+    node.className = `landing-engine-status ${type}`.trim();
+  }
+
+  function formatDate(value) {
+    if (!value) return 'Sin actualización registrada';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime())
+      ? 'Sin actualización registrada'
+      : date.toLocaleString('es-CL');
+  }
+
+  function score(landing = {}) {
+    const parts = {
+      hero: landing.title && landing.subtitle && landing.heroImage ? 15 : 0,
+      gallery: Array.isArray(landing.gallery) ? Math.min(15, landing.gallery.filter(Boolean).length * 4) : 0,
+      video: landing.videoUrl ? 10 : 0,
+      cta: landing.ctaPrimary && landing.ctaSecondary ? 15 : landing.ctaPrimary ? 9 : 0,
+      seo: landing.seoTitle && landing.seoDescription ? 20 : landing.seoTitle || landing.seoDescription ? 10 : 0,
+      analytics: landing.analyticsEnabled ? 10 : 0,
+      speed: landing.heroImage && !landing.heroImage.match(/\.(png|jpg|jpeg)$/i) ? 10 : 6,
+      form: landing.formEnabled ? 5 : 0
+    };
+    return Object.values(parts).reduce((total, value) => total + value, 0);
+  }
+
+  function install() {
+    const nav = document.querySelector('.sidebar-nav');
+    const main = document.querySelector('.main-content');
+    if (!nav || !main || document.getElementById('view-landing-engine')) return;
+
+    const link = document.createElement('a');
+    link.href = '#';
+    link.className = 'nav-item';
+    link.dataset.target = 'view-landing-engine';
+    link.innerHTML = '<i data-lucide="panels-top-left"></i> Landing Engine';
+    nav.append(link);
+
+    const view = document.createElement('div');
+    view.id = 'view-landing-engine';
+    view.className = 'dashboard-section';
+    view.style.display = 'none';
+    view.innerHTML = `
+      <section class="business-hero landing-engine-hero">
+        <div>
+          <span class="eyebrow">TPL BUSINESS</span>
+          <h2>Landing Engine</h2>
+          <p>Los borradores y la versión pública se administran desde Supabase.</p>
+        </div>
+      </section>
+      <p id="landing-engine-status" class="landing-engine-status" role="status" aria-live="polite"></p>
+      <div id="landing-list" class="landing-grid"></div>`;
+    main.append(view);
+
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      document.querySelectorAll('.dashboard-section').forEach((section) => {
+        section.classList.remove('active-section');
+        section.style.display = 'none';
       });
-      return [...merged.values()];
-    } catch {
-      return structuredClone(seed);
+      document.querySelectorAll('.nav-item').forEach((item) => item.classList.remove('active'));
+      view.style.display = 'block';
+      view.classList.add('active-section');
+      link.classList.add('active');
+      const title = document.getElementById('topbar-title');
+      if (title) title.textContent = 'Landing Engine';
+      load();
+    });
+
+    document.addEventListener('click', handleClick);
+    window.lucide?.createIcons();
+  }
+
+  async function load() {
+    status('Cargando configuración…');
+    try {
+      record = await repository().getAdmin(LANDING_CODE);
+      render();
+      status('');
+    } catch (error) {
+      console.error('Landing Engine:', error);
+      status(error.code === '42501'
+        ? 'No tienes permisos para administrar esta Landing.'
+        : `Error al cargar: ${error.message}`, 'error');
     }
   }
-  function save(){localStorage.setItem(LANDING_KEY, JSON.stringify(state));window.dispatchEvent(new CustomEvent('tpl:landing-updated'));}
-  function business(){try{return JSON.parse(localStorage.getItem(BUSINESS_KEY)||'{}')}catch{return {}}}
-  function score(l){
-    const parts={
-      hero:l.title&&l.subtitle&&l.heroImage?15:0,
-      gallery:Array.isArray(l.gallery)?Math.min(15,l.gallery.filter(Boolean).length*4):0,
-      video:l.videoUrl?10:0,
-      cta:l.ctaPrimary&&l.ctaSecondary?15:l.ctaPrimary?9:0,
-      seo:l.seoTitle&&l.seoDescription?20:l.seoTitle||l.seoDescription?10:0,
-      analytics:l.analyticsEnabled?10:0,
-      speed:l.heroImage&&(!l.heroImage.match(/\.(png|jpg|jpeg)$/i))?10:6,
-      form:l.formEnabled?5:0
+
+  function render() {
+    const root = document.getElementById('landing-list');
+    if (!root || !record) return;
+    const landing = record.draft || record.published || {};
+    const stateLabel = {
+      borrador: 'Borrador',
+      publicada: 'Publicada',
+      archivada: 'Archivada'
+    }[record.status] || record.status;
+
+    root.innerHTML = `
+      <article class="landing-card">
+        <div class="landing-card-image" style="background-image:url('${esc(landing.heroImage)}')">
+          <span class="landing-state ${esc(record.status)}">${esc(stateLabel)}</span>
+          <div class="landing-score good"><strong>${score(landing)}</strong><span>/100</span></div>
+        </div>
+        <div class="landing-card-body">
+          <span class="eyebrow">${esc(landing.template || 'parcela-premium')}</span>
+          <h3>${esc(landing.title || 'Landing sin título')}</h3>
+          <p>Última actualización: ${esc(formatDate(record.updatedAt))}</p>
+          <p>Modificada por: ${esc(record.updatedBy || 'Sin usuario registrado')}</p>
+          <div class="landing-actions">
+            <button data-landing-edit>Editar</button>
+            <a href="/plataforma/landing/?id=${encodeURIComponent(record.code)}&preview=1" target="_blank" rel="noopener">Vista previa</a>
+            <a href="${esc(landing.publicUrl || '/caburgua-premium')}" target="_blank" rel="noopener">Vista pública</a>
+            <button class="business-primary" data-landing-publish>Publicar cambios</button>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  function editor() {
+    if (!record) return;
+    const landing = record.draft || record.published || {};
+    let modal = document.getElementById('landing-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'landing-modal';
+      modal.className = 'business-modal';
+      document.body.append(modal);
+    }
+    modal.innerHTML = `
+      <div class="business-modal-box landing-modal-box">
+        <div class="business-modal-head">
+          <h3>Editar borrador</h3>
+          <button type="button" class="business-secondary" data-landing-close>Cerrar</button>
+        </div>
+        <div class="business-modal-body">
+          <form id="landing-form" class="business-form">
+            <label class="wide">Título principal<input name="title" required maxlength="180" value="${esc(landing.title)}"></label>
+            <label class="wide">Subtítulo<textarea name="subtitle" rows="2" maxlength="300">${esc(landing.subtitle)}</textarea></label>
+            <label>Texto superior<input name="eyebrow" maxlength="120" value="${esc(landing.eyebrow)}"></label>
+            <label>Precio<input name="price" maxlength="80" value="${esc(landing.price)}"></label>
+            <label>Ubicación<input name="location" maxlength="160" value="${esc(landing.location)}"></label>
+            <label>Imagen hero<input name="heroImage" value="${esc(landing.heroImage)}"></label>
+            <label class="wide">Descripción<textarea name="description" rows="4" maxlength="1200">${esc(landing.description)}</textarea></label>
+            <label class="wide">Galería (una URL por línea)<textarea name="gallery" rows="5">${esc((landing.gallery || []).join('\n'))}</textarea></label>
+            <label class="wide">Beneficios (uno por línea)<textarea name="benefits" rows="5">${esc((landing.benefits || []).join('\n'))}</textarea></label>
+            <label>CTA principal<input name="ctaPrimary" value="${esc(landing.ctaPrimary || 'Agendar visita')}"></label>
+            <label>CTA secundario<input name="ctaSecondary" value="${esc(landing.ctaSecondary || 'Hablar por WhatsApp')}"></label>
+            <label>WhatsApp<input name="whatsapp" value="${esc(landing.whatsapp)}"></label>
+            <label>Video URL<input name="videoUrl" value="${esc(landing.videoUrl)}"></label>
+            <label class="wide">Mapa / ubicación<input name="mapUrl" value="${esc(landing.mapUrl)}"></label>
+            <label class="wide">Título SEO<input name="seoTitle" maxlength="180" value="${esc(landing.seoTitle)}"></label>
+            <label class="wide">Descripción SEO<textarea name="seoDescription" rows="2" maxlength="320">${esc(landing.seoDescription)}</textarea></label>
+            <label class="landing-check"><input type="checkbox" name="formEnabled" ${landing.formEnabled ? 'checked' : ''}> Formulario activo</label>
+            <label class="landing-check"><input type="checkbox" name="analyticsEnabled" ${landing.analyticsEnabled ? 'checked' : ''}> Analytics conectado</label>
+            <label class="landing-check"><input type="checkbox" name="adsReady" ${landing.adsReady ? 'checked' : ''}> Lista para Google Ads</label>
+            <p id="landing-save-status" class="wide landing-engine-status" role="status" aria-live="polite"></p>
+            <div class="wide business-modal-foot">
+              <button type="button" class="business-secondary" data-landing-close>Cancelar</button>
+              <button class="business-primary" type="submit">Guardar borrador</button>
+            </div>
+          </form>
+        </div>
+      </div>`;
+    modal.classList.add('open');
+    document.getElementById('landing-form').addEventListener('submit', saveDraft);
+  }
+
+  function configuration(form) {
+    const old = record.draft || record.published || {};
+    const values = Object.fromEntries(new FormData(form));
+    return {
+      ...old,
+      title: values.title.trim(),
+      subtitle: values.subtitle.trim(),
+      eyebrow: values.eyebrow.trim(),
+      price: values.price.trim(),
+      location: values.location.trim(),
+      heroImage: values.heroImage.trim(),
+      description: values.description.trim(),
+      gallery: values.gallery.split(/\n+/).map((item) => item.trim()).filter(Boolean),
+      benefits: values.benefits.split(/\n+/).map((item) => item.trim()).filter(Boolean),
+      ctaPrimary: values.ctaPrimary.trim(),
+      ctaSecondary: values.ctaSecondary.trim(),
+      whatsapp: values.whatsapp.replace(/\D/g, ''),
+      videoUrl: values.videoUrl.trim(),
+      mapUrl: values.mapUrl.trim(),
+      seoTitle: values.seoTitle.trim(),
+      seoDescription: values.seoDescription.trim(),
+      formEnabled: form.formEnabled.checked,
+      analyticsEnabled: form.analyticsEnabled.checked,
+      adsReady: form.adsReady.checked,
+      id: record.code,
+      slug: record.slug
     };
-    return {total:Object.values(parts).reduce((a,b)=>a+b,0),parts};
   }
-  function install(){
-    const nav=document.querySelector('.sidebar-nav'), main=document.querySelector('.main-content');
-    if(!nav||!main||document.getElementById('view-landing-engine'))return;
-    const link=document.createElement('a');link.href='#';link.className='nav-item';link.dataset.target='view-landing-engine';link.innerHTML='<i data-lucide="panels-top-left"></i> Landing Engine';
-    const businessLinks=[...nav.querySelectorAll('.nav-item')].filter(x=>['view-business-dashboard','view-business-clients','view-business-projects'].includes(x.dataset.target));
-    const anchor=businessLinks.at(-1); anchor?.after(link);
-    link.addEventListener('click',e=>{e.preventDefault();activate(link);render();});
-    const view=document.createElement('div');view.id='view-landing-engine';view.className='dashboard-section';view.style.display='none';view.innerHTML=`
-      <section class="business-hero landing-engine-hero"><div><span class="eyebrow">TPL BUSINESS · SPRINT 2</span><h2>Landing Engine</h2><p>Crea, evalúa y publica landings comerciales conectadas a clientes y proyectos.</p></div><button class="business-primary" id="landing-new">Nueva landing</button></section>
-      <section class="landing-summary"><article><strong id="landing-count">0</strong><span>Landings</span></article><article><strong id="landing-published">0</strong><span>Publicadas</span></article><article><strong id="landing-average">0</strong><span>Score promedio</span></article><article><strong id="landing-ready">0</strong><span>Listas para Ads</span></article></section>
-      <div id="landing-list" class="landing-grid"></div>`;
-    main.append(view, buildModal());
-    document.getElementById('landing-new').addEventListener('click',()=>openEditor());
-    document.addEventListener('click',handleClick);
-    render(); window.lucide?.createIcons();
+
+  async function saveDraft(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const node = document.getElementById('landing-save-status');
+    const button = form.querySelector('[type="submit"]');
+    if (!form.reportValidity()) return;
+    button.disabled = true;
+    button.textContent = 'Guardando…';
+    node.textContent = 'Guardando…';
+    node.className = 'wide landing-engine-status';
+    try {
+      const draft = configuration(form);
+      const result = await repository().saveDraft(record.code, draft);
+      record = { ...record, draft, updatedAt: result.updatedAt, updatedBy: result.updatedBy };
+      node.textContent = 'Cambios guardados.';
+      node.className = 'wide landing-engine-status success';
+      render();
+    } catch (error) {
+      console.error('Landing Engine guardar:', error);
+      node.textContent = `Error al guardar: ${error.message}`;
+      node.className = 'wide landing-engine-status error';
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Guardar borrador';
+    }
   }
-  function activate(link){document.querySelectorAll('.dashboard-section').forEach(s=>{s.classList.remove('active-section');s.style.display='none'});document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('view-landing-engine').style.display='block';document.getElementById('view-landing-engine').classList.add('active-section');link.classList.add('active');const t=document.getElementById('topbar-title');if(t)t.textContent='Landing Engine';}
-  function buildModal(){const el=document.createElement('div');el.id='landing-modal';el.className='business-modal';el.innerHTML='<div class="business-modal-box landing-modal-box"><div class="business-modal-head"><h3 id="landing-modal-title">Editar landing</h3><button type="button" class="business-secondary" data-landing-close>Cerrar</button></div><div class="business-modal-body" id="landing-modal-body"></div></div>';return el;}
-  function render(){
-    const list=document.getElementById('landing-list');if(!list)return;
-    const avg=state.length?Math.round(state.reduce((n,l)=>n+score(l).total,0)/state.length):0;
-    set('landing-count',state.length);set('landing-published',state.filter(x=>x.status==='published').length);set('landing-average',`${avg}/100`);set('landing-ready',state.filter(x=>score(x).total>=85&&x.analyticsEnabled).length);
-    const biz=business();
-    queueMicrotask(decoratePublicLinks);
-    list.innerHTML=state.map(l=>{const s=score(l);const p=(biz.projects||[]).find(x=>x.id===l.projectId);return `<article class="landing-card"><div class="landing-card-image" style="background-image:url('${esc(l.heroImage)}')"><span class="landing-state ${l.status}">${l.status==='published'?'Publicada':'Borrador'}</span><div class="landing-score ${s.total>=85?'good':s.total>=65?'mid':'low'}"><strong>${s.total}</strong><span>/100</span></div></div><div class="landing-card-body"><span class="eyebrow">${esc(l.template.replaceAll('-',' '))}</span><h3>${esc(l.title)}</h3><p>${esc(p?.name||'Proyecto sin asociar')}</p><div class="landing-mini-checks"><span class="${l.analyticsEnabled?'ok':''}">Analytics</span><span class="${l.formEnabled?'ok':''}">Formulario</span><span class="${l.videoUrl?'ok':''}">Video</span><span class="${l.adsReady?'ok':''}">Ads</span></div><div class="landing-actions"><button data-landing-edit="${esc(l.id)}">Editar</button><a href="/plataforma/landing/?id=${encodeURIComponent(l.id)}" target="_blank" rel="noopener">Vista previa</a><button data-landing-publish="${esc(l.id)}">${l.status==='published'?'Despublicar':'Publicar'}</button></div></div></article>`}).join('')||'<div class="business-empty">Todavía no hay landings.</div>';
+
+  async function publish() {
+    const button = document.querySelector('[data-landing-publish]');
+    if (!record || !button) return;
+    button.disabled = true;
+    button.textContent = 'Publicando…';
+    status('Publicando cambios…');
+    try {
+      const result = await repository().publish(record.code);
+      record = await repository().getAdmin(record.code);
+      render();
+      status(`Publicado correctamente. Versión ${result.version}.`, 'success');
+    } catch (error) {
+      console.error('Landing Engine publicar:', error);
+      status(`Error al publicar: ${error.message}`, 'error');
+      button.disabled = false;
+      button.textContent = 'Publicar cambios';
+    }
   }
-  function decoratePublicLinks(){
-    document.querySelectorAll('.landing-card').forEach((card)=>{
-      const edit=card.querySelector('[data-landing-edit]');
-      const landing=state.find((item)=>item.id===edit?.dataset.landingEdit);
-      if(!landing)return;
-      const preview=card.querySelector('.landing-actions a');
-      if(preview){
-        preview.href=`/plataforma/landing/?id=${encodeURIComponent(landing.id)}&preview=1`;
-        preview.textContent='Vista previa';
-      }
-      const published=window.TPL_getPublicLanding?.(landing.id);
-      if(!published)return;
-      const actions=card.querySelector('.landing-actions');
-      if(actions&&!actions.querySelector('[data-landing-public]')){
-        const publicLink=document.createElement('a');
-        publicLink.dataset.landingPublic=landing.id;
-        publicLink.href=published.publicUrl||`/${published.slug}`;
-        publicLink.target='_blank';
-        publicLink.rel='noopener';
-        publicLink.textContent='Vista pública';
-        preview?.after(publicLink);
-      }
-      const publish=card.querySelector('[data-landing-publish]');
-      if(publish){
-        publish.disabled=true;
-        publish.textContent='Publicada';
-        publish.title='La versión pública se administra desde la configuración compartida.';
-      }
-    });
+
+  function close() {
+    document.getElementById('landing-modal')?.classList.remove('open');
   }
-  function openEditor(id){
-    const l=state.find(x=>x.id===id)||{id:'',status:'draft',template:'parcela-premium',objective:'agendar_visitas',gallery:[],benefits:[],formEnabled:true,analyticsEnabled:false,adsReady:false};
-    const biz=business(), projects=biz.projects||[];
-    document.getElementById('landing-modal-title').textContent=id?'Editar landing':'Nueva landing';
-    document.getElementById('landing-modal-body').innerHTML=`<form id="landing-form" class="business-form"><input type="hidden" name="id" value="${esc(l.id)}"><label>Proyecto<select name="projectId"><option value="">Sin proyecto</option>${projects.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</select></label><label>Plantilla<select name="template"><option value="parcela-premium">Parcela Premium</option><option value="servicio-premium">Servicio Premium</option></select></label><label>Objetivo<select name="objective"><option value="agendar_visitas">Agendar visitas</option><option value="formularios">Generar formularios</option><option value="whatsapp">Recibir WhatsApp</option><option value="ventas">Generar ventas</option></select></label><label>Estado<select name="status"><option value="draft">Borrador</option><option value="published">Publicada</option></select></label><label class="wide">Título principal<input name="title" required value="${esc(l.title||'')}"></label><label class="wide">Subtítulo<textarea name="subtitle" rows="2">${esc(l.subtitle||'')}</textarea></label><label>Texto superior<input name="eyebrow" value="${esc(l.eyebrow||'')}"></label><label>Precio<input name="price" value="${esc(l.price||'')}"></label><label>Ubicación<input name="location" value="${esc(l.location||'')}"></label><label>Imagen hero<input name="heroImage" value="${esc(l.heroImage||'')}"></label><label class="wide">Descripción<textarea name="description" rows="3">${esc(l.description||'')}</textarea></label><label class="wide">Galería (una URL por línea)<textarea name="gallery" rows="4">${esc((l.gallery||[]).join('\n'))}</textarea></label><label class="wide">Beneficios (uno por línea)<textarea name="benefits" rows="4">${esc((l.benefits||[]).join('\n'))}</textarea></label><label>CTA principal<input name="ctaPrimary" value="${esc(l.ctaPrimary||'Agendar visita')}"></label><label>CTA secundario<input name="ctaSecondary" value="${esc(l.ctaSecondary||'Hablar por WhatsApp')}"></label><label>WhatsApp<input name="whatsapp" value="${esc(l.whatsapp||'')}"></label><label>Video URL<input name="videoUrl" value="${esc(l.videoUrl||'')}"></label><label class="wide">Mapa / enlace de ubicación<input name="mapUrl" value="${esc(l.mapUrl||'')}"></label><label class="wide">Título SEO<input name="seoTitle" value="${esc(l.seoTitle||'')}"></label><label class="wide">Descripción SEO<textarea name="seoDescription" rows="2">${esc(l.seoDescription||'')}</textarea></label><label class="landing-check"><input type="checkbox" name="formEnabled" ${l.formEnabled?'checked':''}> Formulario activo</label><label class="landing-check"><input type="checkbox" name="analyticsEnabled" ${l.analyticsEnabled?'checked':''}> Analytics conectado</label><label class="landing-check"><input type="checkbox" name="adsReady" ${l.adsReady?'checked':''}> Lista para Google Ads</label><div class="wide landing-score-preview" id="landing-score-preview"></div><div class="wide business-modal-foot"><button type="button" class="business-secondary" data-landing-close>Cancelar</button><button class="business-primary" type="submit">Guardar landing</button></div></form>`;
-    const f=document.getElementById('landing-form');f.projectId.value=l.projectId||'';f.template.value=l.template||'parcela-premium';f.objective.value=l.objective||'agendar_visitas';f.status.value=l.status||'draft';
-    const updatePreview=()=>{const d=formData(f,l);const s=score(d);document.getElementById('landing-score-preview').innerHTML=`<strong>Landing Score: ${s.total}/100</strong><span>Hero ${s.parts.hero}/15 · Fotos ${s.parts.gallery}/15 · Video ${s.parts.video}/10 · CTA ${s.parts.cta}/15 · SEO ${s.parts.seo}/20 · Analytics ${s.parts.analytics}/10 · Velocidad ${s.parts.speed}/10 · Formulario ${s.parts.form}/5</span>`};
-    f.addEventListener('input',updatePreview);updatePreview();
-    f.addEventListener('submit',e=>{e.preventDefault();const d=formData(f,l);d.id=d.id||`land-${Date.now()}`;d.updatedAt=new Date().toISOString();const i=state.findIndex(x=>x.id===d.id);i>=0?state[i]=d:state.push(d);save();close();render();});
-    document.getElementById('landing-modal').classList.add('open');
+
+  function handleClick(event) {
+    if (event.target.closest('[data-landing-edit]')) editor();
+    if (event.target.closest('[data-landing-publish]')) publish();
+    if (event.target.closest('[data-landing-close]') || event.target.id === 'landing-modal') close();
   }
-  function formData(f,old){const d=Object.fromEntries(new FormData(f));d.gallery=String(d.gallery||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);d.benefits=String(d.benefits||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);d.formEnabled=f.formEnabled.checked;d.analyticsEnabled=f.analyticsEnabled.checked;d.adsReady=f.adsReady.checked;d.clientId=old.clientId||'';d.propertyId=old.propertyId||'';d.slug=old.slug||'';d.publicUrl=old.publicUrl||'';d.features=Array.isArray(old.features)?structuredClone(old.features):[];d.tplBranding=old.tplBranding?structuredClone(old.tplBranding):null;return d;}
-  function handleClick(e){const edit=e.target.closest('[data-landing-edit]');if(edit)openEditor(edit.dataset.landingEdit);const pub=e.target.closest('[data-landing-publish]');if(pub){const l=state.find(x=>x.id===pub.dataset.landingPublish);if(l){l.status=l.status==='published'?'draft':'published';l.updatedAt=new Date().toISOString();save();render();}}if(e.target.closest('[data-landing-close]')||e.target.id==='landing-modal')close();}
-  function close(){document.getElementById('landing-modal')?.classList.remove('open');}
-  function set(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
-  document.addEventListener('DOMContentLoaded',install);
+
+  document.addEventListener('DOMContentLoaded', install);
 })();

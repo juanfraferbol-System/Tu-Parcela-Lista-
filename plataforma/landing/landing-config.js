@@ -1,100 +1,71 @@
 (() => {
   'use strict';
 
-  const landings = [{
-    id: 'land-caburgua',
-    projectId: 'pro-caburgua',
-    clientId: 'cli-caburgua',
-    businessAccountCode: 'cli-caburgua',
-    commercialProjectCode: 'pro-caburgua',
-    propertyId: 'caburgua',
-    slug: 'caburgua-premium',
-    publicUrl: '/caburgua-premium',
-    status: 'published',
-    template: 'parcela-premium',
-    objective: 'agendar_visitas',
-    title: 'Mirador del Villarrica — Parcela Premium en Caburgua',
-    subtitle: '5.000 m² en condominio privado, vista al volcán Villarrica, acceso al río y aguas termales.',
-    eyebrow: 'CABURGUA · REGIÓN DE LA ARAUCANÍA',
-    price: '$200.000.000',
-    location: 'Caburgua, Chile',
-    heroImage: '/image/cesar_Caburgua/cesar_caburgua_(5).webp',
-    gallery: [
-      '/image/cesar_Caburgua/cesar_caburgua_(1).webp',
-      '/image/cesar_Caburgua/cesar_caburgua_ (2).webp',
-      '/image/cesar_Caburgua/cesar_caburgua_(3).webp',
-      '/image/cesar_Caburgua/cesar_caburgua_ (4).webp'
-    ],
-    benefits: [
-      'Vista privilegiada al volcán Villarrica',
-      'Acceso al río dentro del condominio',
-      'Aguas termales para disfrutar todo el año',
-      'Rol propio, agua y energía eléctrica'
-    ],
-    features: [
-      {
-        title: 'Vista al volcán Villarrica',
-        text: 'Un entorno natural privilegiado para disfrutar desde tu futuro proyecto.'
-      },
-      {
-        title: 'Acceso al río',
-        text: 'El condominio dispone de acceso al río para sus residentes.'
-      },
-      {
-        title: 'Aguas termales',
-        text: 'Un atributo especial para disfrutar el sector durante todo el año.'
-      },
-      {
-        title: 'Rol propio',
-        text: 'La parcela dispone de rol individual informado por su propietario o representante.'
-      },
-      {
-        title: 'Agua disponible',
-        text: 'El proyecto informa disponibilidad de agua para el desarrollo de la propiedad.'
-      },
-      {
-        title: 'Energía eléctrica',
-        text: 'Disponibilidad de energía eléctrica informada para el proyecto.'
+  function client() {
+    if (window.tplSupabase) return window.tplSupabase;
+    if (window.tplCrmSupabase) return window.tplCrmSupabase;
+    const config = window.TPL_SUPABASE_CONFIG || {};
+    const url = config.url || config.supabaseUrl;
+    const key = config.anonKey || config.supabaseAnonKey;
+    if (!window.supabase?.createClient || !url || !key) return null;
+    window.tplSupabase = window.supabase.createClient(url, key, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: 'sb-qxavbqhyqaqalpzbhwmh-auth-token'
       }
-    ],
-    description: 'Una oportunidad patrimonial única para construir una residencia de alto estándar, segunda vivienda o proyecto turístico en uno de los sectores con mayor demanda del sur de Chile.',
-    ctaPrimary: 'Agendar visita',
-    ctaSecondary: 'Hablar por WhatsApp',
-    whatsapp: '56988508361',
-    videoUrl: '',
-    mapUrl: '',
-    formEnabled: true,
-    analyticsEnabled: false,
-    adsReady: false,
-    seoTitle: 'Parcela Premium en Caburgua con vista al Volcán Villarrica',
-    seoDescription: 'Parcela de 5.000 m² en condominio privado de Caburgua, con acceso al río, aguas termales, rol propio, agua y luz.',
-    tplBranding: {
-      enabled: true,
-      badgeText: 'Proyecto gestionado mediante TPL Business',
-      supportText: 'Tecnología, registro de consultas y gestión comercial por Tu Parcela Lista.',
-      footerText: 'Tecnología y gestión comercial por Tu Parcela Lista',
-      ctaText: 'Quiero una landing como esta',
-      ctaUrl: '/tecnologia.html',
-      modalTitle: 'Respaldo tecnológico y comercial',
-      modalContent: [
-        'La información del proyecto es proporcionada por el propietario o representante.',
-        'Las consultas y solicitudes son gestionadas mediante TPL Business.',
-        'Las solicitudes pueden registrarse para seguimiento comercial.',
-        'Tu Parcela Lista entrega la infraestructura tecnológica y comercial.'
-      ],
-      footerTheme: 'corporate'
+    });
+    return window.tplSupabase;
+  }
+
+  async function rpc(name, params) {
+    const supabase = client();
+    if (!supabase) throw new Error('No se pudo iniciar la conexión con Supabase.');
+    const { data, error } = await supabase.rpc(name, params);
+    if (error) {
+      const failure = new Error(error.message || 'Error de Supabase.');
+      failure.code = error.code || '';
+      throw failure;
+    }
+    return data;
+  }
+
+  const repository = {
+    async getPublished(identifier) {
+      const result = await rpc('tpl_obtener_landing_publica', {
+        p_identificador: String(identifier || '').trim()
+      });
+      if (!result?.config) return null;
+      return {
+        ...result.config,
+        status: result.status,
+        version: result.version,
+        updatedAt: result.updatedAt,
+        publishedAt: result.publishedAt
+      };
     },
-    updatedAt: '2026-07-23T00:00:00.000Z'
-  }];
 
-  window.TPL_PUBLIC_LANDINGS = Object.freeze(
-    landings.map((landing) => Object.freeze(landing))
-  );
+    async getAdmin(identifier) {
+      return rpc('tpl_obtener_landing_admin', {
+        p_identificador: String(identifier || '').trim()
+      });
+    },
 
-  window.TPL_getPublicLanding = function TPL_getPublicLanding(idOrSlug) {
-    const key = String(idOrSlug || '').trim();
-    return window.TPL_PUBLIC_LANDINGS.find(
-      (landing) => landing.id === key || landing.slug === key
-    ) || null;
+    async saveDraft(code, configuration) {
+      return rpc('tpl_guardar_borrador_landing', {
+        p_landing_codigo: String(code || '').trim(),
+        p_configuracion: configuration
+      });
+    },
+
+    async publish(code) {
+      return rpc('tpl_publicar_landing', {
+        p_landing_codigo: String(code || '').trim()
+      });
+    }
   };
+
+  window.TPLLandingRepository = Object.freeze(repository);
+  window.TPL_getPublicLanding = (identifier) => repository.getPublished(identifier);
 })();

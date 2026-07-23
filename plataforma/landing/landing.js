@@ -1,7 +1,6 @@
-(() => {
+(async () => {
   'use strict';
 
-  const STORAGE_KEY = 'tpl_landing_engine_v1';
   const params = new URLSearchParams(location.search);
   const pathSlug = location.pathname.split('/').filter(Boolean).at(-1);
   const landingKey = params.get('id')
@@ -20,27 +19,30 @@
     }[character])
   );
 
-  function localDraft() {
-    try {
-      const items = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      return Array.isArray(items)
-        ? items.find((item) => item.id === landingKey || item.slug === landingKey)
-        : null;
-    } catch {
-      return null;
-    }
-  }
+  root.innerHTML = '<section class="missing" role="status"><p>Cargando proyecto…</p></section>';
 
-  const published = window.TPL_getPublicLanding?.(landingKey);
-  const draft = preview ? localDraft() : null;
-  const landing = preview && draft
-    ? {
-        ...published,
-        ...draft,
-        features: draft.features || published?.features || [],
-        tplBranding: draft.tplBranding || published?.tplBranding || null
+  let landing = null;
+  try {
+    if (preview) {
+      const admin = await window.TPLLandingRepository?.getAdmin(landingKey);
+      landing = admin?.draft || null;
+      if (landing) {
+        landing.updatedAt = admin.updatedAt;
+        landing.updatedBy = admin.updatedBy;
       }
-    : published;
+    } else {
+      landing = await window.TPLLandingRepository?.getPublished(landingKey);
+    }
+  } catch (error) {
+    console.error('TPL Landing: no fue posible cargar la configuración canónica.', error);
+    root.innerHTML = `
+      <section class="missing" role="alert">
+        <h1>No pudimos cargar el proyecto</h1>
+        <p>Recarga la página. Si el problema continúa, comunícate con Tu Parcela Lista.</p>
+        <button type="button" onclick="location.reload()">Reintentar</button>
+      </section>`;
+    return;
+  }
 
   if (!landing) {
     root.innerHTML = `
@@ -97,7 +99,7 @@
       decoding="async">`).join('');
 
   root.innerHTML = `
-    ${preview ? '<aside class="preview-notice" role="status">Vista previa administrativa. Los cambios locales no afectan la versión pública.</aside>' : ''}
+    ${preview ? '<aside class="preview-notice" role="status">Vista previa del borrador guardado. La página pública no cambia hasta seleccionar “Publicar cambios”.</aside>' : ''}
     <header class="top">
       <a href="/" class="brand">TU PARCELA LISTA</a>
       <nav>
