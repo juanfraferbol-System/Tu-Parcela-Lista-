@@ -8,7 +8,19 @@
     updatedAt: landing.updatedAt || new Date().toISOString()
   }));
   let state = load();
-  function load(){try{const data=JSON.parse(localStorage.getItem(LANDING_KEY)||'null');return Array.isArray(data)&&data.length?data:structuredClone(seed)}catch{return structuredClone(seed)}}
+  function load(){
+    try {
+      const stored=JSON.parse(localStorage.getItem(LANDING_KEY)||'[]');
+      const merged=new Map(seed.map((landing)=>[landing.id,structuredClone(landing)]));
+      if(Array.isArray(stored))stored.forEach((landing)=>{
+        if(!landing?.id)return;
+        merged.set(landing.id,{...(merged.get(landing.id)||{}),...landing});
+      });
+      return [...merged.values()];
+    } catch {
+      return structuredClone(seed);
+    }
+  }
   function save(){localStorage.setItem(LANDING_KEY, JSON.stringify(state));window.dispatchEvent(new CustomEvent('tpl:landing-updated'));}
   function business(){try{return JSON.parse(localStorage.getItem(BUSINESS_KEY)||'{}')}catch{return {}}}
   function score(l){
@@ -47,7 +59,38 @@
     const avg=state.length?Math.round(state.reduce((n,l)=>n+score(l).total,0)/state.length):0;
     set('landing-count',state.length);set('landing-published',state.filter(x=>x.status==='published').length);set('landing-average',`${avg}/100`);set('landing-ready',state.filter(x=>score(x).total>=85&&x.analyticsEnabled).length);
     const biz=business();
+    queueMicrotask(decoratePublicLinks);
     list.innerHTML=state.map(l=>{const s=score(l);const p=(biz.projects||[]).find(x=>x.id===l.projectId);return `<article class="landing-card"><div class="landing-card-image" style="background-image:url('${esc(l.heroImage)}')"><span class="landing-state ${l.status}">${l.status==='published'?'Publicada':'Borrador'}</span><div class="landing-score ${s.total>=85?'good':s.total>=65?'mid':'low'}"><strong>${s.total}</strong><span>/100</span></div></div><div class="landing-card-body"><span class="eyebrow">${esc(l.template.replaceAll('-',' '))}</span><h3>${esc(l.title)}</h3><p>${esc(p?.name||'Proyecto sin asociar')}</p><div class="landing-mini-checks"><span class="${l.analyticsEnabled?'ok':''}">Analytics</span><span class="${l.formEnabled?'ok':''}">Formulario</span><span class="${l.videoUrl?'ok':''}">Video</span><span class="${l.adsReady?'ok':''}">Ads</span></div><div class="landing-actions"><button data-landing-edit="${esc(l.id)}">Editar</button><a href="/plataforma/landing/?id=${encodeURIComponent(l.id)}" target="_blank" rel="noopener">Vista previa</a><button data-landing-publish="${esc(l.id)}">${l.status==='published'?'Despublicar':'Publicar'}</button></div></div></article>`}).join('')||'<div class="business-empty">Todavía no hay landings.</div>';
+  }
+  function decoratePublicLinks(){
+    document.querySelectorAll('.landing-card').forEach((card)=>{
+      const edit=card.querySelector('[data-landing-edit]');
+      const landing=state.find((item)=>item.id===edit?.dataset.landingEdit);
+      if(!landing)return;
+      const preview=card.querySelector('.landing-actions a');
+      if(preview){
+        preview.href=`/plataforma/landing/?id=${encodeURIComponent(landing.id)}&preview=1`;
+        preview.textContent='Vista previa';
+      }
+      const published=window.TPL_getPublicLanding?.(landing.id);
+      if(!published)return;
+      const actions=card.querySelector('.landing-actions');
+      if(actions&&!actions.querySelector('[data-landing-public]')){
+        const publicLink=document.createElement('a');
+        publicLink.dataset.landingPublic=landing.id;
+        publicLink.href=published.publicUrl||`/${published.slug}`;
+        publicLink.target='_blank';
+        publicLink.rel='noopener';
+        publicLink.textContent='Vista pública';
+        preview?.after(publicLink);
+      }
+      const publish=card.querySelector('[data-landing-publish]');
+      if(publish){
+        publish.disabled=true;
+        publish.textContent='Publicada';
+        publish.title='La versión pública se administra desde la configuración compartida.';
+      }
+    });
   }
   function openEditor(id){
     const l=state.find(x=>x.id===id)||{id:'',status:'draft',template:'parcela-premium',objective:'agendar_visitas',gallery:[],benefits:[],formEnabled:true,analyticsEnabled:false,adsReady:false};
@@ -60,7 +103,7 @@
     f.addEventListener('submit',e=>{e.preventDefault();const d=formData(f,l);d.id=d.id||`land-${Date.now()}`;d.updatedAt=new Date().toISOString();const i=state.findIndex(x=>x.id===d.id);i>=0?state[i]=d:state.push(d);save();close();render();});
     document.getElementById('landing-modal').classList.add('open');
   }
-  function formData(f,old){const d=Object.fromEntries(new FormData(f));d.gallery=String(d.gallery||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);d.benefits=String(d.benefits||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);d.formEnabled=f.formEnabled.checked;d.analyticsEnabled=f.analyticsEnabled.checked;d.adsReady=f.adsReady.checked;d.clientId=old.clientId||'';return d;}
+  function formData(f,old){const d=Object.fromEntries(new FormData(f));d.gallery=String(d.gallery||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);d.benefits=String(d.benefits||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);d.formEnabled=f.formEnabled.checked;d.analyticsEnabled=f.analyticsEnabled.checked;d.adsReady=f.adsReady.checked;d.clientId=old.clientId||'';d.propertyId=old.propertyId||'';d.slug=old.slug||'';d.publicUrl=old.publicUrl||'';return d;}
   function handleClick(e){const edit=e.target.closest('[data-landing-edit]');if(edit)openEditor(edit.dataset.landingEdit);const pub=e.target.closest('[data-landing-publish]');if(pub){const l=state.find(x=>x.id===pub.dataset.landingPublish);if(l){l.status=l.status==='published'?'draft':'published';l.updatedAt=new Date().toISOString();save();render();}}if(e.target.closest('[data-landing-close]')||e.target.id==='landing-modal')close();}
   function close(){document.getElementById('landing-modal')?.classList.remove('open');}
   function set(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}

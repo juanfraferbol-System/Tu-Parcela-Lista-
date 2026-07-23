@@ -5,8 +5,11 @@
     id: 'land-caburgua',
     projectId: 'pro-caburgua',
     clientId: 'cli-caburgua',
+    businessAccountCode: 'cli-caburgua',
+    commercialProjectCode: 'pro-caburgua',
     propertyId: 'caburgua',
     slug: 'caburgua-premium',
+    publicUrl: '/caburgua-premium',
     status: 'published',
     template: 'parcela-premium',
     objective: 'agendar_visitas',
@@ -31,14 +34,15 @@
     description: 'Una oportunidad patrimonial única para construir una residencia de alto estándar, segunda vivienda o proyecto turístico en uno de los sectores con mayor demanda del sur de Chile.',
     ctaPrimary: 'Agendar visita',
     ctaSecondary: 'Hablar por WhatsApp',
-    whatsapp: '',
+    whatsapp: '56988508361',
     videoUrl: '',
     mapUrl: '',
     formEnabled: true,
     analyticsEnabled: false,
     adsReady: false,
     seoTitle: 'Parcela Premium en Caburgua con vista al Volcán Villarrica',
-    seoDescription: 'Parcela de 5.000 m² en condominio privado de Caburgua, con acceso al río, aguas termales, rol propio, agua y luz.'
+    seoDescription: 'Parcela de 5.000 m² en condominio privado de Caburgua, con acceso al río, aguas termales, rol propio, agua y luz.',
+    updatedAt: '2026-07-23T00:00:00.000Z'
   }];
 
   window.TPL_PUBLIC_LANDINGS = Object.freeze(
