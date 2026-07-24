@@ -145,6 +145,8 @@ button[type="submit"]:hover, .btn-primary:hover {
 .sidebar-nav {
   flex: 1;
   padding: 1rem 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .sidebar-nav a {
   display: flex;
@@ -298,6 +300,20 @@ button[type="submit"]:hover, .btn-primary:hover {
 .table-container {
   padding: 0 2rem 2rem;
   flex: 1;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nav-beta {
+  margin-left: auto;
+  padding: 0.16rem 0.38rem;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  color: #facc15;
+  font-size: .58rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
 }
 .data-table {
   width: 100%;

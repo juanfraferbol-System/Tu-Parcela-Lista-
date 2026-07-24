@@ -165,19 +165,18 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
   };
 
   const loadPendientesOperativos = async () => {
-    // Simularemos la recolección de los datos de "Pendientes"
-    // En producción se haría con endpoints RPC o conteos
     try {
-      // Clientes Nuevos
-      const resClientes = await supabase.from('clientes').select('id, nombre, creado_en', { count: 'exact' }).eq('estado', 'nuevo').limit(5);
-      document.getElementById('metric-pendientes-clientes').innerText = resClientes.count || 0;
-      
-      // Proyectos/Cotizaciones
-      const resProyectos = await supabase.from('proyectos').select('id, total, creado_en', { count: 'exact' }).eq('estado', 'cotizacion_generada').limit(5);
-      document.getElementById('metric-pendientes-cotizaciones').innerText = resProyectos.count || 0;
+      const [resClientes, resProyectos, resPubs] = await Promise.all([
+        supabase.from('clientes').select('id, nombre, creado_en', { count: 'exact' }).eq('estado', 'nuevo').limit(5),
+        supabase.from('proyectos').select('id, total, creado_en', { count: 'exact' }).eq('estado', 'cotizacion_generada').limit(5),
+        supabase.rpc('crm_listar_publicaciones', { p_estado: 'pendiente_revision' })
+      ]);
 
-      // Publicaciones por revisar
-      const resPubs = await supabase.rpc('crm_listar_publicaciones', { p_estado: 'pendiente_revision' });
+      const failures = [resClientes.error, resProyectos.error, resPubs.error].filter(Boolean);
+      if (failures.length) throw failures[0];
+
+      document.getElementById('metric-pendientes-clientes').innerText = resClientes.count || 0;
+      document.getElementById('metric-pendientes-cotizaciones').innerText = resProyectos.count || 0;
       document.getElementById('metric-pendientes-publicaciones').innerText = resPubs.data?.length || 0;
 
       const tbody = document.getElementById('table-body-pendientes');
@@ -194,13 +193,13 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
       `;
 
       if (resClientes.data?.length) {
-        resClientes.data.forEach(c => html += createRow('Lead', c.creado_en, `Cliente Nuevo: ${c.nombre}`, 'Sin contactar', `<button class="btn-action" onclick="alert('Funcionalidad próxima: Abrir Ficha')">Ver</button>`));
+        resClientes.data.forEach(c => html += createRow('Lead', c.creado_en, `Cliente nuevo: ${c.nombre}`, 'Sin contactar', '<button class="btn-action" type="button" data-pending-target="view-clientes-prioritarios">Ver prioridades</button>'));
       }
       if (resProyectos.data?.length) {
-        resProyectos.data.forEach(p => html += createRow('Cotización', p.creado_en, `Cotización de: $${Number(p.total||0).toLocaleString('es-CL')}`, 'Huérfana', `<button class="btn-action">Revisar</button>`));
+        resProyectos.data.forEach(p => html += createRow('Cotización', p.creado_en, `Cotización de: $${Number(p.total||0).toLocaleString('es-CL')}`, 'Pendiente de revisión', '<button class="btn-action" type="button" data-pending-target="view-cotizaciones">Abrir cotizaciones</button>'));
       }
       if (resPubs.data?.length) {
-        resPubs.data.forEach(p => html += createRow('Parcela', p.creado_en, `Revisar: ${escapeHTML(p.propiedad)}`, 'Pendiente', `<button class="btn-action" onclick="window.verDetalle('${p.id}')">Revisar</button>`));
+        resPubs.data.forEach(p => html += createRow('Parcela', p.creado_en, `Revisar: ${p.propiedad}`, 'Pendiente', `<button class="btn-action" type="button" data-pending-publication="${escapeHTML(p.id)}">Revisar</button>`));
       }
 
       if (!html) html = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#64748b;">No hay tareas operativas pendientes. ¡Todo al día!</td></tr>';
@@ -209,8 +208,23 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
 
     } catch (e) {
       console.error("Error al cargar pendientes:", e);
+      const tbody = document.getElementById('table-body-pendientes');
+      if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="error-msg">No fue posible cargar los pendientes. Usa “Actualizar panel” para reintentar.</td></tr>';
     }
   };
+
+  document.getElementById('table-body-pendientes')?.addEventListener('click', (event) => {
+    const publication = event.target.closest('[data-pending-publication]');
+    if (publication) {
+      window.verDetalle(publication.dataset.pendingPublication);
+      return;
+    }
+    const navigation = event.target.closest('[data-pending-target]');
+    if (!navigation) return;
+    const target = navigation.dataset.pendingTarget;
+    const link = document.querySelector(`[data-target="${CSS.escape(target)}"],[data-business-target="${CSS.escape(target)}"]`);
+    if (link) link.click();
+  });
 
   const loadMetrics = async () => {
     const { data, error } = await supabase.rpc('crm_contadores_publicaciones');
@@ -641,28 +655,39 @@ function renderContratistas() {
   }
   
   filtered.forEach(c => {
+    const partnerId = String(c.id || '');
+    const partnerName = String(c.nombre_comercial || 'Sin nombre');
+    const partnerPlan = String(c.plan_elegido || 'gratis').toUpperCase();
+    const coverage = Array.isArray(c.comunas_atendidas)
+      ? c.comunas_atendidas.join(', ')
+      : String(c.comunas_atendidas || c.region || '-');
+    const phone = String(c.whatsapp || c.telefono || '').replace(/\D/g, '');
+    const rating = Number(c.rating || 0);
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>
-        <strong>${c.nombre_comercial || 'Sin nombre'}</strong>
-        <br><small style="color: #64748b;">${c.plan_elegido ? c.plan_elegido.toUpperCase() : 'GRATIS'}</small>
+        <strong>${escapeHTML(partnerName)}</strong>
+        <br><small style="color: #64748b;">${escapeHTML(partnerPlan)}</small>
       </td>
-      <td>${c.comunas_atendidas || c.region || '-'}</td>
-      <td>${c.tipo_servicio || '-'}</td>
-      <td>${c.whatsapp || c.telefono || '-'}</td>
-      <td>${c.rating ? c.rating + ' ⭐' : '0.00 ⭐'}</td>
+      <td>${escapeHTML(coverage)}</td>
+      <td>${escapeHTML(c.tipo_servicio || '-')}</td>
+      <td>${escapeHTML(c.whatsapp || c.telefono || '-')}</td>
+      <td>${rating.toFixed(2)} ⭐</td>
       <td>
-        <select onchange="updatePartnerStatus('${c.id}', this.value)" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc;">
+        <select data-partner-status="${escapeHTML(partnerId)}" aria-label="Estado de ${escapeHTML(partnerName)}" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc;">
           <option value="pendiente" ${c.estado_verificacion === 'pendiente' ? 'selected' : ''}>Pendiente</option>
           <option value="verificado" ${c.estado_verificacion === 'verificado' ? 'selected' : ''}>Verificado</option>
           <option value="rechazado" ${c.estado_verificacion === 'rechazado' ? 'selected' : ''}>Rechazado</option>
         </select>
       </td>
       <td>
-        <button class="btn-primary-submit" style="padding: 6px 12px; font-size:0.8rem;" onclick="window.open('https://wa.me/${c.whatsapp || c.telefono}', '_blank')"><i data-lucide="message-circle" style="width:14px;"></i> Chat</button>
+        ${phone ? `<a class="btn-primary-submit" style="padding:6px 12px;font-size:.8rem;text-decoration:none;" href="https://wa.me/${encodeURIComponent(phone)}" target="_blank" rel="noopener"><i data-lucide="message-circle" style="width:14px;"></i> Chat</a>` : '<span>Sin teléfono</span>'}
       </td>
     `;
     domContratistas.tableBody.appendChild(tr);
+  });
+  domContratistas.tableBody.querySelectorAll('[data-partner-status]').forEach(select => {
+    select.addEventListener('change', () => window.updatePartnerStatus(select.dataset.partnerStatus, select.value));
   });
   if(window.lucide) window.lucide.createIcons();
 }
@@ -720,40 +745,49 @@ function renderCotizaciones() {
   }
   
   filtered.forEach(c => {
-    // Calcular Smart Match (lógica básica)
-    let mejoresMatch = [...contratistasCache];
-    
-    // 1. Filtrar por cercanía (muy básico)
+    let mejoresMatch = contratistasCache.map(partner => ({ partner, score: 0 }));
+
     if (c.parcela_comuna) {
-      const comuna = c.parcela_comuna.toLowerCase();
-      mejoresMatch.forEach(cont => {
+      const comuna = String(c.parcela_comuna).toLowerCase();
+      mejoresMatch = mejoresMatch.map(item => {
+        const cont = item.partner;
         let score = 0;
-        if (cont.comunas_atendidas && cont.comunas_atendidas.toLowerCase().includes(comuna)) score += 50;
-        else if (cont.region && cont.region.toLowerCase().includes(comuna)) score += 25; // fallback
-        if (cont.rating) score += (cont.rating * 5); // Hasta 25 ptos
-        cont._tempScore = score;
+        const coverage = Array.isArray(cont.comunas_atendidas)
+          ? cont.comunas_atendidas.join(' ')
+          : String(cont.comunas_atendidas || '');
+        if (coverage.toLowerCase().includes(comuna)) score += 50;
+        else if (String(cont.region || '').toLowerCase().includes(comuna)) score += 25;
+        if (Number(cont.rating)) score += Number(cont.rating) * 5;
+        return { partner: cont, score };
       });
-      mejoresMatch.sort((a,b) => (b._tempScore || 0) - (a._tempScore || 0));
+      mejoresMatch.sort((a, b) => b.score - a.score);
     }
     
-    const topMatch = mejoresMatch.length > 0 && mejoresMatch[0]._tempScore > 0 ? mejoresMatch[0] : null;
+    const topMatch = mejoresMatch[0]?.score > 0 ? mejoresMatch[0].partner : null;
+    const topCoverage = topMatch
+      ? (Array.isArray(topMatch.comunas_atendidas) ? topMatch.comunas_atendidas.join(', ') : String(topMatch.comunas_atendidas || 'Sin zona'))
+      : '';
+    const topPhone = String(topMatch?.whatsapp || topMatch?.telefono || '').replace(/\D/g, '');
+    const contactMessage = topMatch
+      ? `Hola ${topMatch.nombre_comercial || ''}, tengo un proyecto en ${c.parcela_comuna || ''} que podría interesarte.`
+      : '';
     const matchHtml = topMatch 
       ? `<div style="font-size:0.8rem; background:#f0fdf4; padding:8px; border-radius:8px; border:1px solid #bbf7d0;">
-          <strong>Sugerido: ${topMatch.nombre_comercial}</strong><br>
-          <span style="color:#166534">${topMatch.comunas_atendidas || 'Sin zona'} • ${topMatch.rating || 0}⭐</span><br>
-          <button onclick="window.open('https://wa.me/${topMatch.whatsapp || topMatch.telefono}?text=Hola ${encodeURIComponent(topMatch.nombre_comercial)}, tengo un proyecto en ${encodeURIComponent(c.parcela_comuna)} que podría interesarte.', '_blank')" style="margin-top:4px; padding:4px 8px; font-size:0.75rem; background:#25D366; color:#fff; border:none; border-radius:4px; cursor:pointer;">Contactar</button>
+          <strong>Sugerido: ${escapeHTML(topMatch.nombre_comercial || 'Partner')}</strong><br>
+          <span style="color:#166534">${escapeHTML(topCoverage)} • ${Number(topMatch.rating || 0).toFixed(2)}⭐</span><br>
+          ${topPhone ? `<a href="https://wa.me/${encodeURIComponent(topPhone)}?text=${encodeURIComponent(contactMessage)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:4px;padding:4px 8px;font-size:.75rem;background:#25D366;color:#fff;border-radius:4px;text-decoration:none;">Contactar</a>` : '<small>Sin teléfono disponible</small>'}
          </div>`
       : '<span style="color:#94a3b8; font-size:0.8rem;">Sin sugerencias</span>';
 
-    const fecha = new Date(c.created_at).toLocaleDateString();
+    const fecha = safeDate(c.created_at);
     
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${fecha}</td>
-      <td><strong>${c.cliente_nombre || 'Anónimo'}</strong><br><small>${c.cliente_telefono || ''}</small></td>
-      <td>ID: ${c.parcela_id || '-'}<br><small>${c.parcela_comuna || ''}</small></td>
+      <td>${escapeHTML(fecha)}</td>
+      <td><strong>${escapeHTML(c.cliente_nombre || 'Anónimo')}</strong><br><small>${escapeHTML(c.cliente_telefono || '')}</small></td>
+      <td>ID: ${escapeHTML(c.parcela_id || '-')}<br><small>${escapeHTML(c.parcela_comuna || '')}</small></td>
       <td>${c.requiere_instalacion ? '<span style="color:#10b981; font-weight:bold;">Sí</span>' : 'No'}</td>
-      <td><span class="preview-badge">${c.estado || 'Nueva'}</span></td>
+      <td><span class="preview-badge">${escapeHTML(c.estado || 'Nueva')}</span></td>
       <td>${matchHtml}</td>
     `;
     domCotizaciones.tableBody.appendChild(tr);

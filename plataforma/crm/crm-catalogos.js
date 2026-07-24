@@ -11,6 +11,12 @@
   };
   const csv = (id) => val(id).split(',').map((item) => item.trim()).filter(Boolean);
   const money = (value) => value == null ? '—' : `$${Number(value).toLocaleString('es-CL')}`;
+  const assetUrl = (value) => {
+    const raw = String(value || '').trim().replaceAll('\\', '/');
+    if (!raw) return '';
+    if (/^(?:https?:|data:|blob:)/i.test(raw) || raw.startsWith('/')) return raw;
+    return `/${raw.replace(/^\.?\//, '').replace(/^(?:\.\.\/)+/, '')}`;
+  };
 
   function field(id, label, value = '', type = 'text', attrs = '') {
     return `<label class="catalog-field"><span>${esc(label)}</span><input id="${id}" type="${type}" value="${esc(value ?? '')}" ${attrs}></label>`;
@@ -108,7 +114,7 @@
 
         <div class="catalog-section-title"><h3>Fotografías</h3><span>${photos.length} archivo(s)</span></div>
         <div class="catalog-photo-grid">
-          ${photos.length ? photos.map((f) => `<a href="${esc(f.url_storage || '')}" target="_blank" rel="noopener"><img src="${esc(f.url_storage || '')}" alt="Fotografía de la parcela" loading="lazy"><span>${f.es_portada ? 'Portada' : `Foto ${Number(f.orden || 0) + 1}`}</span></a>`).join('') : '<p>Esta publicación no tiene fotografías disponibles.</p>'}
+          ${photos.length ? photos.map((f) => `<a href="${esc(assetUrl(f.url_storage))}" target="_blank" rel="noopener"><img src="${esc(assetUrl(f.url_storage))}" alt="Fotografía de la parcela" loading="lazy"><span>${f.es_portada ? 'Portada' : `Foto ${Number(f.orden || 0) + 1}`}</span></a>`).join('') : '<p>Esta publicación no tiene fotografías disponibles.</p>'}
         </div>
       </form>`;
 
@@ -188,7 +194,7 @@
     const houses = data || [];
     body.innerHTML = houses.length ? houses.map((h) => `
       <tr>
-        <td>${h.imagen_principal_url ? `<img class="catalog-thumb" src="${esc(h.imagen_principal_url)}" alt="${esc(h.nombre)}">` : '—'}</td>
+        <td>${h.imagen_principal_url ? `<img class="catalog-thumb" src="${esc(assetUrl(h.imagen_principal_url))}" alt="${esc(h.nombre)}">` : '—'}</td>
         <td><strong>${esc(h.nombre)}</strong><br><small>${esc(h.codigo || '')}</small></td>
         <td>${esc(h.superficie_m2)} m²</td><td>${esc(h.habitaciones)}</td><td>${esc(h.banos)}</td>
         <td>${money(h.precio_base)}</td><td><span class="badge ${h.activa ? 'aprobada' : 'rechazada'}">${h.activa ? 'Activa' : 'Inactiva'}</span></td>

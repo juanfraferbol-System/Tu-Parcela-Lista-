@@ -63,8 +63,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="#" class="nav-item" data-target="view-cotizaciones"><i data-lucide="briefcase"></i> Cotizaciones / Proyectos</a>
         <a href="#" class="nav-item" data-target="view-contratistas"><i data-lucide="users"></i> Red de Partners</a>
         <a href="#" class="nav-item" data-target="view-partner-postulaciones"><i data-lucide="user-check"></i> Postulaciones Partner <span id="partner-pending-badge" class="nav-badge" hidden>0</span></a>
-        <a href="#" class="nav-item" data-target="view-promociones"><i data-lucide="megaphone"></i> Promociones y Ads</a>
-        <a href="/plataforma/studio/" class="nav-item"><i data-lucide="wand-sparkles"></i> TPL Studio AI</a>
+        <!-- Promociones y Ads permanece oculto hasta contar con persistencia y acciones reales. -->
+        <a href="/plataforma/studio/" class="nav-item" title="MVP local: todavía no guarda campañas en Supabase"><i data-lucide="wand-sparkles"></i> TPL Studio <span class="nav-beta">MVP local</span></a>
       </nav>
       <div class="sidebar-bottom">
         <button id="btn-logout"><i data-lucide="log-out"></i> Cerrar sesión</button>
@@ -276,8 +276,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
       </div>
 
-      <!-- VISTA PROMOCIONES Y ADS -->
-      <div id="view-promociones" class="dashboard-section" style="display:none;">
+      <!-- VISTA PROMOCIONES Y ADS: reservada, no se expone hasta implementar su controlador real. -->
+      <div id="view-promociones" class="dashboard-section" style="display:none;" hidden aria-hidden="true">
         <section class="filters-bar" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
           <input type="text" id="search-promos" placeholder="Buscar promoción..." style="padding:8px 12px; border:1px solid #ccc; border-radius:6px; flex:1; min-width:200px;">
           <select id="filter-estado-promo" style="padding:8px; border:1px solid #ccc; border-radius:6px;">
