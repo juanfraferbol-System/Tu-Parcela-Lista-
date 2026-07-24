@@ -1,58 +1,491 @@
-(() => {
+(function (window, document) {
   'use strict';
-  const KEY='tpl_business_v1';
-  const now=()=>new Date().toISOString();
-  const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-  const money=v=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Number(v||0));
-  const clientViewUrl=projectCode=>`/plataforma/tpl-business/?admin_project=${encodeURIComponent(String(projectCode||''))}`;
-  const seed={clients:[{id:'cli-caburgua',name:'Caburgua Premium',contactName:'Propietario Caburgua',email:'',phone:'',plan:'Premium',billingModel:'mensual_comision',monthlyFee:0,commission:0,status:'activo',startedAt:'2026-07-22',notes:'Primer cliente comercial de TPL. Prioridad: activar campaña Google Ads y generar visitas calificadas.'}],projects:[{id:'pro-caburgua',clientId:'cli-caburgua',name:'Venta Parcela Caburgua Premium',propertyId:'caburgua',objective:'Generar consultas calificadas y agendar visitas',budgetGoogle:150000,budgetMeta:0,status:'preparacion',stage:'Preparación',landingUrl:'/caburgua-premium',leadGoal:50,visitGoal:10,saleGoal:1,progress:35,createdAt:'2026-07-22',notes:'Pendiente validar landing, conversiones y campaña.'}],leads:[],sales:[]};
-  let state=load();
-  const liveMetrics={leads:null,visits:null};
-  function load(){try{const data=JSON.parse(localStorage.getItem(KEY)||'null');const loaded=data&&data.clients&&data.projects?data:structuredClone(seed);const caburgua=loaded.projects.find(project=>project.id==='pro-caburgua');if(caburgua&&(!caburgua.landingUrl||caburgua.landingUrl==='/parcela.html?id=caburgua'))caburgua.landingUrl='/caburgua-premium';return loaded}catch{return structuredClone(seed)}}
-  function save(){localStorage.setItem(KEY,JSON.stringify(state));window.dispatchEvent(new CustomEvent('tpl:business-updated'));}
-  function install(){
-    const nav=document.querySelector('.sidebar-nav'), main=document.querySelector('.main-content');
-    if(!nav||!main||document.getElementById('view-business-dashboard'))return;
-    const group=document.createElement('div');group.className='nav-business-group';group.textContent='Centro Comercial';nav.prepend(group);
-    const links=[['view-business-dashboard','layout-dashboard','Dashboard Comercial'],['view-business-clients','building-2','Clientes'],['view-business-projects','folder-kanban','Proyectos Comerciales']];
-    [...links].reverse().forEach(([target,icon,label])=>{const a=document.createElement('a');a.href='#';a.className='nav-item';a.dataset.target=target;a.innerHTML=`<i data-lucide="${icon}"></i> ${label}`;nav.insertBefore(a,group.nextSibling);a.addEventListener('click',e=>{e.preventDefault();activate(a,target,label);renderAll();});});
-    main.append(buildDashboard(),buildClients(),buildProjects(),buildModal());
-    bind(); renderAll(); loadCommercialMetrics(); window.lucide?.createIcons();
+
+  const service = window.TPLBusinessAdminService;
+  const state = {
+    loading: false,
+    accounts: [],
+    projects: [],
+    landings: [],
+    requests: [],
+    modules: [],
+    plans: [],
+    projectModules: [],
+    opportunities: [],
+    visits: []
+  };
+
+  const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[character]));
+
+  const formatDate = value => {
+    if (!value) return 'Sin fecha';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime())
+      ? 'Sin fecha'
+      : new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+  };
+
+  const label = value => ({
+    preparacion: 'Preparación',
+    activo: 'Activo',
+    pausado: 'Pausado',
+    ganado: 'Ganado',
+    perdido: 'Perdido',
+    cerrado: 'Cerrado',
+    solicitada: 'Solicitada',
+    contactando: 'Contactando',
+    aprobada: 'Aprobada',
+    activada: 'Activada',
+    rechazada: 'Rechazada'
+  }[value] || value || 'Sin estado');
+
+  const clientViewUrl = projectCode =>
+    `/plataforma/tpl-business/?admin_project=${encodeURIComponent(String(projectCode || ''))}`;
+
+  function section(id, html) {
+    const element = document.createElement('div');
+    element.id = id;
+    element.className = 'dashboard-section';
+    element.style.display = 'none';
+    element.innerHTML = html;
+    return element;
   }
-  function activate(link,target,label){document.querySelectorAll('.dashboard-section').forEach(s=>{s.classList.remove('active-section');s.style.display='none'});document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const s=document.getElementById(target);if(s){s.style.display='block';s.classList.add('active-section')}link.classList.add('active');const t=document.getElementById('topbar-title');if(t)t.textContent=label;}
-  function section(id,html){const d=document.createElement('div');d.id=id;d.className='dashboard-section';d.style.display='none';d.innerHTML=html;return d;}
-  function buildDashboard(){return section('view-business-dashboard',`<section class="business-hero"><div><span class="eyebrow">TPL BUSINESS V1</span><h2>Centro Comercial</h2><p>Administra clientes, proyectos comerciales, campañas y resultados desde un solo lugar. Caburgua Premium es el primer caso real.</p></div><div class="business-hero-actions"><button class="business-primary" data-business-action="new-client">Nuevo cliente</button><button class="business-secondary" data-business-action="new-project">Nuevo proyecto</button></div></section><section class="business-kpis"><article class="business-kpi"><strong id="biz-kpi-clients">0</strong><span>Clientes activos</span></article><article class="business-kpi"><strong id="biz-kpi-projects">0</strong><span>Proyectos activos</span></article><article class="business-kpi"><strong id="biz-kpi-campaigns">0</strong><span>Campañas activas</span></article><article class="business-kpi"><strong id="biz-kpi-leads">0</strong><span>Leads</span></article><article class="business-kpi"><strong id="biz-kpi-visits">0</strong><span>Visitas</span></article><article class="business-kpi"><strong id="biz-kpi-sales">0</strong><span>Ventas</span></article></section><section class="business-grid"><article class="business-card"><h3>Proyectos prioritarios</h3><div id="biz-priority-projects"></div></article><article class="business-card"><h3>Checklist para activar Google Ads</h3><div class="business-checklist"><div class="business-check"><strong>Landing enfocada</strong><span>Pendiente auditoría</span></div><div class="business-check"><strong>WhatsApp medido</strong><span>Pendiente evento</span></div><div class="business-check"><strong>Formulario medido</strong><span>Pendiente evento</span></div><div class="business-check"><strong>GA4 + Google Ads</strong><span>Pendiente vincular</span></div><div class="business-check"><strong>Campaña y palabras clave</strong><span>Pendiente crear</span></div></div></article></section>`)}
-  function buildClients(){return section('view-business-clients',`<section class="business-hero"><div><span class="eyebrow">Clientes</span><h2>Clientes comerciales</h2><p>Gestiona modalidad de pago, plan, datos de contacto y proyectos asociados.</p></div><button class="business-primary" data-business-action="new-client">Agregar cliente</button></section><div class="business-toolbar"><input id="biz-client-search" type="search" placeholder="Buscar cliente o plan"><select id="biz-client-status"><option value="">Todos los estados</option><option value="activo">Activos</option><option value="pausado">Pausados</option><option value="cerrado">Cerrados</option></select></div><section class="table-container"><table class="data-table"><thead><tr><th>Cliente</th><th>Plan y cobro</th><th>Proyectos</th><th>Estado</th><th>Inicio</th><th>Acciones</th></tr></thead><tbody id="biz-clients-body"></tbody></table></section>`)}
-  function buildProjects(){return section('view-business-projects',`<section class="business-hero"><div><span class="eyebrow">Proyectos comerciales</span><h2>Proyectos orientados a resultados</h2><p>Cada proyecto reúne landing, presupuesto, objetivos, leads, visitas y venta.</p></div><button class="business-primary" data-business-action="new-project">Crear proyecto</button></section><div class="business-toolbar"><input id="biz-project-search" type="search" placeholder="Buscar proyecto o cliente"><select id="biz-project-status"><option value="">Todos los estados</option><option value="preparacion">Preparación</option><option value="activo">Activo</option><option value="optimizando">Optimizando</option><option value="vendido">Vendido</option></select></div><section class="table-container"><table class="data-table"><thead><tr><th>Proyecto</th><th>Cliente</th><th>Objetivo</th><th>Presupuesto</th><th>Avance</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="biz-projects-body"></tbody></table></section>`)}
-  function buildModal(){const m=document.createElement('div');m.id='business-modal';m.className='business-modal';m.innerHTML='<div class="business-modal-box"><div class="business-modal-head"><h3 id="business-modal-title">Nuevo registro</h3><button class="business-secondary" type="button" data-business-close>Cerrar</button></div><div class="business-modal-body" id="business-modal-body"></div></div>';return m;}
-  function bind(){document.addEventListener('click',e=>{const a=e.target.closest('[data-business-action]');if(a){const type=a.dataset.businessAction;if(type==='new-client')clientForm();if(type==='new-project')projectForm();}const edit=e.target.closest('[data-biz-edit-client]');if(edit)clientForm(edit.dataset.bizEditClient);const ep=e.target.closest('[data-biz-edit-project]');if(ep)projectForm(ep.dataset.bizEditProject);if(e.target.closest('[data-business-close]')||e.target.id==='business-modal')closeModal();});document.getElementById('biz-client-search')?.addEventListener('input',renderClients);document.getElementById('biz-client-status')?.addEventListener('change',renderClients);document.getElementById('biz-project-search')?.addEventListener('input',renderProjects);document.getElementById('biz-project-status')?.addEventListener('change',renderProjects);}
-  function renderAll(){renderDashboard();renderClients();renderProjects();}
-  async function loadCommercialMetrics(){
-    const client=window.tplSupabase||window.tplCrmSupabase||window.TPL_getSupabaseClient?.();
-    if(!client)return;
-    try{
-      const projectResult=await client.from('tpl_proyectos_comerciales').select('id').eq('codigo','pro-caburgua').maybeSingle();
-      if(projectResult.error||!projectResult.data?.id)return;
-      const projectId=projectResult.data.id;
-      const [leadsResult,visitsResult]=await Promise.all([
-        client.from('crm_oportunidades').select('id',{count:'exact',head:true}).eq('proyecto_comercial_id',projectId),
-        client.from('visitas').select('id',{count:'exact',head:true}).eq('proyecto_comercial_id',projectId)
-      ]);
-      if(!leadsResult.error)liveMetrics.leads=leadsResult.count||0;
-      if(!visitsResult.error)liveMetrics.visits=visitsResult.count||0;
-      if(liveMetrics.leads!==null)set('biz-kpi-leads',liveMetrics.leads);
-      if(liveMetrics.visits!==null)set('biz-kpi-visits',liveMetrics.visits);
-    }catch(error){
-      console.warn('TPL Business: métricas comerciales todavía no disponibles.',error);
+
+  function buildDashboard() {
+    return section('view-business-dashboard', `
+      <section class="business-hero">
+        <div><span class="eyebrow">TPL BUSINESS</span><h2>Centro Comercial</h2>
+          <p>Información canónica de clientes, proyectos, solicitudes y resultados almacenada en Supabase.</p>
+        </div>
+        <div class="business-hero-actions">
+          <button class="business-primary" data-business-action="new-account">Nueva cuenta</button>
+          <button class="business-secondary" data-business-action="new-project">Nuevo proyecto</button>
+        </div>
+      </section>
+      <div class="business-feedback" data-business-feedback hidden></div>
+      <section class="business-kpis">
+        <article class="business-kpi"><strong data-kpi="accounts">—</strong><span>Cuentas activas</span></article>
+        <article class="business-kpi"><strong data-kpi="projects">—</strong><span>Proyectos abiertos</span></article>
+        <article class="business-kpi"><strong data-kpi="campaigns">—</strong><span>Google Ads activos</span></article>
+        <article class="business-kpi"><strong data-kpi="leads">—</strong><span>Leads reales</span></article>
+        <article class="business-kpi"><strong data-kpi="visits">—</strong><span>Visitas</span></article>
+        <article class="business-kpi"><strong data-kpi="requests">—</strong><span>Solicitudes pendientes</span></article>
+      </section>
+      <section class="business-grid">
+        <article class="business-card"><h3>Proyectos prioritarios</h3><div data-priority-projects></div></article>
+        <article class="business-card"><h3>Actividad comercial</h3><div data-request-summary></div></article>
+      </section>`);
+  }
+
+  function buildAccounts() {
+    return section('view-business-accounts', `
+      <section class="business-hero">
+        <div><span class="eyebrow">Cuentas</span><h2>Clientes de TPL Business</h2>
+          <p>Cada cuenta puede reunir uno o más proyectos comerciales.</p>
+        </div>
+        <button class="business-primary" data-business-action="new-account">Agregar cuenta</button>
+      </section>
+      <div class="business-feedback" data-business-feedback hidden></div>
+      <div class="business-toolbar">
+        <input data-account-search type="search" placeholder="Buscar cuenta">
+        <select data-account-status><option value="">Todos los estados</option><option value="activo">Activas</option><option value="pausado">Pausadas</option><option value="cerrado">Cerradas</option></select>
+      </div>
+      <section class="table-container"><table class="data-table">
+        <thead><tr><th>Cuenta</th><th>Código</th><th>Proyectos</th><th>Estado</th><th>Actualización</th><th>Acciones</th></tr></thead>
+        <tbody data-accounts-body></tbody>
+      </table></section>`);
+  }
+
+  function buildProjects() {
+    return section('view-business-projects', `
+      <section class="business-hero">
+        <div><span class="eyebrow">Proyectos</span><h2>Proyectos comerciales</h2>
+          <p>Fuente única para Mi Proyecto, Landing Premium y resultados comerciales.</p>
+        </div>
+        <button class="business-primary" data-business-action="new-project">Crear proyecto</button>
+      </section>
+      <div class="business-feedback" data-business-feedback hidden></div>
+      <div class="business-toolbar">
+        <input data-project-search type="search" placeholder="Buscar proyecto, cuenta o propiedad">
+        <select data-project-status><option value="">Todos los estados</option><option value="preparacion">Preparación</option><option value="activo">Activos</option><option value="pausado">Pausados</option><option value="ganado">Ganados</option><option value="perdido">Perdidos</option><option value="cerrado">Cerrados</option></select>
+      </div>
+      <section class="table-container"><table class="data-table">
+        <thead><tr><th>Proyecto</th><th>Cuenta</th><th>Landing</th><th>Resultados</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody data-projects-body></tbody>
+      </table></section>`);
+  }
+
+  function buildRequests() {
+    return section('view-business-requests', `
+      <section class="business-hero">
+        <div><span class="eyebrow">Solicitudes</span><h2>Solicitudes comerciales</h2>
+          <p>Gestiona las activaciones pedidas por propietarios y colaboradores desde Mi Proyecto.</p>
+        </div>
+        <button class="business-secondary" data-business-refresh>Actualizar</button>
+      </section>
+      <div class="business-feedback" data-business-feedback hidden></div>
+      <div class="business-toolbar">
+        <input data-request-search type="search" placeholder="Buscar proyecto, módulo o recomendación">
+        <select data-request-status><option value="">Todos los estados</option><option value="solicitada">Solicitadas</option><option value="contactando">Contactando</option><option value="aprobada">Aprobadas</option><option value="activada">Activadas</option><option value="rechazada">Rechazadas</option></select>
+      </div>
+      <section class="table-container"><table class="data-table">
+        <thead><tr><th>Solicitud</th><th>Proyecto</th><th>Fecha</th><th>Estado</th><th>Gestión</th></tr></thead>
+        <tbody data-requests-body></tbody>
+      </table></section>`);
+  }
+
+  function buildModal() {
+    const modal = document.createElement('div');
+    modal.id = 'business-modal';
+    modal.className = 'business-modal';
+    modal.innerHTML = `<div class="business-modal-box" role="dialog" aria-modal="true" aria-labelledby="business-modal-title">
+      <div class="business-modal-head"><h3 id="business-modal-title">Registro</h3><button class="business-secondary" type="button" data-business-close>Cerrar</button></div>
+      <div class="business-feedback business-modal-feedback" data-business-modal-feedback hidden></div>
+      <div class="business-modal-body" data-business-modal-body></div>
+    </div>`;
+    return modal;
+  }
+
+  function install() {
+    const navigation = document.querySelector('.sidebar-nav');
+    const main = document.querySelector('.main-content');
+    if (!navigation || !main || document.getElementById('view-business-dashboard')) return;
+
+    const group = document.createElement('div');
+    group.className = 'nav-business-group';
+    group.textContent = 'TPL Business';
+    navigation.prepend(group);
+
+    const links = [
+      ['view-business-dashboard', 'layout-dashboard', 'Centro Comercial'],
+      ['view-business-accounts', 'building-2', 'Cuentas TPL'],
+      ['view-business-projects', 'folder-kanban', 'Proyectos Comerciales'],
+      ['view-business-requests', 'inbox', 'Solicitudes']
+    ];
+    [...links].reverse().forEach(([target, icon, text]) => {
+      const link = document.createElement('a');
+      link.href = '#';
+      link.className = 'nav-item';
+      link.dataset.businessTarget = target;
+      link.innerHTML = `<i data-lucide="${icon}"></i> ${text}`;
+      navigation.insertBefore(link, group.nextSibling);
+    });
+
+    main.append(buildDashboard(), buildAccounts(), buildProjects(), buildRequests(), buildModal());
+    bind();
+    window.lucide?.createIcons();
+    load();
+  }
+
+  function activate(link) {
+    const target = link.dataset.businessTarget;
+    document.querySelectorAll('.dashboard-section').forEach(section => {
+      section.classList.remove('active-section');
+      section.style.display = 'none';
+    });
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.getElementById(target)?.style.setProperty('display', 'block');
+    document.getElementById(target)?.classList.add('active-section');
+    link.classList.add('active');
+    const title = document.getElementById('topbar-title');
+    if (title) title.textContent = link.textContent.trim();
+    render();
+  }
+
+  async function load() {
+    if (state.loading || !service) return;
+    state.loading = true;
+    feedback('Cargando información desde Supabase…');
+    try {
+      Object.assign(state, await service.loadPanel());
+      feedback('');
+      render();
+    } catch (error) {
+      console.error('[TPL Business CRM] Error:', error.cause || error);
+      feedback(error.message || 'No fue posible cargar TPL Business.', true);
+    } finally {
+      state.loading = false;
     }
   }
-  function renderDashboard(){set('biz-kpi-clients',state.clients.filter(x=>x.status==='activo').length);set('biz-kpi-projects',state.projects.filter(x=>!['vendido','cerrado'].includes(x.status)).length);set('biz-kpi-campaigns',state.projects.filter(x=>x.status==='activo').length);set('biz-kpi-leads',state.leads.length);set('biz-kpi-visits',state.leads.filter(x=>x.stage==='visita').length);set('biz-kpi-sales',state.sales.length);const box=document.getElementById('biz-priority-projects');if(!box)return;box.innerHTML=state.projects.map(p=>{const c=state.clients.find(x=>x.id===p.clientId);return `<div class="business-project"><div><span class="business-status ${p.status==='activo'?'active':''}">${esc(p.stage||p.status)}</span><h4>${esc(p.name)}</h4><p>${esc(c?.name||'Sin cliente')} · Google Ads ${money(p.budgetGoogle)}</p><div class="business-progress"><span style="width:${Math.min(100,Number(p.progress||0))}%"></span></div><p>${Number(p.progress||0)}% preparado</p></div><div class="business-table-actions"><a href="${esc(p.landingUrl||'#')}" target="_blank" rel="noopener">Ver landing</a><a href="${esc(clientViewUrl(p.id))}" target="_blank" rel="noopener">Vista como cliente</a><button data-biz-edit-project="${esc(p.id)}">Editar</button></div></div>`}).join('')||'<div class="business-empty">Aún no hay proyectos.</div>';}
-  function renderClients(){const body=document.getElementById('biz-clients-body');if(!body)return;const q=(document.getElementById('biz-client-search')?.value||'').toLowerCase();const status=document.getElementById('biz-client-status')?.value||'';const rows=state.clients.filter(c=>(!status||c.status===status)&&(!q||`${c.name} ${c.plan} ${c.contactName}`.toLowerCase().includes(q)));body.innerHTML=rows.map(c=>{const n=state.projects.filter(p=>p.clientId===c.id).length;const billing={mensual:'Mensual',comision:'Comisión por venta',servicio:'Pago por servicio',mensual_comision:'Mensual + comisión'}[c.billingModel]||c.billingModel;return `<tr><td><strong>${esc(c.name)}</strong><br><small>${esc(c.contactName||'Sin contacto')}</small></td><td>${esc(c.plan||'Sin plan')}<br><small>${esc(billing||'No definido')}</small></td><td>${n}</td><td><span class="business-status ${c.status==='activo'?'active':''}">${esc(c.status)}</span></td><td>${esc(c.startedAt||'—')}</td><td><div class="business-table-actions"><button data-biz-edit-client="${esc(c.id)}">Editar</button></div></td></tr>`}).join('')||'<tr><td colspan="6" class="business-empty">No hay clientes.</td></tr>';}
-  function renderProjects(){const body=document.getElementById('biz-projects-body');if(!body)return;const q=(document.getElementById('biz-project-search')?.value||'').toLowerCase();const status=document.getElementById('biz-project-status')?.value||'';const rows=state.projects.filter(p=>{const c=state.clients.find(x=>x.id===p.clientId);return(!status||p.status===status)&&(!q||`${p.name} ${c?.name||''}`.toLowerCase().includes(q))});body.innerHTML=rows.map(p=>{const c=state.clients.find(x=>x.id===p.clientId);return `<tr><td><strong>${esc(p.name)}</strong><br><small>${esc(p.propertyId||'')}</small></td><td>${esc(c?.name||'Sin cliente')}</td><td>${esc(p.objective||'—')}</td><td>${money(Number(p.budgetGoogle||0)+Number(p.budgetMeta||0))}</td><td><div class="business-progress"><span style="width:${Math.min(100,Number(p.progress||0))}%"></span></div><small>${Number(p.progress||0)}%</small></td><td><span class="business-stage">${esc(p.stage||p.status)}</span></td><td><div class="business-table-actions"><a href="${esc(p.landingUrl||'#')}" target="_blank" rel="noopener">Landing</a><a href="${esc(clientViewUrl(p.id))}" target="_blank" rel="noopener">Vista como cliente</a><button data-biz-edit-project="${esc(p.id)}">Editar</button></div></td></tr>`}).join('')||'<tr><td colspan="7" class="business-empty">No hay proyectos.</td></tr>';}
-  function clientForm(id){const c=state.clients.find(x=>x.id===id)||{};openModal(id?'Editar cliente':'Nuevo cliente',`<form id="biz-client-form" class="business-form"><input type="hidden" name="id" value="${esc(c.id||'')}"><label>Nombre comercial<input name="name" required value="${esc(c.name||'')}"></label><label>Responsable / contacto<input name="contactName" value="${esc(c.contactName||'')}"></label><label>Correo<input name="email" type="email" value="${esc(c.email||'')}"></label><label>Teléfono / WhatsApp<input name="phone" value="${esc(c.phone||'')}"></label><label>Plan<input name="plan" value="${esc(c.plan||'Premium')}"></label><label>Modalidad de cobro<select name="billingModel"><option value="mensual">Mensual</option><option value="comision">Comisión por venta</option><option value="servicio">Pago por servicio</option><option value="mensual_comision">Mensual + comisión</option></select></label><label>Mensualidad CLP<input name="monthlyFee" type="number" min="0" value="${Number(c.monthlyFee||0)}"></label><label>Comisión %<input name="commission" type="number" min="0" step="0.1" value="${Number(c.commission||0)}"></label><label>Estado<select name="status"><option value="activo">Activo</option><option value="pausado">Pausado</option><option value="cerrado">Cerrado</option></select></label><label>Fecha de inicio<input name="startedAt" type="date" value="${esc(c.startedAt||new Date().toISOString().slice(0,10))}"></label><label class="wide">Notas<textarea name="notes" rows="4">${esc(c.notes||'')}</textarea></label><div class="wide business-modal-foot"><button type="button" class="business-secondary" data-business-close>Cancelar</button><button class="business-primary" type="submit">Guardar cliente</button></div></form>`);const f=document.getElementById('biz-client-form');f.billingModel.value=c.billingModel||'mensual';f.status.value=c.status||'activo';f.addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f));d.id=d.id||`cli-${Date.now()}`;d.monthlyFee=Number(d.monthlyFee||0);d.commission=Number(d.commission||0);const i=state.clients.findIndex(x=>x.id===d.id);i>=0?state.clients[i]={...state.clients[i],...d}:state.clients.push(d);save();closeModal();renderAll();});}
-  function projectForm(id){const p=state.projects.find(x=>x.id===id)||{};openModal(id?'Editar proyecto comercial':'Nuevo proyecto comercial',`<form id="biz-project-form" class="business-form"><input type="hidden" name="id" value="${esc(p.id||'')}"><label class="wide">Nombre del proyecto<input name="name" required value="${esc(p.name||'')}"></label><label>Cliente<select name="clientId">${state.clients.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select></label><label>ID de parcela<input name="propertyId" value="${esc(p.propertyId||'')}"></label><label class="wide">Objetivo<input name="objective" value="${esc(p.objective||'Generar consultas calificadas y agendar visitas')}"></label><label>Presupuesto Google Ads<input name="budgetGoogle" type="number" min="0" value="${Number(p.budgetGoogle||0)}"></label><label>Presupuesto Meta Ads<input name="budgetMeta" type="number" min="0" value="${Number(p.budgetMeta||0)}"></label><label>Estado<select name="status"><option value="preparacion">Preparación</option><option value="activo">Activo</option><option value="optimizando">Optimizando</option><option value="vendido">Vendido</option></select></label><label>Etapa<input name="stage" value="${esc(p.stage||'Preparación')}"></label><label>Landing URL<input name="landingUrl" value="${esc(p.landingUrl||'')}"></label><label>Avance %<input name="progress" type="number" min="0" max="100" value="${Number(p.progress||0)}"></label><label>Meta de leads<input name="leadGoal" type="number" min="0" value="${Number(p.leadGoal||0)}"></label><label>Meta de visitas<input name="visitGoal" type="number" min="0" value="${Number(p.visitGoal||0)}"></label><label>Meta de ventas<input name="saleGoal" type="number" min="0" value="${Number(p.saleGoal||1)}"></label><label class="wide">Notas<textarea name="notes" rows="4">${esc(p.notes||'')}</textarea></label><div class="wide business-modal-foot"><button type="button" class="business-secondary" data-business-close>Cancelar</button><button class="business-primary" type="submit">Guardar proyecto</button></div></form>`);const f=document.getElementById('biz-project-form');f.clientId.value=p.clientId||state.clients[0]?.id||'';f.status.value=p.status||'preparacion';f.addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f));d.id=d.id||`pro-${Date.now()}`;['budgetGoogle','budgetMeta','progress','leadGoal','visitGoal','saleGoal'].forEach(k=>d[k]=Number(d[k]||0));d.createdAt=p.createdAt||now();const i=state.projects.findIndex(x=>x.id===d.id);i>=0?state.projects[i]={...state.projects[i],...d}:state.projects.push(d);save();closeModal();renderAll();});}
-  function openModal(title,html){set('business-modal-title',title);document.getElementById('business-modal-body').innerHTML=html;document.getElementById('business-modal').classList.add('open');}
-  function closeModal(){document.getElementById('business-modal')?.classList.remove('open');}
-  function set(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
-  document.addEventListener('DOMContentLoaded',install);
-})();
+
+  function account(id) {
+    return state.accounts.find(item => item.id === id);
+  }
+
+  function project(id) {
+    return state.projects.find(item => item.id === id);
+  }
+
+  function landing(projectId) {
+    return state.landings.find(item => item.proyecto_comercial_id === projectId);
+  }
+
+  function projectMetrics(projectId) {
+    const opportunities = state.opportunities.filter(item => item.proyecto_comercial_id === projectId);
+    return {
+      leads: opportunities.length,
+      sales: opportunities.filter(item => item.estado === 'ganada' || ['reservado', 'ganado'].includes(item.etapa)).length,
+      visits: state.visits.filter(item => item.proyecto_comercial_id === projectId).length
+    };
+  }
+
+  function requestName(request) {
+    if (request.recomendacion) return request.recomendacion;
+    if (request.modulo_codigo) {
+      return state.modules.find(item => item.codigo === request.modulo_codigo)?.nombre || request.modulo_codigo;
+    }
+    if (request.plan_id) return state.plans.find(item => item.id === request.plan_id)?.nombre || 'Plan comercial';
+    return 'Solicitud comercial';
+  }
+
+  function render() {
+    renderDashboard();
+    renderAccounts();
+    renderProjects();
+    renderRequests();
+  }
+
+  function renderDashboard() {
+    const openProjects = state.projects.filter(item => item.estado !== 'cerrado');
+    const activeCampaigns = state.projectModules.filter(item => item.modulo_codigo === 'google_ads' && item.estado === 'activo');
+    const pendingRequests = state.requests.filter(item => ['solicitada', 'contactando', 'aprobada'].includes(item.estado));
+    const values = {
+      accounts: state.accounts.filter(item => item.estado === 'activo').length,
+      projects: openProjects.length,
+      campaigns: activeCampaigns.length,
+      leads: state.opportunities.length,
+      visits: state.visits.length,
+      requests: pendingRequests.length
+    };
+    Object.entries(values).forEach(([key, value]) => {
+      const element = document.querySelector(`[data-kpi="${key}"]`);
+      if (element) element.textContent = value;
+    });
+
+    const projectsBox = document.querySelector('[data-priority-projects]');
+    if (projectsBox) {
+      projectsBox.innerHTML = openProjects.slice(0, 6).map(item => {
+        const owner = account(item.cuenta_id);
+        const currentLanding = landing(item.id);
+        return `<div class="business-project"><div>
+          <span class="business-status ${item.estado === 'activo' ? 'active' : ''}">${esc(label(item.estado))}</span>
+          <h4>${esc(item.nombre)}</h4><p>${esc(owner?.nombre || 'Sin cuenta')} · ${esc(item.propiedad_codigo || 'Sin propiedad')}</p>
+        </div><div class="business-table-actions">
+          ${currentLanding ? `<a href="/${esc(currentLanding.slug)}" target="_blank" rel="noopener">Landing</a>` : ''}
+          <a href="${esc(clientViewUrl(item.codigo))}" target="_blank" rel="noopener">Vista como cliente</a>
+        </div></div>`;
+      }).join('') || '<div class="business-empty">No existen proyectos abiertos.</div>';
+    }
+
+    const summary = document.querySelector('[data-request-summary]');
+    if (summary) {
+      summary.innerHTML = state.requests.slice(0, 5).map(item => `
+        <div class="business-check"><strong>${esc(requestName(item))}</strong><span>${esc(label(item.estado))}</span></div>
+      `).join('') || '<div class="business-empty">No existen solicitudes todavía.</div>';
+    }
+  }
+
+  function renderAccounts() {
+    const body = document.querySelector('[data-accounts-body]');
+    if (!body) return;
+    const query = String(document.querySelector('[data-account-search]')?.value || '').toLowerCase();
+    const status = document.querySelector('[data-account-status]')?.value || '';
+    const rows = state.accounts.filter(item =>
+      (!status || item.estado === status)
+      && (!query || `${item.nombre} ${item.codigo}`.toLowerCase().includes(query))
+    );
+    body.innerHTML = rows.map(item => {
+      const count = state.projects.filter(projectItem => projectItem.cuenta_id === item.id).length;
+      return `<tr><td><strong>${esc(item.nombre)}</strong></td><td><small>${esc(item.codigo)}</small></td>
+        <td>${count}</td><td><span class="business-status ${item.estado === 'activo' ? 'active' : ''}">${esc(label(item.estado))}</span></td>
+        <td>${esc(formatDate(item.actualizado_en))}</td><td><div class="business-table-actions">
+          <button data-edit-account="${esc(item.id)}">Editar</button>
+          ${item.estado !== 'cerrado' ? `<button data-archive-account="${esc(item.id)}">Archivar</button>` : ''}
+        </div></td></tr>`;
+    }).join('') || '<tr><td colspan="6" class="business-empty">No hay cuentas que coincidan.</td></tr>';
+  }
+
+  function renderProjects() {
+    const body = document.querySelector('[data-projects-body]');
+    if (!body) return;
+    const query = String(document.querySelector('[data-project-search]')?.value || '').toLowerCase();
+    const status = document.querySelector('[data-project-status]')?.value || '';
+    const rows = state.projects.filter(item => {
+      const owner = account(item.cuenta_id);
+      return (!status || item.estado === status)
+        && (!query || `${item.nombre} ${item.codigo} ${item.propiedad_codigo || ''} ${owner?.nombre || ''}`.toLowerCase().includes(query));
+    });
+    body.innerHTML = rows.map(item => {
+      const owner = account(item.cuenta_id);
+      const currentLanding = landing(item.id);
+      const metrics = projectMetrics(item.id);
+      return `<tr><td><strong>${esc(item.nombre)}</strong><br><small>${esc(item.codigo)}</small></td>
+        <td>${esc(owner?.nombre || 'Sin cuenta')}</td>
+        <td>${currentLanding ? `<span class="business-status ${currentLanding.estado === 'publicada' ? 'active' : ''}">${esc(label(currentLanding.estado))}</span>` : 'Sin Landing'}</td>
+        <td><small>${metrics.leads} leads · ${metrics.visits} visitas · ${metrics.sales} ventas</small></td>
+        <td><span class="business-stage">${esc(label(item.estado))}</span></td>
+        <td><div class="business-table-actions">
+          ${currentLanding ? `<a href="/${esc(currentLanding.slug)}" target="_blank" rel="noopener">Landing</a>` : ''}
+          <a href="${esc(clientViewUrl(item.codigo))}" target="_blank" rel="noopener">Vista como cliente</a>
+          <button data-edit-project="${esc(item.id)}">Editar</button>
+          ${item.estado !== 'cerrado' ? `<button data-archive-project="${esc(item.id)}">Archivar</button>` : ''}
+        </div></td></tr>`;
+    }).join('') || '<tr><td colspan="6" class="business-empty">No hay proyectos que coincidan.</td></tr>';
+  }
+
+  function renderRequests() {
+    const body = document.querySelector('[data-requests-body]');
+    if (!body) return;
+    const query = String(document.querySelector('[data-request-search]')?.value || '').toLowerCase();
+    const status = document.querySelector('[data-request-status]')?.value || '';
+    const rows = state.requests.filter(item => {
+      const currentProject = project(item.proyecto_id);
+      return (!status || item.estado === status)
+        && (!query || `${requestName(item)} ${currentProject?.nombre || ''}`.toLowerCase().includes(query));
+    });
+    body.innerHTML = rows.map(item => {
+      const currentProject = project(item.proyecto_id);
+      return `<tr><td><strong>${esc(requestName(item))}</strong><br><small>${esc(item.tipo)}</small></td>
+        <td>${esc(currentProject?.nombre || 'Proyecto no disponible')}</td><td>${esc(formatDate(item.creado_en))}</td>
+        <td><span class="business-status ${item.estado === 'activada' ? 'active' : ''}">${esc(label(item.estado))}</span></td>
+        <td><select data-request-update="${esc(item.id)}" aria-label="Estado de ${esc(requestName(item))}">
+          ${['solicitada', 'contactando', 'aprobada', 'activada', 'rechazada'].map(value =>
+            `<option value="${value}"${item.estado === value ? ' selected' : ''}>${esc(label(value))}</option>`
+          ).join('')}
+        </select></td></tr>`;
+    }).join('') || '<tr><td colspan="5" class="business-empty">No existen solicitudes que coincidan.</td></tr>';
+  }
+
+  function accountForm(id) {
+    const current = account(id) || {};
+    openModal(id ? 'Editar cuenta' : 'Nueva cuenta', `<form data-account-form class="business-form">
+      <input type="hidden" name="id" value="${esc(current.id || '')}">
+      <label class="wide">Nombre de la cuenta<input name="name" required maxlength="160" value="${esc(current.nombre || '')}"></label>
+      <label>Estado<select name="status"><option value="activo">Activa</option><option value="pausado">Pausada</option><option value="cerrado">Cerrada</option></select></label>
+      <div class="wide business-modal-foot"><button type="button" class="business-secondary" data-business-close>Cancelar</button><button class="business-primary" type="submit">Guardar en Supabase</button></div>
+    </form>`);
+    document.querySelector('[data-account-form] [name="status"]').value = current.estado || 'activo';
+  }
+
+  function projectForm(id) {
+    const current = project(id) || {};
+    if (!state.accounts.length) {
+      feedback('Primero debes crear una cuenta TPL Business.', true);
+      return;
+    }
+    openModal(id ? 'Editar proyecto' : 'Nuevo proyecto', `<form data-project-form class="business-form">
+      <input type="hidden" name="id" value="${esc(current.id || '')}">
+      <label>Cuenta<select name="accountId" required>${state.accounts.map(item => `<option value="${esc(item.id)}">${esc(item.nombre)}</option>`).join('')}</select></label>
+      <label>Estado<select name="status">${['preparacion', 'activo', 'pausado', 'ganado', 'perdido', 'cerrado'].map(value => `<option value="${value}">${esc(label(value))}</option>`).join('')}</select></label>
+      <label class="wide">Nombre del proyecto<input name="name" required maxlength="180" value="${esc(current.nombre || '')}"></label>
+      <label>Código de propiedad<input name="propertyCode" maxlength="120" value="${esc(current.propiedad_codigo || '')}"></label>
+      <label class="wide">Objetivo<textarea name="objective" rows="4" maxlength="600">${esc(current.objetivo || '')}</textarea></label>
+      <div class="wide business-modal-foot"><button type="button" class="business-secondary" data-business-close>Cancelar</button><button class="business-primary" type="submit">Guardar en Supabase</button></div>
+    </form>`);
+    const form = document.querySelector('[data-project-form]');
+    form.accountId.value = current.cuenta_id || state.accounts[0].id;
+    form.status.value = current.estado || 'preparacion';
+  }
+
+  function openModal(title, html) {
+    document.getElementById('business-modal-title').textContent = title;
+    const modalFeedback = document.querySelector('[data-business-modal-feedback]');
+    modalFeedback.hidden = true;
+    modalFeedback.textContent = '';
+    document.querySelector('[data-business-modal-body]').innerHTML = html;
+    document.getElementById('business-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('business-modal')?.classList.remove('open');
+  }
+
+  function feedback(message, isError) {
+    document.querySelectorAll('[data-business-feedback],[data-business-modal-feedback]').forEach(element => {
+      element.hidden = !message;
+      element.textContent = message || '';
+      element.classList.toggle('is-error', Boolean(isError));
+    });
+  }
+
+  async function save(form, action, loadingText) {
+    const button = form.querySelector('button[type="submit"]');
+    const previous = button.textContent;
+    button.disabled = true;
+    button.textContent = loadingText;
+    try {
+      await action(Object.fromEntries(new FormData(form)));
+      closeModal();
+      await load();
+    } catch (error) {
+      feedback(error.message || 'No fue posible guardar la información.', true);
+      button.disabled = false;
+      button.textContent = previous;
+    }
+  }
+
+  function bind() {
+    document.addEventListener('click', async event => {
+      const navigation = event.target.closest('[data-business-target]');
+      if (navigation) {
+        event.preventDefault();
+        return activate(navigation);
+      }
+      if (event.target.closest('[data-business-close]') || event.target.id === 'business-modal') return closeModal();
+      if (event.target.closest('[data-business-refresh]')) return load();
+      if (event.target.closest('[data-business-action="new-account"]')) return accountForm();
+      if (event.target.closest('[data-business-action="new-project"]')) return projectForm();
+
+      const editAccount = event.target.closest('[data-edit-account]');
+      if (editAccount) return accountForm(editAccount.dataset.editAccount);
+      const editProject = event.target.closest('[data-edit-project]');
+      if (editProject) return projectForm(editProject.dataset.editProject);
+
+      const archiveAccount = event.target.closest('[data-archive-account]');
+      if (archiveAccount && window.confirm('¿Archivar esta cuenta? Sus datos no serán eliminados.')) {
+        await service.archiveAccount(archiveAccount.dataset.archiveAccount);
+        return load();
+      }
+      const archiveProject = event.target.closest('[data-archive-project]');
+      if (archiveProject && window.confirm('¿Archivar este proyecto? Sus datos no serán eliminados.')) {
+        await service.archiveProject(archiveProject.dataset.archiveProject);
+        return load();
+      }
+    });
+
+    document.addEventListener('submit', event => {
+      const accountFormElement = event.target.closest('[data-account-form]');
+      if (accountFormElement) {
+        event.preventDefault();
+        return save(accountFormElement, values => service.saveAccount(values), 'Guardando…');
+      }
+      const projectFormElement = event.target.closest('[data-project-form]');
+      if (projectFormElement) {
+        event.preventDefault();
+        return save(projectFormElement, values => service.saveProject(values), 'Guardando…');
+      }
+    });
+
+    document.addEventListener('change', async event => {
+      if (event.target.matches('[data-account-status],[data-project-status],[data-request-status]')) return render();
+      const request = event.target.closest('[data-request-update]');
+      if (!request) return;
+      request.disabled = true;
+      try {
+        await service.updateRequest(request.dataset.requestUpdate, request.value);
+        await load();
+      } catch (error) {
+        feedback(error.message || 'No fue posible actualizar la solicitud.', true);
+        request.disabled = false;
+      }
+    });
+
+    document.addEventListener('input', event => {
+      if (event.target.matches('[data-account-search],[data-project-search],[data-request-search]')) render();
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', install);
+})(window, document);
