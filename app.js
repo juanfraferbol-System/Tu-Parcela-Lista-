@@ -2227,9 +2227,41 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!button) return;
       state.mode = button.dataset.projectType === "combo" ? "combo" : "parcela";
       setPressedChoice(DOM.projectTypeOptions, "[data-project-type]", button);
+      
       const combo = state.mode === "combo";
+      state.recommendationActive = false;
+      hideComboProposals();
+      
       if (DOM.familyGroup) DOM.familyGroup.hidden = !combo;
       DOM.decisionFlow?.classList.toggle("combo-mode", combo);
+      DOM.decisionFlow?.classList.toggle("choice-combo", combo);
+      DOM.decisionFlow?.classList.toggle("choice-parcela", !combo);
+      DOM.decisionFlow?.classList.add("budget-active");
+      
+      if (DOM.budgetBox) DOM.budgetBox.style.display = "block";
+      
+      if (combo) {
+        DOM.comboFields?.classList.remove("hidden");
+        if (DOM.budgetTitle) DOM.budgetTitle.textContent = "Buscaremos parcela + casa con tu presupuesto";
+        if (DOM.budgetHelp) DOM.budgetHelp.textContent = "Te mostraremos propuestas de parcela + casa cercanas al monto.";
+        if (DOM.budgetGo) {
+          const label = DOM.budgetGo.querySelector("span");
+          if (label) label.textContent = "Buscar alternativas";
+          else DOM.budgetGo.textContent = "Buscar alternativas";
+        }
+      } else {
+        DOM.comboFields?.classList.add("hidden");
+        if (DOM.budgetTitle) DOM.budgetTitle.textContent = "¿Cuál es tu presupuesto?";
+        if (DOM.budgetHelp) DOM.budgetHelp.textContent = "Te mostraremos 5 parcelas cercanas a tu presupuesto.";
+        if (DOM.budgetGo) {
+          const label = DOM.budgetGo.querySelector("span");
+          if (label) label.textContent = "Buscar parcelas";
+          else DOM.budgetGo.textContent = "Buscar parcelas";
+        }
+      }
+      
+      scrollToBudget();
+      setTimeout(() => DOM.budgetInput?.focus(), 520);
     });
 
     DOM.priorityOptions?.addEventListener("click", event => {

@@ -60,6 +60,52 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- CSS globales del index desvinculados para evitar conflictos en esta ficha -->
 <link rel="stylesheet" href="css/tpl-lead-advisor.css?v=20260721-context-v4">
   <link rel="stylesheet" href="css/tpl-header-unified.css">
+<style>
+/* Animación añadir a proyecto */
+@keyframes addedSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); background: #16a34a; }
+  100% { transform: scale(1); background: #16a34a; }
+}
+.btn-added-success {
+  animation: addedSuccess 0.5s ease forwards !important;
+  pointer-events: none;
+}
+
+/* Rediseño Contact Tabs */
+.contact-tab { transition: all 0.2s; }
+.contact-tab:hover { background: #f8fafc !important; }
+.contact-tab.active { background: #f0fdf4 !important; color: #166534 !important; border-bottom: 2px solid #16a34a !important; }
+
+/* Sticky Bar Móvil */
+@media(max-width: 900px) {
+  .mobile-sticky-bar {
+    display: flex !important;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    padding: 12px 20px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    z-index: 1000;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #e2e8f0;
+  }
+  .mobile-sticky-price small { display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700; }
+  .mobile-sticky-price strong { font-size: 1.25rem; color: #0f172a; font-weight: 800; }
+  body { padding-bottom: 80px; } /* Evita que el contenido quede detrás de la barra */
+  .listing-right { margin-bottom: 20px; }
+}
+
+/* Payment Simulator Rediseño Visual */
+.payment-simulator { background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
+.simulator-track { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; display: flex; margin: 12px 0; }
+.simulator-pie { height: 100%; background: #003f7a; transition: width 0.3s; }
+.simulator-credito { height: 100%; background: #10b981; transition: width 0.3s; }
+.simulator-legend { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: #64748b; }
+.simulator-legend .leg-pie { color: #003f7a; }
+.simulator-legend .leg-cred { color: #10b981; }
+</style>
 </head>
 <body class="parcela-page">
 <!-- Google Tag Manager (noscript) -->
@@ -193,6 +239,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </ul>
   </div>
 </section>
+<!-- Sección de Video (Oculta si no hay video) -->
+<section class="container parcel-video-section" id="parcel-video-section" hidden aria-label="Video de la parcela">
+  <div class="parcel-video-card" style="margin-top: 30px; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; padding: 20px;">
+    <h3 style="margin-top: 0; color: #0f172a; font-size: 1.25rem;"><i data-lucide="youtube" style="color: #ef4444; width: 24px; vertical-align: middle; margin-right: 8px;"></i>Video Recorrido</h3>
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-top: 15px;">
+      <iframe id="parcel-video-iframe" src="" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
 <section class="container parcel-next-step" aria-label="Siguiente paso del proyecto">
   <div class="parcel-next-step-card">
     <div class="parcel-next-step-icon"><i data-lucide="house-plus"></i></div>
@@ -314,42 +369,61 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </div>
 <div class="payment-simulator" id="payment-simulator" style="display:none;">
 <h4>Simulador facilidad de pago</h4>
-<p>Pie mínimo 50% del valor. Puedes subir el pie, no bajarlo.</p>
-<label>Pie inicial <input id="pay-down" max="100" min="50" step="1" type="range" value="50"/></label>
+<p>Pie mínimo 50% del valor. Puedes subir el pie para bajar la cuota.</p>
+
+<div class="simulator-track">
+  <div class="simulator-pie" id="sim-bar-pie" style="width: 50%;"></div>
+  <div class="simulator-credito" id="sim-bar-credito" style="width: 50%;"></div>
+</div>
+<div class="simulator-legend">
+  <span class="leg-pie" id="leg-pie-text">Pie: 50%</span>
+  <span class="leg-cred" id="leg-cred-text">Financiamiento: 50%</span>
+</div>
+
+<label style="margin-top: 16px;">Ajustar Pie inicial <input id="pay-down" max="100" min="50" step="1" type="range" value="50"/></label>
 <div class="pay-row"><span id="pay-down-text"></span><strong id="pay-down-value"></strong></div>
 <label>Cuotas <input id="pay-installments" min="1" type="number" value="12"/></label>
 <div class="pay-alert" id="pay-alert" style="display:none;"></div>
 <div class="pay-total" id="pay-result"></div>
 </div>
 <!-- Botón de Acción Especial: Volver a cotizar con casa -->
-<a class="btn-primary-submit" href="#" id="sidebar-quote-project-btn" style="background: var(--secondary); text-decoration: none;">
+<a class="btn-primary-submit" href="#" id="sidebar-quote-project-btn" style="background: var(--secondary); text-decoration: none; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
 <i data-lucide="home"></i> Elegir esta parcela y ver casas
-          </a>
-<!-- Botón de WhatsApp -->
-<a class="btn-whatsapp-quote" href="#" id="sidebar-whatsapp-btn" style="text-decoration: none; padding: 14px;" target="_blank">
-<i data-lucide="message-circle"></i> Consultar por WhatsApp
-          </a>
-<!-- Botón Compartir -->
-<details class="tpl-contact-details">
-<summary>Prefiero contacto por correo</summary>
-<form class="contact-form" id="detail-contact-form">
-<div class="form-group">
-<input id="contact-name" placeholder="Tu Nombre Completo" required="" type="text"/>
+</a>
+
+<div class="trust-badge-mini" style="display:flex; align-items:center; gap:6px; font-size:0.75rem; color:#16a34a; justify-content:center; margin-bottom:16px;">
+  <i data-lucide="shield-check" style="width:16px;"></i> Compra Segura / Asesoría Incluida
 </div>
-<div class="form-group">
-<input id="contact-email" placeholder="Tu Correo Electrónico" required="" type="email"/>
+
+<div class="contact-tabs" style="display:flex; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; margin-bottom:16px;">
+  <button type="button" class="contact-tab active" data-target="tab-whatsapp" style="flex:1; padding:10px; border:none; background:#f0fdf4; color:#166534; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;"><i data-lucide="message-circle" style="width:16px;"></i> WhatsApp</button>
+  <button type="button" class="contact-tab" data-target="tab-email" style="flex:1; padding:10px; border:none; border-left:1px solid #e2e8f0; background:white; color:#64748b; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;"><i data-lucide="mail" style="width:16px;"></i> Correo</button>
 </div>
-<div class="form-group">
-<input id="contact-phone" placeholder="Tu Teléfono (ej: +569...)" required="" type="tel"/>
+
+<div id="tab-whatsapp" class="contact-tab-content" style="display:block;">
+  <a class="btn-whatsapp-quote" href="#" id="sidebar-whatsapp-btn" style="text-decoration: none; padding: 14px;" target="_blank">
+  <i data-lucide="message-circle"></i> Consultar por WhatsApp
+  </a>
 </div>
-<div class="form-group">
-<textarea id="contact-message" placeholder="Hola, me interesa este terreno y me gustaría recibir asesoría." required="" rows="3"></textarea>
+
+<div id="tab-email" class="contact-tab-content" style="display:none;">
+  <form class="contact-form" id="detail-contact-form">
+    <div class="form-group"><input id="contact-name" placeholder="Tu Nombre" required="" type="text"/></div>
+    <div class="form-group"><input id="contact-email" placeholder="Correo" required="" type="email"/></div>
+    <div class="form-group"><input id="contact-phone" placeholder="Teléfono" required="" type="tel"/></div>
+    <div class="form-group"><textarea id="contact-message" placeholder="Hola, me interesa..." required="" rows="2"></textarea></div>
+    <button class="btn-primary-submit" id="contact-submit-btn" type="submit"><i data-lucide="send"></i> Enviar correo</button>
+  </form>
 </div>
-<button class="btn-primary-submit" id="contact-submit-btn" type="submit">
-<i data-lucide="send"></i> Enviar consulta
-              </button>
-</form>
-</details>
+</div>
+
+<!-- Mobile Sticky Bottom Bar -->
+<div class="mobile-sticky-bar" style="display:none;">
+  <div class="mobile-sticky-price">
+    <small>Valor Terreno</small>
+    <strong id="mobile-sticky-price-text">$0</strong>
+  </div>
+  <a class="btn-primary-submit" href="#" id="mobile-sticky-quote-btn" style="background: var(--secondary); margin:0; padding:10px 16px; font-size:0.9rem;"><i data-lucide="home" style="width:18px;"></i> Elegir parcela</a>
 </div>
 </aside>
 </main>
@@ -497,6 +571,29 @@ viewAllBtn: document.getElementById("gallery-view-all-btn"),
       }
 
       window.TPLSEO?.applyParcel?.(p);
+
+      // Inyección de Video (si existe)
+      const videoSection = document.getElementById("parcel-video-section");
+      const videoIframe = document.getElementById("parcel-video-iframe");
+      // Soportar tanto videoUrl (publicador nuevo) como video (antiguo)
+      const videoEnlace = p.videoUrl || p.video || (p.medios && p.medios.videoUrl);
+      
+      if (videoEnlace && videoEnlace.trim() !== "") {
+        try {
+          // Convertir URL regular de YouTube a embed
+          let embedUrl = videoEnlace;
+          if (videoEnlace.includes("youtube.com/watch?v=")) {
+            embedUrl = videoEnlace.replace("watch?v=", "embed/");
+          } else if (videoEnlace.includes("youtu.be/")) {
+            embedUrl = videoEnlace.replace("youtu.be/", "youtube.com/embed/");
+          }
+          
+          videoIframe.src = embedUrl;
+          videoSection.hidden = false;
+        } catch(e) {
+          console.error("Error al incrustar video", e);
+        }
+      }
 
       // Si el usuario viene desde cotizador.html para cambiar parcela,
       // mostramos una invitación clara para reemplazar la parcela actual y volver al cotizador.
@@ -934,8 +1031,21 @@ document.addEventListener("keydown", (e) => {
           const pie = Math.round(total * pct / 100);
           const saldo = Math.max(0, total - pie + recargo);
           const cuota = Math.ceil(saldo / n);
-          downText.textContent = `Pie ${pct}%`;
+          downText.textContent = `Pie`;
           downValue.textContent = fmt(pie);
+          
+          // Actualizar Barras Visuales
+          const simPie = document.getElementById("sim-bar-pie");
+          const simCredito = document.getElementById("sim-bar-credito");
+          const legPie = document.getElementById("leg-pie-text");
+          const legCred = document.getElementById("leg-cred-text");
+          if(simPie && simCredito) {
+            simPie.style.width = pct + "%";
+            simCredito.style.width = (100 - pct) + "%";
+            legPie.textContent = `Pie: ${pct}%`;
+            legCred.textContent = `Financiamiento: ${100 - pct}%`;
+          }
+
           alert.style.display = recargo ? "block" : "none";
           alert.textContent = recargo ? `Al superar 12 cuotas se suma ${fmt(1000000)} por año. Recargo aplicado: ${fmt(recargo)}.` : "";
           result.innerHTML = `<span>Saldo a financiar: <b>${fmt(saldo)}</b></span><strong>${n} cuotas de ${fmt(cuota)}</strong>`;
@@ -974,6 +1084,60 @@ document.addEventListener("keydown", (e) => {
         }
         modal.classList.add("show");
       });
+
+      // Contact Tabs Logic
+      const contactTabs = document.querySelectorAll('.contact-tab');
+      contactTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.contact-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.contact-tab-content').forEach(c => c.style.display = 'none');
+          tab.classList.add('active');
+          const target = document.getElementById(tab.getAttribute('data-target'));
+          if (target) target.style.display = 'block';
+        });
+      });
+
+      // Populate Mobile Sticky Bar
+      const mobilePriceText = document.getElementById("mobile-sticky-price-text");
+      if (mobilePriceText && p.precio) {
+        mobilePriceText.textContent = p.precio;
+      }
+      
+      const mobileQuoteBtn = document.getElementById("mobile-sticky-quote-btn");
+      if (mobileQuoteBtn) {
+        mobileQuoteBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          mobileQuoteBtn.classList.add('btn-added-success');
+          mobileQuoteBtn.innerHTML = '<i data-lucide="check" style="width:18px;"></i> Añadido al proyecto';
+          lucide.createIcons();
+          setTimeout(() => {
+            const btnPrimary = document.getElementById("sidebar-quote-project-btn");
+            if (btnPrimary) btnPrimary.click();
+          }, 600);
+        });
+      }
+
+      const sidebarQuoteBtn = document.getElementById("sidebar-quote-project-btn");
+      if (sidebarQuoteBtn) {
+        sidebarQuoteBtn.addEventListener("click", (e) => {
+          // Si no queremos prevenir default, solo agregamos la animación si hay delay, 
+          // pero como ya redirecciona a index via site-polish.js o similar, podemos interceptarlo
+          if (!sidebarQuoteBtn.classList.contains('btn-added-success')) {
+            e.preventDefault(); // Retrasar redirección
+            sidebarQuoteBtn.classList.add('btn-added-success');
+            sidebarQuoteBtn.innerHTML = '<i data-lucide="check"></i> ¡Parcela seleccionada!';
+            lucide.createIcons();
+            
+            // Simular el guardado antes de redireccionar
+            window.localStorage.setItem('tpl_cotizador_parcela_elegida', p.id);
+            window.localStorage.setItem('tpl_cotizador_parcela_nombre', p.nombre);
+            
+            setTimeout(() => {
+              window.location.href = `index.html#casas-section`;
+            }, 800);
+          }
+        });
+      }
 
       // Crear Iconos
       lucide.createIcons();

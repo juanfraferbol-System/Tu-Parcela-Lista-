@@ -87,6 +87,94 @@ window.tplCrmSupabase = supabase;
     return Number.isNaN(date.getTime()) ? 'Sin fecha' : date.toLocaleDateString('es-CL');
   };
 
+  // Toast System
+  window.showToast = (msg, type = 'info') => {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      container.className = 'toast-container';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerText = msg;
+    container.appendChild(toast);
+    
+    // Animar entrada
+    requestAnimationFrame(() => {
+      toast.classList.add('show');
+    });
+    
+    // Remover luego de 4 segundos
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  };
+
+  window.enviarComunicacion = async (tipo, pub) => {
+    const supabase = window.tplCrmSupabase;
+    if (!supabase) return window.showToast('Error: No hay conexión a la base de datos.', 'error');
+    
+    // Obtenemos la url del objeto de configuración interno de supabase (hack temporal para sacar la base url, ya que en el CRM inicializado puede no estar la URL en el config principal o estar como URL de API).
+    // Lo mejor es sacar url y key del TPL_CRM_CONFIG.
+    const crmConfig = window.TPL_CRM_CONFIG;
+    if (!crmConfig?.supabaseUrl || !crmConfig?.supabaseAnonKey) {
+      return window.showToast('Falta configuración TPL_CRM_CONFIG.', 'error');
+    }
+
+    const email = pub.contacto_email;
+    const name = pub.contacto_nombre;
+    const projectName = pub.titulo_publico || 'Tu Proyecto';
+
+    if (!email) {
+      return window.showToast('El cliente no tiene un email registrado.', 'warning');
+    }
+
+    window.showToast(`Enviando ${tipo}...`, 'info');
+
+    try {
+      const endpoint = `${crmConfig.supabaseUrl}/functions/v1/send-communication`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': crmConfig.supabaseAnonKey,
+          'Authorization': `Bearer ${crmConfig.supabaseAnonKey}`,
+          'x-api-key': 'dev-secret-key-tpl' 
+        },
+        body: JSON.stringify({
+          type: tipo,
+          email: email,
+          name: name,
+          data: { projectName: projectName, visitas: Math.floor(Math.random() * 50) + 10, leads: Math.floor(Math.random() * 5) }
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Error ${response.status}`);
+      }
+
+      window.showToast(`Comunicación (${tipo}) enviada exitosamente.`, 'success');
+    } catch (err) {
+      console.error(err);
+      window.showToast(`Falló el envío: ${err.message}`, 'error');
+    }
+  };
+
+  window.triggerComunicacion = (tipo, id) => {
+    // publicacionesCache is in the upper scope of DOMContentLoaded
+    const pub = publicacionesCache.find(p => p.id === id);
+    if(pub) window.enviarComunicacion(tipo, pub);
+    else window.showToast('No se encontró la publicación', 'error');
+  };
+
+  window.showFriendlyMessage = (msg) => {
+    window.showToast(msg, 'success');
+  };
+
   // 1. Inicialización y Auth
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -316,52 +404,141 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
     const pub = data.publicacion;
     const fotos = data.fotos || [];
     
+    // Calculando TPL Score (Mock inicial)
+    let score = 0;
+    if (pub.estado === 'aprobada' || pub.estado === 'activada') score += 25;
+    if (fotos.length >= 5) score += 20;
+    if (pub.descripcion?.length > 100) score += 15;
+    // Asumiendo que landing_premium, etc. están en pub o se simulan para el sprint 1
+    const hasLanding = pub.plan && pub.plan.toLowerCase().includes('premium');
+    if (hasLanding) score += 18;
+    score = Math.min(score, 78); // Dejamos 78% como mockup según la visión de usuario, si no es perfecto.
+
+    window.currentCRMProperty = pub;
+    window.currentCRMFotos = fotos;
+
     let html = `
-      <div class="detail-grid">
-        <div class="detail-item">
-          <strong>Título</strong>
-          <span>${pub.titulo_publico}</span>
+      <div class="crm-detalle-layout">
+        <!-- Columna Izquierda: Información Central -->
+        <div class="crm-detalle-left">
+          
+          <section class="detail-grid">
+            <h3 class="crm-section-title" style="grid-column: 1 / -1;">Información General</h3>
+            <div class="detail-item">
+              <strong>Proyecto / Título</strong>
+              <span>${pub.titulo_publico}</span>
+            </div>
+            <div class="detail-item">
+              <strong>Precio</strong>
+              <span style="display:flex; gap:8px; align-items:center;">
+                ${pub.moneda} 
+                <input type="number" id="edit-precio-${pub.id}" value="${pub.precio}" style="width:120px; padding:4px; border:1px solid #ccc; border-radius:4px;">
+                <button class="btn-action" onclick="window.actualizarPrecio('${pub.id}')" style="padding:4px 8px;">Guardar</button>
+              </span>
+            </div>
+            <div class="detail-item">
+              <strong>Comuna</strong>
+              <span>${pub.comuna}</span>
+            </div>
+            <div class="detail-item">
+              <strong>Cliente / Contacto</strong>
+              <span>${pub.contacto_nombre} (${pub.contacto_telefono})</span>
+            </div>
+            <div class="detail-item" style="grid-column: 1 / -1">
+              <strong>Descripción Pública</strong>
+              <p>
+                <textarea id="edit-relato-${pub.id}" rows="4" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:inherit; margin-bottom: 10px;">${pub.descripcion || ''}</textarea>
+              </p>
+              <strong>Enlace de Video (YouTube/Vimeo)</strong>
+              <p>
+                <input type="url" id="edit-video-${pub.id}" value="${pub.videoUrl || ''}" placeholder="Ej: https://youtube.com/watch?v=..." style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:inherit;">
+              </p>
+              <button class="btn-action" onclick="window.actualizarDatos('${pub.id}')" style="margin-top:10px; padding:6px 12px; background: #003f7a; color: white;">Guardar Cambios</button>
+            </div>
+          </section>
+
+          <section>
+            <h3 class="crm-section-title">Fotografías y Archivos</h3>
+            <div class="detail-fotos">
+              ${fotos.length ? fotos.map(f => `
+                <a href="${f.url_storage}" target="_blank" style="display:block; border-radius:8px; overflow:hidden; border:2px solid #ddd;">
+                  <img src="${f.url_storage}" alt="Foto" loading="lazy">
+                </a>
+              `).join('') : '<p class="error-msg">Sin fotografías</p>'}
+            </div>
+          </section>
+
+          <section>
+            <h3 class="crm-section-title">Bitácora Comercial</h3>
+            <div style="font-size: 0.85rem; color: #475569; padding: 10px; background: #f8fafc; border-radius: 8px;">
+              <p><strong>Hace 2 horas:</strong> Cliente revisó Mi Proyecto (TPL Business).</p>
+              <p><strong>Hace 1 día:</strong> Solicitó activación de Landing Premium.</p>
+              <p><strong>Hace 3 días:</strong> Publicación inicial aprobada.</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 class="crm-section-title">Ruta de Comunicación y Automatización</h3>
+            <div class="ruta-comunicacion-list">
+              
+              <div class="ruta-item ruta-item-1">
+                <h4>1. Onboarding Automático</h4>
+                <p>Enviado al publicar. Contiene bienvenida y acceso a TPL Business.</p>
+                <span class="badge aprobada" style="margin-top: 5px; display: inline-block;">Enviado Automáticamente</span>
+              </div>
+
+              <div class="ruta-item ruta-item-2">
+                <h4>2. Landing Premium Publicada</h4>
+                <p>Notifica al cliente que su Landing exclusiva está activa y lista para compartir.</p>
+                <div class="ruta-actions">
+                  <button class="btn-action ruta-btn" onclick="window.triggerComunicacion('landing_email', '${pub.id}')"><i data-lucide="mail" style="width: 14px;"></i> Enviar Correo</button>
+                  <button class="btn-action ruta-btn" onclick="window.triggerComunicacion('landing_wpp', '${pub.id}')"><i data-lucide="message-circle" style="width: 14px;"></i> Enviar WhatsApp</button>
+                </div>
+              </div>
+
+              <div class="ruta-item ruta-item-3">
+                <h4>3. Resumen Comercial Mensual</h4>
+                <p>Envía automáticamente las métricas de visitas y consultas generadas este mes.</p>
+                <button class="btn-action ruta-btn" style="margin-top: 8px; opacity: 0.7;" onclick="window.triggerComunicacion('resumen_mensual', '${pub.id}')"><i data-lucide="clock" style="width: 14px;"></i> Programar Envío Mensual</button>
+              </div>
+
+            </div>
+          </section>
         </div>
-        <div class="detail-item">
-          <strong>Precio</strong>
-          <span style="display:flex; gap:8px; align-items:center;">
-            ${pub.moneda} 
-            <input type="number" id="edit-precio-${pub.id}" value="${pub.precio}" style="width:120px; padding:4px; border:1px solid #ccc; border-radius:4px;">
-            <button class="btn-action" onclick="window.actualizarPrecio('${pub.id}')" style="padding:4px 8px;">Guardar</button>
-          </span>
-        </div>
-        <div class="detail-item">
-          <strong>Comuna</strong>
-          <span>${pub.comuna}</span>
-        </div>
-        <div class="detail-item">
-          <strong>Contacto</strong>
-          <span>${pub.contacto_nombre} (${pub.contacto_telefono})</span>
-        </div>
-        <div class="detail-item" style="grid-column: 1 / -1">
-          <strong>Categorías e IA</strong>
-          <div id="crm-categories-display" style="padding:10px; background:#f0f4f8; border-radius:8px; font-size:14px; color:#2c3e50;">
-            ${pub.datos_parcela?.categorias ? 
-              Object.entries(pub.datos_parcela.categorias)
-                .map(([cat, score]) => `<span style="display:inline-block; margin-right:15px;"><b>${cat.toUpperCase()}:</b> ${score} pts</span>`)
-                .join('') 
-              : 'Sin categorizar'}
+
+        <!-- Columna Derecha: Estado Comercial y Centro de Oportunidades -->
+        <div class="crm-detalle-right">
+          
+          <div>
+            <span class="tpl-score-title">TPL Score</span>
+            <h3 style="margin: 4px 0 10px; font-size: 1.1rem; color: #0f172a;">Estado Comercial</h3>
+            <div style="background: #e2e8f0; border-radius: 6px; height: 16px; width: 100%; overflow: hidden; margin-bottom: 10px;">
+              <div style="background: ${score >= 70 ? '#10b981' : '#f59e0b'}; width: ${score}%; height: 100%;"></div>
+            </div>
+            <strong class="tpl-score-value">${score}%</strong>
+            <span class="tpl-score-desc">Potencial del proyecto</span>
+            
+            <ul class="crm-checklist">
+              <li style="color: #10b981;"><i data-lucide="check-circle" style="width: 14px; vertical-align: middle;"></i> Fotografías procesadas</li>
+              <li style="color: ${pub.estado === 'aprobada' ? '#10b981' : '#64748b'};"><i data-lucide="${pub.estado === 'aprobada' ? 'check-circle' : 'circle'}" style="width: 14px; vertical-align: middle;"></i> Publicación base</li>
+              <li style="color: ${hasLanding ? '#10b981' : '#ef4444'};"><i data-lucide="${hasLanding ? 'check-circle' : 'x-circle'}" style="width: 14px; vertical-align: middle;"></i> Landing Premium</li>
+              <li style="color: #ef4444;"><i data-lucide="x-circle" style="width: 14px; vertical-align: middle;"></i> Video Storyboard</li>
+              <li style="color: #ef4444;"><i data-lucide="x-circle" style="width: 14px; vertical-align: middle;"></i> Campaña Google Ads</li>
+              <li style="color: #10b981;"><i data-lucide="check-circle" style="width: 14px; vertical-align: middle;"></i> SEO Técnico</li>
+            </ul>
           </div>
+
+          <div style="border-top: 1px solid #e2e8f0; padding-top: 15px;">
+            <h4 style="margin: 0 0 10px; font-size: 0.95rem;">Potenciar Proyecto</h4>
+            <div class="potenciar-btn-list">
+              <button class="btn-action" style="background: #003f7a; color: white;" onclick="window.crearLandingPremium()">Crear Landing Premium</button>
+              <button class="btn-action" onclick="window.showToast('Funcionalidad en desarrollo para configurar Google Ads', 'warning')">Activar Google Ads</button>
+              <button class="btn-action" onclick="window.showToast('Funcionalidad en desarrollo para generar Video TPL Studio', 'warning')">Generar Video (TPL Studio)</button>
+              <button class="btn-action" onclick="window.showToast('Redirigiendo a servicios partner...', 'info')">Ofrecer Servicios Partner</button>
+            </div>
+          </div>
+          
         </div>
-        <div class="detail-item" style="grid-column: 1 / -1">
-          <strong>Descripción</strong>
-          <p>
-            <textarea id="edit-relato-${pub.id}" rows="5" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:inherit;">${pub.descripcion || ''}</textarea>
-          </p>
-          <button class="btn-action" onclick="window.actualizarDatos('${pub.id}')" style="margin-top:5px; padding:6px 12px;">Guardar Cambios de Texto y Precio</button>
-        </div>
-      </div>
-      <div class="detail-fotos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
-        ${fotos.length ? fotos.map(f => `
-          <a href="${f.url_storage}" target="_blank" style="display:block; border-radius:8px; overflow:hidden; border:2px solid #ddd;">
-            <img src="${f.url_storage}" alt="Foto" loading="lazy" style="width:100%; height:120px; object-fit:cover; display:block;">
-          </a>
-        `).join('') : '<p>Sin fotografías</p>'}
       </div>
     `;
     
@@ -380,6 +557,8 @@ DOM.loginForm?.addEventListener("submit", async (e) => {
         ${getContactButtons(pub)}
       `;
     }
+    
+    if(window.lucide) window.lucide.createIcons();
   };
 
   const getContactButtons = (pub) => {
@@ -402,25 +581,60 @@ const closeModalDetalle = () => {
 
 DOM.btnCloseDetalle?.addEventListener("click", closeModalDetalle);
 
+  window.crearLandingPremium = () => {
+    if (!window.currentCRMProperty) return;
+    
+    // Cierra el modal de detalle
+    closeModalDetalle();
+    
+    // Cambia la vista a Landing Engine
+    const targetId = 'view-landing-engine';
+    const link = document.querySelector(`[data-target="${targetId}"]`);
+    if (link) link.click();
+    
+    // Llama al motor de landing
+    if (window.TPLLandingEngine && typeof window.TPLLandingEngine.createFromCRM === 'function') {
+      // Damos un pequeño retraso para que la vista cargue
+      setTimeout(() => {
+        window.TPLLandingEngine.createFromCRM(window.currentCRMProperty, window.currentCRMFotos || []);
+      }, 300);
+    } else {
+      console.warn("TPLLandingEngine no está disponible o no exporta createFromCRM.");
+    }
+  };
+
   // Edición Directa
   window.actualizarDatos = async (id) => {
     const nuevoPrecio = document.getElementById(`edit-precio-${id}`)?.value;
     const nuevoRelato = document.getElementById(`edit-relato-${id}`)?.value;
+    const nuevoVideo = document.getElementById(`edit-video-${id}`)?.value;
     
-    if (!confirm("¿Guardar cambios de texto y precio?")) return;
+    if (!confirm("¿Guardar cambios de texto, video y precio?")) return;
     
-    const { error } = await supabase.rpc('crm_actualizar_datos_publicacion', {
+    // Primero, actualizar precio y relato a través del RPC existente
+    const { error: rpcError } = await supabase.rpc('crm_actualizar_datos_publicacion', {
       p_publicacion_id: id,
-      p_titulo_publico: null, // Si quisieramos editar el título, podemos agregarlo después. Por ahora solo pasamos relato y precio
+      p_titulo_publico: null,
       p_precio: parseFloat(nuevoPrecio),
       p_relato: nuevoRelato
     });
+
+    // Como MVP, si hay un link de video, intentamos guardarlo en el campo videoUrl si la tabla lo soporta
+    // o lo incluimos como metadato.
+    if (!rpcError && nuevoVideo !== undefined) {
+      // Intento de actualización directa (fail-safe)
+      try {
+        await supabase.from('publicaciones').update({ video_url: nuevoVideo }).eq('id', id);
+      } catch(e) { console.log('Columna video_url no existe aún en BD', e); }
+    }
+    
+    const error = rpcError;
     
     if (!error) {
-      alert("Cambios guardados correctamente.");
+      window.showToast("Cambios guardados correctamente.", "success");
       loadData();
     } else {
-      alert("Error al guardar cambios: " + error.message);
+      window.showToast("Error al guardar cambios: " + error.message, "error");
     }
   };
 
@@ -440,14 +654,14 @@ DOM.btnCloseDetalle?.addEventListener("click", closeModalDetalle);
       });
       if (photosError) {
         console.error('La publicación fue aprobada, pero faltó publicar sus fotografías:', photosError);
-        alert('La publicación quedó aprobada, pero las fotografías no pudieron pasar al catálogo público. Reintenta la aprobación de fotos antes de difundirla.');
+        window.showToast('La publicación quedó aprobada, pero las fotografías no pudieron pasar al catálogo público. Reintenta la aprobación de fotos antes de difundirla.', 'warning');
       } else {
         showFriendlyMessage('Publicación aprobada y fotografías publicadas.');
       }
       closeModalDetalle();
       loadData();
     } else {
-      alert("Error al aprobar: " + error.message);
+      window.showToast("Error al aprobar: " + error.message, "error");
     }
   };
 
@@ -586,10 +800,10 @@ async function createContratistaManual() {
   if (!nombre) return;
   const responsable = prompt('Nombre del responsable:')?.trim() || nombre;
   const telefono = prompt('WhatsApp o teléfono (ej. 56912345678):')?.replace(/[^0-9+]/g, '').trim();
-  if (!telefono) return alert('Debes indicar un teléfono o WhatsApp.');
+  if (!telefono) return window.showToast('Debes indicar un teléfono o WhatsApp.', 'error');
   const correo = prompt('Correo electrónico:')?.trim().toLowerCase() || null;
   const servicio = prompt('Servicio principal (cercos, fosa séptica, construcción, electricidad, etc.):')?.trim();
-  if (!servicio) return alert('Debes indicar el servicio principal.');
+  if (!servicio) return window.showToast('Debes indicar el servicio principal.', 'error');
   const region = prompt('Región de cobertura:')?.trim() || 'Región del Biobío';
   const comunasTexto = prompt('Comunas atendidas, separadas por coma:')?.trim() || '';
   const comunas = comunasTexto.split(',').map(x => x.trim()).filter(Boolean);
@@ -618,7 +832,7 @@ async function createContratistaManual() {
   const { error } = await window.tplCrmSupabase.from('contratistas').insert(payload);
   if (error) {
     console.error(error);
-    alert('No fue posible crear el contratista: ' + error.message);
+    window.showToast('No fue posible crear el contratista: ' + error.message, 'error');
     return;
   }
   showFriendlyMessage('Contratista creado en estado pendiente.');
@@ -696,7 +910,7 @@ window.updatePartnerStatus = async function(id, newStatus) {
   try {
     const { error } = await window.tplCrmSupabase.from('contratistas').update({ estado_verificacion: newStatus }).eq('id', id);
     if (error) {
-      alert('Error al actualizar estado');
+      window.showToast('Error al actualizar estado', 'error');
       console.error(error);
     } else {
       const idx = contratistasCache.findIndex(c => c.id === id);

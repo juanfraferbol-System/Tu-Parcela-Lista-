@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { coordinateOrNull, publicLocation } from './location-utils.mjs';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -87,8 +88,8 @@ function normalizePayload(payload:Record<string, any>) {
     plan: normalizePlan(pick(payload.plan_publicacion, plan.id, form.planSeleccionado)),
     tasacion: payload.tasacion || {},
     ubicacion: {
-      lat: numberOrNull(pick(location.lat, location.latitude)),
-      lng: numberOrNull(pick(location.lng, location.longitude)),
+      lat: coordinateOrNull(pick(location.lat, location.latitude), -90, 90),
+      lng: coordinateOrNull(pick(location.lng, location.longitude), -180, 180),
       source: clean(pick(location.source, location.fuente)),
       publica_aproximada: location.publicaAproximada !== false && location.publica_aproximada !== false
     }
@@ -145,6 +146,7 @@ Deno.serve(async (req) => {
       if (file.size > 12*1024*1024) return json(400,{ok:false,error:`La foto ${file.name} supera 12 MB.`});
     }
 
+    const publicMapLocation = publicLocation(payload.ubicacion);
     const row = {
       codigo_publico: codigo,
       idempotency_key: idempotencyKey,
@@ -170,6 +172,9 @@ Deno.serve(async (req) => {
       ubicacion_publica_aproximada: payload.ubicacion.publica_aproximada ? 'aproximada' : 'privada',
       latitud_privada: payload.ubicacion.lat,
       longitud_privada: payload.ubicacion.lng,
+      latitud_publica: publicMapLocation.latitude,
+      longitud_publica: publicMapLocation.longitude,
+      precision_ubicacion: publicMapLocation.precision,
       rol: payload.rol || null,
       agua: payload.agua || null,
       luz: payload.luz || null,
@@ -208,8 +213,8 @@ Deno.serve(async (req) => {
       tipo_precio_actual: 'precio_publicado_solicitado',
       precio_propietario_solicitado: payload.precio || null,
       precio_publico: payload.precio || null,
-      consentimiento_uso_ubicacion: Boolean(payload.ubicacion.lat && payload.ubicacion.lng),
-      consentimiento_uso_ubicacion_en: payload.ubicacion.lat && payload.ubicacion.lng ? new Date().toISOString() : null,
+      consentimiento_uso_ubicacion: publicMapLocation.consent,
+      consentimiento_uso_ubicacion_en: publicMapLocation.consent ? new Date().toISOString() : null,
       distancia_ruta_principal_km: payload.distanciaRutaPrincipalKm || null
     };
 

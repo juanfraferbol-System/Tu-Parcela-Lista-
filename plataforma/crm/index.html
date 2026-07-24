@@ -55,16 +55,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <aside class="sidebar">
       <div class="sidebar-brand">TPL Admin</div>
       <nav class="sidebar-nav">
-        <a href="#" class="nav-item active" data-target="view-pendientes"><i data-lucide="bell"></i> Pendientes Operativos</a>
-        <a href="#" class="nav-item" data-target="view-solicitudes"><i data-lucide="map-pinned"></i> Parcelas</a>
-        <a href="#" class="nav-item" data-target="view-casas"><i data-lucide="house"></i> Casas</a>
-        <a href="#" class="nav-item" data-target="view-extras"><i data-lucide="list-plus"></i> Extras y fundaciones</a>
-        <a href="#" class="nav-item" data-target="view-tasador"><i data-lucide="calculator"></i> Tasador TPL</a>
-        <a href="#" class="nav-item" data-target="view-cotizaciones"><i data-lucide="briefcase"></i> Cotizaciones / Proyectos</a>
+        <div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:10px 15px; font-weight:800; letter-spacing:0.05em;">Operativa</div>
+        <a href="#" class="nav-item active" data-target="view-pendientes"><i data-lucide="bell"></i> Panel de Pendientes</a>
+        
+        <div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:15px 15px 5px; font-weight:800; letter-spacing:0.05em;">Gestión Comercial</div>
+        <a href="#" class="nav-item" data-target="view-cotizaciones"><i data-lucide="briefcase"></i> Centro de Cotizaciones (Leads)</a>
+        <a href="#" class="nav-item" data-target="view-solicitudes"><i data-lucide="map-pinned"></i> Inventario de Parcelas</a>
+        <a href="#" class="nav-item" data-target="view-casas"><i data-lucide="house"></i> Inventario de Casas</a>
+        
+        <div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:15px 15px 5px; font-weight:800; letter-spacing:0.05em;">Herramientas TPL</div>
+        <a href="/plataforma/studio/" class="nav-item"><i data-lucide="wand-sparkles"></i> Creador de Landings</a>
+        <a href="#" class="nav-item" data-target="view-tasador"><i data-lucide="calculator"></i> Tasador Inteligente</a>
+        <a href="#" class="nav-item" data-target="view-extras"><i data-lucide="list-plus"></i> Catálogo de Extras</a>
+        
+        <div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:15px 15px 5px; font-weight:800; letter-spacing:0.05em;">Ecosistema</div>
         <a href="#" class="nav-item" data-target="view-contratistas"><i data-lucide="users"></i> Red de Partners</a>
         <a href="#" class="nav-item" data-target="view-partner-postulaciones"><i data-lucide="user-check"></i> Postulaciones Partner <span id="partner-pending-badge" class="nav-badge" hidden>0</span></a>
-        <!-- Promociones y Ads permanece oculto hasta contar con persistencia y acciones reales. -->
-        <a href="/plataforma/studio/" class="nav-item" title="MVP local: todavía no guarda campañas en Supabase"><i data-lucide="wand-sparkles"></i> TPL Studio <span class="nav-beta">MVP local</span></a>
       </nav>
       <div class="sidebar-bottom">
         <button id="btn-logout"><i data-lucide="log-out"></i> Cerrar sesión</button>

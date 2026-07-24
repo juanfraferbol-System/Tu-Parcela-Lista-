@@ -86,6 +86,42 @@ function mergeUploadedMedia(payload,upload){
  clone.medios={...(clone.medios||{}),storage:'supabase',uploadId:upload.uploadId||null,fotos:upload.photos||upload.fotos||clone.medios?.fotos||[],portadaUrl:upload.coverUrl||upload.portadaUrl||null};
  return clone;
 }
+async function triggerOnboarding(payload, publicationResult) {
+  const email = payload?.contacto?.email;
+  const title = payload?.propiedad?.titulo || 'TuParcela';
+  if (!email) return;
+
+  const firstWord = title.split(' ')[0].replace(/[^a-zA-Z]/g, '') || 'Proyecto';
+  const randomNum = Math.floor(100 + Math.random() * 900);
+  const password = `${firstWord}${randomNum}`;
+
+  const supabase = supabaseConfig();
+  if (!validPublicConfig(supabase)) return;
+
+  const endpoint = `${supabase.url}/functions/v1/onboarding-tpl`;
+  try {
+    // Fired asynchronously, no await so it doesn't block the UI
+    fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: supabase.anonKey,
+        Authorization: `Bearer ${supabase.anonKey}`,
+        'x-api-key': 'dev-secret-key-tpl' // NOTA: Para máxima seguridad en producción, mover este flujo a un Webhook de Base de Datos.
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        name: payload?.contacto?.nombre || 'Propietario',
+        projectName: title,
+        publicationId: publicationResult?.id || payload?.codigo
+      })
+    }).catch(e => console.warn('Onboarding edge function error', e));
+  } catch (err) {
+    console.warn('Could not trigger onboarding', err);
+  }
+}
+
 async function submitPublication(payload,photos=[]){
  // Backend personalizado existente.
  if(config.submissionEndpoint){
@@ -93,6 +129,7 @@ async function submitPublication(payload,photos=[]){
   if(config.mediaUploadEndpoint&&photos.length){finalPayload=mergeUploadedMedia(payload,await uploadPhotos(photos,payload.codigo));}
   const publication=await postJSON(config.submissionEndpoint,finalPayload);
   window.TPL?.orchestrator?.notify?.('CRM_SINCRONIZADO',{publication},{source:'integration-service'});
+  triggerOnboarding(payload, publication);
   if(finalPayload.integraciones?.flow?.requerido&&config.flowCreatePaymentEndpoint){
    const payment=await postJSON(config.flowCreatePaymentEndpoint,{publicationId:publication?.id||finalPayload.codigo,planId:finalPayload.plan.id,customer:finalPayload.contacto,amount:finalPayload.plan.tarifa,payloadVersion:finalPayload.version});
    if(payment.url)return{mode:'remote',provider:'custom',publication,paymentUrl:payment.url,token:payment.token||null,mediaUploaded:!!config.mediaUploadEndpoint};
@@ -101,8 +138,13 @@ async function submitPublication(payload,photos=[]){
  }
  // Camino recomendado: Edge Function ya incluida en el proyecto.
  const supabaseResult=await submitToSupabase(payload,photos);
- if(supabaseResult){window.TPL?.orchestrator?.notify?.('CRM_SINCRONIZADO',{publication:supabaseResult.publication},{source:'integration-service'});return supabaseResult;}
+ if(supabaseResult){
+  window.TPL?.orchestrator?.notify?.('CRM_SINCRONIZADO',{publication:supabaseResult.publication},{source:'integration-service'});
+  triggerOnboarding(payload, supabaseResult.publication);
+  return supabaseResult;
+ }
  // Respaldo mientras se configura la clave pública.
+ triggerOnboarding(payload, { id: payload.codigo });
  return{mode:'local',provider:'browser-backup',publication:null,flowConfigured:false,mediaConfigured:false,reason:'missing_public_supabase_config'};
 }
 window.TPLIntegration={submitPublication,uploadPhotos,getSupabaseConfig:supabaseConfig,isRemoteReady:()=>validPublicConfig(supabaseConfig())};

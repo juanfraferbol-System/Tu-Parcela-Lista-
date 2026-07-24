@@ -173,12 +173,19 @@
   }
 
   async function loadCatalogs() {
-    const [parcelas, casas, extras, fundacionExtraRules] = await Promise.all([
-      apiGetParcelas(),
-      apiGetCasas(),
-      apiGetExtras(),
-      apiGetFundacionExtraRules()
-    ]);
+    let parcelas = [], casas = [], extras = [], fundacionExtraRules = [];
+    try {
+      const results = await Promise.all([
+        apiGetParcelas(),
+        apiGetCasas(),
+        apiGetExtras(),
+        apiGetFundacionExtraRules()
+      ]);
+      [parcelas, casas, extras, fundacionExtraRules] = results;
+    } catch (error) {
+      console.warn('TPL Catalog Fallback: No se pudo conectar o las tablas no existen. Usando catálogos vacíos para no romper la UI.', error);
+    }
+    
     state.parcelas = parcelas;
     state.casas = casas;
     state.fundaciones = extras

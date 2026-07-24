@@ -546,7 +546,7 @@ function dataObject(){const raw=Object.fromEntries(new FormData(form).entries())
  plan:{id:state.plan,nombre:plan?.name||'',precioTexto:plan?.price||'',tarifa:plan?.fee||'',comision:plan?.commission||'',recomendado:state.recommendedPlan,coincideConUrgencia:state.plan===state.recommendedPlan},
  promocion:{urgente:urgencyValue()==='alta'||urgencyValue()==='critica',urgenteGratis:urgencyValue()==='alta'&&!plan?.fee,destacadoPago:Boolean(plan?.fee&&plan?.fee!=='$0'),nivel:urgencyValue()==='critica'?'maxima':urgencyValue()==='alta'?'alta':'normal',presupuestoTexto:plan?.fee||'$0',estado:plan?.fee&&plan?.fee!=='$0'?'pendiente_pago':'sin_pago',prioridadGrilla:urgencyValue()==='critica'?100:urgencyValue()==='alta'?60:0},
  tasacion:{resultado:state.valuation,variablesUsadas:{ubicacion:!!state.coordinates,superficie:true,terreno:state.type!=='casa',casa:state.type==='casa'||state.type==='parcela_con_casa',cobertura:state.valuation?.fieldCoverage||valuationCoverage(state.type),origen:state.valuation?.source||null,persistidaEnSupabase:Boolean(state.valuation?.persisted),urgencia:raw.urgencia||''},valorRespaldadoTPL:Boolean(state.valuation?.persisted&&state.valuation?.quick)&&number(val('precioVenta'))<=Number(state.valuation?.quick||0),distintivoPublico:Boolean(state.valuation?.persisted&&state.valuation?.quick)&&number(val('precioVenta'))<=Number(state.valuation?.quick||0)?{activo:true,titulo:'Valor respaldado por Tu Parcela Lista',etiqueta:'Precio recomendado',tipo:'tpl_valor_respaldado',motivo:state.valuation?.selectedStrategy==='quick'?'venta_rapida_seleccionada':'precio_manual_igual_o_inferior'}:{activo:false}},
- medios:{cantidadFotos:state.photos.length,portadaIndice:0,fotos:state.photos.map((p,i)=>({id:p.id,orden:i,portada:i===0,nombreOriginal:p.originalName,tamanoOriginal:p.originalSize,anchoOriginal:p.width,altoOriginal:p.height,variantes:Object.fromEntries(Object.entries(p.variants||{}).map(([k,v])=>[k,{nombre:v.file?.name,tamano:v.size,ancho:v.width,alto:v.height,tipo:'image/webp'}]))}))},
+ medios:{videoUrl:raw.videoUrl||'',cantidadFotos:state.photos.length,portadaIndice:0,fotos:state.photos.map((p,i)=>({id:p.id,orden:i,portada:i===0,nombreOriginal:p.originalName,tamanoOriginal:p.originalSize,anchoOriginal:p.width,altoOriginal:p.height,variantes:Object.fromEntries(Object.entries(p.variants||{}).map(([k,v])=>[k,{nombre:v.file?.name,tamano:v.size,ancho:v.width,alto:v.height,tipo:'image/webp'}]))}))},
  distintivos:{valorRespaldadoTPL:Boolean(state.valuation?.persisted)&&state.valuation?.selectedStrategy==='quick'&&number(val('precioVenta'))===Number(state.valuation?.quick||0),precioRecomendado:Boolean(state.valuation?.persisted)&&state.valuation?.selectedStrategy==='quick'&&number(val('precioVenta'))===Number(state.valuation?.quick||0),texto:'Valor respaldado por Tu Parcela Lista',badge:'Precio recomendado'},integraciones:{flow:{requerido:!!plan&&plan.fee!=='$0'&&plan.fee!=='$0/mes',estado:'pendiente_configuracion'},crm:{estado:'listo_para_sincronizar'},tasador:{estado:state.valuation?.persisted?'registrado_supabase':state.valuation?'estimacion_local':'datos_preparados'}},
  consentimiento:{terminos:$('#acceptTerms')?.checked||false},
  metadata:{origen:'publicador_web',createdAt:new Date().toISOString()}
@@ -555,7 +555,53 @@ function dataObject(){const raw=Object.fromEntries(new FormData(form).entries())
 
 function saveDraft(){clearTimeout(state.saveTimer);state.saveTimer=setTimeout(()=>{try{const data=dataObject();data.completed=[...state.completed];data.current=state.current;localStorage.setItem(DRAFT_KEY,JSON.stringify(data));$('#saveState').textContent='Borrador guardado';}catch{}},250);}
 function restoreDraft(){try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');if(!d)return;const src=d.formulario||d;for(const [k,v] of Object.entries(src)){if(['naturaleza','extrasCasa','mejorasOfrecidas'].includes(k)){(v||[]).forEach(value=>{const el=$(`input[name="${k}"][value="${CSS.escape(value)}"]`);if(el)el.checked=true;});continue;}const el=form.elements[k];if(!el||v==null||typeof v==='object')continue;if(el instanceof RadioNodeList){[...el].forEach(r=>r.checked=r.value===v);}else el.value=v;}if(src.region)fillCommunes(src.region,src.comuna);state.type=src.tipo||d.propiedad?.tipo||'';state.plan=d.plan?.id||d.plan||null;const planInput=$('#selectedPlanInput');if(planInput)planInput.value=state.plan||'';state.recommendedPlan=d.plan?.recomendado||null;state.valuation=d.tasacion?.resultado||d.tasacion||null;state.coordinates=d.ubicacion||null;state.completed=new Set(d.completed||[]);state.current=d.current||'tipo';setType(state.type);if(d.propiedad?.titulo||d.titulo){$('#tituloEditable').value=d.propiedad?.titulo||d.titulo;state.copyEdited=true;}if(d.propiedad?.descripcion||d.descripcionFinal){$('#descripcionEditable').value=d.propiedad?.descripcion||d.descripcionFinal;state.copyEdited=true;}if(state.coordinates)setTimeout(()=>setCoordinates(state.coordinates.lat,state.coordinates.lng,state.coordinates.source||'Ubicación restaurada'),500);updateUrgency();updateProgress();updatePreview();}catch(err){console.warn('No fue posible restaurar el borrador',err);localStorage.removeItem(DRAFT_KEY);}}
-async function submit(e){e.preventDefault();const plan=selectedPlanObject();if(!plan){$('#submitState').textContent='Primero debes elegir un plan en el paso 8.';renderFinal();return;}if(!$('#acceptTerms').checked){$('#submitState').textContent='Marca la casilla para confirmar que revisaste el plan y autorizas el uso de tus datos para gestionar la publicación.';return;}const payload=dataObject(),code='TPL-'+new Date().getFullYear()+'-'+Math.floor(100000+Math.random()*900000);payload.codigo=code;window.TPL?.orchestrator?.notify?.('PUBLICACION_CREADA',{codigo:code,publication:payload},{source:'publicador'});const btn=$('#submitBtn');btn.disabled=true;btn.textContent='Procesando…';$('#submitState').textContent='Guardando la publicación y preparando las integraciones…';try{const result=window.TPLIntegration?await window.TPLIntegration.submitPublication(payload,state.photos):{mode:'local'};if(result?.paymentUrl){$('#submitState').textContent='Redirigiendo al pago seguro…';location.href=result.paymentUrl;return;}if(result?.mode!=='remote'){const saved=JSON.parse(localStorage.getItem('tpl_publicaciones_prueba')||'[]');saved.push({...payload,integrationResult:result});localStorage.setItem('tpl_publicaciones_prueba',JSON.stringify(saved));}window.TPLValuationCRM?.markPublished?.(state.valuationSessionId,{publicationCode:result?.publication?.codigo_publico||code,payload});const crmResult=result?.mode==='remote'?null:window.TPLCRM?.registerPublication?.(payload,result);if(crmResult)window.TPL?.orchestrator?.notify?.('CRM_SINCRONIZADO',{codigo:code,propertyId:crmResult.dossier.id,ownerId:crmResult.dossier.ownerId,tasks:crmResult.tasks.length},{source:'publicador-crm'});localStorage.removeItem(DRAFT_KEY);const node=$('#successTemplate').content.cloneNode(true);const finalCode=result?.publication?.codigo_publico||code;node.querySelector('.success-code').textContent=finalCode;const msg=node.querySelector('p:not(.eyebrow)');if(msg)msg.textContent=result?.mode==='remote'?'La propiedad fue enviada correctamente para revisión y sincronización con el CRM.':'La publicación quedó guardada en modo de prueba. La conexión real se activará al configurar Supabase y Flow.';$('.publisher-content').replaceChildren(node);window.scrollTo({top:0,behavior:'smooth'});}catch(err){console.error(err);$('#submitState').textContent=err.message||'No fue posible completar el envío. El borrador sigue guardado.';btn.disabled=false;btn.textContent=selectedPlanObject()?.button||'Guardar publicación';}}
+async function submit(e){
+  e.preventDefault();
+  
+  // Anti-Bot Honeypot Check
+  const honeypot = $('#user_contact_website');
+  if (honeypot && honeypot.value) {
+    console.warn('Bot submission blocked.');
+    $('#submitState').textContent = 'Error de seguridad. Por favor recarga la página.';
+    return;
+  }
+
+  const plan=selectedPlanObject();
+  if(!plan){$('#submitState').textContent='Primero debes elegir un plan en el paso 8.';renderFinal();return;}
+  if(!$('#acceptTerms').checked){$('#submitState').textContent='Marca la casilla para confirmar que revisaste el plan y autorizas el uso de tus datos para gestionar la publicación.';return;}
+  const payload=dataObject(),code='TPL-'+new Date().getFullYear()+'-'+Math.floor(100000+Math.random()*900000);
+  payload.codigo=code;
+  window.TPL?.orchestrator?.notify?.('PUBLICACION_CREADA',{codigo:code,publication:payload},{source:'publicador'});
+  const btn=$('#submitBtn');
+  btn.disabled=true;
+  btn.textContent='Procesando…';
+  $('#submitState').textContent='Guardando la publicación y preparando las integraciones…';
+  try{
+    const result=window.TPLIntegration?await window.TPLIntegration.submitPublication(payload,state.photos):{mode:'local'};
+    if(result?.paymentUrl){$('#submitState').textContent='Redirigiendo al pago seguro…';location.href=result.paymentUrl;return;}
+    if(result?.mode!=='remote'){
+      const saved=JSON.parse(localStorage.getItem('tpl_publicaciones_prueba')||'[]');
+      saved.push({...payload,integrationResult:result});
+      localStorage.setItem('tpl_publicaciones_prueba',JSON.stringify(saved));
+    }
+    window.TPLValuationCRM?.markPublished?.(state.valuationSessionId,{publicationCode:result?.publication?.codigo_publico||code,payload});
+    const crmResult=result?.mode==='remote'?null:window.TPLCRM?.registerPublication?.(payload,result);
+    if(crmResult)window.TPL?.orchestrator?.notify?.('CRM_SINCRONIZADO',{codigo:code,propertyId:crmResult.dossier.id,ownerId:crmResult.dossier.ownerId,tasks:crmResult.tasks.length},{source:'publicador-crm'});
+    localStorage.removeItem(DRAFT_KEY);
+    const node=$('#successTemplate').content.cloneNode(true);
+    const finalCode=result?.publication?.codigo_publico||code;
+    node.querySelector('.success-code').textContent=finalCode;
+    const msg=node.querySelector('p:not(.eyebrow)');
+    if(msg)msg.textContent=result?.mode==='remote'?'La propiedad fue enviada correctamente para revisión y sincronización con el CRM.':'La publicación quedó guardada en modo de prueba. La conexión real se activará al configurar Supabase y Flow.';
+    $('.publisher-content').replaceChildren(node);
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(err){
+    console.error(err);
+    $('#submitState').textContent=err.message||'No fue posible completar el envío. El borrador sigue guardado.';
+    btn.disabled=false;
+    btn.textContent=selectedPlanObject()?.button||'Guardar publicación';
+  }
+}
 
 function bind(){
  $$('input[name="tipo"]').forEach(r=>r.addEventListener('change',()=>{setType(r.value);clearError('tipo');}));

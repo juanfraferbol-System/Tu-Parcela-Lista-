@@ -237,6 +237,147 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 .tpl-backed-value-badge strong{display:block;font-size:.78rem;line-height:1.2;font-weight:850}.tpl-backed-value-badge small{display:block;margin-top:2px;font-size:.69rem;font-weight:650;color:#39775a}.tpl-backed-value-check{display:grid;place-items:center;width:23px;height:23px;border-radius:50%;background:#16844b;color:#fff;font-weight:900;flex:0 0 auto}
 @media(max-width:640px){.tpl-backed-value-badge{padding:8px 9px}.tpl-backed-value-badge strong{font-size:.73rem}}
 </style>
+<style>
+.tpl-budget-container { margin-bottom: 24px; }
+.tpl-budget-quick-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.budget-quick-btn {
+  background: rgba(0, 63, 122, 0.05);
+  border: 1px solid rgba(0, 63, 122, 0.1);
+  color: #003f7a;
+  border-radius: 99px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  text-align: center;
+  min-width: 100px;
+}
+.budget-quick-btn:hover, .budget-quick-btn.active {
+  background: #003f7a;
+  color: white;
+  border-color: #003f7a;
+}
+
+/* Mejora de Visibilidad Botones Activos (Cotizador) */
+.tpl-choice.is-active, .tpl-priority.is-active, .tpl-family.is-active {
+  background: #003f7a !important; /* Color corporativo */
+  color: white !important;
+  border-color: #003f7a !important;
+  box-shadow: 0 4px 15px rgba(0, 63, 122, 0.3) !important;
+}
+.tpl-choice.is-active i, .tpl-priority.is-active i, .tpl-family.is-active i, 
+.tpl-choice.is-active small, .tpl-priority.is-active small, .tpl-family.is-active small {
+  color: rgba(255,255,255,0.85) !important; /* Textos secundarios en blanco tenue */
+}
+.tpl-choice.is-active strong, .tpl-priority.is-active strong, .tpl-family.is-active strong {
+  color: white !important;
+}
+
+/* Mejora Filtros Extras */
+.extra-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 99px;
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.extra-filter-btn i { width: 16px; height: 16px; }
+.extra-filter-btn:hover { background: #e2e8f0; }
+.extra-filter-btn.active {
+  background: #003f7a;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 63, 122, 0.2);
+}
+.extra-card-compact.selected {
+  border: 2px solid #10b981 !important;
+  background: #f0fdf4 !important;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Micro-animaciones para Tarjetas Premium */
+.parcela-card, .card-parcela-v5, .combo-proposal-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  will-change: transform, box-shadow;
+}
+.parcela-card:hover, .card-parcela-v5:hover, .combo-proposal-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+  border-color: rgba(0, 63, 122, 0.2) !important;
+}
+.parcela-card .card-gallery-container img, .card-parcela-v5 .card-gallery-container img {
+  transition: transform 0.5s ease !important;
+}
+.parcela-card:hover .card-gallery-container img, .card-parcela-v5:hover .card-gallery-container img {
+  transform: scale(1.05) !important;
+}
+
+/* Modal Filtro Móvil */
+@media(max-width: 900px) {
+  .mobile-filters-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #003f7a;
+    color: white;
+    border-radius: 50px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    box-shadow: 0 8px 24px rgba(0, 63, 122, 0.3);
+    z-index: 100;
+    border: none;
+  }
+  .parcelas-sidebar {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    right: 0;
+    background: white;
+    z-index: 1000;
+    padding: 24px;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+    transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .parcelas-sidebar.active {
+    bottom: 0;
+  }
+  .parcelas-sidebar-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .parcelas-sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+  }
+  .close-filters-mobile {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #64748b;
+  }
+}
+</style>
   <link rel="stylesheet" href="css/tpl-header-unified.css">
 <script defer src="js/tpl-seo.js?v=20260722-1"></script>
 </head>
@@ -397,10 +538,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p id="budget-help">Responde tres preguntas rápidas y encontraremos las alternativas que mejor calzan contigo.</p>
     </div>
 
-    <label class="tpl-budget-field" for="budget-input">
-      <span>Mi presupuesto total es</span>
-      <span class="tpl-budget-input-wrap"><b>$</b><input id="budget-input" inputmode="numeric" placeholder="15.000.000" type="text" autocomplete="off"/></span>
-    </label>
+    <div class="tpl-budget-container">
+      <label class="tpl-budget-field" for="budget-input">
+        <span>Mi presupuesto total es</span>
+        <span class="tpl-budget-input-wrap"><b>$</b><input id="budget-input" inputmode="numeric" placeholder="15.000.000" type="text" autocomplete="off"/></span>
+      </label>
+      
+      <div class="trust-badge-mini" style="display:flex; align-items:center; gap:16px; font-size:0.75rem; color:#16a34a; justify-content:center; margin-top:8px;">
+        <span style="display:flex; align-items:center; gap:4px;"><i data-lucide="shield-check" style="width:14px;"></i> Compra Segura</span>
+        <span style="display:flex; align-items:center; gap:4px;"><i data-lucide="file-text" style="width:14px;"></i> Asesoría Legal</span>
+      </div>
+      
+      <div class="tpl-budget-quick-actions">
+        <button type="button" class="budget-quick-btn" data-value="15000000">Menos de $15M</button>
+        <button type="button" class="budget-quick-btn" data-value="25000000">$15M - $30M</button>
+        <button type="button" class="budget-quick-btn" data-value="45000000">Más de $30M</button>
+      </div>
+    </div>
 
     <fieldset class="tpl-guided-group">
       <legend>¿Qué proyecto quieres comenzar?</legend>
@@ -470,9 +624,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ========================================= -->
 <!-- SIDEBAR IZQUIERDO -->
 <!-- ========================================= -->
-<aside class="parcelas-sidebar">
-<div class="sidebar-header sidebar-menu-title">
+<button class="mobile-filters-btn" id="mobile-filters-btn" type="button">
+  <i data-lucide="sliders-horizontal"></i> Filtros
+</button>
+<div class="parcelas-sidebar-overlay" id="parcelas-sidebar-overlay"></div>
+
+<aside class="parcelas-sidebar" id="parcelas-sidebar">
+<div class="sidebar-header sidebar-menu-title" style="display:flex; justify-content:space-between; align-items:center;">
 <h3>Filtrar parcela</h3>
+<button class="close-filters-mobile" id="close-filters-mobile" type="button" aria-label="Cerrar filtros">&times;</button>
 </div>
 <div class="filter-buttons-wrapper" id="parcelas-filters">
 <button class="filter-btn" id="filter-gps" type="button">
@@ -911,11 +1071,11 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
   </div>
 
   <div class="extras-filters" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:10px; margin-bottom:15px;">
-    <button type="button" class="extra-filter-btn active" data-filter="todos">Todos</button>
-    <button type="button" class="extra-filter-btn" data-filter="terminaciones">Terminaciones</button>
-    <button type="button" class="extra-filter-btn" data-filter="instalaciones">Instalaciones</button>
-    <button type="button" class="extra-filter-btn" data-filter="exterior">Exterior</button>
-    <button type="button" class="extra-filter-btn" data-filter="sanitario">Sanitario</button>
+    <button type="button" class="extra-filter-btn active" data-filter="todos"><i data-lucide="layers"></i> Todos</button>
+    <button type="button" class="extra-filter-btn" data-filter="terminaciones"><i data-lucide="paint-roller"></i> Terminaciones</button>
+    <button type="button" class="extra-filter-btn" data-filter="instalaciones"><i data-lucide="zap"></i> Instalaciones</button>
+    <button type="button" class="extra-filter-btn" data-filter="exterior"><i data-lucide="sun"></i> Exterior</button>
+    <button type="button" class="extra-filter-btn" data-filter="sanitario"><i data-lucide="droplet"></i> Sanitario</button>
   </div>
 
   <!-- Botón Pack Llave en Mano -->
@@ -1202,6 +1362,50 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <script defer src="tpl-analytics.js"></script>
 <script defer src="js/site-polish.js?v=20260723-cotizador-v2"></script>
 <!-- <script defer src="agente/agente.js"></script> -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const quickBtns = document.querySelectorAll('.budget-quick-btn');
+  const budgetInput = document.getElementById('budget-input');
+  
+  if (quickBtns.length > 0 && budgetInput) {
+    quickBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        quickBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Formatear el valor en el input
+        const rawValue = this.getAttribute('data-value');
+        budgetInput.value = new Intl.NumberFormat('es-CL').format(rawValue);
+        
+        // Simular evento input para que otros scripts lo detecten
+        budgetInput.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    });
+  }
+
+  // Filtros Modal Móvil
+  const btnOpenFilters = document.getElementById('mobile-filters-btn');
+  const btnCloseFilters = document.getElementById('close-filters-mobile');
+  const sidebar = document.getElementById('parcelas-sidebar');
+  const overlay = document.getElementById('parcelas-sidebar-overlay');
+  
+  if (btnOpenFilters && sidebar && overlay) {
+    const toggleFilters = () => {
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+      if (sidebar.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    };
+    btnOpenFilters.addEventListener('click', toggleFilters);
+    btnCloseFilters.addEventListener('click', toggleFilters);
+    overlay.addEventListener('click', toggleFilters);
+  }
+});
+</script>
 
 <script>
 /* FIX v0.9.1.1: mantener catálogo de parcelas disponible desde la carga inicial. */

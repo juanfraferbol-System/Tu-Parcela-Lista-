@@ -59,6 +59,12 @@
 
     <form id="publisherForm" novalidate>
       <input type="hidden" id="titulo" name="titulo"><input type="hidden" id="descripcionFinal" name="descripcionFinal">
+      
+      <!-- Anti-Bot Honeypot: Do not fill this field -->
+      <div style="opacity: 0; position: absolute; top: 0; left: 0; height: 0; width: 0; z-index: -1;">
+        <label for="user_contact_website">Si eres humano, deja este campo vacío</label>
+        <input type="text" id="user_contact_website" name="user_contact_website" tabindex="-1" autocomplete="off">
+      </div>
 
       <section class="form-section observable" id="tipo" data-step="tipo">
         <header class="section-heading"><span>01</span><div><p class="eyebrow">Comencemos</p><h2>¿Qué deseas publicar?</h2><p>Los campos cambiarán automáticamente según el tipo de propiedad.</p></div></header>
@@ -179,6 +185,13 @@
           <div class="photo-location-actions"><button type="button" class="btn small secondary" id="tryPhotoLocation">Buscar ubicación en las fotos</button><button type="button" class="btn small primary" id="usePhotoLocation" hidden>Usar ubicación encontrada</button><button type="button" class="btn small ghost" id="backToLocation">Volver a ubicación</button></div>
         </div>
         <div class="photo-grid" id="photoGrid"></div><p class="field-error" data-error-for="fotos"></p>
+        
+        <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+          <h3 style="margin-bottom: 8px;">Video de la propiedad (Opcional)</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">Ingresa el enlace de YouTube o Vimeo. Si lo dejas en blanco, la sección de video no aparecerá en la página de la propiedad.</p>
+          <label class="field"><input type="url" id="videoUrl" name="videoUrl" placeholder="https://www.youtube.com/watch?v=..."></label>
+        </div>
+
         <div class="section-actions"><button type="button" class="btn ghost previous-section" data-prev="ubicacion">Volver</button><button type="button" class="btn primary next-section" data-next="precio">Continuar al precio</button></div>
       </section>
 

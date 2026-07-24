@@ -517,3 +517,143 @@ button[type="submit"]:hover, .btn-primary:hover {
 .partner-actions{display:flex;gap:6px;flex-wrap:wrap}.partner-actions button{padding:7px 9px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-size:.78rem;font-weight:700}.partner-actions .approve{background:#047857;color:#fff;border-color:#047857}.partner-actions .reject{color:#b91c1c;border-color:#fecaca}
 .partner-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.partner-detail-grid div{padding:12px;background:#f8fafc;border-radius:10px}.partner-detail-grid strong{display:block;font-size:.74rem;color:#64748b;margin-bottom:4px;text-transform:uppercase}.partner-detail-wide{grid-column:1/-1}
 @media(max-width:800px){.partner-admin-head{flex-direction:column}.partner-detail-grid{grid-template-columns:1fr}.partner-filters input{min-width:100%;width:100%}}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+}
+.toast {
+  background: var(--bg-panel);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.toast.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+.toast.success { border-left: 4px solid var(--success); }
+.toast.error { border-left: 4px solid var(--danger); }
+.toast.info { border-left: 4px solid var(--info); }
+
+/* Detalle Ficha Administrativa y Ruta de Comunicación */
+.crm-detalle-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  margin-top: 10px;
+}
+.crm-detalle-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.crm-detalle-right {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.crm-section-title {
+  color: #003f7a;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+}
+
+.ruta-comunicacion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 10px;
+}
+.ruta-item {
+  padding-left: 15px;
+}
+.ruta-item-1 { border-left: 3px solid #10b981; }
+.ruta-item-2 { border-left: 3px solid #003f7a; }
+.ruta-item-3 { border-left: 3px solid #f59e0b; }
+
+.ruta-item h4 {
+  margin: 0 0 5px;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+.ruta-item p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+.ruta-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+.ruta-btn {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tpl-score-title {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #0f766e;
+}
+.tpl-score-value {
+  font-size: 1.4rem;
+  color: #0f172a;
+  font-weight: bold;
+}
+.tpl-score-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.crm-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0 0;
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.crm-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.potenciar-btn-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.potenciar-btn-list button {
+  width: 100%;
+  justify-content: center;
+}

@@ -301,4 +301,59 @@
   }
 
   document.addEventListener('DOMContentLoaded', install);
+
+  window.TPLLandingEngine = {
+    createFromCRM: (propertyData, fotos) => {
+      // 1. Validar que la interfaz principal esté montada
+      if (!document.getElementById('view-landing-engine')) {
+        install();
+      }
+      
+      // 2. Mock o inicializar un nuevo registro basado en la propiedad
+      const newCode = `LND-${propertyData.id.split('-')[0].toUpperCase()}`;
+      
+      const newLanding = {
+        title: propertyData.titulo_publico,
+        subtitle: 'Un lugar diseñado para conectarte con lo que de verdad importa.',
+        eyebrow: 'Caburgua Premium',
+        price: (propertyData.precio || 0) + ' ' + (propertyData.moneda || 'UF'),
+        location: propertyData.comuna + (propertyData.sector ? ', ' + propertyData.sector : ''),
+        heroImage: fotos && fotos.length > 0 ? fotos[0].url_storage : '',
+        description: propertyData.descripcion || 'Descripción del proyecto.',
+        gallery: fotos ? fotos.map(f => f.url_storage) : [],
+        benefits: [
+          'Tranquilidad absoluta a minutos del centro urbano.',
+          'Alta plusvalía garantizada por el desarrollo del sector.',
+          'Entorno natural con espacios privilegiados.'
+        ],
+        ctaPrimary: 'Agendar visita',
+        ctaSecondary: 'Hablar por WhatsApp',
+        whatsapp: propertyData.contacto_telefono || '',
+        videoUrl: '',
+        formEnabled: true,
+        analyticsEnabled: true,
+        adsReady: false,
+        seoTitle: propertyData.titulo_publico + ' | Proyecto Inmobiliario',
+        seoDescription: propertyData.descripcion ? propertyData.descripcion.substring(0, 150) + '...' : ''
+      };
+
+      // 3. Crear el registro en memoria
+      const newRecord = {
+        code: newCode,
+        status: 'borrador',
+        updatedAt: new Date().toISOString(),
+        draft: newLanding
+      };
+      
+      // Agregar al inicio para que aparezca primero (esto es temporal en UI, se guardará luego en la DB)
+      records.unshift(newRecord);
+      
+      // Renderizamos la grilla
+      render();
+      
+      // Abrimos el editor con el nuevo código
+      editor(newCode);
+    }
+  };
+
 })();

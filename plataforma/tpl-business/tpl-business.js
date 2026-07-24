@@ -117,14 +117,14 @@
           <span class="tpl-brand-mark">TPL</span>
           <span><strong>${esc(config.brand.name)}</strong><small>${esc(config.brand.eyebrow)}</small></span>
         </a>
-        <span class="tpl-kicker">Centro privado de clientes</span>
-        <h1>Administra la venta de tu propiedad.</h1>
-        <p>Revisa tu Landing Premium, resultados y próximos pasos desde una experiencia simple y segura.</p>
+        <span class="tpl-kicker">Tu espacio exclusivo</span>
+        <h1>Te ayudamos a que más personas encuentren tu proyecto.</h1>
+        <p>Aquí puedes revisar las personas interesadas, ver el alcance de tu Landing y preparar los próximos pasos para vender mejor.</p>
         <div class="tpl-auth-trust">${icon('check')}<span>Tus proyectos se identifican mediante tu cuenta. No utilizamos enlaces públicos para conceder acceso.</span></div>
       </section>
       <section class="tpl-auth-card" aria-labelledby="login-title">
-        <span class="tpl-kicker">Mi Proyecto</span>
-        <h2 id="login-title">Ingresa a TPL Business</h2>
+        <span class="tpl-kicker">Centro de Negocios</span>
+        <h2 id="login-title">Ingresa a Mi Proyecto</h2>
         <p>Utiliza el correo asociado a tu proyecto.</p>
         <form id="tpl-login-form">
           <label>Correo electrónico<input name="email" type="email" autocomplete="email" required></label>
@@ -397,7 +397,7 @@
           <div class="tpl-account-card"><div>${icon('user')}<span><small>Usuario</small><strong>${esc(user.email || 'Correo no disponible')}</strong></span></div><div>${icon('building')}<span><small>Cuenta</small><strong>${esc(account.name)}</strong></span></div><div>${icon('layout')}<span><small>Proyecto</small><strong>${esc(project.name)}</strong></span></div></div>
         </section>
       </main>
-      <footer class="tpl-footer"><div class="tpl-footer-brand"><span class="tpl-brand-mark">TPL</span><div><strong>${esc(config.brand.name)}</strong><p>${esc(config.brand.support)}</p></div></div><div class="tpl-footer-links"><a href="#inicio">Mi Proyecto</a><a href="#resultados">Resultados</a><a href="#crecimiento">Cómo crecer</a></div><p class="tpl-copyright">© ${new Date().getFullYear()} TPL Business. Centro privado de clientes.</p></footer>
+      <footer class="tpl-footer"><div class="tpl-footer-brand"><span class="tpl-brand-mark">TPL</span><div><strong>${esc(config.brand.name)}</strong><p>${esc(config.brand.support)}</p></div></div><div class="tpl-footer-links"><a href="#inicio">Mi Proyecto</a><a href="#resultados">Resultados</a><a href="#crecimiento">Cómo crecer</a></div><p class="tpl-copyright">© ${new Date().getFullYear()} Tu Parcela Lista. Centro de Negocios.</p></footer>
       <div class="tpl-dialog-backdrop" data-dialog-backdrop hidden><section class="tpl-dialog" role="dialog" aria-modal="true" aria-labelledby="tpl-dialog-title"><button class="tpl-dialog-close" type="button" data-close-dialog aria-label="Cerrar ficha">${icon('close')}</button><div data-dialog-content></div></section></div>
       <div class="tpl-toast" data-toast role="status" hidden></div>`;
 
@@ -685,6 +685,11 @@
       return;
     }
 
+    // Prevenir parpadeo del formulario si viene un token en la URL (Magic Link)
+    if (window.location.hash.includes('access_token=')) {
+      renderEntry('Validando acceso seguro', 'Estamos confirmando tu enlace mágico.');
+    }
+
     state.authSubscription = auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
         renderRecovery('update');
@@ -692,7 +697,11 @@
         state.portalSession = null;
         state.project = null;
         renderLogin('');
-      } else if (event === 'SIGNED_IN' && session && root.querySelector('#tpl-login-form')) {
+      } else if (event === 'SIGNED_IN' && session && (root.querySelector('#tpl-login-form') || window.location.hash.includes('access_token='))) {
+        // Limpiamos el hash de la URL por seguridad y estética si venía de un magic link
+        if (window.location.hash.includes('access_token=')) {
+          history.replaceState({}, '', window.location.pathname + window.location.search);
+        }
         loadPortal();
       }
     });
@@ -704,7 +713,7 @@
         renderRecovery('update');
       } else if (session) {
         await loadPortal();
-      } else {
+      } else if (!window.location.hash.includes('access_token=')) {
         renderLogin('');
       }
     } catch (error) {
