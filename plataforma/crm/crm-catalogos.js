@@ -75,6 +75,9 @@
           ${field('par-distancia', 'Distancia a ciudad', p.distancia_ciudad)}
           ${field('par-lat', 'Latitud privada', p.latitud_privada, 'number', 'step="any" min="-90" max="90"')}
           ${field('par-lng', 'Longitud privada', p.longitud_privada, 'number', 'step="any" min="-180" max="180"')}
+          ${field('par-lat-publica', 'Latitud del mapa público', p.latitud_publica, 'number', 'step="any" min="-90" max="90"')}
+          ${field('par-lng-publica', 'Longitud del mapa público', p.longitud_publica, 'number', 'step="any" min="-180" max="180"')}
+          <div class="catalog-span-2 catalog-check-row">${checkbox('par-mapa-exacto', 'Mostrar estas coordenadas exactas en la Landing Premium', p.consentimiento_uso_ubicacion && p.latitud_publica != null && p.longitud_publica != null)}</div>
         </div>
 
         <div class="catalog-section-title"><h3>Características de la parcela</h3><small>Completa manualmente lo que falte.</small></div>
@@ -137,6 +140,10 @@
       region: val('par-region'), comuna: val('par-comuna'), sector: val('par-sector'), ubicacion_publica_aproximada: val('par-ubicacion'),
       ciudad_principal: val('par-ciudad') || null, distancia_ciudad: val('par-distancia') || null,
       latitud_privada: numberOrNull('par-lat'), longitud_privada: numberOrNull('par-lng'),
+      latitud_publica: bool('par-mapa-exacto') ? (numberOrNull('par-lat-publica') ?? numberOrNull('par-lat')) : null,
+      longitud_publica: bool('par-mapa-exacto') ? (numberOrNull('par-lng-publica') ?? numberOrNull('par-lng')) : null,
+      consentimiento_uso_ubicacion: bool('par-mapa-exacto'),
+      precision_ubicacion: bool('par-mapa-exacto') ? 'exacta' : 'aproximada',
       agua: val('par-agua') || null, luz: val('par-luz') || null, acceso: val('par-acceso') || null, topografia: val('par-topografia') || null,
       naturaleza: csv('par-naturaleza'), cuerpos_agua: csv('par-cuerpos-agua'), servicios: csv('par-servicios'),
       facilidad_pago: bool('par-facilidad-pago'), detalle_facilidad_pago: val('par-detalle-pago') || null,
