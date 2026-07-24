@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     budgetHelp: document.getElementById("budget-help"),
     comboFields: document.getElementById("combo-fields"),
     projectTypeOptions: document.getElementById("project-type-options"),
-    priorityOptions: document.getElementById("search-priority-options"),
+    priorityOptions: document.getElementById("priority-options"),
     familyGroup: document.getElementById("family-profile-group"),
     familyOptions: document.getElementById("family-profile-options"),
 
