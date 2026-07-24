@@ -176,7 +176,10 @@
     main.append(buildDashboard(), buildAccounts(), buildProjects(), buildRequests(), buildModal());
     bind();
     window.lucide?.createIcons();
-    load();
+    const client = window.TPL_getSupabaseClient?.();
+    client?.auth.getSession().then(({ data, error }) => {
+      if (!error && data?.session) load();
+    });
   }
 
   function activate(link) {
@@ -203,6 +206,10 @@
       feedback('');
       render();
     } catch (error) {
+      if (/iniciar sesión/i.test(error.message || '')) {
+        feedback('');
+        return;
+      }
       console.error('[TPL Business CRM] Error:', error.cause || error);
       feedback(error.message || 'No fue posible cargar TPL Business.', true);
     } finally {
