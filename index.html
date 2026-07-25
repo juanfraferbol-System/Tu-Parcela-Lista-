@@ -563,7 +563,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </nav>
 <div style="display: flex; gap: 16px; align-items: center;">
 <a class="nav-contact-btn" href="#contacto">Contacto</a>
-<button aria-label="Abrir Menú" class="nav-toggle" id="nav-toggle">
+<button aria-label="Abrir Menú" aria-expanded="false" aria-controls="nav-links" class="nav-toggle" id="nav-toggle">
 <i data-lucide="menu"></i>
 </button>
 </div>
@@ -814,7 +814,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         Nativas
                     </button>
 <div class="dropdown-container">
-<button class="filter-btn" id="filter-region-btn" type="button">
+<button class="filter-btn" id="filter-region-btn" type="button" aria-expanded="false" aria-controls="region-dropdown">
 <i data-lucide="map"></i>
                             Comunas
                             <i data-lucide="chevron-down"></i>
@@ -844,7 +844,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <button class="view-btn view-switcher active" data-view="grid" title="Vista Amplia"><i data-lucide="layout-grid"></i></button>
   <button class="view-btn view-switcher" data-view="list" title="Vista de Lista"><i data-lucide="list"></i></button>
 </div>
-<button class="view-btn btn-open-map v3-map-button" id="btn-map-view" type="button">
+<button class="view-btn btn-open-map v3-map-button" id="btn-map-view" type="button" aria-expanded="false" aria-controls="map-layout">
 <i data-lucide="globe-2"></i>
 <span>Ver en mapa</span>
 </button>
@@ -856,7 +856,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="map-cards" style="flex:1; padding: 10px; display:flex; flex-direction:column; gap:10px;"></div>
   </div>
   <div id="map-container"></div>
-  <img alt="Tu Parcela Lista" class="map-brand-watermark" src="image/logo-tu-parcela-lista.png"/>
+  <img alt="Tu Parcela Lista" class="map-brand-watermark" src="image/logo-tu-parcela-lista.png" loading="lazy" decoding="async"/>
 </div>
 <div class="parcelas-grid" id="parcelas-container"></div>
 </div>
@@ -1149,7 +1149,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <div style="flex: 1 1 300px; display: flex; justify-content: flex-end; position: relative;">
       <div style="position: absolute; top: 0; bottom: 0; left: -1px; width: 80px; background: linear-gradient(to right, #113336, transparent); z-index: 1;"></div>
-      <img src="image/3d_house.jpg" alt="Cotizador Premium de Casas" style="width: 100%; height: 100%; object-fit: cover; min-height: 350px; max-height: 400px; display: block;">
+      <img src="image/3d_house.jpg" alt="Cotizador Premium de Casas" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: cover; min-height: 350px; max-height: 400px; display: block;">
     </div>
     
   </div>
@@ -1276,12 +1276,12 @@ Servicio no incluido. Puedes continuar con tu propio equipo o activar un plan de
 <div class="preview-images">
 <div class="preview-photo-box">
 <button class="preview-ficha-btn" data-project-info="parcela" type="button">Ver parcela</button>
-<img alt="Parcela seleccionada" data-project-info="parcela" id="preview-parcela-img" src="image/placeholder-parcela.jpg"/>
+<img alt="Parcela seleccionada" data-project-info="parcela" id="preview-parcela-img" src="image/placeholder-parcela.jpg" loading="lazy" decoding="async"/>
 <button class="summary-change-link" data-change-project="parcela" id="change-parcela" style="display:none;" type="button">Cambiar parcela</button>
 </div>
 <div class="preview-photo-box">
 <button class="preview-ficha-btn" data-project-info="casa" type="button">Ver casa</button>
-<img alt="Casa seleccionada" data-project-info="casa" id="preview-casa-img" src="image/placeholder-casa.jpg"/>
+<img alt="Casa seleccionada" data-project-info="casa" id="preview-casa-img" src="image/placeholder-casa.jpg" loading="lazy" decoding="async"/>
 <button class="summary-change-link" data-change-project="casa" id="change-casa" style="display:none;" type="button">Cambiar casa</button>
 </div>
 </div>

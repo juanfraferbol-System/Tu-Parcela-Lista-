@@ -30,3 +30,5 @@ scratch/
 *.ai
 *.mp4
 *.mov
+.vercel
+.env*

@@ -757,7 +757,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const visibleList = list.slice(0, state.parcelasRenderLimit || (state.recommendationActive ? 5 : 40));
     DOM.parcelasContainer.innerHTML = "";
     DOM.parcelasContainer.className = "parcelas-grid";
-    DOM.parcelasContainer.style.display = "grid";
+    if (DOM.parcelasContainer) DOM.parcelasContainer.style.display = "grid";
     if (DOM.resultsCount) DOM.resultsCount.textContent = `${list.length} parcelas encontradas`;
     updateSearchHeading(list);
 
@@ -906,9 +906,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       modal.querySelector(".house-plan-modal-close")?.addEventListener("click", closeHousePlanModal);
       modal.querySelector(".house-plan-modal-backdrop")?.addEventListener("click", closeHousePlanModal);
-      document.addEventListener("keydown", e => {
-        if (e.key === "Escape" && modal.classList.contains("active")) closeHousePlanModal();
-      });
     }
 
     const img = modal.querySelector(".house-plan-modal-image");
@@ -920,12 +917,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (title) title.textContent = casaNombre || "Casa seleccionada";
     modal.classList.add("active");
     document.body.classList.add("plan-modal-open");
+    document.addEventListener("keydown", housePlanKeydownHandler);
+  }
+
+  function housePlanKeydownHandler(e) {
+    if (e.key === "Escape") closeHousePlanModal();
   }
 
   function closeHousePlanModal() {
     const modal = document.getElementById("house-plan-modal");
     modal?.classList.remove("active");
     document.body.classList.remove("plan-modal-open");
+    document.removeEventListener("keydown", housePlanKeydownHandler);
   }
 
 
@@ -972,10 +975,11 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.addEventListener("click", e => {
       if (e.target.closest("[data-summary-info-close]")) closeSummaryInfoModal();
     });
-    document.addEventListener("keydown", e => {
-      if (e.key === "Escape" && modal.classList.contains("active")) closeSummaryInfoModal();
-    });
     return modal;
+  }
+
+  function summaryInfoKeydownHandler(e) {
+    if (e.key === "Escape") closeSummaryInfoModal();
   }
 
   window.TPLOpenSummaryInfoModal = (type) => openSummaryInfoModal(type);
@@ -986,6 +990,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.remove("active");
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("summary-info-open");
+    document.removeEventListener("keydown", summaryInfoKeydownHandler);
   }
 
   function openSummaryInfoModal(type) {
@@ -1044,6 +1049,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.add("active");
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("summary-info-open");
+    document.addEventListener("keydown", summaryInfoKeydownHandler);
     if (window.lucide) lucide.createIcons();
   }
 
@@ -1985,10 +1991,13 @@ document.addEventListener("DOMContentLoaded", () => {
     DOM.mapLayout?.classList.remove("map-hidden");
     if (DOM.btnMapView) {
       DOM.btnMapView.innerHTML = '<i data-lucide="map"></i><span>Ocultar mapa</span>';
+      DOM.btnMapView.setAttribute("aria-expanded", "true");
       if(window.lucide) window.lucide.createIcons();
     }
     renderMapa(focusId);
-    setTimeout(() => { map?.invalidateSize(); if (focusId) renderMapa(focusId); }, 80);
+    requestAnimationFrame(() => {
+      map?.invalidateSize();
+    });
   }
 
   function closeMap() {
@@ -1996,6 +2005,7 @@ document.addEventListener("DOMContentLoaded", () => {
     DOM.mapLayout?.classList.add("map-hidden");
     if (DOM.btnMapView) {
       DOM.btnMapView.innerHTML = '<i data-lucide="globe-2"></i><span>Ver en mapa</span>';
+      DOM.btnMapView.setAttribute("aria-expanded", "false");
       if(window.lucide) window.lucide.createIcons();
     }
   }
@@ -2009,7 +2019,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function toggleClear() {
     if (!DOM.filterClear) return;
     const f = state.activeFilters;
-    DOM.filterClear.style.display = f.text || f.gps || f.economic || f.size || f.payment || f.water || f.river || f.native || f.commune !== "all" ? "inline-flex" : "none";
+    if (DOM.filterClear) DOM.filterClear.style.display = f.text || f.gps || f.economic || f.size || f.payment || f.water || f.river || f.native || f.commune !== "all" ? "inline-flex" : "none";
   }
 
   function refresh() {
@@ -2147,7 +2157,7 @@ document.addEventListener("DOMContentLoaded", () => {
       hideComboProposals();
       DOM.decisionFlow?.classList.remove("combo-mode");
       DOM.decisionFlow?.classList.add("budget-active");
-      DOM.budgetBox.style.display = "block";
+      if (DOM.budgetBox) DOM.budgetBox.style.display = "block";
       DOM.comboFields?.classList.add("hidden");
       if (DOM.budgetTitle) DOM.budgetTitle.textContent = "¿Cuál es tu presupuesto?";
       if (DOM.budgetHelp) DOM.budgetHelp.textContent = "";
@@ -2163,7 +2173,7 @@ document.addEventListener("DOMContentLoaded", () => {
       state.mode = "combo";
       hideComboProposals();
       DOM.decisionFlow?.classList.add("budget-active", "combo-mode");
-      DOM.budgetBox.style.display = "block";
+      if (DOM.budgetBox) DOM.budgetBox.style.display = "block";
       DOM.comboFields?.classList.remove("hidden");
       if (DOM.budgetTitle) DOM.budgetTitle.textContent = "Buscaremos parcela + casa con tu presupuesto";
       if (DOM.budgetHelp) DOM.budgetHelp.textContent = "";
@@ -2493,6 +2503,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const isOpen = DOM.regionDropdown?.classList.toggle("active");
       const sidebar = document.querySelector(".parcelas-sidebar");
       sidebar?.classList.toggle("comunas-open", !!isOpen);
+      if (DOM.filterRegionBtn) DOM.filterRegionBtn.setAttribute("aria-expanded", String(!!isOpen));
       if (isOpen) {
         // Al abrir Comunas se activa scroll interno del sidebar y se acomoda la vista.
         setTimeout(() => revealParcelaSidebar(115), 80);
@@ -2612,8 +2623,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       } catch (e) {}
       DOM.whatsappBtn.textContent = "Quiero este proyecto";
-      DOM.whatsappBtn.style.pointerEvents = "auto";
-      DOM.whatsappBtn.style.opacity = "1";
+      if (DOM.whatsappBtn) {
+        DOM.whatsappBtn.style.pointerEvents = "auto";
+        DOM.whatsappBtn.style.opacity = "1";
+      }
       window.open(`https://wa.me/${CONTACT_PHONE_WA}?text=${msg}`, "_blank");
 
     });
