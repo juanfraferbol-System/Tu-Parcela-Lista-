@@ -1702,7 +1702,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function openActivationModal() {
     if (!state.selectedParcela) {
       showFriendlyMessage("Primero selecciona una parcela para activar el proyecto.");
-      scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor);
+      (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
     if (DOM.activationModal) {
@@ -2434,7 +2434,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (ev.key === "Enter") handleBudgetSearch(ev);
     }, true);
 
-    DOM.searchBtn?.addEventListener("click", () => { state.activeFilters.text = DOM.searchInput?.value || ""; refresh(); scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor); });
+    DOM.searchBtn?.addEventListener("click", () => { state.activeFilters.text = DOM.searchInput?.value || ""; refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
     DOM.searchInput?.addEventListener("keydown", e => { if (e.key === "Enter") DOM.searchBtn?.click(); });
     document.querySelectorAll('a[href="#parcelas-anchor"], a[href="index.html#parcelas-anchor"]').forEach(link => {
       link.addEventListener("click", () => {
@@ -2455,7 +2455,7 @@ document.addEventListener("DOMContentLoaded", () => {
         state.activeFilters.gps = false;
         DOM.filterGps.classList.remove("active");
         refresh();
-        scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor);
+        (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
       if (!navigator.geolocation) { showFriendlyMessage("Tu navegador no permite ubicación. Puedes usar los otros filtros."); return; }
@@ -2465,15 +2465,15 @@ document.addEventListener("DOMContentLoaded", () => {
         DOM.filterGps.classList.add("active");
         showFriendlyMessage("Ordenamos las parcelas por distancia. En cada tarjeta verás kilómetros y tiempo estimado en vehículo.");
         refresh();
-        scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor);
+        (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, () => showFriendlyMessage("No pudimos obtener tu ubicación. Revisa los permisos del navegador."));
     });
-    DOM.filterEconomic?.addEventListener("click", () => { state.activeFilters.economic = !state.activeFilters.economic; DOM.filterEconomic.classList.toggle("active", state.activeFilters.economic); refresh(); scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor); });
-    DOM.filterSize?.addEventListener("click", () => { state.activeFilters.size = !state.activeFilters.size; DOM.filterSize.classList.toggle("active", state.activeFilters.size); refresh(); scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor); });
-    DOM.filterPayment?.addEventListener("click", () => { state.activeFilters.payment = !state.activeFilters.payment; DOM.filterPayment.classList.toggle("active", state.activeFilters.payment); refresh(); scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor); });
-    DOM.filterWater?.addEventListener("click", () => { state.activeFilters.water = !state.activeFilters.water; DOM.filterWater.classList.toggle("active", state.activeFilters.water); refresh(); scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor); });
-    DOM.filterRiver?.addEventListener("click", () => { state.activeFilters.river = !state.activeFilters.river; DOM.filterRiver.classList.toggle("active", state.activeFilters.river); refresh(); scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor); });
-    DOM.filterNative?.addEventListener("click", () => { state.activeFilters.native = !state.activeFilters.native; DOM.filterNative.classList.toggle("active", state.activeFilters.native); refresh(); scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor); });
+    DOM.filterEconomic?.addEventListener("click", () => { state.activeFilters.economic = !state.activeFilters.economic; DOM.filterEconomic.classList.toggle("active", state.activeFilters.economic); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    DOM.filterSize?.addEventListener("click", () => { state.activeFilters.size = !state.activeFilters.size; DOM.filterSize.classList.toggle("active", state.activeFilters.size); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    DOM.filterPayment?.addEventListener("click", () => { state.activeFilters.payment = !state.activeFilters.payment; DOM.filterPayment.classList.toggle("active", state.activeFilters.payment); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    DOM.filterWater?.addEventListener("click", () => { state.activeFilters.water = !state.activeFilters.water; DOM.filterWater.classList.toggle("active", state.activeFilters.water); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    DOM.filterRiver?.addEventListener("click", () => { state.activeFilters.river = !state.activeFilters.river; DOM.filterRiver.classList.toggle("active", state.activeFilters.river); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    DOM.filterNative?.addEventListener("click", () => { state.activeFilters.native = !state.activeFilters.native; DOM.filterNative.classList.toggle("active", state.activeFilters.native); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
     function revealParcelaSidebar(extraOffset = 140) {
       const sidebar = document.querySelector(".parcelas-sidebar");
       const target = sidebar || DOM.parcelasAnchor;
@@ -2558,7 +2558,7 @@ document.addEventListener("DOMContentLoaded", () => {
     DOM.whatsappBtn?.addEventListener("click", async () => {
       if (!state.selectedParcela) {
         showFriendlyMessage("Primero selecciona una parcela para enviar la cotización.");
-        scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor);
+        (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
 
@@ -3264,12 +3264,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const parcelasSec = document.getElementById("parcelas-container");
       if (parcelasSec) {
         const headerOffset = 140;
-        const elementPosition = parcelasSec.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-        window.scrollTo({
-             top: offsetPosition,
-             behavior: "smooth"
-        });
+        parcelasSec.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     });
   }
