@@ -3,6 +3,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const CONTACT_PHONE_DISPLAY = "+56988508361";
   const CONTACT_PHONE_WA = "56988508361";
 
+  // Catálogos dinámicos. Se inicializan vacíos para que la interfaz principal
+  // (menú, filtros, comunas y mapa) no se detenga mientras Supabase responde.
+  let fundaciones = Array.isArray(window.fundaciones) ? window.fundaciones : [];
+  let extrasAutomaticos = Array.isArray(window.extrasAutomaticos) ? window.extrasAutomaticos : [];
+  let extrasOpcionales = Array.isArray(window.extrasOpcionales) ? window.extrasOpcionales : [];
+
   const state = {
     mode: "normal", // normal | parcela | combo
     viewMode: "grid",
@@ -3204,10 +3210,18 @@ document.addEventListener("DOMContentLoaded", () => {
   addMapToolbarButtons();
   
   if (window.TPLCatalog?.ready) {
-    window.TPLCatalog.ready.then(({ parcelas, casas, extras, fundaciones }) => {
+    window.TPLCatalog.ready.then((catalog) => {
+      const parcelas = Array.isArray(catalog?.parcelas) ? catalog.parcelas : [];
+      const casas = Array.isArray(catalog?.casas) ? catalog.casas : [];
+      const extras = Array.isArray(catalog?.extras) ? catalog.extras : [];
+      const planesFundacion = Array.isArray(catalog?.fundaciones) ? catalog.fundaciones : [];
+
       window.SERVER_PARCELAS = parcelas;
       window.SERVER_CASAS = casas;
-      window.extrasOpcionales = extras;
+      extrasOpcionales = extras;
+      fundaciones = planesFundacion;
+      extrasAutomaticos = Array.isArray(window.extrasAutomaticos) ? window.extrasAutomaticos : [];
+      window.extrasOpcionales = extrasOpcionales;
       window.fundaciones = fundaciones;
       hydrateFromUrlOrStorage();
       renderParcelas();
@@ -3371,8 +3385,8 @@ document.addEventListener('DOMContentLoaded', () => {
         prompt += 'A ' + (state.selectedCasa.habitaciones || 3) + '-bedroom modern ' + (isWood ? 'wooden' : 'prefabricated') + ' house is built on this plot. ';
       }
       if (state.selectedExtras && state.selectedExtras.size > 0) {
-         let extrasArr = Array.from(state.selectedExtras).map(id => {
-           let e = [...extrasAutomaticos, ...extrasOpcionales].find(x => x.id === id);
+         let extrasArr = Array.from(state.selectedExtras.keys()).map(id => {
+           let e = [...extrasAutomaticos, ...extrasOpcionales].find(x => extraKey(x) === extraKey(id));
            return e ? e.nombre.toLowerCase() : null;
          }).filter(Boolean);
          if (extrasArr.length > 0) {
