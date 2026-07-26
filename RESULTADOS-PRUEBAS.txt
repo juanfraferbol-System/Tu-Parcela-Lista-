@@ -1,0 +1,21 @@
+0|./js/core/core-2.2-tests.mjs|Core 2.2 tests OK
+0|./js/core/redaccion/motor-redaccion-tests.mjs|Motor de Redacción TPL: pruebas correctas
+0|./js/cotizador-integrity-tests.mjs|# duration_ms 8.674739
+0|./js/crm-service-tests.mjs|(Use `node --trace-warnings ...` to show where the warning was created)
+0|./plataforma/crm/crm-business-integration-tests.mjs|crm-business-integration: OK
+0|./plataforma/crm/crm-phase1-stability-tests.mjs|crm-phase1-stability: OK
+0|./plataforma/landing/landing-branding-tests.mjs|landing-branding: OK
+0|./plataforma/landing/landing-lead-service-tests.mjs|landing-lead-service: OK
+0|./plataforma/publicar/house-valuation-tests.mjs|# duration_ms 7.512163
+0|./plataforma/publicar/publicador-valuation-integration-tests.mjs|# duration_ms 8.132474
+1|./plataforma/tpl-business/tpl-business-contract-tests.mjs|Node.js v22.16.0
+0|./pruebas/landing-canonical-flow-tests.mjs|OK: flujo canónico CRM → Supabase → Landing pública
+0|./supabase/centro-control-operativo-contract-tests.mjs|centro-control-operativo-contract: OK
+0|./supabase/crm-security-tests.mjs|OK: CRM oficial, Auth/RPC, perfiles admin activos, estados, auditoría y cero secretos de servidor.
+0|./supabase/fase0-security-tests.mjs|OK: privacidad pública, Flow, envío real y límites estabilizados.
+0|./supabase/functions/corregir-publicacion/correction-logic-tests.mjs|OK: token de corrección, hash SHA-256, payload y acciones validadas sin exponer secretos.
+0|./supabase/functions/publicar-parcela/upload-logic-tests.mjs|OK: recuperación parcial de Storage, omisión de existentes y respuesta incompleta.
+0|./supabase/functions/resolve-google-maps/logic-tests.mjs|resolve-google-maps logic tests: OK
+0|./supabase/functions/tasar-parcela/engine-tests.mjs|# duration_ms 9.038139
+0|./supabase/tasador-security-tests.mjs|OK: esquema, Edge Function, flujo gratuito, decisiones, CRM y rollback del Tasador TPL.
+0|./supabase/tpl-business-security-tests.mjs|tpl-business-security: OK

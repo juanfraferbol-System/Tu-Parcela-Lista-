@@ -10,7 +10,7 @@ const [html, css, crm, catalogs] = await Promise.all([
 ]);
 
 assert.doesNotMatch(html, /class="nav-item" data-target="view-promociones"/);
-assert.match(html, /TPL Studio <span class="nav-beta">MVP local<\/span>/);
+assert.match(html, /Creador de Landings/);
 assert.match(html, /id="view-promociones"[^>]+hidden[^>]+aria-hidden="true"/);
 
 assert.doesNotMatch(crm, /Funcionalidad próxima: Abrir Ficha/);
