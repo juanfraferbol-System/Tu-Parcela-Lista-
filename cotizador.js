@@ -523,7 +523,7 @@ name.includes('ceramico') || name.includes('ceramica') || name.includes('piso'))
 /**
  * Calculate total values.
  */
-function calculateTotal() {
+function _executeLegacyCalculateTotal() {
   const storedId = localStorage.getItem('selectedParcelaId');
   const storedCasaId = localStorage.getItem('selectedCasaId');
   const targetParcelas = getParcelasArray();
@@ -559,6 +559,31 @@ function calculateTotal() {
   });
 
   return total;
+}
+
+/**
+ * Calculate total values (Interceptor Canónico V2 con Shadow Running).
+ */
+function calculateTotal() {
+  const totalHeredado = _executeLegacyCalculateTotal();
+  if (typeof window !== 'undefined' && window.TPL && window.TPL.ProjectState && window.TPL.CalculatorEngine && window.TPL.ShadowComparator) {
+    const engineMode = window.TPL_CONFIG?.engineMode || 'shadow';
+    if (engineMode !== 'legacy') {
+      try {
+        const estadoCanonic = window.TPL.ProjectState.buildFromLegacy();
+        const resultadoCanonic = window.TPL.CalculatorEngine.compute(estadoCanonic);
+        window.TPL.ProjectState.set(resultadoCanonic); // Sincronizar estado en memoria en modo shadow
+        window.TPL.ShadowComparator.compare(totalHeredado, resultadoCanonic, 'calculateTotal_invocation');
+        
+        if (engineMode === 'v2_force') {
+          return Number(resultadoCanonic.totales.totalEstimadoClp) || 0;
+        }
+      } catch (err) {
+        if (console && console.warn) console.warn('[TPL Shadow Running Error]', err);
+      }
+    }
+  }
+  return totalHeredado;
 }
 /**
  * Update summary table rows and final total projection.
@@ -638,14 +663,17 @@ function updateSummary() {
         qty = Number(qtyInput ? qtyInput.value : 1) || 0;
         qtyLabel = `${qty} ${tipo === 'metro' ? 'metros' : 'unidades'}`;
       }
-      const extraCost = e.valor * qty;
+      const isIncluded = chk.dataset.estado === 'incluido' || Number(chk.dataset.valor) === 0;
+      const extraCost = isIncluded ? 0 : e.valor * qty;
+      const valDisplay = isIncluded ? '<span style="color:#10b981;font-weight:700;">Incluido</span>' : formatCurrency(extraCost);
+      const subLabel = isIncluded ? '<span style="color:#10b981;">Incluido en tu material de construcción</span>' : `${qtyLabel} × ${formatCurrency(e.valor)}`;
       tbody.insertAdjacentHTML('beforeend', `
         <tr>
           <td>
             <div class="summary-item-name">${e.nombre}</div>
-            <div style="font-size:0.75rem;color:var(--text-muted);">${qtyLabel} × ${formatCurrency(e.valor)}</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">${subLabel}</div>
           </td>
-          <td class="summary-item-value">${formatCurrency(extraCost)}</td>
+          <td class="summary-item-value">${valDisplay}</td>
         </tr>
       `);
     }
@@ -687,6 +715,11 @@ function updateSummary() {
     nombre: chk.dataset.name,
     valor: Number(chk.dataset.price) || 0
   }));
+
+  const stickyTotal = document.getElementById('sticky-total-amount');
+  if (stickyTotal) stickyTotal.textContent = formatCurrency(total);
+  if (typeof syncAdnToProject === 'function') syncAdnToProject();
+  if (typeof checkActiveBundlesIntegrity === 'function') checkActiveBundlesIntegrity();
 }
 /**
  * Initialize Cotizador Page setup.
@@ -745,6 +778,11 @@ async function initCotizador() {
   renderProjectVisualizer();
   // 3. Initial Summary Table
   updateSummary();
+
+  // 3.2. Initialize Phase A2 Interactive Modules
+  initBundles();
+  initAdnProyecto();
+  initStickyConversionBar();
 
   // 3.5. Upsell Checkbox Listeners
   document.querySelectorAll('.extra-check-upsell').forEach(chk => {
@@ -945,6 +983,61 @@ async function generateProjectPdf(client = {}) {
   doc.text(doc.splitTextToSize(note, pageW - margin * 2), margin, y);
   doc.text('tuparcelalista@gmail.com', margin, 805);
 
+  // PÁGINA 2: MANIFIESTO Y ADN DEL PROYECTO
+  const adn = window.ProyectoTPL?.adnProyecto || {};
+  const hasAdn = adn.prioridades?.length || adn.futuro?.length || adn.resumenLibre || adn.evitar || adn.enlaces;
+
+  if (hasAdn) {
+    doc.addPage();
+    doc.setFillColor(12, 43, 46);
+    doc.rect(0, 0, pageW, 842, 'F');
+
+    doc.setFillColor(16, 185, 129);
+    doc.rect(0, 0, pageW, 10, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont(undefined, 'bold');
+    doc.text('El ADN de tu Proyecto', margin, 60);
+    doc.setFontSize(12);
+    doc.setTextColor(167, 243, 208);
+    doc.setFont(undefined, 'normal');
+    doc.text('Manifiesto de Estilo de Vida y Plan Maestro Evolutivo', margin, 80);
+
+    let yAdn = 120;
+    const adnSection = (title, content, isShield = false) => {
+      if (!content || (Array.isArray(content) && !content.length)) return;
+      if (yAdn > 740) { doc.addPage(); doc.setFillColor(12, 43, 46); doc.rect(0, 0, pageW, 842, 'F'); yAdn = 60; }
+      doc.setDrawColor(isShield ? 245 : 52, isShield ? 158 : 211, isShield ? 11 : 153);
+      doc.roundedRect(margin, yAdn, pageW - margin * 2, 24, 6, 6, 'S');
+      
+      doc.setTextColor(isShield ? 253 : 52, isShield ? 230 : 211, isShield ? 138 : 153);
+      doc.setFontSize(13);
+      doc.setFont(undefined, 'bold');
+      doc.text(title, margin + 12, yAdn + 16);
+      yAdn += 36;
+
+      doc.setTextColor(241, 245, 249);
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      const textVal = Array.isArray(content) ? content.join(' • ') : String(content);
+      const lines = doc.splitTextToSize(textVal, pageW - margin * 2 - 10);
+      doc.text(lines, margin + 6, yAdn);
+      yAdn += lines.length * 16 + 24;
+    };
+
+    adnSection('❤️ ¿Cómo imaginas vivir aquí?', adn.resumenLibre);
+    adnSection('⭐ Prioridades Hoy', adn.prioridades);
+    adnSection('📅 Plan Maestro Evolutivo (2 a 5 años)', adn.futuro);
+    adnSection('🛡️ Restricciones y preferencias declaradas por el cliente', adn.evitar, true);
+    adnSection('🔗 Inspiración y Referencias', adn.enlaces);
+
+    doc.setTextColor(148, 163, 184);
+    doc.setFontSize(9.5);
+    doc.setFont(undefined, 'italic');
+    doc.text('Brief inicial sujeto a validación técnica, factibilidad de terreno y condiciones contractuales definitivas.', margin, 800);
+  }
+
   const filename = `proyecto-tu-parcela-lista-${Date.now()}.pdf`;
   doc.save(filename);
   return filename;
@@ -1089,3 +1182,199 @@ function setupActivateProjectModal() {
 document.addEventListener('DOMContentLoaded', setupActivateProjectModal);
 
 window.renderExtrasOpcionales = renderExtrasOpcionales;
+
+/* ==========================================================================
+   FASE A2: LÓGICA DE BUNDLES (1-CLIC), ADN DEL PROYECTO & STICKY BAR
+   ========================================================================== */
+
+function checkActiveBundlesIntegrity() {
+  const activeBundle = document.querySelector('.bundle-card.active-bundle');
+  if (!activeBundle) return;
+  const BUNDLE_CONFIG = {
+    llave_en_mano: ['fosa_septica', 'empalme_electrico', 'cierre_perimetral', 'porton'],
+    sustentable: ['pozo_profundo', 'fosa_septica', 'cierre_perimetral'],
+    inversion: ['cierre_perimetral', 'porton', 'maquinaria']
+  };
+  const targetIds = BUNDLE_CONFIG[activeBundle.dataset.bundle] || [];
+  const allCheckedIds = Array.from(document.querySelectorAll('#opcionales-container .extra-check:checked')).map(c => c.dataset.id);
+  const allStillChecked = targetIds.every(id => allCheckedIds.includes(id));
+  if (!allStillChecked) {
+    activeBundle.classList.remove('active-bundle');
+  }
+}
+
+function initBundles() {
+  const cards = document.querySelectorAll('.bundle-card');
+  if (!cards.length) return;
+
+  const BUNDLE_CONFIG = {
+    llave_en_mano: ['fosa_septica', 'empalme_electrico', 'cierre_perimetral', 'porton'],
+    sustentable: ['pozo_profundo', 'fosa_septica', 'cierre_perimetral'],
+    inversion: ['cierre_perimetral', 'porton', 'maquinaria']
+  };
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const bundleKey = card.dataset.bundle;
+      const targetIds = BUNDLE_CONFIG[bundleKey] || [];
+
+      // Highlight active bundle
+      const isAlreadyActive = card.classList.contains('active-bundle');
+      cards.forEach(c => c.classList.remove('active-bundle'));
+
+      if (!isAlreadyActive) {
+        card.classList.add('active-bundle');
+      }
+
+      // Check / uncheck extras in opcionales-container
+      const allChecks = document.querySelectorAll('#opcionales-container .extra-check');
+      allChecks.forEach(chk => {
+        const id = chk.dataset.id;
+        const cardElem = chk.closest('.extra-card-compact');
+        if (!id || !cardElem || cardElem.classList.contains('disabled')) return;
+
+        if (!isAlreadyActive && targetIds.includes(id)) {
+          chk.checked = true;
+          cardElem.classList.add('selected');
+        } else if (isAlreadyActive && targetIds.includes(id)) {
+          chk.checked = false;
+          cardElem.classList.remove('selected');
+        }
+      });
+
+      updateSummary();
+    });
+  });
+}
+
+function initAdnProyecto() {
+  const prioCards = document.querySelectorAll('#adn-prioridades-grid .adn-option-card');
+  const futCards = document.querySelectorAll('#adn-futuro-grid .adn-option-card');
+  const libreInput = document.getElementById('adn-resumen-libre');
+  const evitarInput = document.getElementById('adn-evitar');
+  const enlacesInput = document.getElementById('adn-enlaces');
+
+  // Restore from sessionStorage (sin PII)
+  try {
+    const saved = sessionStorage.getItem('tpl_adn_project_v1');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (libreInput && parsed.resumenLibre) libreInput.value = parsed.resumenLibre;
+      if (evitarInput && parsed.evitar) evitarInput.value = parsed.evitar;
+      if (enlacesInput && parsed.enlaces) enlacesInput.value = parsed.enlaces;
+      if (Array.isArray(parsed.prioridades)) {
+        prioCards.forEach(card => {
+          if (parsed.prioridades.includes(card.textContent.trim())) card.classList.add('selected');
+        });
+      }
+      if (Array.isArray(parsed.futuro)) {
+        futCards.forEach(card => {
+          if (parsed.futuro.includes(card.textContent.trim())) card.classList.add('selected');
+        });
+      }
+    }
+  } catch (err) {}
+
+  const attachCardListeners = (cards) => {
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        card.classList.toggle('selected');
+        syncAdnToProject();
+      });
+    });
+  };
+
+  attachCardListeners(prioCards);
+  attachCardListeners(futCards);
+
+  [libreInput, evitarInput, enlacesInput].forEach(input => {
+    if (input) {
+      input.addEventListener('input', () => syncAdnToProject());
+    }
+  });
+
+  // Initial sync
+  syncAdnToProject();
+}
+
+function syncAdnToProject() {
+  const prioCards = document.querySelectorAll('#adn-prioridades-grid .adn-option-card.selected');
+  const futCards = document.querySelectorAll('#adn-futuro-grid .adn-option-card.selected');
+  const libreInput = document.getElementById('adn-resumen-libre');
+  const evitarInput = document.getElementById('adn-evitar');
+  const enlacesInput = document.getElementById('adn-enlaces');
+
+  const prioridades = Array.from(prioCards).map(c => c.textContent.trim());
+  const futuro = Array.from(futCards).map(c => c.textContent.trim());
+  const resumenLibre = libreInput ? libreInput.value.trim() : '';
+  const evitar = evitarInput ? evitarInput.value.trim() : '';
+  const enlaces = enlacesInput ? enlacesInput.value.trim() : '';
+
+  const adnData = { prioridades, futuro, resumenLibre, evitar, enlaces };
+
+  // Persisting in sessionStorage (sin PII ni impacto en total)
+  try {
+    sessionStorage.setItem('tpl_adn_project_v1', JSON.stringify(adnData));
+  } catch (err) {}
+
+  // Sync to canonical SSOT window.ProyectoTPL
+  if (typeof window !== 'undefined') {
+    window.ProyectoTPL = window.ProyectoTPL || {};
+    window.ProyectoTPL.adnProyecto = adnData;
+    if (typeof window.getTplProjectState === 'function') {
+      const state = window.getTplProjectState();
+      state.adnProyecto = adnData;
+    }
+  }
+
+  // Update executive synthesis preview
+  const previewBox = document.getElementById('adn-sintesis-container');
+  const previewText = document.getElementById('adn-sintesis-text');
+  if (!previewBox || !previewText) return;
+
+  const hasAnyData = prioridades.length || futuro.length || resumenLibre || evitar || enlaces;
+  if (!hasAnyData) {
+    previewBox.style.display = 'none';
+    return;
+  }
+
+  previewBox.style.display = 'block';
+  let sintesis = [];
+  if (prioridades.length) {
+    sintesis.push(`Proyecto enfocado en: ${prioridades.join(', ')}.`);
+  }
+  if (resumenLibre) {
+    sintesis.push(`Visión de estilo de vida: "${resumenLibre}".`);
+  }
+  if (futuro.length) {
+    sintesis.push(`Plan maestro evolutivo proyectado (2-5 años): ${futuro.join(', ')}.`);
+  }
+  if (evitar) {
+    sintesis.push(`🛡️ Restricciones declaradas por el cliente: ${evitar}.`);
+  }
+  if (enlaces) {
+    sintesis.push(`🔗 Referencias e inspiración adjuntas.`);
+  }
+
+  previewText.textContent = sintesis.join(' ');
+}
+
+function initStickyConversionBar() {
+  const evalBtn = document.getElementById('sticky-btn-evaluate');
+  if (!evalBtn) return;
+  evalBtn.addEventListener('click', () => {
+    const activateBtn = document.getElementById('activate-project-btn');
+    if (activateBtn) {
+      activateBtn.click();
+    } else {
+      const summaryCard = document.querySelector('.cotizacion-summary-card');
+      if (summaryCard) summaryCard.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+}
+window.initBundles = initBundles;
+window.initAdnProyecto = initAdnProyecto;
+window.syncAdnToProject = syncAdnToProject;
+window.initStickyConversionBar = initStickyConversionBar;
+window.checkActiveBundlesIntegrity = checkActiveBundlesIntegrity;
+

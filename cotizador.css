@@ -1125,3 +1125,488 @@ footer.main-footer {
 
 /* TPL V22: precio visible de planes de instalación */
 .installation-plan-price{margin-top:auto;padding-top:14px;border-top:1px solid rgba(15,52,96,.14);display:grid;gap:3px}.installation-plan-price strong{font-size:1.2rem;color:#0f3460}.installation-plan-price small{color:#5d6775;font-weight:700}
+
+/* ==========================================================================
+   TPL COTIZADOR V2 — FASE A2: RICHAESTHETICS, GLASSMORPHISM & MOTOR DE SUEÑOS
+   ========================================================================== */
+
+/* 1. Opcionales & Extra Cards Compact (Modern Typeform Style) */
+.opcionales-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 15px;
+}
+
+.extra-card-compact {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--border-light, #e2e8f0);
+  border-radius: 16px;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+.extra-card-compact:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 130, 138, 0.12);
+  border-color: var(--primary, #1a5e63);
+}
+.extra-card-compact.selected {
+  border-color: var(--secondary, #10b981);
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.18);
+}
+.extra-card-compact.selected:hover {
+  transform: translateY(-2px);
+}
+.extra-card-compact.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #f8fafc;
+  border-style: dashed;
+}
+
+.extra-card-compact .status-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  background: var(--secondary, #10b981);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+  z-index: 2;
+}
+.extra-card-compact.selected .status-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.extra-icon-box {
+  width: 54px;
+  height: 54px;
+  background: #f1f5f9;
+  color: var(--primary, #1a5e63);
+  border-radius: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+.extra-card-compact.selected .extra-icon-box {
+  background: #d1fae5;
+  color: #059669;
+  transform: scale(1.05);
+}
+
+.extra-title-compact {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.extra-price-compact {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.extra-card-compact.selected .extra-price-compact {
+  color: #059669;
+  font-weight: 700;
+}
+
+.extra-btn-compact {
+  margin-top: auto;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 8px 16px;
+  border-radius: 99px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  width: 100%;
+  transition: all 0.2s ease;
+  border: none;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.extra-card-compact.selected .extra-btn-compact {
+  background: var(--secondary, #10b981);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.extra-info-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  color: #cbd5e1;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+.extra-info-btn:hover { color: var(--primary, #1a5e63); }
+.extra-tooltip {
+  display: none;
+  position: absolute;
+  top: 36px;
+  left: 8px;
+  right: 8px;
+  background: #0f172a;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 8px 10px;
+  border-radius: 8px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  line-height: 1.4;
+  text-align: left;
+}
+.extra-info-btn:hover ~ .extra-tooltip { display: block; }
+
+/* 2. 1-Click Bundles (Paquetes Recomendados) */
+.bundles-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 18px 0;
+}
+.bundle-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.03);
+}
+.bundle-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary, #1a5e63);
+  box-shadow: 0 15px 30px rgba(26, 94, 99, 0.12);
+}
+.bundle-card.active-bundle {
+  border-color: var(--secondary, #10b981);
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);
+}
+.bundle-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: #e0f2f1;
+  color: var(--primary, #1a5e63);
+  margin-bottom: 10px;
+  align-self: flex-start;
+}
+.bundle-card.active-bundle .bundle-badge {
+  background: #d1fae5;
+  color: #065f46;
+}
+.bundle-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+.bundle-desc {
+  font-size: 0.85rem;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.bundle-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+  font-size: 0.82rem;
+  color: #334155;
+}
+.bundle-items-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.bundle-items-list li i { color: var(--secondary, #10b981); width: 14px; height: 14px; flex-shrink: 0; }
+.bundle-btn {
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+.bundle-card:hover .bundle-btn { background: var(--primary, #1a5e63); }
+.bundle-card.active-bundle .bundle-btn {
+  background: var(--secondary, #10b981);
+  color: #ffffff;
+}
+
+/* 3. ADN del Proyecto (Glassmorphism & Quiz Style) */
+.adn-glass-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(12, 43, 46, 0.96) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 24px;
+  padding: 32px;
+  color: #ffffff;
+  margin: 40px 0;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+.adn-glass-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%);
+  pointer-events: none;
+}
+.adn-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.adn-header h2 {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 900;
+  margin: 0 0 8px 0;
+  background: linear-gradient(to right, #ffffff, #a7f3d0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.adn-header p {
+  color: #94a3b8;
+  font-size: 1rem;
+  max-width: 650px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.adn-question-block {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.adn-question-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0 0 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.adn-question-title i { color: #34d399; }
+.adn-question-desc {
+  color: #94a3b8;
+  font-size: 0.88rem;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.adn-textarea, .adn-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+.adn-textarea:focus, .adn-input:focus {
+  outline: none;
+  border-color: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
+}
+.adn-textarea { resize: vertical; min-height: 90px; }
+
+.adn-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+.adn-option-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 14px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.adn-option-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+.adn-option-card.selected {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.3) 100%);
+  border-color: #34d399;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+.adn-option-card i { font-size: 1.4rem; color: #6ee7b7; }
+.adn-option-card span { font-size: 0.88rem; font-weight: 700; color: #f1f5f9; }
+
+.adn-sintesis-preview {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 24px;
+}
+.adn-sintesis-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #34d399;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.adn-sintesis-text {
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  font-style: italic;
+  margin: 0;
+}
+
+/* 4. Sticky Conversion Bar (Mobile under 768px ONLY) */
+.sticky-conversion-bar {
+  display: none !important;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 12px 20px;
+  z-index: 9999;
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease;
+}
+.sticky-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.sticky-total-group {
+  display: flex;
+  flex-direction: column;
+}
+.sticky-total-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.sticky-total-amount {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #34d399;
+  letter-spacing: -0.5px;
+}
+.sticky-actions-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.sticky-cta-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 99px;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+.sticky-cta-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
+}
+
+@media (max-width: 768px) {
+  .sticky-conversion-bar {
+    display: block !important;
+  }
+  .opcionales-grid-compact { grid-template-columns: repeat(2, 1fr); }
+  .adn-glass-card { padding: 20px 16px; }
+  .adn-cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .sticky-bar-inner { flex-direction: row; justify-content: space-between; }
+  .sticky-total-amount { font-size: 1.15rem; }
+  .sticky-cta-btn { padding: 8px 14px; font-size: 0.85rem; }
+  /* Ensure padding at bottom of page so sticky bar doesn't overlap footer content */
+  body { padding-bottom: 80px !important; }
+}
+@media (max-width: 480px) {
+  .opcionales-grid-compact { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .bundles-container { grid-template-columns: 1fr; }
+  .adn-cards-grid { grid-template-columns: 1fr 1fr; }
+}
+

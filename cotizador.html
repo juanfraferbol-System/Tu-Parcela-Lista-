@@ -111,6 +111,71 @@
             </div>
           </div>
           
+          <!-- 1-Click Bundles (Paquetes Recomendados) -->
+          <div class="options-box" id="bundles-box">
+            <h3><i data-lucide="package"></i> Paquetes Recomendados (1-Clic)</h3>
+            <p class="box-description">
+              Selecciona un paquete inteligente preconfigurado por nuestros ingenieros para equipar tu parcela al instante con las mejores combinaciones.
+            </p>
+            <div class="bundles-container" id="bundles-container">
+              
+              <div class="bundle-card" data-bundle="llave_en_mano">
+                <div class="bundle-head">
+                  <span class="bundle-badge">⚡ Más Popular</span>
+                  <h4 class="bundle-title">Pack Habilitación Inicial</h4>
+                  <p class="bundle-desc">Todo listo para habitar sin preocuparte por instalaciones básicas.</p>
+                </div>
+                <ul class="bundle-items-list">
+                  <li><i data-lucide="check-circle-2"></i> Fosa séptica con instalación ($1.500.000)</li>
+                  <li><i data-lucide="check-circle-2"></i> Empalme eléctrico interior ($1.500.000)</li>
+                  <li><i data-lucide="check-circle-2"></i> Cerco perimetral alambre púas ($2.000/m)</li>
+                  <li><i data-lucide="check-circle-2"></i> Portón acceso principal ($1.200.000)</li>
+                </ul>
+                <button type="button" class="bundle-btn" data-bundle-action="llave_en_mano">
+                  <span>Seleccionar Habilitación Inicial</span>
+                  <i data-lucide="arrow-right"></i>
+                </button>
+              </div>
+
+              <div class="bundle-card" data-bundle="sustentable">
+                <div class="bundle-head">
+                  <span class="bundle-badge">🌿 100% Ecológico</span>
+                  <h4 class="bundle-title">Pack Autonomía Básica</h4>
+                  <p class="bundle-desc">Independencia de agua y cierre en tu campo agrícola.</p>
+                </div>
+                <ul class="bundle-items-list">
+                  <li><i data-lucide="check-circle-2"></i> Pozo profundo agua clara ($50.000/m)</li>
+                  <li><i data-lucide="check-circle-2"></i> Fosa séptica con instalación ($1.500.000)</li>
+                  <li><i data-lucide="check-circle-2"></i> Cerco perimetral alambre púas ($2.000/m)</li>
+                  <li style="color:var(--secondary); font-size:0.75rem;"><i data-lucide="sun"></i> <em>Nota: Energía solar cotizable en ADN (Visión Futura) sin costo actual.</em></li>
+                </ul>
+                <button type="button" class="bundle-btn" data-bundle-action="sustentable">
+                  <span>Seleccionar Autonomía Básica</span>
+                  <i data-lucide="arrow-right"></i>
+                </button>
+              </div>
+
+              <div class="bundle-card" data-bundle="inversion">
+                <div class="bundle-head">
+                  <span class="bundle-badge">📈 Alta Plusvalía</span>
+                  <h4 class="bundle-title">Pack Preparación de Parcela</h4>
+                  <p class="bundle-desc">Consolidación física del suelo perimetral y accesos.</p>
+                </div>
+                <ul class="bundle-items-list">
+                  <li><i data-lucide="check-circle-2"></i> Cerco perimetral alambre púas ($2.000/m)</li>
+                  <li><i data-lucide="check-circle-2"></i> Portón acceso principal ($1.200.000)</li>
+                  <li><i data-lucide="check-circle-2"></i> Maquinaria retroexcavadora ($42.000/hr)</li>
+                </ul>
+                <button type="button" class="bundle-btn" data-bundle-action="inversion">
+                  <span>Seleccionar Preparación Parcela</span>
+                  <i data-lucide="arrow-right"></i>
+                </button>
+              </div>
+
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:12px; font-style:italic;">Valores referenciales. La necesidad, cantidad y factibilidad de cada obra debe validarse según las condiciones reales del terreno y el proyecto.</p>
+          </div>
+
           <!-- Optional Extras Section -->
           <div class="options-box">
             <h3><i data-lucide="plus-circle"></i> Obras Adicionales y Opciones Extras</h3>
@@ -218,6 +283,77 @@
         </aside>
         
       </div>
+
+      <!-- ADN DEL PROYECTO: Motor de Sueños y Estilo de Vida -->
+      <section class="adn-glass-card" id="adn-proyecto-container">
+        <div class="adn-header">
+          <span class="bundle-badge" style="background:#047857; color:#a7f3d0; border:1px solid #34d399;">🧬 Funcionalidad Exclusiva TPL</span>
+          <h2>Cuéntanos cómo imaginas tu proyecto</h2>
+          <p>
+            No almacenamos solo medidas, materiales ni números fríos. Queremos entender tu sueño familiar y plan de vida para que los arquitectos, contratistas y asesores te entreguen una propuesta 100% a tu medida.
+          </p>
+        </div>
+
+        <!-- Pregunta 1: Texto Libre -->
+        <div class="adn-question-block">
+          <h3 class="adn-question-title"><i data-lucide="heart"></i> ¿Cómo imaginas vivir aquí?</h3>
+          <p class="adn-question-desc">Escribe libremente cómo será tu vida en el campo, qué espacios sueñas o quiénes disfrutarán este hogar.</p>
+          <textarea class="adn-textarea" id="adn-resumen-libre" placeholder="Ej: Quiero una cocina integrada grande donde toda la familia pueda reunirse los domingos. Necesito una oficina privada con vista al campo porque trabajo desde casa..."></textarea>
+        </div>
+
+        <!-- Pregunta 2: Prioridades Hoy -->
+        <div class="adn-question-block">
+          <h3 class="adn-question-title"><i data-lucide="star"></i> ¿Qué es lo más importante para ti hoy?</h3>
+          <p class="adn-question-desc">Selecciona tus prioridades principales (puedes elegir varias):</p>
+          <div class="adn-cards-grid" id="adn-prioridades-grid">
+            <div class="adn-option-card" data-prio="Familia"><i data-lucide="users"></i><span>Vida Familiar</span></div>
+            <div class="adn-option-card" data-prio="Teletrabajo"><i data-lucide="laptop"></i><span>Teletrabajo</span></div>
+            <div class="adn-option-card" data-prio="Descanso"><i data-lucide="coffee"></i><span>Descanso & Paz</span></div>
+            <div class="adn-option-card" data-prio="Naturaleza"><i data-lucide="trees"></i><span>Naturaleza</span></div>
+            <div class="adn-option-card" data-prio="Mascotas"><i data-lucide="dog"></i><span>Mascotas / Perros</span></div>
+            <div class="adn-option-card" data-prio="Inversion"><i data-lucide="trending-up"></i><span>Inversión</span></div>
+            <div class="adn-option-card" data-prio="Adultos_mayores"><i data-lucide="heart-handshake"></i><span>Adultos Mayores</span></div>
+            <div class="adn-option-card" data-prio="Turismo"><i data-lucide="compass"></i><span>Turismo / Airbnb</span></div>
+          </div>
+        </div>
+
+        <!-- Pregunta 3: Plan Maestro Evolutivo -->
+        <div class="adn-question-block">
+          <h3 class="adn-question-title"><i data-lucide="calendar"></i> ¿Qué te gustaría construir en el futuro (2 a 5 años)?</h3>
+          <p class="adn-question-desc">Tu casa de hoy se diseña para conectar estratégicamente con estas futuras obras sin demoliciones ni sobrecostos:</p>
+          <div class="adn-cards-grid" id="adn-futuro-grid">
+            <div class="adn-option-card" data-fut="Quincho"><i data-lucide="flame"></i><span>Quincho Techado</span></div>
+            <div class="adn-option-card" data-fut="Piscina"><i data-lucide="waves"></i><span>Piscina Exterior</span></div>
+            <div class="adn-option-card" data-fut="Invernadero"><i data-lucide="sprout"></i><span>Invernadero</span></div>
+            <div class="adn-option-card" data-fut="Huerto"><i data-lucide="apple"></i><span>Huerto Orgánico</span></div>
+            <div class="adn-option-card" data-fut="Bodega"><i data-lucide="box"></i><span>Taller / Bodega</span></div>
+            <div class="adn-option-card" data-fut="Cabana_visitas"><i data-lucide="home"></i><span>Cabaña Visitas</span></div>
+            <div class="adn-option-card" data-fut="Paneles_solares"><i data-lucide="sun"></i><span>Paneles Solares</span></div>
+            <div class="adn-option-card" data-fut="Segunda_vivienda"><i data-lucide="building"></i><span>Segunda Vivienda</span></div>
+          </div>
+        </div>
+
+        <!-- Pregunta 4: Escudo de Protección -->
+        <div class="adn-question-block">
+          <h3 class="adn-question-title"><i data-lucide="shield-alert"></i> Directivas de Protección: ¿Hay algo que NO quieres?</h3>
+          <p class="adn-question-desc">Lo que indiques aquí será una regla innegociable para nuestros arquitectos y constructores asociados:</p>
+          <input type="text" class="adn-input" id="adn-evitar" placeholder="Ej: Nada de escaleras interiores, evitar dormitorios oscuros, no quiero madera exterior que requiera barniz anual..." />
+        </div>
+
+        <!-- Pregunta 5: Inspiración -->
+        <div class="adn-question-block">
+          <h3 class="adn-question-title"><i data-lucide="link"></i> Inspiración y Referencias</h3>
+          <p class="adn-question-desc">Pega aquí enlaces de tableros de Pinterest, publicaciones de Instagram o videos que representen el estilo que buscas:</p>
+          <input type="text" class="adn-input" id="adn-enlaces" placeholder="https://pinterest.com/... o https://instagram.com/..." />
+        </div>
+
+        <!-- Síntesis Ejecutiva autogenerada -->
+        <div class="adn-sintesis-preview" id="adn-sintesis-container" style="display:none;">
+          <div class="adn-sintesis-title"><i data-lucide="sparkles"></i> ADN del Proyecto Sintetizado por TPL Brain</div>
+          <p class="adn-sintesis-text" id="adn-sintesis-text">Completando tu perfil de proyecto...</p>
+        </div>
+      </section>
+
     </div>
   </main>
   <!-- Footer -->
@@ -250,6 +386,10 @@
   <script src="js/config-negocio.js"></script>
   <script src="js/error-logger.js"></script>
   <script src="js/db-api.js?v=20260723-catalog-v2"></script>
+  <script src="js/core/project-state.js"></script>
+  <script src="js/core/calculator-engine.js"></script>
+  <script src="js/core/shadow-comparator.js"></script>
+  <script src="js/core/observers.js"></script>
   <script src="extradata.js" defer></script>
   <script src="cotizador.js" defer></script>
   <script src="js/tpl-professional-flow.js" defer></script>
@@ -278,6 +418,23 @@
       </form>
     </div>
   </div>
+
+  <!-- Sticky Conversion Bar (Mobile & Desktop Quick Action) -->
+  <aside class="sticky-conversion-bar" id="sticky-conversion-bar" aria-label="Barra de cotización rápida">
+    <div class="sticky-bar-inner">
+      <div class="sticky-total-group">
+        <span class="sticky-total-label">Inversión Estimada</span>
+        <span class="sticky-total-amount" id="sticky-total-amount">$0 CLP</span>
+      </div>
+      <div class="sticky-actions-group">
+        <button type="button" class="sticky-cta-btn" id="sticky-btn-evaluate">
+          <i data-lucide="check-circle"></i>
+          <span>Solicitar Evaluación y PDF</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
   <script src="js/core/event-bus.js"></script>
 <script src="js/core/orchestrator.js"></script>
 <script src="js/tpl-launch.js"></script>
