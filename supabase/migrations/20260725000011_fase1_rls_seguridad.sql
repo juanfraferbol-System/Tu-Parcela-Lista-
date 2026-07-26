@@ -1,0 +1,11 @@
+BEGIN;
+ALTER TABLE public.tpl_automatizaciones_cola ENABLE ROW LEVEL SECURITY; ALTER TABLE public.tpl_pagos ENABLE ROW LEVEL SECURITY; ALTER TABLE public.tpl_suscripciones ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Cola aislada" ON public.tpl_automatizaciones_cola;
+CREATE POLICY "Cola aislada" ON public.tpl_automatizaciones_cola FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin TPL lee pagos" ON public.tpl_pagos;
+CREATE POLICY "Admin TPL lee pagos" ON public.tpl_pagos FOR SELECT TO authenticated USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND tipo = 'administrador'));
+DROP POLICY IF EXISTS "Admin TPL lee suscripciones" ON public.tpl_suscripciones;
+CREATE POLICY "Admin TPL lee suscripciones" ON public.tpl_suscripciones FOR SELECT TO authenticated USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND tipo = 'administrador'));
+DROP POLICY IF EXISTS "Propietarios ven sus suscripciones" ON public.tpl_suscripciones;
+CREATE POLICY "Propietarios ven sus suscripciones" ON public.tpl_suscripciones FOR SELECT TO authenticated USING (proyecto_id IN (SELECT proyecto_id FROM public.tpl_business_membresias WHERE usuario_id = auth.uid()));
+COMMIT;
