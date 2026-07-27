@@ -306,10 +306,111 @@
         <div class="valuation-signals" id="valuationSignals"></div>
       </div>
       <div id="valuationResults" class="valuation-results" hidden></div>
-      <div id="valuationModalError" class="valuation-modal-error" hidden></div>
+      <div id="valuationModalError" class="valuation-results valuation-error" hidden role="alert"></div>
     </section>
   </div>
-<script src="publicador-config.js?v=20260720-core1"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script><script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script><script defer src="../../js/core/event-bus.js?v=20260718-core22"></script><script defer src="../../js/core/property-model.js?v=20260718-core22"></script><script defer src="../../js/core/intelligence-engine.js?v=20260718-core22"></script><script defer src="../../js/core/redaccion/motor-redaccion.js?v=20260719-redaccion1"></script><script defer src="../../js/core/orchestrator.js?v=20260718-core22"></script><script defer src="valuation-premiums.js?v=20260723-1"></script><script defer src="house-valuation.js?v=20260723-house-v2"></script><script defer src="valuation-service.js?v=20260723-supabase-v1"></script><script defer src="photo-optimizer.js?v=20260718-photo1"></script><script defer src="crm-automation-engine.js?v=20260718-crm1"></script><script defer src="valuation-crm-service.js?v=20260723-crm-tasador2"></script><script defer src="integration-service.js?v=20260718-crm1"></script><script defer src="app.js?v=20260723-tasador-v2"></script>
+
+  <!-- Modal de Captura Comercial TPL Business (Tarea A-1) -->
+  <div class="valuation-modal" id="tplCommercialModal" hidden aria-hidden="true">
+    <div class="valuation-modal-backdrop" id="closeTplCommercialBackdrop"></div>
+    <section class="valuation-modal-dialog tpl-commercial-dialog" role="dialog" aria-modal="true" aria-labelledby="tplCommercialTitle">
+      <button type="button" class="valuation-modal-close" id="closeTplCommercialBtn" aria-label="Cerrar ventana">×</button>
+      <div class="valuation-modal-brand"><span>✦</span><div><small>INFORMES PROFESIONALES TU PARCELA LISTA</small><strong id="tplCommercialTitle">Respalda y defiende tu precio</strong></div></div>
+      
+      <!-- Estado 0/1: Formulario de Captura -->
+      <div id="tplCommercialFormView">
+        <div class="tpl-commercial-summary">
+          <p class="eyebrow">RESUMEN DE TU PROPIEDAD</p>
+          <h4 id="tplCommLocation">Tu propiedad en valoración</h4>
+          <div class="tpl-comm-metrics">
+            <div><small>VALOR REFERENCIAL</small><strong id="tplCommPrice">$0</strong></div>
+            <div><small>NIVEL DE CONFIANZA</small><strong id="tplCommConfidence">Alta</strong></div>
+          </div>
+          <p class="tpl-comm-note">Estás a un paso de obtener un Informe Profesional en PDF con el valor referencial, los principales factores de la propiedad y estrategias de venta.</p>
+        </div>
+
+        <form id="tplCommercialForm" class="tpl-commercial-form" novalidate>
+          <div class="form-grid">
+            <label class="field">
+              <span>Nombre y Apellido <b class="req">*</b></span>
+              <input type="text" id="tplLeadName" required placeholder="Ej. Juan Pérez González">
+            </label>
+            <label class="field">
+              <span>Correo electrónico (para enviarte el PDF) <b class="req">*</b></span>
+              <input type="email" id="tplLeadEmail" required placeholder="Ej. jperez@correo.com">
+            </label>
+            <label class="field">
+              <span>Teléfono / WhatsApp <b class="req">*</b></span>
+              <input type="tel" id="tplLeadPhone" required placeholder="Ej. +56 9 1234 5678">
+            </label>
+            <label class="field">
+              <span>¿Para qué usarás el informe? <small>(Opcional)</small></span>
+              <select id="tplLeadGoal">
+                <option value="">Selecciona una opción...</option>
+                <option value="vender_pronto">Defender mi precio y vender pronto</option>
+                <option value="evaluar_compra">Negociar la compra de esta propiedad</option>
+                <option value="evaluar_patrimonio">Conocer el valor de mi patrimonio</option>
+                <option value="otro">Otro uso profesional o comercial</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="tpl-commercial-consents">
+            <label class="checkbox-field">
+              <input type="checkbox" id="tplConsentGenerate" checked required>
+              <span>Acepto usar estos datos para generar el informe y mostrarlos en su portada. <b class="req">*</b></span>
+            </label>
+            <label class="checkbox-field">
+              <input type="checkbox" id="tplConsentContact" checked>
+              <span>Quiero que un especialista de Tu Parcela Lista me contacte por WhatsApp para ayudarme con la venta o resolver dudas.</span>
+            </label>
+          </div>
+
+          <div id="tplCommFormError" class="field-error" hidden></div>
+
+          <div class="tpl-commercial-actions">
+            <button type="button" class="btn ghost" id="cancelTplCommercialBtn">Volver a mis resultados</button>
+            <button type="submit" class="btn primary tpl-submit-btn" id="submitTplCommercialBtn">
+              <span>✦</span> Generar mi Informe Profesional ➔
+            </button>
+          </div>
+          <p class="tpl-comm-privacy-lock">🔒 Usaremos tus datos para generar el informe y, solo si lo autorizas, para contactarte.</p>
+        </form>
+      </div>
+
+      <!-- Estado 2: Cargando / Generando -->
+      <div id="tplCommercialLoadingView" class="valuation-loading" hidden>
+        <div class="valuation-orbit" aria-hidden="true"><i></i><b></b><span>🛡️</span></div>
+        <div class="valuation-thinking">
+          <p id="tplCommLoadingText">Preparando tu informe profesional…</p>
+          <div class="valuation-thinking-bar"><i style="width: 75%"></i></div>
+          <small>Estamos organizando el valor referencial, los factores principales y las estrategias de venta.</small>
+        </div>
+      </div>
+
+      <!-- Estado 3: Éxito / Transición -->
+      <div id="tplCommercialSuccessView" class="tpl-commercial-success" hidden>
+        <div class="success-icon" style="background:#176b4d;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;">✓</div>
+        <h3>¡Tu Informe Profesional está listo!</h3>
+        <p>Tu informe fue generado con la referencia <strong id="tplCommLeadRef">TPL-XXXX</strong>.</p><p id="tplCommSaveStatus" class="tpl-comm-note">Comprobando registro de la solicitud…</p>
+        <div class="tpl-success-box" style="background:#f4f8f6;border:1px solid #dbe7e1;padding:16px;border-radius:12px;margin:20px 0;text-align:left;">
+          <p style="margin:0 0 8px;font-weight:700;color:#173229;">¿Qué incluye tu informe?</p>
+          <ul style="margin:0;padding-left:20px;color:#52665e;font-size:0.9rem;line-height:1.5;">
+            <li>Valor referencial calculado para tu comuna y superficie.</li>
+            <li>Rango de precio y nivel de confianza técnica.</li>
+            <li>Código único de solicitud para identificar este informe.</li>
+          </ul>
+        </div>
+        <div class="tpl-commercial-actions" style="justify-content:center;">
+          <button type="button" class="btn primary" id="downloadTplReportActionBtn">
+            <span>⬇</span> Abrir o guardar mi Informe PDF
+          </button>
+        </div>
+        <button type="button" class="btn ghost small" id="closeTplSuccessBtn" style="margin-top:12px;">Cerrar y volver a mi publicación</button>
+      </div>
+    </section>
+  </div>
+<script src="publicador-config.js?v=20260720-core1"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script><script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script><script defer src="../../js/core/event-bus.js?v=20260718-core22"></script><script defer src="../../js/core/property-model.js?v=20260718-core22"></script><script defer src="../../js/core/intelligence-engine.js?v=20260718-core22"></script><script defer src="../../js/core/redaccion/motor-redaccion.js?v=20260719-redaccion1"></script><script defer src="../../js/core/orchestrator.js?v=20260718-core22"></script><script defer src="tpl-land-engine.js?v=20260727-v1"></script><script defer src="valuation-premiums.js?v=20260723-1"></script><script defer src="house-valuation.js?v=20260723-house-v2"></script><script defer src="valuation-service.js?v=20260723-supabase-v1"></script><script defer src="photo-optimizer.js?v=20260718-photo1"></script><script defer src="crm-automation-engine.js?v=20260718-crm1"></script><script defer src="valuation-crm-service.js?v=20260727-crm-privacy1"></script><script defer src="integration-service.js?v=20260718-crm1"></script><script defer src="tpl-report-generator.js?v=20260727-a2-fix1"></script><script defer src="app.js?v=20260727-land-engine-v1"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../../js/db-api.js"></script>

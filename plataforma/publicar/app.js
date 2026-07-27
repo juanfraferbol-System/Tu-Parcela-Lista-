@@ -4,13 +4,38 @@ const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelect
 const form=$('#publisherForm');
 const DRAFT_KEY='tpl_publicador_smart_fields_v3_plans';
 const SECTIONS=['tipo','datos','ubicacion','fotos','precio','vista','anunciante','planes','publicar'];
-const REGIONS={
+const REGIONS_FALLBACK={
   'Región de Ñuble':['Bulnes','Chillán','Chillán Viejo','Cobquecura','Coelemu','Coihueco','El Carmen','Ninhue','Ñiquén','Pemuco','Pinto','Portezuelo','Quillón','Quirihue','Ránquil','San Carlos','San Fabián','San Ignacio','San Nicolás','Trehuaco','Yungay'],
   'Región del Biobío':['Alto Biobío','Antuco','Arauco','Cabrero','Cañete','Chiguayante','Concepción','Contulmo','Coronel','Curanilahue','Florida','Hualpén','Hualqui','Laja','Lebu','Los Álamos','Los Ángeles','Lota','Mulchén','Nacimiento','Negrete','Penco','Quilaco','Quilleco','San Pedro de la Paz','San Rosendo','Santa Bárbara','Santa Juana','Talcahuano','Tirúa','Tomé','Tucapel','Yumbel'],
   'Región de La Araucanía':['Angol','Carahue','Cholchol','Collipulli','Cunco','Curacautín','Curarrehue','Ercilla','Freire','Galvarino','Gorbea','Lautaro','Loncoche','Lonquimay','Los Sauces','Lumaco','Melipeuco','Nueva Imperial','Padre Las Casas','Perquenco','Pitrufquén','Pucón','Purén','Renaico','Saavedra','Temuco','Teodoro Schmidt','Toltén','Traiguén','Victoria','Vilcún','Villarrica'],
   'Región de Los Ríos':['Corral','Futrono','La Unión','Lago Ranco','Lanco','Los Lagos','Máfil','Mariquina','Paillaco','Panguipulli','Río Bueno','Valdivia'],
   'Región de Los Lagos':['Ancud','Calbuco','Castro','Chaitén','Chonchi','Cochamó','Curaco de Vélez','Dalcahue','Fresia','Frutillar','Futaleufú','Hualaihué','Llanquihue','Los Muermos','Maullín','Osorno','Palena','Puerto Montt','Puerto Octay','Puerto Varas','Puqueldón','Purranque','Puyehue','Queilén','Quellón','Quemchi','Quinchao','Río Negro','San Juan de la Costa','San Pablo']
 };
+function getRegionsMap(){
+  const cat=window.TPL_NATIONAL_CATALOG;
+  if(Array.isArray(cat?.regions) && Array.isArray(cat?.communes)){
+    const regionNamesByCode=new Map(cat.regions.map(region=>[region.code,region.name]));
+    const map={};
+    cat.regions.forEach(region=>{map[region.name]=[];});
+    cat.communes.forEach(commune=>{
+      const regionName=regionNamesByCode.get(commune.reg);
+      if(regionName && commune.name)map[regionName].push(commune.name);
+    });
+    Object.values(map).forEach(communes=>communes.sort((a,b)=>a.localeCompare(b,'es')));
+    return map;
+  }
+  return REGIONS_FALLBACK;
+}
+async function ensureNationalCatalog(){
+  if(window.TPL_NATIONAL_CATALOG)return window.TPL_NATIONAL_CATALOG;
+  try{
+    const module=await import('./tpl-national-catalog.mjs');
+    window.TPL_NATIONAL_CATALOG=module.TPL_NATIONAL_CATALOG||window.TPL_NATIONAL_CATALOG;
+  }catch(error){
+    console.warn('No fue posible cargar el catálogo territorial nacional; se usará el respaldo regional.',error);
+  }
+  return window.TPL_NATIONAL_CATALOG||null;
+}
 const OWNER_PLANS=[
  {id:'prop_base',urgency:'baja',urgencyLabel:'Urgencia baja',name:'Corretaje TPL',price:'$0 para comenzar · 2% + IVA al vender',fee:'$0',commission:'2% + IVA',description:'Tu Parcela Lista te acompaña durante todo el proceso comercial y solo cobra si la propiedad se vende.',items:['Publicación y optimización profesional del anuncio','Generación automática de título y descripción comercial','Recepción, filtro y seguimiento de interesados','Informes sobre visitas, contactos y comportamiento del anuncio','Recomendaciones de precio, presentación y estrategia','Acompañamiento comercial hasta el cierre'],recommended:true,button:'Comenzar sin pago inicial'},
  {id:'prop_impulso',urgency:'leve',urgencyLabel:'Urgencia leve',name:'Impulso',price:'$50.000 una vez · 2% + IVA al vender',fee:'$50.000',commission:'2% + IVA',description:'Para dar mayor visibilidad al anuncio y comenzar una campaña enfocada en captar interesados.',items:['Todo lo incluido en Corretaje TPL','Landing comercial usando parcela.html','Activación inicial de campaña en Google Ads','Optimización del anuncio para conversión','Posición destacada dentro de Tu Parcela Lista','Informe semanal de rendimiento'],button:'Elegir Impulso'},
@@ -34,8 +59,19 @@ const checked=name=>$$(`input[name="${name}"]:checked`).map(x=>x.value);
 const listText=(items)=>items.filter(Boolean).join(', ').replace(/, ([^,]*)$/, ' y $1');
 const sentence=s=>s?String(s).charAt(0).toUpperCase()+String(s).slice(1):'';
 
-function initLocations(){const r=$('#region');Object.keys(REGIONS).forEach(name=>r.add(new Option(name,name)));r.addEventListener('change',()=>fillCommunes(r.value));}
-function fillCommunes(region,selected=''){const c=$('#comuna');c.innerHTML='<option value="">Selecciona</option>';(REGIONS[region]||[]).forEach(name=>c.add(new Option(name,name)));c.disabled=!region;if(selected)c.value=selected;}
+async function initLocations(){
+  const r=$('#region');
+  const c=$('#comuna');
+  if(!r||!c)throw new Error('No se encontraron los selectores de región y comuna.');
+  await ensureNationalCatalog();
+  const current=r.value;
+  r.innerHTML='<option value="">Selecciona</option>';
+  const regionsMap=getRegionsMap();
+  Object.keys(regionsMap).forEach(name=>r.add(new Option(name,name)));
+  if(current&&regionsMap[current])r.value=current;
+  fillCommunes(r.value);
+}
+function fillCommunes(region,selected=''){const c=$('#comuna');c.innerHTML='<option value="">Selecciona</option>';(getRegionsMap()[region]||[]).forEach(name=>c.add(new Option(name,name)));c.disabled=!region;if(selected)c.value=selected;}
 function normalizePropertyType(type){
   const value=String(type||'').trim().toLowerCase();
 
@@ -166,47 +202,92 @@ function removePhoto(index){const photo=state.photos[index];window.TPLPhotoOptim
 function setCover(index){if(index<=0)return;const [photo]=state.photos.splice(index,1);state.photos.unshift(photo);renderPhotos();updatePreview();saveDraft();}
 function movePhoto(from,to){if(from===to||from<0||to<0)return;const [photo]=state.photos.splice(from,1);state.photos.splice(to,0,photo);renderPhotos();updatePreview();saveDraft();}
 
-const TPL_VALUATION_RULES={
+function getValConfig() { return window.TPL_VALUATION_CONFIG || null; }
+function getNatCatalog() { return window.TPL_NATIONAL_CATALOG || null; }
+
+const TPL_VALUATION_RULES_FALLBACK={
  basePriceM2:2000,
  surfacePricing:{
-  progressiveLimitM2:40000,
-  largeLandStartM2:40000,
-  largeLandRateM2:1000,
-  largeLandMaxM2:250000,
-  largeLandFinalPct:-.30,
-  bands:[
-   {upTo:7000,rate:2000},
-   {upTo:10000,rate:1000},
-   {upTo:20000,rate:500},
-   {upTo:40000,rate:250}
-  ]
+  progressiveLimitM2:40000,largeLandStartM2:40000,largeLandRateM2:1000,largeLandMaxM2:250000,largeLandFinalPct:-.30,
+  bands:[{upTo:7000,rate:2000},{upTo:10000,rate:1000},{upTo:20000,rate:500},{upTo:40000,rate:250}]
  },
- enabledRegions:['Región del Biobío','Región de Ñuble'],
+ enabledRegions:['Región del Biobío','Región de Ñuble','Región Metropolitana de Santiago','Región de Valparaíso','Región de Los Lagos','Región de La Araucanía','Región de Coquimbo','Región de Los Ríos','Región de Arica y Parinacota','Región de Tarapacá','Región de Antofagasta','Región de Atacama','Región del Libertador General Bernardo O\'Higgins','Región del Maule','Región de Aysén del General Carlos Ibáñez del Campo','Región de Magallanes y de la Antártica Chilena'],
  majorCities:[
+  {name:'Gran Santiago',lat:-33.4489,lng:-70.6693,weight:1.0},
+  {name:'Gran Valparaíso',lat:-33.0245,lng:-71.5518,weight:1.0},
   {name:'Concepción',lat:-36.8201,lng:-73.0444,weight:1.30},
   {name:'Chillán',lat:-36.6066,lng:-72.1034,weight:1.15},
-  {name:'Los Ángeles',lat:-37.4697,lng:-72.3537,weight:1.10}
+  {name:'Los Ángeles',lat:-37.4697,lng:-72.3537,weight:1.10},
+  {name:'La Serena–Coquimbo',lat:-29.9324,lng:-71.2619,weight:1.0},
+  {name:'Temuco–Padre Las Casas',lat:-38.7359,lng:-72.5904,weight:1.0},
+  {name:'Valdivia',lat:-39.8142,lng:-73.2459,weight:1.0},
+  {name:'Osorno',lat:-40.5739,lng:-73.1335,weight:1.0},
+  {name:'Puerto Montt–Puerto Varas',lat:-41.3895,lng:-72.9368,weight:1.0},
+  {name:'Coyhaique',lat:-45.5712,lng:-72.0683,weight:1.0},
+  {name:'Punta Arenas',lat:-53.1638,lng:-70.9171,weight:1.0},
+  {name:'Arica',lat:-18.4783,lng:-70.3126,weight:1.0},
+  {name:'Iquique–Alto Hospicio',lat:-20.2307,lng:-70.1357,weight:1.0},
+  {name:'Antofagasta',lat:-23.6509,lng:-70.3975,weight:1.0},
+  {name:'Rancagua–Machalí',lat:-34.1701,lng:-70.7406,weight:1.0},
+  {name:'Talca',lat:-35.4264,lng:-71.6554,weight:1.0}
  ],
  distanceBands:[
-  {max:10,pct:5.00,label:'0 a 10 km'},
-  {max:20,pct:3.00,label:'10 a 20 km'},
-  {max:30,pct:1.50,label:'20 a 30 km'},
-  {max:40,pct:1.00,label:'30 a 40 km'},
-  {max:50,pct:.90,label:'40 a 50 km'},
-  {max:60,pct:.50,label:'50 a 60 km'},
-  {max:80,pct:.20,label:'60 a 80 km'},
+  {max:10,pct:0.50,label:'0 a 10 km'},
+  {max:20,pct:0.30,label:'10 a 20 km'},
+  {max:30,pct:0.15,label:'20 a 30 km'},
+  {max:40,pct:0.10,label:'30 a 40 km'},
+  {max:50,pct:0.09,label:'40 a 50 km'},
+  {max:60,pct:0.05,label:'50 a 60 km'},
+  {max:80,pct:0.02,label:'60 a 80 km'},
   {max:Infinity,pct:0,label:'Más de 80 km'}
  ],
- adjustments:{electricConnected:.25,electricFeasible:.10,electricUnavailable:-.10,nativeForest:.20,fruitTrees:.25,plantation:-.05},
- commercialPremiums:window.TPLValuationPremiums?.RULES||{tourismNational:3.00,tourismLocal:.20,riverAccess:.10},
- globalAdjustments:{rolPropio:.10,rolTramite:-.20,cesionDerechos:-.50,condominio:.10,market:-.20},
+ adjustments:{electricConnected:.15,electricFeasible:.12,electricUnavailable:-.12,nativeForest:.20,fruitTrees:.25,plantation:-.05,waterConnected:.15,waterFeasible:.08,waterUnavailable:-.15,topoFlat:0,topoSteep:-.10,springWater:.04,panoramicView:.06},
+ commercialPremiums:window.TPLValuationPremiums?.RULES||{tourismNational:0.30,tourismLocal:.20,riverAccess:.10,lakeAccess:.12},
+ globalAdjustments:{rolPropio:.10,rolTramite:-.20,cesionDerechos:-.50,condominio:.10,market:-.20,perimeterFencing:.05,accessGate:.03,internalRoads:.03},
  routeDistanceBands:[{max:5,pct:0,label:'0 a 5 km'},{max:10,pct:-.10,label:'6 a 10 km'},{max:20,pct:-.15,label:'11 a 20 km'},{max:30,pct:-.20,label:'21 a 30 km'},{max:40,pct:-.30,label:'31 a 40 km'},{max:50,pct:-.40,label:'41 a 50 km'},{max:60,pct:-.50,label:'51 a 60 km'},{max:Infinity,pct:-.60,label:'Más de 60 km'}],
- accessibility:{routeFactor:1.20,averageSpeedKmh:60,bands:[
-  {minKm:80,pct:-.40,label:'Más de 80 km'},
-  {minKm:70,pct:-.30,label:'Más de 70 km'},
-  {minKm:60,pct:-.20,label:'Más de 60 km'},
-  {minMinutes:60,pct:-.20,label:'Más de 1 hora de viaje'}
- ]}
+ accessibility:{routeFactor:1.20,averageSpeedKmh:60,bands:[{minKm:80,pct:-.40,label:'Más de 80 km'},{minKm:70,pct:-.30,label:'Más de 70 km'},{minKm:60,pct:-.20,label:'Más de 60 km'},{minMinutes:60,pct:-.20,label:'Más de 1 hora de viaje'}]}
+};
+
+const TPL_VALUATION_RULES={
+ get basePriceM2(){const cfg=getValConfig();return cfg?.landRules?.surfacePricing?.upTo7000M2?.value||TPL_VALUATION_RULES_FALLBACK.basePriceM2;},
+ get surfacePricing(){return TPL_VALUATION_RULES_FALLBACK.surfacePricing;},
+ get enabledRegions(){const cat=getNatCatalog();return cat?.regions?.map(r=>r.name)||TPL_VALUATION_RULES_FALLBACK.enabledRegions;},
+ get majorCities(){const cat=getNatCatalog();if(cat?.conurbations){return cat.conurbations.map(c=>({name:c.name,lat:c.centroid.lat,lng:c.centroid.lng,weight:c.weight||1.0,urbanRadiusKm:c.urbanRadiusKm}));}return TPL_VALUATION_RULES_FALLBACK.majorCities;},
+ get distanceBands(){const cfg=getValConfig();return cfg?.distanceRules?.urbanProximityBands||TPL_VALUATION_RULES_FALLBACK.distanceBands;},
+ get adjustments(){
+  const cfg=getValConfig();const adj=cfg?.landRules?.directAdjustments;
+  return {
+   electricConnected:adj?.electricConnected?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.electricConnected,
+   electricFeasible:adj?.electricFeasible?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.electricFeasible,
+   electricUnavailable:adj?.electricUnavailable?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.electricUnavailable,
+   nativeForest:adj?.nativeForest?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.nativeForest,
+   fruitTrees:adj?.fruitTrees?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.fruitTrees,
+   plantation:adj?.forestryPlantation?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.plantation,
+   waterConnected:adj?.waterConnected?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.waterConnected,
+   waterFeasible:adj?.waterFeasible?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.waterFeasible,
+   waterUnavailable:adj?.waterUnavailable?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.waterUnavailable,
+   topoFlat:adj?.topographyFlat?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.topoFlat,
+   topoSteep:adj?.topographySteep?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.topoSteep,
+   springWater:adj?.springWater?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.springWater,
+   panoramicView:adj?.panoramicView?.value??TPL_VALUATION_RULES_FALLBACK.adjustments.panoramicView
+  };
+ },
+ get commercialPremiums(){return window.TPLValuationPremiums?.RULES||TPL_VALUATION_RULES_FALLBACK.commercialPremiums;},
+ get globalAdjustments(){
+  const cfg=getValConfig();const leg=cfg?.marketRules?.legalStatusModifiers;const inf=cfg?.marketRules?.infrastructureModifiers;const mkt=cfg?.marketRules?.marketFactors;
+  return {
+   rolPropio:leg?.rolPropio?.value??TPL_VALUATION_RULES_FALLBACK.globalAdjustments.rolPropio,
+   rolTramite:leg?.rolEnTramite?.value??TPL_VALUATION_RULES_FALLBACK.globalAdjustments.rolTramite,
+   cesionDerechos:leg?.cesionDerechos?.value??TPL_VALUATION_RULES_FALLBACK.globalAdjustments.cesionDerechos,
+   condominio:leg?.condominio?.value??TPL_VALUATION_RULES_FALLBACK.globalAdjustments.condominio,
+   market:mkt?.generalDiscountPct?.value??TPL_VALUATION_RULES_FALLBACK.globalAdjustments.market,
+   perimeterFencing:inf?.perimeterFencing?.value??TPL_VALUATION_RULES_FALLBACK.globalAdjustments.perimeterFencing,
+   accessGate:inf?.accessGate?.value??TPL_VALUATION_RULES_FALLBACK.globalAdjustments.accessGate,
+   internalRoads:inf?.internalRoads?.value??TPL_VALUATION_RULES_FALLBACK.globalAdjustments.internalRoads
+  };
+ },
+ get routeDistanceBands(){const cfg=getValConfig();return cfg?.distanceRules?.routeAccessibilityBands||TPL_VALUATION_RULES_FALLBACK.routeDistanceBands;},
+ get accessibility(){return TPL_VALUATION_RULES_FALLBACK.accessibility;}
 };
  function valuationInputs(){
   const type=state.type||form.tipo.value;
@@ -215,7 +296,15 @@ const TPL_VALUATION_RULES={
   const houseArea=number(val('casaSuperficie'));
   const area=type==='casa'?houseArea:landArea;
   const location=[val('localidad'),val('comuna'),val('region')].filter(Boolean).join(', ');
-  return {type,asking,area,landArea,houseArea,location,region:val('region'),comuna:val('comuna'),sector:val('localidad')};
+  return {
+   type,asking,area,landArea,houseArea,location,
+   region:val('region'),comuna:val('comuna'),sector:val('localidad'),
+   rol:val('rol'),electricity:val('luz'),topography:val('topografia'),
+   nature:checked('naturaleza'),tourism:val('zonaTuristica'),view:val('vistaPrincipal'),
+   routeDistanceKm:number(val('distanciaRutaPrincipalKm')),fencing:val('cierre'),
+   condominium:val('condominio'),gate:val('porton'),vegetation:val('vegetacion'),
+   soil:val('condicionSuelo'),water:val('agua')
+  };
  }
 
  function valuationCoverage(type){
@@ -300,20 +389,37 @@ function calculateLandRuleValuation({asking,area,location,region}){
  const base=surfacePricing.base,adjustments=[];
  const add=(label,pct,detail='')=>adjustments.push({label,pct,amount:Math.round(base*pct),detail});
  const city=nearestMajorCity();
- if(city){
+ const proximityAlreadyReflected=Boolean(window.TPLCatalog?.state?.proximityReflected||(city&&city.distanceKm<=(city.urbanRadiusKm||15)));
+ if(city&&!proximityAlreadyReflected){
   const band=distanceRule(city.distanceKm);
   const weightedPct=band.pct*city.weight;
   if(weightedPct)add(`Cercanía a ${city.name}`,weightedPct,`${city.distanceKm.toFixed(1)} km · tramo ${band.label} · factor ciudad ${city.weight.toFixed(2)}`);
+ }else if(city&&proximityAlreadyReflected){
+  add(`Cercanía a ${city.name} (Reflejada en zona urbana)`,0,`${city.distanceKm.toFixed(1)} km · Protocolo antibucle activo`);
  }
  const nature=checked('naturaleza'),natureText=normalize(nature.join(' '));
  const electricity=normalize(val('luz'));
  if(/conectada|empalme instalado/.test(electricity))add('Empalme eléctrico instalado',TPL_VALUATION_RULES.adjustments.electricConnected);
  else if(/postacion|factibilidad/.test(electricity))add('Factibilidad eléctrica',TPL_VALUATION_RULES.adjustments.electricFeasible);
  else if(/sin electricidad/.test(electricity))add('Sin factibilidad eléctrica',TPL_VALUATION_RULES.adjustments.electricUnavailable);
+ const water=normalize(val('agua'));
+ if(/potable|apr|conectada|pozo profundo|inscrito/.test(water))add('Agua conectada / APR',TPL_VALUATION_RULES.adjustments.waterConnected);
+ else if(/factibilidad|pozo/.test(water))add('Factibilidad de agua / Pozo',TPL_VALUATION_RULES.adjustments.waterFeasible);
+ else if(/sin agua|aljibe|precario/.test(water))add('Sin agua potable',TPL_VALUATION_RULES.adjustments.waterUnavailable);
+ const topo=normalize(val('topografia'));
+ if(/plana|lomaje suave/.test(topo))add('Topografía plana o lomaje suave',TPL_VALUATION_RULES.adjustments.topoFlat);
+ else if(/fuerte|escarpada|quebrada/.test(topo))add('Topografía con pendiente fuerte',TPL_VALUATION_RULES.adjustments.topoSteep);
+ if(natureText.includes('estero')||natureText.includes('vertiente'))add('Estero o vertiente natural',TPL_VALUATION_RULES.adjustments.springWater);
+ if(natureText.includes('vista')||normalize(val('vistaPrincipal')).includes('panoramica'))add('Vista panorámica destacada',TPL_VALUATION_RULES.adjustments.panoramicView);
  const vegetation=normalize(val('vegetacion'));
  if(/arboles frutales/.test(vegetation))add('Árboles frutales',TPL_VALUATION_RULES.adjustments.fruitTrees);
  else if(/bosque nativo/.test(vegetation)||natureText.includes('bosque nativo'))add('Bosque nativo',TPL_VALUATION_RULES.adjustments.nativeForest);
  else if(/pinos|eucaliptus|plantacion forestal/.test(vegetation))add('Pinos o eucaliptus',TPL_VALUATION_RULES.adjustments.plantation);
+ const usableAreaPct=number(val('superficieAprovechable'))||number(state.superficieAprovechable)||100;
+ if(usableAreaPct>0&&usableAreaPct<100){
+  const usableFactor=Math.max(-0.50,(usableAreaPct-100)/100*0.50);
+  add(`Superficie aprovechable (${usableAreaPct}%)`,usableFactor,'Ajuste proporcional por área no utilizable');
+ }
  const totalPct=adjustments.reduce((sum,x)=>sum+x.pct,0);
  let calculated=Math.max(base,Math.round(base*(1+totalPct)));
  const globalAdjustments=[];
@@ -323,6 +429,12 @@ function calculateLandRuleValuation({asking,area,location,region}){
  else if(rol.includes('cesion de derechos'))globalAdjustments.push({key:'cesion_derechos',pct:TPL_VALUATION_RULES.globalAdjustments.cesionDerechos});
  const isCondominium=normalize(val('condominio'))==='si'||normalize(val('privacidad')).includes('condominio');
  if(isCondominium)globalAdjustments.push({key:'condominio',pct:TPL_VALUATION_RULES.globalAdjustments.condominio});
+ const cierre=normalize(val('cierre'));
+ if(cierre.includes('completo')||cierre.includes('100%')||cierre.includes('perimetral'))globalAdjustments.push({key:'cierre_perimetral',pct:TPL_VALUATION_RULES.globalAdjustments.perimeterFencing});
+ const porton=normalize(val('porton'));
+ if(porton.includes('automatico')||porton.includes('electrico')||porton.includes('acceso'))globalAdjustments.push({key:'porton_acceso',pct:TPL_VALUATION_RULES.globalAdjustments.accessGate});
+ const accesoVial=normalize(val('acceso'));
+ if(accesoVial.includes('interior estabilizado')||accesoVial.includes('buen estado')||accesoVial.includes('compactado'))globalAdjustments.push({key:'caminos_interiores',pct:TPL_VALUATION_RULES.globalAdjustments.internalRoads});
  for(const adjustment of globalAdjustments)calculated=Math.round(calculated*(1+adjustment.pct));
  const largeLandAdjustment=area>TPL_VALUATION_RULES.surfacePricing.largeLandStartM2?{applied:true,pct:TPL_VALUATION_RULES.surfacePricing.largeLandFinalPct,label:'Ajuste interno por campo de gran superficie'}:{applied:false,pct:0,label:'No aplica'};
  if(largeLandAdjustment.applied)calculated=Math.round(calculated*(1+largeLandAdjustment.pct));
@@ -333,11 +445,12 @@ function calculateLandRuleValuation({asking,area,location,region}){
  calculated=Math.round(calculated*(1+TPL_VALUATION_RULES.globalAdjustments.market));
  const tourism=val('zonaTuristica');
  const hasRiver=nature.some(item=>normalize(item).includes('rio dentro o junto'));
+ const hasLake=nature.some(item=>normalize(item).includes('lago'));
  const premiumResult=window.TPLValuationPremiums?.calculate
-  ? window.TPLValuationPremiums.calculate(calculated,{tourism,riverAccess:hasRiver})
-  : {total:calculated,tourism:{type:'none',pct:0,applied:false},riverAccess:{pct:0,applied:false},order:[]};
+  ? window.TPLValuationPremiums.calculate(calculated,{tourism,riverAccess:hasRiver,lakeAccess:hasLake})
+  : {total:calculated,tourism:{type:'none',pct:0,applied:false},riverAccess:{pct:0,applied:false},lakeAccess:{pct:0,applied:false},order:[]};
  calculated=premiumResult.total;
- const commercialPremiums={tourism:premiumResult.tourism,riverAccess:premiumResult.riverAccess,order:premiumResult.order};
+ const commercialPremiums={tourism:premiumResult.tourism,riverAccess:premiumResult.riverAccess,lakeAccess:premiumResult.lakeAccess||{pct:0,applied:false},order:premiumResult.order};
  const ideal=Math.round(calculated/10000)*10000;
  const quick=Math.round(ideal*.91/10000)*10000;
  const patient=Math.round(ideal*1.10/10000)*10000;
@@ -378,23 +491,46 @@ function calculateLandRuleValuation({asking,area,location,region}){
  }
 
  async function calculateLandValuation(inputs){
-  const payload=parcelValuationPayload(inputs);
-  let serverError='';
-  try{
-   const remote=await window.TPLValuationService?.valueParcel?.(payload);
-   const mapped=mapRemoteLandValuation(remote,inputs);
-   if(mapped)return mapped;
-   serverError=remote?.cautions?.[0]||'Supabase informó cobertura insuficiente.';
-  }catch(error){
-   console.warn('Tasador Supabase no disponible; se evaluará respaldo canónico.',error);
-   serverError=error.message||'No fue posible consultar el Tasador TPL.';
+  if(!window.TPLLandEngine?.calculate){
+   return {error:'El motor canónico TPL no está disponible. Recarga la página e inténtalo nuevamente.'};
   }
-  if(TPL_VALUATION_RULES.enabledRegions.includes(inputs.region)){
-   const local=calculateLandRuleValuation(inputs);
-   return {...local,source:'reglas_locales_respaldo',persisted:false,serverError,coverage:'experimental',cautions:[serverError,'Estimación preliminar: debe revisarse antes de usarla como precio respaldado.']};
+  const city=nearestMajorCity();
+  if(!city){
+   return {error:'Marca la ubicación de la propiedad en el mapa para calcular su distancia a una ciudad principal.'};
   }
-  return calculateComparableValuation(inputs,serverError);
+  const result=window.TPLLandEngine.calculate({
+   area:inputs.landArea,
+   asking:inputs.asking,
+   location:inputs.location,
+   region:inputs.region,
+   comuna:inputs.comuna,
+   sector:inputs.sector,
+   distanceKm:city.distanceKm,
+   nearestCity:city,
+   rol:inputs.rol,
+   electricity:inputs.electricity,
+   topography:inputs.topography,
+   nature:inputs.nature,
+   tourism:inputs.tourism,
+   view:inputs.view,
+   routeDistanceKm:inputs.routeDistanceKm,
+   fencing:inputs.fencing,
+   condominium:inputs.condominium,
+   gate:inputs.gate,
+   vegetation:inputs.vegetation,
+   soil:inputs.soil,
+   water:inputs.water
+  });
+  if(result?.error)return result;
+  return {
+   ...result,
+   source:'tpl_land_engine_local',
+   persisted:false,
+   coverage:'reglas_tpl_propietario_v1',
+   cautions:[...(result.cautions||[]),'Estimación comercial orientativa basada en las reglas vigentes de Tu Parcela Lista.']
+  };
  }
+
 
  async function calculateValuation(){
   const inputs=valuationInputs();
@@ -455,11 +591,12 @@ function valuationCard(key,label,price,time,description,recommended=false){retur
  function renderValuationModal(r){
  const current=r.asking?`<div class="valuation-current"><span>Tu precio informado</span><strong>${money(r.asking)}</strong><em>${Math.abs(r.diff).toFixed(1)}% ${r.diff>=0?'sobre':'bajo'} la recomendación TPL</em></div>`:'';
   const confidence=r.score>=80?'Alta':r.score>=55?'Media':'Inicial';
-  const sourceText=r.persisted?'Tasación registrada con antecedentes de Supabase.':'Estimación preliminar de respaldo; requiere revisión antes de aprobar la publicación.';
+  const sourceText=r.source==='tpl_land_engine_local'?'Estimación calculada con las reglas territoriales TPL definidas para el publicador.':r.persisted?'Tasación registrada con antecedentes de Supabase.':'Estimación preliminar de respaldo; requiere revisión antes de aprobar la publicación.';
   const cautions=(r.cautions||[]).filter(Boolean).slice(0,3);
   const components=r.components?`<div class="valuation-components"><span>Terreno: <strong>${money(r.components.land.ideal)}</strong></span><span>Vivienda: <strong>${money(r.components.house.ideal)}</strong></span></div>`:'';
+  const advisoryCta = `<div class="tpl-advisory-cta-card"><div class="tpl-advisory-icon">🛡️</div><div class="tpl-advisory-content"><h4>¿Quieres entender mejor este precio y negociar con más seguridad?</h4><p>Genera un Informe Profesional TPL con el valor referencial, los factores principales de la propiedad y tres estrategias posibles de venta.</p><button type="button" class="btn primary tpl-advisory-btn" data-open-tpl-report><span>✦</span> Generar Informe Profesional en PDF ➔</button></div></div>`;
   $('#valuationResults').hidden=false;
-  $('#valuationResults').innerHTML=`<div class="valuation-result-heading"><p class="eyebrow">Análisis completado</p><h3>Encontramos tres estrategias posibles</h3><p>${escapeHTML(r.location||'Tu propiedad')} · ${formatDigits(r.area)} m²${r.houseArea?` de terreno + ${formatDigits(r.houseArea)} m² construidos`:''}</p></div><div class="valuation-private-summary"><div><small>CONFIANZA DE LA ESTIMACIÓN</small><strong>${confidence}</strong></div><p>${escapeHTML(sourceText)} La cobertura del formulario es ${escapeHTML(r.fieldCoverage?.label||'suficiente')}.</p></div>${components}${current}<div class="valuation-options">${valuationCard('quick','Venta rápida',r.quick,'1 a 3 meses','Mayor competitividad para aumentar consultas y acelerar decisiones.')}${valuationCard('ideal','Precio ideal',r.ideal,'3 a 6 meses','El mejor equilibrio estimado entre valor y probabilidad de venta.',true)}${valuationCard('patient','Venta paciente',r.patient,'6 a 12 meses o más','Para propietarios con menor urgencia que pueden esperar mejores condiciones.')}</div>${cautions.length?`<ul class="valuation-cautions">${cautions.map(item=>`<li>${escapeHTML(item)}</li>`).join('')}</ul>`:''}<p class="valuation-disclaimer">Estimación comercial orientativa para apoyar la publicación. No reemplaza una tasación bancaria o pericial. Tu Parcela Lista no muestra públicamente su fórmula, valores base ni porcentajes internos.</p>`;
+  $('#valuationResults').innerHTML=`<div class="valuation-result-heading"><p class="eyebrow">Análisis completado</p><h3>Encontramos tres estrategias posibles</h3><p>${escapeHTML(r.location||'Tu propiedad')} · ${formatDigits(r.area)} m²${r.houseArea?` de terreno + ${formatDigits(r.houseArea)} m² construidos`:''}</p></div><div class="valuation-private-summary"><div><small>CONFIANZA DE LA ESTIMACIÓN</small><strong>${confidence}</strong></div><p>${escapeHTML(sourceText)} La cobertura del formulario es ${escapeHTML(r.fieldCoverage?.label||'suficiente')}.</p></div>${components}${current}<div class="valuation-options">${valuationCard('quick','Venta rápida',r.quick,'1 a 3 meses','Mayor competitividad para aumentar consultas y acelerar decisiones.')}${valuationCard('ideal','Precio ideal',r.ideal,'3 a 6 meses','El mejor equilibrio estimado entre valor y probabilidad de venta.',true)}${valuationCard('patient','Venta paciente',r.patient,'6 a 12 meses o más','Para propietarios con menor urgencia que pueden esperar mejores condiciones.')}</div>${advisoryCta}${cautions.length?`<ul class="valuation-cautions">${cautions.map(item=>`<li>${escapeHTML(item)}</li>`).join('')}</ul>`:''}<p class="valuation-disclaimer">Estimación comercial orientativa para apoyar la publicación. No reemplaza una tasación bancaria o pericial. Tu Parcela Lista no muestra públicamente su fórmula, valores base ni porcentajes internos.</p>`;
 }
 function applyValuationPrice(key){
  if(!state.valuation)return;const price=state.valuation[key];if(!price)return;
@@ -472,6 +609,73 @@ function applyValuationPrice(key){
   $('#valuationResult').hidden=false;$('#valuationResult').innerHTML=`<p class="eyebrow">Estrategia seleccionada</p><h3>${key==='quick'?'Venta rápida':key==='patient'?'Venta paciente':'Precio ideal recomendado'}</h3>${backedCopy}<div class="valuation-metrics"><div><small>Precio elegido</small><strong>${money(price)}</strong></div><div><small>Tiempo orientativo</small><strong>${key==='quick'?'1 a 3 meses':key==='patient'?'6 a 12+ meses':'3 a 6 meses'}</strong></div><div><small>Referencia TPL</small><strong>${money(state.valuation.ideal)}</strong></div></div><button type="button" class="btn ghost" id="reviewValuationAgain">Revisar las 3 alternativas</button>`;
  closeValuationModal();
  setTimeout(()=>$('#reviewValuationAgain')?.addEventListener('click',()=>{renderValuationModal(state.valuation);$('#valuationLoading').hidden=true;$('#valuationResults').hidden=false;$('#valuationModal').hidden=false;$('#valuationModal').setAttribute('aria-hidden','false');document.body.classList.add('valuation-modal-open');}),0);
+}
+function openTplCommercialModal(){
+  if(!state.valuation)return;
+  const r=state.valuation;
+  const confidence=r.score>=80?'Alta':r.score>=55?'Media':'Inicial';
+  $('#tplCommLocation').textContent=r.location||'Tu propiedad en valoración';
+  $('#tplCommPrice').textContent=money(r.ideal);
+  $('#tplCommConfidence').textContent=confidence;
+  if(!$('#tplLeadName').value && val('nombre')) $('#tplLeadName').value=val('nombre');
+  if(!$('#tplLeadEmail').value && val('email')) $('#tplLeadEmail').value=val('email');
+  if(!$('#tplLeadPhone').value && val('telefono')) $('#tplLeadPhone').value=val('telefono');
+  $('#tplCommercialFormView').hidden=false;
+  $('#tplCommercialLoadingView').hidden=true;
+  $('#tplCommercialSuccessView').hidden=true;
+  $('#tplCommFormError').hidden=true;
+  const modal=$('#tplCommercialModal');
+  if(modal){modal.hidden=false;modal.setAttribute('aria-hidden','false');document.body.classList.add('valuation-modal-open');}
+}
+function closeTplCommercialModal(){
+  const modal=$('#tplCommercialModal');
+  if(modal){modal.hidden=true;modal.setAttribute('aria-hidden','true');if($('#valuationModal').hidden)document.body.classList.remove('valuation-modal-open');}
+}
+async function submitTplCommercialForm(e){
+  e?.preventDefault?.();
+  const name=$('#tplLeadName').value.trim().replace(/\s+/g,' ');
+  const email=$('#tplLeadEmail').value.trim().toLowerCase();
+  const phoneRaw=$('#tplLeadPhone').value.trim();
+  const phoneDigits=phoneRaw.replace(/\D/g,'');
+  const phone=phoneDigits.startsWith('56')?`+${phoneDigits}`:phoneDigits.startsWith('9')?`+56${phoneDigits}`:phoneRaw;
+  const goal=$('#tplLeadGoal').value;
+  const consentGen=$('#tplConsentGenerate').checked;
+  const consentCont=$('#tplConsentContact').checked;
+  const errBox=$('#tplCommFormError');
+  const errors=[];
+  if(name.length<3)errors.push('Ingresa tu nombre y apellido.');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(email))errors.push('Ingresa un correo electrónico válido.');
+  if(phoneDigits.length<9 || phoneDigits.length>12)errors.push('Ingresa un teléfono o WhatsApp válido.');
+  if(!consentGen)errors.push('Debes aceptar el uso de tus datos para generar el informe.');
+  if(errors.length){
+    if(errBox){errBox.hidden=false;errBox.innerHTML=errors.map(item=>`<div>• ${escapeHTML(item)}</div>`).join('');}
+    return;
+  }
+  if(errBox)errBox.hidden=true;
+  const submitBtn=$('#submitTplCommercialBtn');
+  if(submitBtn){submitBtn.disabled=true;submitBtn.setAttribute('aria-busy','true');}
+  $('#tplCommercialFormView').hidden=true;
+  $('#tplCommercialLoadingView').hidden=false;
+  const leadRef=`TPL-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${(globalThis.crypto?.randomUUID?.()||`${Date.now()}-${Math.random()}`).replace(/-/g,'').slice(0,12).toUpperCase()}`;
+  state.tplLead={name,email,phone,goal,consentGen,consentCont,leadRef,createdAt:new Date().toISOString(),valuation:state.valuation};
+  let crmStatus='local';
+  try{
+    if(window.TPLValuationCRM?.requestReport){
+      const result=await window.TPLValuationCRM.requestReport(state.valuationSessionId,state.tplLead);
+      crmStatus=result?.remoteSaved?'remote':'local';
+    }else if(window.TPLValuationCRM?.event){
+      window.TPLValuationCRM.event(state.valuationSessionId,'informe_solicitado',{leadRef,goal,consentCont});
+    }
+  }catch(err){
+    console.warn('No fue posible registrar la solicitud en el CRM remoto.',err);
+  }
+  state.tplLead.crmStatus=crmStatus;
+  if($('#tplCommLeadRef'))$('#tplCommLeadRef').textContent=leadRef;
+  const statusText=$('#tplCommSaveStatus');
+  if(statusText)statusText.textContent=crmStatus==='remote'?'Solicitud registrada correctamente.':'El informe está listo. La solicitud quedó pendiente de sincronización con el CRM.';
+  $('#tplCommercialLoadingView').hidden=true;
+  $('#tplCommercialSuccessView').hidden=false;
+  if(submitBtn){submitBtn.disabled=false;submitBtn.removeAttribute('aria-busy');}
 }
 function runValuation(){openValuationModal();}
 
@@ -592,7 +796,11 @@ async function submit(e){
     const finalCode=result?.publication?.codigo_publico||code;
     node.querySelector('.success-code').textContent=finalCode;
     const msg=node.querySelector('p:not(.eyebrow)');
-    if(msg)msg.textContent=result?.mode==='remote'?'La propiedad fue enviada correctamente para revisión y sincronización con el CRM.':'La publicación quedó guardada en modo de prueba. La conexión real se activará al configurar Supabase y Flow.';
+    if(msg){
+      msg.textContent=result?.mode==='remote'
+        ?'La propiedad fue enviada correctamente para revisión y sincronización con el CRM.'
+        :'La propiedad quedó guardada en modo de prueba. La conexión real se activará al configurar Supabase y Flow.';
+    }
     $('.publisher-content').replaceChildren(node);
     window.scrollTo({top:0,behavior:'smooth'});
   }catch(err){
@@ -612,7 +820,8 @@ function bind(){
  $('#tituloEditable').addEventListener('input',()=>{$('#titulo').value=$('#tituloEditable').value;});$('#descripcionEditable').addEventListener('input',()=>{$('#descripcionFinal').value=$('#descripcionEditable').value;});
  $('#useGoogleMapsLink').addEventListener('click',useGoogleMapsLink);$('#googleMapsLink').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();useGoogleMapsLink();}});$('#useGps').addEventListener('click',useGps);$('#focusMapSearch').addEventListener('click',()=>$('#mapSearch').focus());$('#focusMap').addEventListener('click',()=>{document.getElementById('map').scrollIntoView({behavior:'smooth',block:'center'});$('#locationStatus').textContent='Haz clic sobre el lugar exacto dentro del mapa.';});$('#searchMap').addEventListener('click',searchMap);$('#mapSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchMap();}});
  const photoInput=$('#fotosInput'),photoDrop=$('#photoDrop'),photoGrid=$('#photoGrid');photoInput.addEventListener('change',e=>addPhotos(e.target.files));['dragenter','dragover'].forEach(type=>photoDrop.addEventListener(type,e=>{e.preventDefault();photoDrop.classList.add('drag-over');}));['dragleave','drop'].forEach(type=>photoDrop.addEventListener(type,e=>{e.preventDefault();photoDrop.classList.remove('drag-over');}));photoDrop.addEventListener('drop',e=>addPhotos(e.dataTransfer.files));photoGrid.addEventListener('click',e=>{const remove=e.target.dataset.remove,cover=e.target.dataset.cover;if(remove!=null)removePhoto(Number(remove));else if(cover!=null)setCover(Number(cover));});let dragIndex=null;photoGrid.addEventListener('dragstart',e=>{const item=e.target.closest('[data-photo-index]');if(!item)return;dragIndex=Number(item.dataset.photoIndex);item.classList.add('dragging');});photoGrid.addEventListener('dragover',e=>{e.preventDefault();const item=e.target.closest('[data-photo-index]');$$('.photo-item',photoGrid).forEach(x=>x.classList.remove('drag-target'));item?.classList.add('drag-target');});photoGrid.addEventListener('drop',e=>{e.preventDefault();const item=e.target.closest('[data-photo-index]');if(item&&dragIndex!=null)movePhoto(dragIndex,Number(item.dataset.photoIndex));dragIndex=null;});photoGrid.addEventListener('dragend',()=>{$$('.photo-item',photoGrid).forEach(x=>x.classList.remove('dragging','drag-target'));dragIndex=null;});$('#tryPhotoLocation').addEventListener('click',inspectAllPhotoLocations);$('#usePhotoLocation').addEventListener('click',()=>{if(!state.photoCoordinates)return;setCoordinates(state.photoCoordinates.lat,state.photoCoordinates.lng,'Ubicación recuperada desde una fotografía');$('#photoLocationFallback').hidden=true;clearError('fotos');});$('#backToLocation').addEventListener('click',()=>goTo('ubicacion',false));
- $('#runValuation').addEventListener('click',runValuation);$('#valuationModal').addEventListener('click',e=>{if(e.target.closest('[data-close-valuation]'))closeValuationModal();const use=e.target.closest('[data-use-valuation]');if(use)applyValuationPrice(use.dataset.useValuation);});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#valuationModal').hidden)closeValuationModal();});$('#plansGrid').addEventListener('click',e=>{const btn=e.target.closest('[data-select-plan]');const card=e.target.closest('[data-plan-id]');const id=btn?.dataset.selectPlan||card?.dataset.planId;if(!id)return;state.plan=id;const planInput=$('#selectedPlanInput');if(planInput)planInput.value=id;renderPlans();saveDraft();});$('#finalSummary').addEventListener('click',e=>{if(e.target.closest('[data-edit-plans]'))goTo('planes',false);});form.addEventListener('submit',submit);
+ $('#runValuation').addEventListener('click',runValuation);$('#valuationModal').addEventListener('click',e=>{if(e.target.closest('[data-close-valuation]'))closeValuationModal();const use=e.target.closest('[data-use-valuation]');if(use)applyValuationPrice(use.dataset.useValuation);const reportBtn=e.target.closest('[data-open-tpl-report]');if(reportBtn)openTplCommercialModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#valuationModal').hidden)closeValuationModal();if(e.key==='Escape'&&!$('#tplCommercialModal')?.hidden)closeTplCommercialModal();if(e.key==='Escape'&&document.body.classList.contains('tpl-report-open'))window.TPLReportGenerator?.closeReport();});$('#plansGrid').addEventListener('click',e=>{const btn=e.target.closest('[data-select-plan]');const card=e.target.closest('[data-plan-id]');const id=btn?.dataset.selectPlan||card?.dataset.planId;if(!id)return;state.plan=id;const planInput=$('#selectedPlanInput');if(planInput)planInput.value=id;renderPlans();saveDraft();});$('#finalSummary').addEventListener('click',e=>{if(e.target.closest('[data-edit-plans]'))goTo('planes',false);});form.addEventListener('submit',submit);
+ $('#tplCommercialModal')?.addEventListener('click',e=>{if(e.target.id==='closeTplCommercialBtn'||e.target.id==='closeTplCommercialBackdrop'||e.target.id==='cancelTplCommercialBtn'||e.target.id==='closeTplSuccessBtn')closeTplCommercialModal();if(e.target.id==='downloadTplReportActionBtn'){closeTplCommercialModal();if(window.TPLReportGenerator)window.TPLReportGenerator.openReport(state.valuation,state.tplLead,dataObject());}});$('#tplCommercialForm')?.addEventListener('submit',submitTplCommercialForm);
  const toggle=$('#menuToggle'),nav=$('#mainNav');toggle.addEventListener('click',()=>{const open=nav.classList.toggle('open');toggle.setAttribute('aria-expanded',String(open));});nav.addEventListener('click',()=>nav.classList.remove('open'));
  window.addEventListener('beforeunload',()=>{window.TPLValuationCRM?.markAbandoned?.(state.valuationSessionId,{form:dataObject(),reason:'salida_sin_publicar'});try{localStorage.setItem(DRAFT_KEY,JSON.stringify({...dataObject(),completed:[...state.completed],current:state.current}));}catch{}});
 }

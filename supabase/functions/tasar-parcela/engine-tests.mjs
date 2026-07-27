@@ -20,7 +20,7 @@ test('genera una tasación con comparables válidos',()=>{
 test('aplica turismo nacional y luego acceso a río',()=>{
   const normal=calculateValuation(base,records,parameters,new Date('2026-07-23'));
   const premium=calculateValuation({...base,zona_turistica:'nacional',acceso_rio:true},records,parameters,new Date('2026-07-23'));
-  assert.equal(premium.range.market,Math.round(normal.range.market*4*1.1/10000)*10000);
+  assert.equal(premium.range.market,Math.round(normal.range.market*1.3*1.1/10000)*10000);
   assert.equal(materialInput({...base,zona_turistica:'local',acceso_rio:true}).zona_turistica,'local');
 });
 

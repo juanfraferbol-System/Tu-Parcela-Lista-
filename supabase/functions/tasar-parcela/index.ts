@@ -34,7 +34,7 @@ async function hashHex(value:string){
 }
 
 function valuationResponse(row:any){
- return {id:row.id,status:row.estado==='rechazada_datos_insuficientes'?'insufficient':'generated',range:{minimum:row.valor_minimo,quick:row.venta_rapida,market:row.valor_mercado,maximum:row.valor_maximo},pricePerM2:row.precio_m2,difference:row.diferencia_porcentual,position:row.resumen_factores?.position||'sin_decision',confidence:row.confianza,confidenceScore:row.confianza_puntaje,coverage:row.cobertura,comparableCount:row.resumen_factores?.comparableCount||0,strengths:row.resumen_factores?.strengths||[],cautions:row.resumen_factores?.cautions||[],algorithmVersion:row.algoritmo_version,createdAt:row.creada_en,legalNotice:LEGAL_NOTICE,reused:true};
+  return {id:row.id,status:row.estado==='rechazada_datos_insuficientes'?'insufficient':'generated',valuationMode:'server_canonical',backed:true,officialResult:true,range:{minimum:row.valor_minimo,quick:row.venta_rapida,market:row.valor_mercado,maximum:row.valor_maximo},pricePerM2:row.precio_m2,difference:row.diferencia_porcentual,position:row.resumen_factores?.position||'sin_decision',confidence:row.confianza,confidenceScore:row.confianza_puntaje,coverage:row.cobertura,comparableCount:row.resumen_factores?.comparableCount||0,strengths:row.resumen_factores?.strengths||[],cautions:row.resumen_factores?.cautions||[],explanation:row.resumen_factores?.explanation||null,confidenceIndex:row.resumen_factores?.confidenceIndex||null,auditTrail:row.resumen_factores?.auditTrail||null,proximityInfo:row.resumen_factores?.proximityInfo||null,algorithmVersion:row.algoritmo_version,createdAt:row.creada_en,legalNotice:LEGAL_NOTICE,reused:true};
 }
 
 Deno.serve(async request=>{
@@ -107,5 +107,5 @@ Deno.serve(async request=>{
   return json(origin,502,{ok:false,error:'No fue posible guardar la tasación.'});
  }
  const savedRow=Array.isArray(saved.data)?saved.data[0]:saved.data;
- return json(origin,200,{ok:true,accessToken,result:{id:savedRow?.id,status:result.status,range:result.range,pricePerM2:result.pricePerM2,difference:result.difference,position:result.position,confidence:result.confidence,confidenceScore:result.confidenceScore,coverage:result.coverage,comparableCount:result.comparableCount,strengths:result.strengths,cautions:result.cautions,algorithmVersion:configuration.data.version,createdAt:savedRow?.creada_en,legalNotice:LEGAL_NOTICE,reused:false}});
+ return json(origin,200,{ok:true,accessToken,result:{id:savedRow?.id,status:result.status,valuationMode:result.valuationMode,backed:result.backed,officialResult:result.officialResult,range:result.range,pricePerM2:result.pricePerM2,difference:result.difference,position:result.position,confidence:result.confidence,confidenceScore:result.confidenceScore,coverage:result.coverage,comparableCount:result.comparableCount,strengths:result.strengths,cautions:result.cautions,explanation:result.explanation,confidenceIndex:result.confidenceIndex,auditTrail:result.auditTrail,proximityInfo:result.proximityInfo,algorithmVersion:configuration.data.version,createdAt:savedRow?.creada_en,legalNotice:LEGAL_NOTICE,reused:false}});
 });
