@@ -30,13 +30,14 @@
   }
 
   function createHeader(leadRef, pageNum, totalPages){
+    const dateStr = formatDate(new Date().toISOString());
     return `
       <div class="tpl-print-header">
         <div class="tpl-print-header-brand">
           <span class="tpl-print-logo">🛡️</span>
           <div>
             <strong>TU PARCELA LISTA</strong>
-            <small>INFORME PROFESIONAL DE VALORACIÓN COMERCIAL</small>
+            <small>INFORME PROFESIONAL DE VALORACIÓN COMERCIAL · ${dateStr}</small>
           </div>
         </div>
         <div class="tpl-print-header-meta">
@@ -50,8 +51,8 @@
   function createFooter(leadRef){
     return `
       <div class="tpl-print-footer">
-        <p>Informe profesional generado por <strong>Tu Parcela Lista</strong> · Referencia de solicitud <strong>${leadRef}</strong></p>
-        <small>Este informe representa una estimación referencial de mercado para apoyar decisiones de compraventa y negociación comercial.</small>
+        <p>Informe profesional generado por <strong>Tu Parcela Lista</strong> · Referencia de expediente <strong>${leadRef}</strong> · Fecha: <strong>${formatDate(new Date().toISOString())}</strong></p>
+        <small style="display:block; margin-top:2px;">Motores canónicos: Suelo v2026.07 · Vivienda v2026.07 · Catálogo Nacional v2026.07. Fórmulas algorítmicas confidenciales protegidas por secreto comercial e intelectual TPL.</small>
       </div>
     `;
   }
@@ -67,8 +68,8 @@
     const location = valData?.location || formValues?.comuna || 'Sector no especificado';
     const area = Number(valData?.area || formValues?.superficie || 5000);
     const idealPrice = valData?.ideal || 0;
-    const quickPrice = valData?.quick || Math.round(idealPrice * 0.88);
-    const patientPrice = valData?.patient || Math.round(idealPrice * 1.12);
+    const quickPrice = valData?.quick || Math.round(idealPrice * 0.90);
+    const patientPrice = valData?.patient || Math.round(idealPrice * 1.10);
     const confidenceLabel = (valData?.score >= 80) ? '★★★★☆ ALTA CONFIABILIDAD' : (valData?.score >= 55) ? '★★★☆☆ CONFIABILIDAD MEDIA' : '★★☆☆☆ INICIAL';
     const pricePerM2 = area > 0 ? Math.round(idealPrice / area) : 0;
 
@@ -147,8 +148,8 @@
     const camino = formValues?.acceso || 'Buen estado';
     const topo = formValues?.topografia || 'Plana o lomaje suave';
     const idealPrice = valData?.ideal || 0;
-    const quickPrice = valData?.quick || Math.round(idealPrice * 0.88);
-    const patientPrice = valData?.patient || Math.round(idealPrice * 1.12);
+    const quickPrice = valData?.quick || Math.round(idealPrice * 0.90);
+    const patientPrice = valData?.patient || Math.round(idealPrice * 1.10);
 
     return `
       <div class="tpl-report-page">
@@ -337,6 +338,16 @@
     container.innerHTML = html;
     container.hidden = false;
     document.body.classList.add('tpl-report-open');
+
+    // Req 9: Guardar copia en Supabase Storage asociada al expediente
+    try {
+      const client = typeof window.getSupabaseClient === 'function' ? window.getSupabaseClient() : null;
+      if (client && client.storage && leadData?.leadRef) {
+        const fileName = `reportes/${leadData.leadRef}/${Date.now()}_informe_tpl_business.html`;
+        const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
+        client.storage.from('publicaciones').upload(fileName, blob, { upsert: true }).catch(() => {});
+      }
+    } catch (_) {}
 
     // Registrar evento de apertura en CRM
     if(window.TPLValuationCRM?.event && valData?.sessionId){

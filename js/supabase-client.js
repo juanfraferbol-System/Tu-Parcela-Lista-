@@ -63,3 +63,12 @@ export function getSupabaseClient(options={}){
  cachedSignature=signature;
  return cachedClient;
 }
+
+const exportObj = { isServiceRoleKey, readSupabaseConfig, hasValidSupabaseConfig, resetSupabaseClient, getSupabaseClient };
+if (typeof window !== 'undefined') {
+  window.TPLSupabaseClient = exportObj;
+  window.getSupabaseClient = getSupabaseClient;
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.TPLSupabaseClient = exportObj;
+  globalThis.getSupabaseClient = getSupabaseClient;
+}

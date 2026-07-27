@@ -1,0 +1,30 @@
+TASADOR TPL AUDITADO V2 - AJUSTE FINAL 2026-07-27
+
+Archivos incluidos:
+- plataforma/publicar/app.js
+- plataforma/publicar/index.html
+- plataforma/publicar/tpl-land-engine.js
+- plataforma/publicar/tpl-report-generator.js
+- plataforma/publicar/valuation-crm-service.js
+
+Correcciones finales:
+1. El publicador usa TPLLandEngine como motor canónico para terrenos.
+2. Distancia a carretera/ruta principal: -1% por km, con tope de -30%.
+3. Venta rápida: 90% del valor ideal.
+4. Venta paciente: 110% del valor ideal.
+5. El informe PDF usa los mismos factores 90% / 100% / 110%.
+6. La animación ya no afirma analizar comparables; describe el cálculo real por reglas TPL.
+7. Se mantienen catálogo, mapa, modal, CRM e informe profesional.
+
+Validaciones ejecutadas:
+- Sintaxis JavaScript correcta en app.js, tpl-land-engine.js, tpl-report-generator.js y valuation-crm-service.js.
+- Pruebas automáticas aprobadas para superficie, distancia ciudad, carretera, Santiago y Chicureo.
+
+Importante:
+Esta auditoría cubre los archivos incluidos en el paquete del publicador. No sustituye una auditoría del repositorio completo si existen otros archivos locales no incluidos aquí.
+
+ACTUALIZACIÓN 2026-07-27 — REGLA INTERNA DE MERCADO
+- Se aplica factor 0,75 al valor final en todas las regiones.
+- Excepciones: Región Metropolitana, Región de Valparaíso, Región de Antofagasta y comuna de Puerto Varas.
+- Puerto Varas se exceptúa por comuna; otras comunas de Los Lagos reciben el factor 0,75.
+- La regla se conserva como metadata interna y no aparece en el desglose público ni en el informe comercial.

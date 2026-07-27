@@ -33,24 +33,54 @@ async function hashHex(value:string){
  return [...bytes].map(item=>item.toString(16).padStart(2,'0')).join('');
 }
 
-function valuationResponse(row:any){
-  return {id:row.id,status:row.estado==='rechazada_datos_insuficientes'?'insufficient':'generated',valuationMode:'server_canonical',backed:true,officialResult:true,range:{minimum:row.valor_minimo,quick:row.venta_rapida,market:row.valor_mercado,maximum:row.valor_maximo},pricePerM2:row.precio_m2,difference:row.diferencia_porcentual,position:row.resumen_factores?.position||'sin_decision',confidence:row.confianza,confidenceScore:row.confianza_puntaje,coverage:row.cobertura,comparableCount:row.resumen_factores?.comparableCount||0,strengths:row.resumen_factores?.strengths||[],cautions:row.resumen_factores?.cautions||[],explanation:row.resumen_factores?.explanation||null,confidenceIndex:row.resumen_factores?.confidenceIndex||null,auditTrail:row.resumen_factores?.auditTrail||null,proximityInfo:row.resumen_factores?.proximityInfo||null,algorithmVersion:row.algoritmo_version,createdAt:row.creada_en,legalNotice:LEGAL_NOTICE,reused:true};
+async function signIntegrity(id:string,market:number,quick:number,secret:string){
+ return await hashHex(`${id}:${Math.round(market)}:${Math.round(quick)}:${secret}`);
+}
+
+function logSecurityEvent(reason:string,origin:string,ip:string,userAgent:string,extra:any={}){
+ console.error(JSON.stringify({
+  audit: 'TPL_SECURITY_AUDIT',
+  timestamp: new Date().toISOString(),
+  reason,
+  origin,
+  ip,
+  userAgent: userAgent.slice(0, 150),
+  ...extra
+ }));
+}
+
+function valuationResponse(row:any, integritySig:string=''){
+  return {id:row.id,status:row.estado==='rechazada_datos_insuficientes'?'insufficient':'generated',valuationMode:'server_canonical',backed:true,officialResult:true,range:{minimum:row.valor_minimo,quick:row.venta_rapida,market:row.valor_mercado,maximum:row.valor_maximo},pricePerM2:row.precio_m2,difference:row.diferencia_porcentual,position:row.resumen_factores?.position||'sin_decision',confidence:row.confianza,confidenceScore:row.confianza_puntaje,coverage:row.cobertura,comparableCount:row.resumen_factores?.comparableCount||0,strengths:row.resumen_factores?.strengths||[],cautions:row.resumen_factores?.cautions||[],explanation:row.resumen_factores?.explanation||null,confidenceIndex:row.resumen_factores?.confidenceIndex||null,auditTrail:row.resumen_factores?.auditTrail||null,proximityInfo:row.resumen_factores?.proximityInfo||null,algorithmVersion:row.algoritmo_version,createdAt:row.creada_en,integritySignature:integritySig||row.integrity_signature||'',legalNotice:LEGAL_NOTICE,reused:true};
 }
 
 Deno.serve(async request=>{
- const origin=request.headers.get('origin')||'';
- if(!allowedOrigins().has(origin))return json(origin,403,{ok:false,error:'Origen no permitido.'});
+ const origin=request.headers.get('origin')||'',ip=request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()||'desconocido',userAgent=request.headers.get('user-agent')||'';
+ if(!allowedOrigins().has(origin)){
+  logSecurityEvent('ORIGEN_DENEGADO',origin,ip,userAgent);
+  return json(origin,403,{ok:false,error:'Origen no permitido.'});
+ }
  if(request.method==='OPTIONS')return new Response('ok',{headers:corsHeaders(origin)});
  if(request.method!=='POST')return json(origin,405,{ok:false,error:'Método no permitido.'});
  const apiKey=request.headers.get('apikey')||'';
- if(!apiKey||!publicKeys().has(apiKey))return json(origin,401,{ok:false,error:'Clave pública no válida.'});
+ if(!apiKey||!publicKeys().has(apiKey)){
+  logSecurityEvent('APIKEY_INVALIDA',origin,ip,userAgent);
+  return json(origin,401,{ok:false,error:'Clave pública no válida.'});
+ }
  const url=Deno.env.get('SUPABASE_URL')||'',secret=serverKey();
  if(!url||!secret)return json(origin,503,{ok:false,error:'El Tasador TPL no está configurado en el servidor.'});
 
+ const rawText = await request.text();
+ if(rawText.length > 25000){
+  logSecurityEvent('PAYLOAD_EXCESIVO',origin,ip,userAgent,{size: rawText.length});
+  return json(origin,413,{ok:false,error:'El tamaño del cuerpo supera el límite permitido (25KB).'});
+ }
  let body:any;
- try{body=await request.json();}catch{return json(origin,400,{ok:false,error:'Solicitud no válida.'});}
+ try{body=JSON.parse(rawText);}catch{return json(origin,400,{ok:false,error:'Solicitud JSON no válida.'});}
  const accessToken=String(body?.accessToken||''),sessionId=String(body?.sessionId||''),idempotencyKey=String(body?.idempotencyKey||'');
- if(!UUID_PATTERN.test(accessToken)||!UUID_PATTERN.test(sessionId))return json(origin,400,{ok:false,error:'La sesión de tasación no es válida.'});
+ if(!UUID_PATTERN.test(accessToken)||!UUID_PATTERN.test(sessionId)){
+  logSecurityEvent('UUID_SESION_INVALIDO',origin,ip,userAgent);
+  return json(origin,400,{ok:false,error:'La sesión de tasación no es válida.'});
+ }
  const accessTokenHash=await hashHex(accessToken),admin=createClient(url,secret,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
 
  let userId:string|null=null;
@@ -65,26 +95,35 @@ Deno.serve(async request=>{
   if(updated.error)return json(origin,502,{ok:false,error:'No fue posible registrar la decisión de precio.'});
   return json(origin,200,{ok:true,saved:true});
  }
- if(existingByAccess.data)return json(origin,200,{ok:true,result:valuationResponse(existingByAccess.data)});
+ if(existingByAccess.data){
+  const sig=await signIntegrity(existingByAccess.data.id, Number(existingByAccess.data.valor_mercado||0), Number(existingByAccess.data.venta_rapida||0), secret);
+  return json(origin,200,{ok:true,result:valuationResponse(existingByAccess.data, sig)});
+ }
  if(body?.action==='reopen')return json(origin,404,{ok:false,error:'No encontramos una tasación asociada a esta sesión.'});
  if(body?.level&&body.level!=='basica')return json(origin,403,{ok:false,error:'El informe Premium todavía no está habilitado.',code:'premium_not_enabled'});
  if(!UUID_PATTERN.test(idempotencyKey))return json(origin,400,{ok:false,error:'El identificador de la operación no es válido.'});
 
  const data=body?.data&&typeof body.data==='object'?body.data:{};
  const surface=Number(data.superficie_m2??data.superficie),enteredPrice=Number(data.precio_ingresado??data.precio);
- if(!Number.isFinite(surface)||surface<=0||!String(data.comuna||'').trim()||!Number.isFinite(enteredPrice)||enteredPrice<=0)return json(origin,400,{ok:false,error:'Comuna, superficie y precio son obligatorios para comprobar el valor.'});
+ if(!Number.isFinite(surface)||surface<=0||surface>1000000||!String(data.comuna||'').trim()||!Number.isFinite(enteredPrice)||enteredPrice<=0||enteredPrice>5000000000){
+  logSecurityEvent('DATOS_NEGOCIO_ANOMALOS',origin,ip,userAgent,{surface,enteredPrice,comuna:String(data.comuna||'')});
+  return json(origin,400,{ok:false,error:'Comuna, superficie (hasta 1.000.000 m2) y precio son obligatorios y deben estar dentro de los límites transaccionales permitidos.'});
+ }
  const propertyKey=await hashHex(JSON.stringify(propertyIdentityInput(data))),materialFingerprint=await hashHex(JSON.stringify(materialInput(data)));
  let propertyQuery=admin.from('tasaciones').select('id').eq('propiedad_key',propertyKey).eq('nivel','basica').neq('estado','rechazada_datos_insuficientes').limit(1);
  propertyQuery=userId?propertyQuery.eq('usuario_id',userId):propertyQuery.is('usuario_id',null);
  const propertyExisting=await propertyQuery;
  if(propertyExisting.data?.length)return json(origin,409,{ok:false,error:'Esta propiedad ya utilizó su tasación básica gratuita. Puedes reabrirla desde el mismo borrador o iniciar sesión para recuperar tu historial.',code:'free_valuation_used'});
 
- const abuseSalt=String(Deno.env.get('TASADOR_ABUSE_SALT')||''),forwarded=request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()||'',userAgent=request.headers.get('user-agent')||'';
+ const abuseSalt=String(Deno.env.get('TASADOR_ABUSE_SALT')||''),forwarded=ip;
  const abuseSignalHash=abuseSalt?await hashHex(`${abuseSalt}:${forwarded}:${userAgent.slice(0,160)}`):null;
  if(abuseSignalHash){
   const since=new Date(Date.now()-3600000).toISOString();
   const recent=await admin.from('consumos_tasador').select('id',{count:'exact',head:true}).eq('abuse_signal_hash',abuseSignalHash).gte('creado_en',since);
-  if((recent.count||0)>=8)return json(origin,429,{ok:false,error:'Se alcanzó el límite temporal de consultas. Intenta nuevamente más tarde.'});
+  if((recent.count||0)>=8){
+   logSecurityEvent('RATE_LIMIT_EXCEDIDO',origin,ip,userAgent,{count:recent.count});
+   return json(origin,429,{ok:false,error:'Se alcanzó el límite temporal de consultas (8/hora). Intenta nuevamente más tarde.'});
+  }
  }
 
  const configuration=await admin.from('configuracion_tasador').select('*').eq('estado','activa').single();
@@ -107,5 +146,6 @@ Deno.serve(async request=>{
   return json(origin,502,{ok:false,error:'No fue posible guardar la tasación.'});
  }
  const savedRow=Array.isArray(saved.data)?saved.data[0]:saved.data;
- return json(origin,200,{ok:true,accessToken,result:{id:savedRow?.id,status:result.status,valuationMode:result.valuationMode,backed:result.backed,officialResult:result.officialResult,range:result.range,pricePerM2:result.pricePerM2,difference:result.difference,position:result.position,confidence:result.confidence,confidenceScore:result.confidenceScore,coverage:result.coverage,comparableCount:result.comparableCount,strengths:result.strengths,cautions:result.cautions,explanation:result.explanation,confidenceIndex:result.confidenceIndex,auditTrail:result.auditTrail,proximityInfo:result.proximityInfo,algorithmVersion:configuration.data.version,createdAt:savedRow?.creada_en,legalNotice:LEGAL_NOTICE,reused:false}});
+ const sig=savedRow?.id?await signIntegrity(savedRow.id, Number(result.range.market||0), Number(result.range.quick||0), secret):'';
+ return json(origin,200,{ok:true,accessToken,result:{id:savedRow?.id,status:result.status,valuationMode:result.valuationMode,backed:result.backed,officialResult:result.officialResult,range:result.range,pricePerM2:result.pricePerM2,difference:result.difference,position:result.position,confidence:result.confidence,confidenceScore:result.confidenceScore,coverage:result.coverage,comparableCount:result.comparableCount,strengths:result.strengths,cautions:result.cautions,explanation:result.explanation,confidenceIndex:result.confidenceIndex,auditTrail:result.auditTrail,proximityInfo:result.proximityInfo,algorithmVersion:configuration.data.version,createdAt:savedRow?.creada_en,integritySignature:sig,legalNotice:LEGAL_NOTICE,reused:false}});
 });

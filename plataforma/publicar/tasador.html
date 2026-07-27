@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tasador Integral TPL · Tu Parcela Lista Business</title>
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-card: #151b2b;
+      --bg-input: #1e2638;
+      --border-color: #2a344d;
+      --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; padding: 2rem 1rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 2.5rem; }
+    header h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
+    header p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+    @media (min-width: 900px) { .grid { grid-template-columns: 1.2fr 0.8fr; } }
+    .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 1.5rem; }
+    .card h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; color: #60a5fa; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main); }
+    .form-group p.hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .form-control { width: 100%; padding: 0.75rem 1rem; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-size: 1rem; transition: border-color 0.2s; }
+    .form-control:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    .works-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; max-height: 380px; overflow-y: auto; padding-right: 0.5rem; }
+    .work-item { background: rgba(30, 38, 56, 0.5); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 8px; }
+    .work-item label { font-size: 0.8rem; font-weight: 500; display: block; margin-bottom: 0.3rem; }
+    .work-item input { width: 100%; padding: 0.4rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; color: white; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); margin-bottom: 1rem; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6); }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6); }
+    .result-box { background: rgba(16, 185, 129, 0.05); border: 2px solid var(--success); border-radius: 12px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem; }
+    .result-box h3 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .result-price { font-size: 2.5rem; font-weight: 900; color: var(--success); margin-bottom: 1rem; }
+    .price-range { display: flex; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; }
+    .price-range div span { display: block; font-size: 0.8rem; color: var(--text-muted); }
+    .price-range div strong { font-size: 1.2rem; color: #60a5fa; }
+    .breakdown-list { list-style: none; margin: 1.5rem 0; }
+    .breakdown-list li { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px dashed var(--border-color); font-size: 0.95rem; }
+    .badge-alert { background: rgba(59, 130, 246, 0.15); border-left: 4px solid var(--accent-color); padding: 1rem; border-radius: 6px; margin: 1rem 0; font-size: 0.9rem; display: flex; align-items: center; gap: 0.75rem; }
+    .toggle-section { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; background: var(--bg-input); padding: 1rem; border-radius: 10px; }
+    .toggle-section input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent-color); }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Tasador Integral TPL</h1>
+      <p>Valorización comercial canónica de terrenos, viviendas, fundaciones y 14 obras adicionales con Garantía Visual TPL Business.</p>
+    </header>
+
+    <div class="grid">
+      <!-- PANEL DE FORMULARIO -->
+      <div class="form-section">
+        <form id="tpl-form" onsubmit="return false;">
+          <!-- 1. TERRENO -->
+          <div class="card">
+            <h2>🌍 1. Información del Terreno</h2>
+            <div class="row-2">
+              <div class="form-group">
+                <label>Región</label>
+                <select class="form-control" id="region">
+                  <option value="Región Metropolitana">Región Metropolitana</option>
+                  <option value="Región de Valparaíso">Región de Valparaíso</option>
+                  <option value="Región de Los Lagos">Región de Los Lagos</option>
+                  <option value="Región de La Araucanía">Región de La Araucanía</option>
+                  <option value="Región del Biobío" selected>Región del Biobío</option>
+                  <option value="Región del Maule">Región del Maule</option>
+                  <option value="Región de O'Higgins">Región de O'Higgins</option>
+                  <option value="Región de Coquimbo">Región de Coquimbo</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Comuna</label>
+                <input type="text" class="form-control" id="comuna" value="Los Ángeles" placeholder="Ej. Villarrica, Pucón, Puerto Varas">
+              </div>
+            </div>
+            <div class="row-2">
+              <div class="form-group">
+                <label>Superficie Terreno (m²)</label>
+                <input type="number" class="form-control" id="superficie" value="5000" min="100" step="100">
+              </div>
+              <div class="form-group">
+                <label>Distancia a Ciudad / Ruta (km)</label>
+                <input type="number" class="form-control" id="distanceKm" value="12" min="0" step="0.5">
+              </div>
+            </div>
+            <div class="row-3">
+              <div class="form-group">
+                <label>Rol de Avalúo (Opcional)</label>
+                <input type="text" class="form-control" id="rol" placeholder="Ej. 1234-56">
+              </div>
+              <div class="form-group">
+                <label>Luz Eléctrica</label>
+                <select class="form-control" id="electricity">
+                  <option value="conectada">Empalme conectado</option>
+                  <option value="factible">Factibilidad</option>
+                  <option value="sin_luz">Sin luz</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Topografía</label>
+                <select class="form-control" id="topography">
+                  <option value="plana">Mayormente plana</option>
+                  <option value="suave">Pendiente suave</option>
+                  <option value="mixta">Mixta / quebrada</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. VIVIENDA -->
+          <div class="card">
+            <h2>🏠 2. Vivienda y Construcción</h2>
+            <div class="toggle-section">
+              <input type="checkbox" id="incluyeVivienda" checked onchange="toggleHouse(this.checked)">
+              <label for="incluyeVivienda" style="margin:0; font-size:1.1rem; cursor:pointer;">La propiedad incluye una vivienda construida</label>
+            </div>
+
+            <div id="house-fields">
+              <div class="row-2">
+                <div class="form-group">
+                  <label>Superficie Vivienda (m²)</label>
+                  <input type="number" class="form-control" id="areaCasa" value="120" min="0">
+                </div>
+                <div class="form-group">
+                  <label>Material Principal</label>
+                  <select class="form-control" id="materialCasa">
+                    <option value="madera">Construcción Madera ($270k/m²)</option>
+                    <option value="metalcon" selected>Sólida - Metalcon ($350k/m²)</option>
+                    <option value="albanileria">Sólida - Albañilería ($350k/m²)</option>
+                    <option value="hormigon">Sólida - Hormigón ($350k/m²)</option>
+                    <option value="mixta">Sólida - Mixta ($350k/m²)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row-3">
+                <div class="form-group">
+                  <label>Antigüedad (Años)</label>
+                  <input type="number" class="form-control" id="antiguedadCasa" value="4" min="0">
+                </div>
+                <div class="form-group">
+                  <label>Estado General</label>
+                  <select class="form-control" id="estadoCasa">
+                    <option value="excelente">Excelente / Nueva</option>
+                    <option value="bueno" selected>Bueno / Estándar</option>
+                    <option value="aceptable">Aceptable (-$2k/m²)</option>
+                    <option value="malo">Malo / Deteriorado (-$5k/m²)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Tipo Fundación</label>
+                  <select class="form-control" id="tipoFundacion">
+                    <option value="radier_terminado">Radier terminado ($20k/m²)</option>
+                    <option value="base_simple">Base simple / Pilotes ($5k/m²)</option>
+                    <option value="sin_fundacion">Sin fundación</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. OBRAS ADICIONALES -->
+          <div class="card">
+            <h2>🛠️ 3. Obras Adicionales (14 Categorías)</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Ingresa las cantidades o m² construidos para aplicar valorización comercial y depreciación protegida.</p>
+            <div class="works-grid">
+              <div class="work-item"><label>Quincho Abierto (m²)</label><input type="number" id="work_quincho_abierto" value="0" min="0"></div>
+              <div class="work-item"><label>Quincho Cerrado (m²)</label><input type="number" id="work_quincho_cerrado" value="0" min="0"></div>
+              <div class="work-item"><label>Terraza Sin Techo (m²)</label><input type="number" id="work_terraza_sin_techo" value="0" min="0"></div>
+              <div class="work-item"><label>Terraza Techada (m²)</label><input type="number" id="work_terraza_techada" value="15" min="0"></div>
+              <div class="work-item"><label>Bodega de Madera (m²)</label><input type="number" id="work_bodega_madera" value="0" min="0"></div>
+              <div class="work-item"><label>Bodega Sólida (m²)</label><input type="number" id="work_bodega_solida" value="12" min="0"></div>
+              <div class="work-item"><label>Galpón Simple (m²)</label><input type="number" id="work_galpon" value="0" min="0"></div>
+              <div class="work-item"><label>Cobertizo (m²)</label><input type="number" id="work_cobertizo" value="0" min="0"></div>
+              <div class="work-item"><label>Estacionamiento Tech. (m²)</label><input type="number" id="work_estacionamiento_techado" value="30" min="0"></div>
+              <div class="work-item"><label>Piscina de Fibra (m² agua)</label><input type="number" id="work_piscina_fibra" value="0" min="0"></div>
+              <div class="work-item"><label>Piscina Hormigón (m² agua)</label><input type="number" id="work_piscina_hormigon" value="32" min="0"></div>
+              <div class="work-item"><label>Tinaja Simple (Unidades)</label><input type="number" id="work_tinaja_simple" value="0" min="0"></div>
+              <div class="work-item"><label>Tinaja Equipada (Unidades)</label><input type="number" id="work_tinaja_equipada" value="1" min="0"></div>
+              <div class="work-item"><label>Portón Automático (Unid.)</label><input type="number" id="work_porton_automatico" value="1" min="0"></div>
+            </div>
+          </div>
+
+          <!-- 4. CARACTERÍSTICA DIFERENCIADORA -->
+          <div class="card">
+            <h2>✨ 4. Característica Diferenciadora (+10%)</h2>
+            <div class="form-group">
+              <label>Describe un atributo único (Mínimo 15 caracteres válidos)</label>
+              <input type="text" class="form-control" id="caracteristicaDiferenciadora" value="Hermosa vista panorámica al volcán y borde río natural" placeholder="Ej. Borde río privado, vista panorámica, bosque centenario de araucarias">
+              <p class="hint">Si es válido, aplica +10% una sola vez sobre el subtotal consolidado.</p>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="execValuation()">⚡ Calcular Tasación Comercial Integral TPL</button>
+        </form>
+      </div>
+
+      <!-- PANEL DE RESULTADOS Y ACCIONES COMERCIALES -->
+      <div class="result-section">
+        <div class="card" style="position: sticky; top: 2rem;">
+          <h2>📊 Informe Comercial TPL</h2>
+          
+          <div class="result-box">
+            <h3>Valor Recomendado TPL</h3>
+            <div class="result-price" id="res-price">$0</div>
+            <div class="price-range">
+              <div><span>Venta Rápida (-10%)</span><strong id="res-low">$0</strong></div>
+              <div><span>Venta Paciente (+10%)</span><strong id="res-high">$0</strong></div>
+            </div>
+          </div>
+
+          <div class="badge-alert" id="badge-box">
+            <span style="font-size:1.5rem;">⭐</span>
+            <div>
+              <strong>Publicación alineada con TPL</strong>
+              <div style="font-size:0.8rem; opacity:0.9;">El precio comercial calculado cumple los criterios de recomendación TPL.</div>
+            </div>
+          </div>
+
+          <h3 style="font-size:1rem; color:#60a5fa; margin-top:1.5rem;">Desglose de Subtotales</h3>
+          <ul class="breakdown-list">
+            <li><span>Valor Terreno Canónico:</span> <strong id="res-terreno">$0</strong></li>
+            <li><span>Vivienda Construida:</span> <strong id="res-casa">$0</strong></li>
+            <li><span>Fundaciones / Radier:</span> <strong id="res-fundacion">$0</strong></li>
+            <li><span>Obras Adicionales (14):</span> <strong id="res-obras">$0</strong></li>
+            <li style="color:#60a5fa;"><span>Bonificación Diferenciadora:</span> <strong id="res-bono">$0</strong></li>
+            <li style="border-top:1px solid var(--border-color); padding-top:0.8rem; font-size:1.1rem; color:var(--success);"><span>Valor Total Consolidado:</span> <strong id="res-total">$0</strong></li>
+          </ul>
+
+          <div style="margin-top:2rem;">
+            <button class="btn btn-success" onclick="initiateAction('publicar')">🚀 Publicar Propiedad con Borrador TPL</button>
+            <button class="btn btn-primary" onclick="initiateAction('informe')" style="margin-top: 0.8rem; background: var(--secondary); color: #fff;">📊 Solicitar Informe TPL Business</button>
+            <p style="font-size:0.75rem; text-align:center; color:var(--text-muted); margin-top:0.5rem;">Al hacer clic, el borrador canónico se generará con un UUID seguro (?draft=UUID) para el flujo de publicación o descarga del informe orientativo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Captura Comercial del Propietario -->
+  <div id="captureModal" class="modal-overlay hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; display:flex; align-items:center; justify-content:center;">
+    <div class="modal-content" style="background:var(--card-bg); padding:2rem; border-radius:12px; width:90%; max-width:450px; border:1px solid var(--border-color); box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+      <h3 style="margin-bottom:1rem; color:var(--primary); font-size:1.3rem;">🧑‍🤝‍🧑 Captura Comercial del Propietario</h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.2rem;">Ingresa tus datos para registrar la tasación canónica e iniciar el expediente oficial.</p>
+      <div style="margin-bottom:1rem;">
+        <label class="form-label">Nombre Completo:</label>
+        <input type="text" id="ownerName" class="form-input" placeholder="Ej: Juan Pérez" required>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label class="form-label">Correo Electrónico:</label>
+        <input type="email" id="ownerEmail" class="form-input" placeholder="ejemplo@correo.cl" required>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label class="form-label">Teléfono / WhatsApp:</label>
+        <input type="tel" id="ownerPhone" class="form-input" placeholder="+56 9 1234 5678" required>
+      </div>
+      <div style="margin-bottom:1.5rem;">
+        <label class="form-label">Plazo Estimado de Venta:</label>
+        <select id="ownerTimeframe" class="form-select">
+          <option value="inmediato">Venta inmediata / rápida (0 a 3 meses)</option>
+          <option value="paciente">Venta paciente (3 a 6 meses)</option>
+          <option value="evaluando">Solo evaluando / sin urgencia inmediata</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:1rem; justify-content:flex-end;">
+        <button class="btn ghost" onclick="closeCaptureModal()" style="padding:0.6rem 1rem;">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitCaptureForm()" style="padding:0.6rem 1.2rem;">Confirmar y Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../js/supabase-client.js"></script>
+  <script src="tpl-land-engine.js"></script>
+  <script src="tpl-location-service.js"></script>
+  <script src="tpl-house-engine.js"></script>
+  <script src="tpl-commercial-lifecycle.js"></script>
+  <script src="tpl-report-generator.js"></script>
+  <script>
+    let currentResult = null;
+    let pendingAction = null;
+    let ownerData = null;
+
+    function toggleHouse(show) {
+      document.getElementById('house-fields').classList.toggle('hidden', !show);
+      execValuation();
+    }
+
+    function execValuation() {
+      if (!window.TPLHouseEngine) {
+        alert('Motor canónico no disponible en entorno actual.');
+        return;
+      }
+
+      const obras = {};
+      const workIds = ['quincho_abierto','quincho_cerrado','terraza_sin_techo','terraza_techada','bodega_madera','bodega_solida','galpon','cobertizo','estacionamiento_techado','piscina_fibra','piscina_hormigon','tinaja_simple','tinaja_equipada','porton_automatico'];
+      workIds.forEach(id => {
+        const val = Number(document.getElementById('work_' + id).value) || 0;
+        if (val > 0) obras[id] = val;
+      });
+
+      const input = {
+        region: document.getElementById('region').value,
+        comuna: document.getElementById('comuna').value,
+        superficie: Number(document.getElementById('superficie').value) || 0,
+        distanceKm: Number(document.getElementById('distanceKm').value) || 0,
+        rol: document.getElementById('rol').value,
+        electricity: document.getElementById('electricity').value,
+        topography: document.getElementById('topography').value,
+        incluyeVivienda: document.getElementById('incluyeVivienda').checked,
+        areaCasa: Number(document.getElementById('areaCasa').value) || 0,
+        materialCasa: document.getElementById('materialCasa').value,
+        antiguedadCasa: Number(document.getElementById('antiguedadCasa').value) || 0,
+        estadoCasa: document.getElementById('estadoCasa').value,
+        tipoFundacion: document.getElementById('tipoFundacion').value,
+        obrasAdicionales: obras,
+        caracteristicaDiferenciadora: document.getElementById('caracteristicaDiferenciadora').value
+      };
+
+      currentResult = window.TPLHouseEngine.calculate(input);
+      renderResults(currentResult);
+    }
+
+    function fmt(num) {
+      return '$' + Number(num || 0).toLocaleString('es-CL');
+    }
+
+    function renderResults(res) {
+      document.getElementById('res-price').textContent = fmt(res.ideal);
+      document.getElementById('res-low').textContent = fmt(res.quick);
+      document.getElementById('res-high').textContent = fmt(res.patient);
+      document.getElementById('res-terreno').textContent = fmt(res.desglose.valorTerreno);
+      document.getElementById('res-casa').textContent = fmt(res.desglose.valorCasa);
+      document.getElementById('res-fundacion').textContent = fmt(res.desglose.valorFundacion);
+      document.getElementById('res-obras').textContent = fmt(res.desglose.sumaObrasAdicionales);
+      document.getElementById('res-bono').textContent = fmt(res.desglose.bonificaciónDiferenciadora);
+      document.getElementById('res-total').textContent = fmt(res.ideal);
+    }
+
+    function initiateAction(actionType) {
+      if (!currentResult) execValuation();
+      pendingAction = actionType;
+      if (!ownerData) {
+        document.getElementById('captureModal').classList.remove('hidden');
+      } else {
+        executePendingAction();
+      }
+    }
+
+    function closeCaptureModal() {
+      document.getElementById('captureModal').classList.add('hidden');
+      pendingAction = null;
+    }
+
+    function submitCaptureForm() {
+      const name = document.getElementById('ownerName').value.trim();
+      const email = document.getElementById('ownerEmail').value.trim();
+      const phone = document.getElementById('ownerPhone').value.trim();
+      const timeframe = document.getElementById('ownerTimeframe').value;
+      if (!name || !email || !phone) {
+        alert('Por favor completa todos los campos de contacto.');
+        return;
+      }
+      ownerData = { name, email, phone, timeframe };
+      document.getElementById('captureModal').classList.add('hidden');
+      executePendingAction();
+    }
+
+    async function executePendingAction() {
+      if (!currentResult) execValuation();
+      const draftUUID = 'tpl_' + (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15) + '-' + Date.now());
+      const secureToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      const leadRef = 'TPL-REF-' + Math.floor(10000 + Math.random() * 90000);
+
+      const draftPayload = {
+        id: draftUUID,
+        secureToken: secureToken,
+        leadRef: leadRef,
+        createdAt: new Date().toISOString(),
+        owner: ownerData,
+        valuation: currentResult,
+        input: {
+          region: document.getElementById('region').value,
+          comuna: document.getElementById('comuna').value,
+          superficie: Number(document.getElementById('superficie').value) || 0,
+          incluyeVivienda: document.getElementById('incluyeVivienda').checked
+        }
+      };
+
+      // Req 3 & 6 & 7: Intentar guardar en Supabase con cliente único (o en localStorage temporal con token seguro)
+      try {
+        const client = typeof window.getSupabaseClient === 'function' ? window.getSupabaseClient() : null;
+        if (client && client.from) {
+          client.from('tasaciones_viviendas_tpl').insert([draftPayload]).catch(() => {});
+        }
+      } catch (_) {}
+
+      // Recuperación temporal en interfaz (sin ser fuente canónica per req 6)
+      try {
+        localStorage.setItem('tpl_draft_' + draftUUID, JSON.stringify(draftPayload));
+      } catch (_) {}
+
+      if (pendingAction === 'publicar') {
+        const url = `index.html?draft=${draftUUID}&token=${secureToken}&price=${currentResult.ideal}&source=tasador_integral_tpl`;
+        window.location.href = url;
+      } else if (pendingAction === 'informe') {
+        if (window.TPLReportGenerator && typeof window.TPLReportGenerator.openReport === 'function') {
+          window.TPLReportGenerator.openReport(currentResult, {
+            leadRef: leadRef,
+            nombre: ownerData.name,
+            email: ownerData.email,
+            telefono: ownerData.phone,
+            plazo: ownerData.timeframe,
+            ubicacion: document.getElementById('comuna').value + ', ' + document.getElementById('region').value
+          }, draftPayload.input);
+        } else {
+          alert('Generador de informe no disponible en este momento.');
+        }
+      }
+      pendingAction = null;
+    }
+
+    function goToPublisher() {
+      initiateAction('publicar');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      execValuation();
+    });
+  </script>
+</body>
+</html>

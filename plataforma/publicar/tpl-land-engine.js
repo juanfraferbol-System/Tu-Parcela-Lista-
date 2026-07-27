@@ -13,11 +13,13 @@
       Object.freeze({ maxKm: 25, multiplier: 4, label: 'Más de 15 hasta 25 km' }),
       Object.freeze({ maxKm: 35, multiplier: 3, label: 'Más de 25 hasta 35 km' }),
       Object.freeze({ maxKm: 45, multiplier: 2, label: 'Más de 35 hasta 45 km' }),
-      Object.freeze({ maxKm: Infinity, multiplier: 1, label: 'Más de 45 km' })
+      Object.freeze({ maxKm: 60, multiplier: 1.5, label: 'Más de 45 hasta 60 km' }),
+      Object.freeze({ maxKm: Infinity, multiplier: 1, label: 'Más de 60 km' })
     ]),
     quickFactor: 0.90,
     patientFactor: 1.10,
-    minimumAdjustmentFactor: 0.10
+    minimumAdjustmentFactor: 0.10,
+    internalMarketFactor: 0.75
   });
 
   const normalize = value => String(value || '')
@@ -73,8 +75,24 @@
     return null;
   }
 
+  // Regla comercial interna. No se incorpora a `adjustments` para evitar
+  // exponerla en la interfaz pública o en el desglose comercial del informe.
+  function internalMarketRule(region, comuna){
+    const r = normalize(region);
+    const c = normalize(comuna);
+    const exempt = r.includes('metropolitana') ||
+      r.includes('valparaiso') ||
+      r.includes('antofagasta') ||
+      c.includes('puerto varas');
+    return {
+      factor: exempt ? 1 : RULES.internalMarketFactor,
+      applied: !exempt,
+      rule: exempt ? 'mercado_exento' : 'ajuste_interno_mercado'
+    };
+  }
+
   function calculate(input){
-    const area = Math.max(0, Number(input.area) || 0);
+    const area = Math.max(0, Number(input.area || input.superficie || input.areaTerreno) || 0);
     if(!area) return { error:'La superficie debe ser mayor que cero.' };
     const distanceKm = Number(input.distanceKm);
     if(!Number.isFinite(distanceKm) || distanceKm < 0) return { error:'No fue posible determinar la distancia a una ciudad principal.' };
@@ -138,7 +156,9 @@
 
     const totalPct = adjustments.reduce((sum,item) => sum + item.pct, 0);
     const appliedFactor = Math.max(RULES.minimumAdjustmentFactor, 1 + totalPct);
-    const ideal = roundPrice(commercialBase * appliedFactor);
+    const valueBeforeInternalMarketRule = commercialBase * appliedFactor;
+    const internalMarket = internalMarketRule(input.region, input.comuna);
+    const ideal = roundPrice(valueBeforeInternalMarketRule * internalMarket.factor);
     const quick = roundPrice(ideal * RULES.quickFactor);
     const patient = roundPrice(ideal * RULES.patientFactor);
     const asking = Number(input.asking) || 0;
@@ -151,12 +171,15 @@
       cityDistance:distance, distanceMultiplier:distance.multiplier,
       nearestCity: input.nearestCity ? { name:input.nearestCity.name, distanceKm:Number(distanceKm.toFixed(1)) } : null,
       adjustments, totalPct, adjustmentFactor:appliedFactor,
+      internalPricing:{ marketFactor:internalMarket.factor, applied:internalMarket.applied, rule:internalMarket.rule },
       score:Math.max(35,Math.min(95,55 + Math.min(30, adjustments.length * 3))),
       coverage:'reglas_tpl_propietario_v1', source:'tpl_land_engine_local', persisted:false,
       method:'tpl-land-engine-v1',
-      cautions: distanceKm > 45 ? ['Para distancias superiores a 45 km se utiliza multiplicador ×1 hasta definir un tramo adicional.'] : []
+      cautions: distanceKm > 60 ? ['Para distancias superiores a 60 km se aplica multiplicador ×1.'] : []
     };
   }
 
-  global.TPLLandEngine = Object.freeze({ RULES, calculateSurfaceBase, distanceRule, calculate });
-})(window);
+  const exportObj = Object.freeze({ RULES, calculateSurfaceBase, distanceRule, internalMarketRule, calculate });
+  if (typeof module !== 'undefined' && module.exports) module.exports = exportObj;
+  global.TPLLandEngine = exportObj;
+})(typeof window !== 'undefined' ? window : globalThis);

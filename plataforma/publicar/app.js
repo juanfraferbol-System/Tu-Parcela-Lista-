@@ -566,8 +566,8 @@ function calculateLandRuleValuation({asking,area,location,region}){
  const modal=$('#valuationModal'),loading=$('#valuationLoading'),results=$('#valuationResults'),errorBox=$('#valuationModalError');
  modal.hidden=false;modal.setAttribute('aria-hidden','false');document.body.classList.add('valuation-modal-open');
  loading.hidden=false;results.hidden=true;errorBox.hidden=true;$('#valuationSignals').innerHTML='';$('#valuationThinkingBar').style.width='4%';
- const messages=['Revisando ubicación y superficie…','Buscando propiedades comparables…','Analizando acceso, agua y electricidad…','Evaluando atributos y documentación…','Calculando estrategias de venta…','Preparando tu recomendación comercial…'];
- const signals=['Ubicación identificada','Superficie incorporada','Atributos considerados','Comparables analizados'];
+ const messages=['Revisando ubicación y superficie…','Calculando valor base por superficie…','Analizando acceso, agua y electricidad…','Evaluando atributos y documentación…','Calculando estrategias de venta…','Preparando tu recomendación comercial…'];
+ const signals=['Ubicación identificada','Superficie incorporada','Atributos considerados','Reglas TPL aplicadas'];
   let i=0,finished=false;
   const timer=setInterval(()=>{i++;$('#valuationThinkingText').textContent=messages[Math.min(i,messages.length-1)];$('#valuationThinkingBar').style.width=Math.min(96,12+i*17)+'%';if(i<=signals.length)$('#valuationSignals').insertAdjacentHTML('beforeend',`<span>✓ ${signals[i-1]}</span>`);},620);
   try{
@@ -679,7 +679,86 @@ async function submitTplCommercialForm(e){
 }
 function runValuation(){openValuationModal();}
 
- function updatePreview(){const type=form.tipo.value||state.type;$('#previewType').textContent=type==='casa'?'Casa':propertyLabel();$('#previewTitle').textContent=$('#tituloEditable').value||state.generated.title||'Tu propiedad aparecerá aquí';$('#previewLocation').textContent=[val('localidad'),val('comuna'),val('region')].filter(Boolean).join(', ')||'Ubicación por completar';$('#previewPrice').textContent=money(val('precioVenta'));const tplBadge=$('#previewTplValueBadge');const backed=Boolean(state.valuation?.persisted)&&state.valuation?.selectedStrategy==='quick'&&number(val('precioVenta'))===Number(state.valuation?.quick||0);if(tplBadge)tplBadge.hidden=!backed;$('#previewDescription').textContent=$('#descripcionEditable').value||state.generated.description||'La descripción comercial aparecerá aquí.';const hasPhoto=Boolean(photoUrl(state.photos[0],'large'));const photo=$('#previewPhoto'),placeholder=$('#previewPlaceholder'),wrap=$('#previewImageWrap');if(hasPhoto){photo.src=photoUrl(state.photos[0],'large');photo.hidden=false;placeholder.hidden=true;wrap.classList.remove('preview-image-empty');}else{photo.removeAttribute('src');photo.hidden=true;placeholder.hidden=false;wrap.classList.add('preview-image-empty');}const features=type==='casa'?[number(val('casaSuperficie'))&&formatDigits(val('casaSuperficie'))+' m²',val('habitaciones')&&val('habitaciones')+' dormitorios',val('banos')&&val('banos')+' baños',val('estadoCasa')]:[number(val('superficie'))&&formatDigits(val('superficie'))+' m²',val('topografia'),val('rol'),val('agua')];$('#previewFeatures').innerHTML=features.filter(Boolean).map(x=>`<span>${escapeHTML(x)}</span>`).join('');}
+ function updatePreview(){
+  const type=form.tipo.value||state.type;
+  $('#previewType').textContent=type==='casa'?'Casa':propertyLabel();
+  $('#previewTitle').textContent=$('#tituloEditable').value||state.generated.title||'Tu propiedad aparecerá aquí';
+  $('#previewLocation').textContent=[val('localidad'),val('comuna'),val('region')].filter(Boolean).join(', ')||'Ubicación por completar';
+  
+  const asking = number(val('precioVenta'));
+  $('#previewPrice').textContent = money(val('precioVenta'));
+  
+  const tplBadge = $('#previewTplValueBadge');
+  let advEl = document.getElementById('precioAdvertenciaTpl');
+  if(!advEl) {
+    const inputEl = document.getElementById('precioVenta');
+    if(inputEl && inputEl.parentNode && inputEl.parentNode.parentNode) {
+      advEl = document.createElement('div');
+      advEl.id = 'precioAdvertenciaTpl';
+      advEl.style.cssText = 'font-size:0.8rem; margin-top:4px; font-weight:500;';
+      inputEl.parentNode.parentNode.appendChild(advEl);
+    }
+  }
+
+  if (state.valuation && state.valuation.ideal && asking > 0) {
+    const valorRecomendadoTPL = Number(state.valuation.ideal);
+    // REGLA COMERCIAL INMUTABLE TPL: Umbrales exactos respecto al valor recomendado TPL
+    // Si la publicación es inferior o igual a valorRecomendadoTPL (incluso venta rápida/rebaja), conserva el reconocimiento (diferenciaPct <= 5).
+    const diferenciaPct = ((asking - valorRecomendadoTPL) / valorRecomendadoTPL) * 100;
+    let badgeText = '⭐ Publicación alineada con TPL';
+    let advText = `✓ Precio dentro de rango canónico (${Math.abs(diferenciaPct).toFixed(1)}% de diferencia).`;
+    let color = 'var(--success, #22c55e)';
+    let categoria = 'alineada_tpl';
+    
+    if (diferenciaPct > 25) {
+      badgeText = '🛑 Sobreprecio severo y posible baja rotación';
+      advText = `⚠️ Advertencia: ${diferenciaPct.toFixed(1)}% sobre el valor referencial TPL.`;
+      color = '#ef4444';
+      categoria = 'sobreprecio_severo';
+    } else if (diferenciaPct > 15) {
+      badgeText = '⚠️ Sobreprecio moderado respecto de TPL';
+      advText = `⚠️ Advertencia: ${diferenciaPct.toFixed(1)}% sobre el valor referencial TPL.`;
+      color = '#f97316';
+      categoria = 'sobreprecio_moderado';
+    } else if (diferenciaPct > 5) {
+      badgeText = '🤝 Negociación abierta con margen moderado';
+      advText = `ℹ️ ${diferenciaPct.toFixed(1)}% sobre la referencia canónica TPL.`;
+      color = '#3b82f6';
+      categoria = 'negociacion_abierta';
+    } else {
+      // diferenciaPct <= 5% (incluye precios inferiores al recomendado o venta rápida)
+      badgeText = '⭐ Publicación alineada con TPL';
+      advText = `✓ Precio alineado con TPL (${diferenciaPct <= 0 ? 'inferior o igual al recomendado' : 'hasta +5% de margen'}).`;
+      color = 'var(--success, #22c55e)';
+      categoria = 'alineada_tpl';
+    }
+    state.clasificacionVisualPrecio = categoria;
+    
+    if (tplBadge) {
+      tplBadge.hidden = false;
+      tplBadge.textContent = badgeText;
+      tplBadge.style.backgroundColor = color;
+      tplBadge.style.color = '#fff';
+      tplBadge.style.padding = '4px 8px';
+      tplBadge.style.borderRadius = '6px';
+    }
+    if (advEl) {
+      advEl.textContent = advText;
+      advEl.style.color = color;
+    }
+  } else {
+    if (tplBadge) tplBadge.hidden = true;
+    if (advEl) advEl.textContent = '';
+  }
+
+  $('#previewDescription').textContent=$('#descripcionEditable').value||state.generated.description||'La descripción comercial aparecerá aquí.';
+  const hasPhoto=Boolean(photoUrl(state.photos[0],'large'));
+  const photo=$('#previewPhoto'),placeholder=$('#previewPlaceholder'),wrap=$('#previewImageWrap');
+  if(hasPhoto){photo.src=photoUrl(state.photos[0],'large');photo.hidden=false;placeholder.hidden=true;wrap.classList.remove('preview-image-empty');}
+  else{photo.removeAttribute('src');photo.hidden=true;placeholder.hidden=false;wrap.classList.add('preview-image-empty');}
+  const features=type==='casa'?[number(val('casaSuperficie'))&&formatDigits(val('casaSuperficie'))+' m²',val('habitaciones')&&val('habitaciones')+' dormitorios',val('banos')&&val('banos')+' baños',val('estadoCasa')]:[number(val('superficie'))&&formatDigits(val('superficie'))+' m²',val('topografia'),val('rol'),val('agua')];
+  $('#previewFeatures').innerHTML=features.filter(Boolean).map(x=>`<span>${escapeHTML(x)}</span>`).join('');
+}
 const URGENCY_CONFIG={
  baja:{label:'Urgencia baja',publicLabel:'Sin apuro',ownerPlan:'prop_base',brokerPlan:'corr_canje',score:10,protocol:'Seguimiento normal, informe mensual y optimización orgánica.',strategy:'Puedes probar el rango superior del valor referencial y observar la respuesta del mercado.'},
  leve:{label:'Urgencia leve',publicLabel:'Quiero comenzar a moverla',ownerPlan:'prop_impulso',brokerPlan:'corr_impulso',score:35,protocol:'Revisión semanal, campaña inicial y alerta si el interés es bajo.',strategy:'Conviene equilibrar precio y velocidad para aumentar consultas sin sacrificar valor.'},
