@@ -1,27 +1,16 @@
-PARTNER TPL - ETAPA 3
+CAMBIOS
+- Elimina visualmente Comenzar mi busqueda, banner amarillo Partner y Publicar una propiedad del hero.
+- Elimina el recuadro grafico explicativo del hero.
+- Deja presupuesto inmediatamente debajo del texto principal.
+- Reduce el espacio antes de filtros y tarjetas de parcelas.
+- Evita que primero aparezca el header viejo y luego el nuevo.
+- Confirma y unifica plataforma/partners/index.html con el burger global.
+- En movil agrega Parcelas al lado de Publicar y mantiene burger a la derecha.
 
-OBJETIVO
-- Publicar u ocultar la landing básica desde TPL Business.
-- Mostrar actividades, etapas y pagos en la landing pública.
-- Generar un currículum profesional automático que se puede guardar como PDF.
-- Mantener TPL Studio como siguiente paso comercial.
-
-ORDEN DE INSTALACIÓN
-1. Ejecuta en Supabase:
-   supabase/migrations/202607280003_partner_landing_curriculum.sql
-2. Reemplaza:
-   plataforma/partners/perfil.html
-   plataforma/partners/curriculum.html
-   plataforma/tpl-business/tpl-business-service.js
-   plataforma/tpl-business/tpl-business.js
-3. Inicia sesión en TPL Business con el mismo correo del Partner aprobado.
-4. Abre “Mi perfil profesional”.
-5. Prueba “Publicar perfil”, “Ver mi perfil público” y “Ver y guardar currículum PDF”.
-
-NOTA
-El botón “Guardar como PDF” abre la impresión del navegador. Selecciona “Guardar como PDF”.
-No se activa ningún plan pagado ni se confirma ningún pago en esta etapa.
-
-CORRECCIÓN 2026-07-28
-La migración ya no depende de tpl_business_tiene_acceso(uuid). La autorización se valida directamente mediante tpl_business_membresias activas o rol administrador.
-Si la versión anterior falló dentro de BEGIN, vuelve a ejecutar este archivo completo.
+INSTALACION
+1. Copiar css, js y plataforma sobre la raiz del proyecto.
+2. Copiar APLICAR-EN-INDEX.ps1 dentro de una carpeta temporal en la raiz o cambiar la ruta si fuese necesario.
+3. En index.html cambiar las referencias a:
+   css/tpl-site-shell.css?v=20260728-3
+   js/tpl-site-shell.js?v=20260728-3
+4. Subir a Vercel y hacer Ctrl+F5.
