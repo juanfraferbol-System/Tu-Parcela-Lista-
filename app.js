@@ -251,12 +251,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function scrollToParcelasResults() {
-    const target = document.getElementById("search-heading-card") || DOM.parcelasAnchor || DOM.parcelasContainer;
     let tries = 0;
     const run = () => {
       tries += 1;
       const firstCard = DOM.parcelasContainer?.querySelector(".parcela-card");
-      if (target) scrollTo(target);
+      const mapButton = DOM.btnMapView || document.getElementById("btn-map-view");
+      const target = mapButton || document.getElementById("search-heading-card") || DOM.parcelasAnchor || DOM.parcelasContainer;
+
+      if (target) {
+        const header = document.querySelector(".tpl-site-header, .navbar");
+        const locationBar = document.querySelector(".location-filter-bar");
+        const headerHeight = header?.getBoundingClientRect().height || 72;
+        const stickyLocationHeight = locationBar && getComputedStyle(locationBar).position === "sticky"
+          ? locationBar.getBoundingClientRect().height
+          : 0;
+        const visibleGap = 12;
+        const top = target.getBoundingClientRect().top + window.scrollY - headerHeight - stickyLocationHeight - visibleGap;
+        window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      }
+
       if (firstCard) {
         firstCard.classList.add("tpl-result-focus");
         return;
@@ -264,6 +277,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (tries < 8) setTimeout(run, 90);
     };
     requestAnimationFrame(() => requestAnimationFrame(run));
+  }
+
+  function applyManualParcelFilter() {
+    // Un filtro manual debe trabajar sobre el catálogo completo, no únicamente
+    // sobre las cinco recomendaciones generadas por la búsqueda de presupuesto.
+    state.recommendationActive = false;
+    state.parcelasRenderLimit = Number.POSITIVE_INFINITY;
+    refresh();
+    scrollToParcelasResults();
   }
 
   function getPendingProjectChange() {
@@ -2450,7 +2472,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (ev.key === "Enter") handleBudgetSearch(ev);
     }, true);
 
-    DOM.searchBtn?.addEventListener("click", () => { state.activeFilters.text = DOM.searchInput?.value || ""; refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    DOM.searchBtn?.addEventListener("click", () => { state.activeFilters.text = DOM.searchInput?.value || ""; applyManualParcelFilter(); });
     DOM.searchInput?.addEventListener("keydown", e => { if (e.key === "Enter") DOM.searchBtn?.click(); });
     document.querySelectorAll('a[href="#parcelas-anchor"], a[href="index.html#parcelas-anchor"]').forEach(link => {
       link.addEventListener("click", () => {
@@ -2470,8 +2492,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!activate) {
         state.activeFilters.gps = false;
         DOM.filterGps.classList.remove("active");
-        refresh();
-        (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        applyManualParcelFilter();
         return;
       }
       if (!navigator.geolocation) { showFriendlyMessage("Tu navegador no permite ubicación. Puedes usar los otros filtros."); return; }
@@ -2480,16 +2501,15 @@ document.addEventListener("DOMContentLoaded", () => {
         state.activeFilters.gps = true;
         DOM.filterGps.classList.add("active");
         showFriendlyMessage("Ordenamos las parcelas por distancia. En cada tarjeta verás kilómetros y tiempo estimado en vehículo.");
-        refresh();
-        (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        applyManualParcelFilter();
       }, () => showFriendlyMessage("No pudimos obtener tu ubicación. Revisa los permisos del navegador."));
     });
-    DOM.filterEconomic?.addEventListener("click", () => { state.activeFilters.economic = !state.activeFilters.economic; DOM.filterEconomic.classList.toggle("active", state.activeFilters.economic); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
-    DOM.filterSize?.addEventListener("click", () => { state.activeFilters.size = !state.activeFilters.size; DOM.filterSize.classList.toggle("active", state.activeFilters.size); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
-    DOM.filterPayment?.addEventListener("click", () => { state.activeFilters.payment = !state.activeFilters.payment; DOM.filterPayment.classList.toggle("active", state.activeFilters.payment); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
-    DOM.filterWater?.addEventListener("click", () => { state.activeFilters.water = !state.activeFilters.water; DOM.filterWater.classList.toggle("active", state.activeFilters.water); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
-    DOM.filterRiver?.addEventListener("click", () => { state.activeFilters.river = !state.activeFilters.river; DOM.filterRiver.classList.toggle("active", state.activeFilters.river); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
-    DOM.filterNative?.addEventListener("click", () => { state.activeFilters.native = !state.activeFilters.native; DOM.filterNative.classList.toggle("active", state.activeFilters.native); refresh(); (DOM.parcelasContainer || DOM.parcelasAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    DOM.filterEconomic?.addEventListener("click", () => { state.activeFilters.economic = !state.activeFilters.economic; DOM.filterEconomic.classList.toggle("active", state.activeFilters.economic); applyManualParcelFilter(); });
+    DOM.filterSize?.addEventListener("click", () => { state.activeFilters.size = !state.activeFilters.size; DOM.filterSize.classList.toggle("active", state.activeFilters.size); applyManualParcelFilter(); });
+    DOM.filterPayment?.addEventListener("click", () => { state.activeFilters.payment = !state.activeFilters.payment; DOM.filterPayment.classList.toggle("active", state.activeFilters.payment); applyManualParcelFilter(); });
+    DOM.filterWater?.addEventListener("click", () => { state.activeFilters.water = !state.activeFilters.water; DOM.filterWater.classList.toggle("active", state.activeFilters.water); applyManualParcelFilter(); });
+    DOM.filterRiver?.addEventListener("click", () => { state.activeFilters.river = !state.activeFilters.river; DOM.filterRiver.classList.toggle("active", state.activeFilters.river); applyManualParcelFilter(); });
+    DOM.filterNative?.addEventListener("click", () => { state.activeFilters.native = !state.activeFilters.native; DOM.filterNative.classList.toggle("active", state.activeFilters.native); applyManualParcelFilter(); });
     function revealParcelaSidebar(extraOffset = 140) {
       const sidebar = document.querySelector(".parcelas-sidebar");
       const target = sidebar || DOM.parcelasAnchor;
@@ -2516,16 +2536,13 @@ document.addEventListener("DOMContentLoaded", () => {
       state.activeFilters.commune = item.dataset.commune;
       DOM.regionDropdown.classList.remove("active");
       document.querySelector(".parcelas-sidebar")?.classList.remove("comunas-open");
-      refresh();
-      // Al elegir una comuna, se baja un poco y se deja visible el inicio de resultados.
-      setTimeout(() => revealParcelaSidebar(105), 80);
+      applyManualParcelFilter();
     });
     DOM.filterClear?.addEventListener("click", () => {
       state.activeFilters = { text: "", gps: false, economic: false, size: false, payment: false, water: false, river: false, native: false, commune: "all" };
       if (DOM.searchInput) DOM.searchInput.value = "";
       document.querySelectorAll(".filter-btn.active").forEach(b => b.classList.remove("active"));
-      refresh();
-      setTimeout(() => scrollTo(DOM.parcelasContainer || DOM.parcelasAnchor), 80);
+      applyManualParcelFilter();
     });
 
     DOM.btnMapView?.addEventListener("click", () => {
