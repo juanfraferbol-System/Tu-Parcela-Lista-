@@ -532,6 +532,45 @@ function calculateLandRuleValuation({asking,area,location,region}){
  }
 
 
+ function enrichWithUniversalEngine(res, inputs) {
+  if (!res || res.error) return res;
+  if (window.TPLValuationEngine && window.TPLValuationEngine.calcularTasacionTPL) {
+    const coreInput = {
+      superficieTerrenoM2: inputs.landArea || inputs.area || 0,
+      region: inputs.region || '',
+      comuna: inputs.comuna || '',
+      distanciaReferenciaKm: inputs.distanceKm || null,
+      tieneCasa: inputs.type === 'casa' || (inputs.type === 'parcela_con_casa') || (Number(inputs.houseArea) > 0),
+      tipoConstruccion: inputs.materialPrincipal || 'madera',
+      superficieCasaM2: inputs.houseArea || 0,
+      antiguedadCasa: inputs.antiguedad || 0,
+      estadoCasa: inputs.estadoConservacion || 'excelente',
+      tipoFundacion: inputs.fundacion || 'radier_terminado',
+      mejoras: inputs.obrasAdicionales || {},
+      origen: 'publicar_parcela'
+    };
+    const univ = window.TPLValuationEngine.calcularTasacionTPL(coreInput);
+    if (univ) {
+      res.valorTplTotal = univ.valorTplTotal;
+      res.valorMercadoTotal = univ.valorMercadoTotal;
+      res.valorMercadoM2 = univ.valorMercadoM2;
+      res.valorComercialRecomendado = univ.valorComercialRecomendado;
+      res.ideal = univ.valorComercialRecomendado || res.ideal;
+      res.quick = univ.precioVentaRapida || res.quick;
+      res.patient = univ.precioVentaPaciente || res.patient;
+      res.reference = res.ideal;
+      res.low = res.quick;
+      res.high = res.patient;
+      res.diff = inputs.asking ? ((inputs.asking - res.ideal) / res.ideal * 100) : 0;
+      res.posicionMercado = univ.posicionMercado;
+      res.confianzaMercado = univ.confianzaMercado;
+      res.versionIndice = univ.versionIndice;
+      res.fechaCalculo = univ.fechaCalculo;
+    }
+  }
+  return res;
+ }
+
  async function calculateValuation(){
   const inputs=valuationInputs();
   if(!inputs.area)return {error:'Indica primero la superficie de la propiedad para poder calcular una referencia.'};
@@ -541,15 +580,15 @@ function calculateLandRuleValuation({asking,area,location,region}){
   if(inputs.type==='casa'){
    const house=window.TPLHouseValuation?.calculate?.(houseValuationInput(inputs));
    if(!house||house.error)return house||{error:'El motor de tasación de casas no pudo iniciar.'};
-   return {...house,coverage:'reglas_construccion',fieldCoverage:coverage,source:'motor_casa_local',persisted:false,cautions:house.cautions||[house.note]};
+   return enrichWithUniversalEngine({...house,coverage:'reglas_construccion',fieldCoverage:coverage,source:'motor_casa_local',persisted:false,cautions:house.cautions||[house.note]}, inputs);
   }
   const land=await calculateLandValuation(inputs);
   if(land.error)return land;
-  if(inputs.type==='parcela')return {...land,fieldCoverage:coverage};
+  if(inputs.type==='parcela')return enrichWithUniversalEngine({...land,fieldCoverage:coverage}, inputs);
   const house=window.TPLHouseValuation?.calculate?.(houseValuationInput(inputs,0));
   if(!house||house.error)return {error:house?.error||'Faltan antecedentes de la vivienda para tasar la parcela con casa.'};
   const ideal=Number(land.ideal)+Number(house.ideal),quick=Number(land.quick)+Number(house.quick),patient=Number(land.patient)+Number(house.patient);
-  return {
+  return enrichWithUniversalEngine({
    quick,ideal,patient,reference:ideal,low:quick,high:patient,
    diff:inputs.asking?((inputs.asking-ideal)/ideal*100):0,asking:inputs.asking,area:inputs.landArea,houseArea:inputs.houseArea,
    location:inputs.location,region:inputs.region,score:Math.min(Number(land.score||0),Number(house.score||0)),
@@ -557,7 +596,7 @@ function calculateLandRuleValuation({asking,area,location,region}){
    valuationId:land.valuationId||null,components:{land,house},
    cautions:[...(land.cautions||[]),'La vivienda se estimó mediante reglas de construcción; el terreno se calculó por separado.'],
    method:`composite:${land.method}+${house.method}`
-  };
+  }, inputs);
  }
 
  async function openValuationModal(){
@@ -589,27 +628,40 @@ function calculateLandRuleValuation({asking,area,location,region}){
 function closeValuationModal(){window.TPLValuationCRM?.event?.(state.valuationSessionId,'tasador_cerrado',{selectedStrategy:state.valuation?.selectedStrategy||null});const modal=$('#valuationModal');modal.hidden=true;modal.setAttribute('aria-hidden','true');document.body.classList.remove('valuation-modal-open');}
 function valuationCard(key,label,price,time,description,recommended=false){return `<article class="valuation-option ${recommended?'recommended':''}"><div class="valuation-option-top"><small>${label}</small>${recommended?'<span>RECOMENDADO POR TPL</span>':''}</div><strong>${money(price)}</strong><p>${description}</p><div class="valuation-sale-time"><small>TIEMPO ORIENTATIVO DE VENTA</small><b>${time}</b></div><button type="button" class="btn ${recommended?'primary':'ghost'}" data-use-valuation="${key}">Usar este precio</button></article>`;}
  function renderValuationModal(r){
- const current=r.asking?`<div class="valuation-current"><span>Tu precio informado</span><strong>${money(r.asking)}</strong><em>${Math.abs(r.diff).toFixed(1)}% ${r.diff>=0?'sobre':'bajo'} la recomendación TPL</em></div>`:'';
-  const confidence=r.score>=80?'Alta':r.score>=55?'Media':'Inicial';
+  const current=r.asking?`<div class="valuation-current"><span>Tu precio informado</span><strong>${money(r.asking)}</strong><em>${Math.abs(r.diff).toFixed(1)}% ${r.diff>=0?'sobre':'bajo'} la recomendación TPL</em></div>`:'';
+  const confidence=r.confianzaMercado||(r.score>=80?'Alta':r.score>=55?'Media':'Inicial');
   const sourceText=r.source==='tpl_land_engine_local'?'Estimación calculada con las reglas territoriales TPL definidas para el publicador.':r.persisted?'Tasación registrada con antecedentes de Supabase.':'Estimación preliminar de respaldo; requiere revisión antes de aprobar la publicación.';
   const cautions=(r.cautions||[]).filter(Boolean).slice(0,3);
   const components=r.components?`<div class="valuation-components"><span>Terreno: <strong>${money(r.components.land.ideal)}</strong></span><span>Vivienda: <strong>${money(r.components.house.ideal)}</strong></span></div>`:'';
   const advisoryCta = `<div class="tpl-advisory-cta-card"><div class="tpl-advisory-icon">🛡️</div><div class="tpl-advisory-content"><h4>¿Quieres entender mejor este precio y negociar con más seguridad?</h4><p>Genera un Informe Profesional TPL con el valor referencial, los factores principales de la propiedad y tres estrategias posibles de venta.</p><button type="button" class="btn primary tpl-advisory-btn" data-open-tpl-report><span>✦</span> Generar Informe Profesional en PDF ➔</button></div></div>`;
+  const marketBlock = `<div class="tpl-market-summary-box" style="background:#f8fafc;border:1px solid #e2e8f0;padding:14px;border-radius:10px;margin:14px 0;text-align:left;">
+    <div style="font-size:0.8rem;color:#64748b;font-weight:700;margin-bottom:6px;">COMPARACIÓN DE MERCADO TPL (ETAPA 8)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.85rem;">
+      <div><span>Valor TPL:</span> <strong style="color:#0f172a;">${money(r.valorTplTotal || r.ideal)}</strong></div>
+      <div><span>Mercado Comunal:</span> <strong style="color:#0f172a;">${r.valorMercadoTotal ? money(r.valorMercadoTotal) + ' (' + money(r.valorMercadoM2) + '/m²)' : 'Promedio comunal aún no disponible'}</strong></div>
+      <div><span>Valor Recomendado:</span> <strong style="color:#1e3a8a;">${money(r.valorComercialRecomendado || r.ideal)}</strong></div>
+      <div><span>Posición estimada:</span> <strong style="color:#10b981;">${r.posicionMercado || 'Alineada con el mercado'}</strong></div>
+      <div><span>Nivel de confianza:</span> <strong>${confidence}</strong></div>
+      <div><span>Fecha del índice:</span> <small>${r.versionIndice || 'IM-TPL-2026-07'}</small></div>
+    </div>
+  </div>`;
   $('#valuationResults').hidden=false;
-  $('#valuationResults').innerHTML=`<div class="valuation-result-heading"><p class="eyebrow">Análisis completado</p><h3>Encontramos tres estrategias posibles</h3><p>${escapeHTML(r.location||'Tu propiedad')} · ${formatDigits(r.area)} m²${r.houseArea?` de terreno + ${formatDigits(r.houseArea)} m² construidos`:''}</p></div><div class="valuation-private-summary"><div><small>CONFIANZA DE LA ESTIMACIÓN</small><strong>${confidence}</strong></div><p>${escapeHTML(sourceText)} La cobertura del formulario es ${escapeHTML(r.fieldCoverage?.label||'suficiente')}.</p></div>${components}${current}<div class="valuation-options">${valuationCard('quick','Venta rápida',r.quick,'1 a 3 meses','Mayor competitividad para aumentar consultas y acelerar decisiones.')}${valuationCard('ideal','Precio ideal',r.ideal,'3 a 6 meses','El mejor equilibrio estimado entre valor y probabilidad de venta.',true)}${valuationCard('patient','Venta paciente',r.patient,'6 a 12 meses o más','Para propietarios con menor urgencia que pueden esperar mejores condiciones.')}</div>${advisoryCta}${cautions.length?`<ul class="valuation-cautions">${cautions.map(item=>`<li>${escapeHTML(item)}</li>`).join('')}</ul>`:''}<p class="valuation-disclaimer">Estimación comercial orientativa para apoyar la publicación. No reemplaza una tasación bancaria o pericial. Tu Parcela Lista no muestra públicamente su fórmula, valores base ni porcentajes internos.</p>`;
-}
-function applyValuationPrice(key){
- if(!state.valuation)return;const price=state.valuation[key];if(!price)return;
-  $('#precioVenta').value=formatDigits(price);state.valuation.selectedStrategy=key;state.valuation.selectedPrice=price;window.TPLValuationCRM?.select?.(state.valuationSessionId,{strategy:key,price,asking:state.valuation.asking,ideal:state.valuation.ideal});
+  $('#valuationResults').innerHTML=`<div class="valuation-result-heading"><p class="eyebrow">Análisis completado</p><h3>Encontramos tres estrategias posibles</h3><p>${escapeHTML(r.location||'Tu propiedad')} · ${formatDigits(r.area)} m²${r.houseArea?` de terreno + ${formatDigits(r.houseArea)} m² construidos`:''}</p></div><div class="valuation-private-summary"><div><small>CONFIANZA DE LA ESTIMACIÓN</small><strong>${confidence}</strong></div><p>${escapeHTML(sourceText)} La cobertura del formulario es ${escapeHTML(r.fieldCoverage?.label||'suficiente')}.</p></div>${components}${marketBlock}${current}<div class="valuation-options">${valuationCard('quick','Venta rápida',r.quick,'1 a 3 meses','Mayor competitividad para aumentar consultas y acelerar decisiones.')}${valuationCard('ideal','Precio ideal',r.ideal,'3 a 6 meses','El mejor equilibrio estimado entre valor y probabilidad de venta.',true)}${valuationCard('patient','Venta paciente',r.patient,'6 a 12 meses o más','Para propietarios con menor urgencia que pueden esperar mejores condiciones.')}</div>${advisoryCta}${cautions.length?`<ul class="valuation-cautions">${cautions.map(item=>`<li>${escapeHTML(item)}</li>`).join('')}</ul>`:''}<p class="valuation-disclaimer">Estimación comercial orientativa para apoyar la publicación. No reemplaza una tasación bancaria o pericial. Tu Parcela Lista no muestra públicamente su fórmula, valores base ni porcentajes internos.</p>`;
+ }
+ function applyValuationPrice(key){
+  if(!state.valuation)return;const price=state.valuation[key];if(!price)return;
+  $('#precioVenta').value=formatDigits(price);state.valuation.selectedStrategy=key;state.valuation.selectedPrice=price;
+  state.estrategia_precio=key==='quick'?'rapida':key==='patient'?'paciente':'recomendada';
+  window.TPLValuationCRM?.select?.(state.valuationSessionId,{strategy:key,price,asking:state.valuation.asking,ideal:state.valuation.ideal});
   if(state.type==='parcela'&&state.valuation.persisted){
    window.TPLValuationService?.saveDecision?.(parcelValuationPayload(valuationInputs()),key,price).catch(error=>console.warn('No fue posible registrar la decisión del tasador.',error));
   }
- generateCopy();updatePreview();saveDraft();
+  generateCopy();updatePreview();saveDraft();
   const backedCopy=key==='quick'&&state.valuation.persisted?'<div class="valuation-backed-confirmation"><strong>✓ Valor respaldado por Tu Parcela Lista</strong><span>La publicación mostrará el distintivo Precio recomendado mientras conserve este valor.</span></div>':key==='quick'?'<div class="valuation-backed-confirmation is-preliminary"><strong>Estimación preliminar seleccionada</strong><span>El equipo TPL deberá revisarla antes de activar un distintivo público.</span></div>':'';
   $('#valuationResult').hidden=false;$('#valuationResult').innerHTML=`<p class="eyebrow">Estrategia seleccionada</p><h3>${key==='quick'?'Venta rápida':key==='patient'?'Venta paciente':'Precio ideal recomendado'}</h3>${backedCopy}<div class="valuation-metrics"><div><small>Precio elegido</small><strong>${money(price)}</strong></div><div><small>Tiempo orientativo</small><strong>${key==='quick'?'1 a 3 meses':key==='patient'?'6 a 12+ meses':'3 a 6 meses'}</strong></div><div><small>Referencia TPL</small><strong>${money(state.valuation.ideal)}</strong></div></div><button type="button" class="btn ghost" id="reviewValuationAgain">Revisar las 3 alternativas</button>`;
- closeValuationModal();
- setTimeout(()=>$('#reviewValuationAgain')?.addEventListener('click',()=>{renderValuationModal(state.valuation);$('#valuationLoading').hidden=true;$('#valuationResults').hidden=false;$('#valuationModal').hidden=false;$('#valuationModal').setAttribute('aria-hidden','false');document.body.classList.add('valuation-modal-open');}),0);
-}
+  closeValuationModal();
+  setTimeout(()=>$('#reviewValuationAgain')?.addEventListener('click',()=>{renderValuationModal(state.valuation);$('#valuationLoading').hidden=true;$('#valuationResults').hidden=false;$('#valuationModal').hidden=false;$('#valuationModal').setAttribute('aria-hidden','false');document.body.classList.add('valuation-modal-open');}),0);
+ }
 function openTplCommercialModal(){
   if(!state.valuation)return;
   const r=state.valuation;
@@ -905,5 +957,47 @@ function bind(){
  window.addEventListener('beforeunload',()=>{window.TPLValuationCRM?.markAbandoned?.(state.valuationSessionId,{form:dataObject(),reason:'salida_sin_publicar'});try{localStorage.setItem(DRAFT_KEY,JSON.stringify({...dataObject(),completed:[...state.completed],current:state.current}));}catch{}});
 }
 form.addEventListener('change',e=>{if(['negociacionPrecio','luz','agua','aguaCasa','acceso','cierre','porton','sanitarioCasa'].includes(e.target?.name||e.target?.id))updateNegotiationModule();});
-try{initLocations();initMap();bind();restoreDraft();updateUrgency();updateNegotiationModule();initObserver();updateProgress();generateCopy();updatePreview();}catch(err){console.error(err);$('#startupError').hidden=false;$('#startupError').textContent='El publicador no pudo iniciar correctamente. Recarga con Ctrl + F5 y revisa que todos los archivos estén dentro de plataforma/publicar/.';}
+function restoreFromUrlParams() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const tasacionCod = params.get('tasacion');
+    if (!tasacionCod && !params.get('superficie')) return;
+    if (params.get('region')) {
+      const reg = params.get('region');
+      fillCommunes(reg, params.get('comuna') || '');
+      const regEl = $('#region');
+      if (regEl) regEl.value = reg;
+    }
+    if (params.get('comuna')) {
+      const comEl = $('#comuna');
+      if (comEl) comEl.value = params.get('comuna');
+    }
+    if (params.get('superficie')) {
+      const sup = params.get('superficie');
+      const supEl = $('#superficie');
+      if (supEl) supEl.value = formatDigits(sup);
+      const casaTerEl = $('#casaTerreno');
+      if (casaTerEl) casaTerEl.value = formatDigits(sup);
+    }
+    if (params.get('precio')) {
+      const p = params.get('precio');
+      const pEl = $('#precioVenta');
+      if (pEl) pEl.value = formatDigits(p);
+    }
+    if (params.get('tipo')) {
+      setType(params.get('tipo'));
+      const radio = form.querySelector(`input[name="tipo"][value="${params.get('tipo')}"]`);
+      if (radio) radio.checked = true;
+    }
+    if (tasacionCod) {
+      console.log('Publicación iniciada con tasación previa:', tasacionCod);
+    }
+    generateCopy();
+    updatePreview();
+    saveDraft();
+  } catch(e) {
+    console.warn('Error leyendo parámetros de URL de tasación:', e);
+  }
+}
+try{initLocations();initMap();bind();restoreDraft();restoreFromUrlParams();updateUrgency();updateNegotiationModule();initObserver();updateProgress();generateCopy();updatePreview();}catch(err){console.error(err);$('#startupError').hidden=false;$('#startupError').textContent='El publicador no pudo iniciar correctamente. Recarga con Ctrl + F5 y revisa que todos los archivos estén dentro de plataforma/publicar/.';}
 })();

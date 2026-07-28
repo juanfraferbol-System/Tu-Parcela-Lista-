@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="robots" content="index,follow">
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -195,6 +195,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <!-- Google Ads Tracking -->
 
+<link rel="stylesheet" href="../../css/tpl-site-shell.css?v=20260728-2">
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -240,6 +241,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="actions">
           <a href="#" id="btn-whatsapp" class="btn btn-whatsapp" target="_blank">WhatsApp</a>
           <a href="#contacto" id="btn-email" class="btn btn-primary">Solicitar Cotización</a>
+          <a href="#" id="btn-curriculum" class="btn btn-primary">Ver currículum</a>
         </div>
         
         <div class="grid-info">
@@ -259,6 +261,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </ul>
           </div>
         </div>
+      </div>
+
+      <div class="card" id="services-card">
+        <h2 style="color: var(--primary); margin-top: 0;">Cómo trabaja</h2>
+        <div class="grid-info">
+          <div class="info-block"><h3>Actividades</h3><ul id="list-activities"></ul></div>
+          <div class="info-block"><h3>Etapas del servicio</h3><ul id="list-stages"></ul></div>
+          <div class="info-block"><h3>Modalidades de pago</h3><ul id="list-payments"></ul></div>
+        </div>
+        <p id="payment-summary" style="margin:24px 0 0;color:var(--text-muted);"></p>
       </div>
 
       <div class="card" id="gallery-card">
@@ -287,10 +299,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       return number.slice(0, 15);
     }
     async function loadProfile() {
-      const slug = new URLSearchParams(location.search).get('id')?.trim();
+      const params = new URLSearchParams(location.search);
+      const slug = (params.get('slug') || params.get('id') || '').trim();
       if (!slug || !/^[a-z0-9-]{3,100}$/i.test(slug)) return showError();
       try {
-        const fields = 'nombre_comercial,descripcion_servicios,tipo_servicio,especialidades,region,comunas_atendidas,anos_experiencia,disponibilidad,logo_url,galeria_urls,slug,rating,trabajos_realizados,whatsapp,correo,plan_activo';
+        const fields = 'nombre_comercial,nombre_responsable,descripcion_servicios,tipo_servicio,especialidades,actividades,etapas_servicio,modalidades_pago,porcentaje_anticipo,garantia_servicio,region,comunas_atendidas,anos_experiencia,disponibilidad,emite_factura,logo_url,galeria_urls,slug,rating,trabajos_realizados,whatsapp,correo,plan_activo,curriculum_publicado';
         const response = await fetch(`${SUPABASE_URL}/rest/v1/partners_publicos?slug=eq.${encodeURIComponent(slug)}&select=${fields}&limit=1`, {
           headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
         });
@@ -322,6 +335,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       else emailButton.style.display = 'none';
       populateList('list-coverage', [partner.region, ...(partner.comunas_atendidas || [])]);
       populateList('list-specialties', partner.especialidades || []);
+      populateList('list-activities', partner.actividades || []);
+      populateList('list-stages', partner.etapas_servicio || []);
+      populateList('list-payments', partner.modalidades_pago || []);
+      const paymentParts = [];
+      if (Number(partner.porcentaje_anticipo || 0) > 0) paymentParts.push(`Anticipo habitual: ${Number(partner.porcentaje_anticipo)}%`);
+      if (partner.garantia_servicio) paymentParts.push(`Garantía: ${partner.garantia_servicio}`);
+      if (partner.emite_factura) paymentParts.push('Emite factura');
+      document.getElementById('payment-summary').textContent = paymentParts.join(' · ');
+      const curriculumButton = document.getElementById('btn-curriculum');
+      if (partner.curriculum_publicado !== false) curriculumButton.href = `/plataforma/partners/curriculum.html?slug=${encodeURIComponent(partner.slug)}`;
+      else curriculumButton.style.display = 'none';
       document.getElementById('exp-years').textContent = `${Number(partner.anos_experiencia || 0)} años de experiencia`;
       document.getElementById('jobs-done').textContent = `${Number(partner.trabajos_realizados || 0)} trabajos derivados por TPL`;
       const gallery = (partner.galeria_urls || []).map(safeImageUrl).filter(Boolean).slice(0, 12);
@@ -343,5 +367,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
     loadProfile();
   </script>
+<script defer src="../../js/tpl-site-shell.js?v=20260728-2"></script>
 </body>
 </html>

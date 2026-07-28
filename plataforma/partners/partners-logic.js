@@ -7,6 +7,29 @@ const MAX_GALLERY = 5;
 const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 const form = document.getElementById('partner-form');
+const PLAN_PRICES = { partner: 0, ideal: 29990, empresa: 69990, premium: 120000 };
+
+function addRepeatableRow(containerId, placeholder, value = '') {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const row = document.createElement('div');
+  row.className = 'repeatable-row';
+  row.innerHTML = `<span class="row-number"></span><input type="text" maxlength="140" placeholder="${placeholder}"><button type="button" aria-label="Eliminar">×</button>`;
+  row.querySelector('input').value = value;
+  row.querySelector('button').addEventListener('click', () => { row.remove(); renumber(container); });
+  container.appendChild(row);
+  renumber(container);
+}
+function renumber(container) { [...container.querySelectorAll('.row-number')].forEach((node, i) => node.textContent = i + 1); }
+function repeatableValues(id) { return [...document.querySelectorAll(`#${id} input`)].map(input => input.value.trim()).filter(Boolean); }
+function paymentValues() { return [...document.querySelectorAll('#payment-options input:checked')].map(input => input.value); }
+document.getElementById('add-activity')?.addEventListener('click', () => addRepeatableRow('activities-list','Ej: Construcción de radier'));
+document.getElementById('add-service-stage')?.addEventListener('click', () => addRepeatableRow('service-stages-list','Ej: Visita y evaluación inicial'));
+addRepeatableRow('activities-list','Ej: Construcción de radier');
+addRepeatableRow('service-stages-list','Ej: Visita y evaluación inicial');
+addRepeatableRow('service-stages-list','Ej: Presupuesto y planificación');
+addRepeatableRow('service-stages-list','Ej: Ejecución y entrega final');
+
 const submitButton = document.getElementById('btn-submit');
 const statusBox = document.getElementById('form-status');
 
@@ -107,7 +130,12 @@ function buildPayload() {
     plan_solicitado: document.querySelector('input[name="plan"]:checked')?.value || 'partner',
     acepta_terminos: document.getElementById('acepta_terminos').checked,
     acepta_privacidad: document.getElementById('acepta_privacidad').checked,
-    autoriza_contacto: document.getElementById('autoriza_contacto').checked
+    autoriza_contacto: document.getElementById('autoriza_contacto').checked,
+    actividades: repeatableValues('activities-list'),
+    etapas_servicio: repeatableValues('service-stages-list'),
+    modalidades_pago: paymentValues(),
+    porcentaje_anticipo: Number(document.getElementById('porcentaje_anticipo')?.value || 0),
+    garantia_servicio: document.getElementById('garantia_servicio')?.value || 'No informada'
   };
 }
 
@@ -117,7 +145,22 @@ for (const card of document.querySelectorAll('.plan-card')) {
     card.classList.add('active');
     const radio = card.querySelector('input[type="radio"]');
     if (radio) radio.checked = true;
+    document.querySelectorAll('.plan-card').forEach(item => item.classList.toggle('is-paying', Number(PLAN_PRICES[item.querySelector('input')?.value] || 0) > 0 && item.classList.contains('active')));
   });
+}
+
+async function startFlowPayment(result, payload) {
+  const plan = payload.plan_solicitado;
+  const amount = PLAN_PRICES[plan] || 0;
+  if (!amount) return false;
+  const response = await fetch('/api/flow-create', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ amount, email: payload.correo, subject: `Plan Partner TPL ${plan}`, leadId: result.id, returnUrl: `${location.origin}/plataforma/partners/index.html?pago=retorno&postulacion=${encodeURIComponent(result.codigo)}` })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.redirectUrl) throw new Error(data.error?.message || data.error || 'El pago con Flow aún no está configurado en el servidor. Tu postulación quedó guardada y TPL podrá contactarte.');
+  location.href = data.redirectUrl;
+  return true;
 }
 
 form?.addEventListener('submit', async event => {
@@ -130,7 +173,11 @@ form?.addEventListener('submit', async event => {
 
   try {
     const { logo, gallery } = validateFormFiles();
-    const result = await callRpc('tpl_postular_partner', { p_payload: buildPayload() });
+    const payload = buildPayload();
+    if (!payload.actividades.length) throw new Error('Agrega al menos una actividad que puedas realizar.');
+    if (!payload.etapas_servicio.length) throw new Error('Agrega al menos una etapa de tu servicio.');
+    if (!payload.modalidades_pago.length) throw new Error('Selecciona al menos una modalidad de pago.');
+    const result = await callRpc('tpl_postular_partner', { p_payload: payload });
     const applicationId = result.id;
     const uploadToken = result.upload_token;
 
@@ -147,6 +194,8 @@ form?.addEventListener('submit', async event => {
       p_logo_path: logoPath,
       p_galeria_paths: galleryPaths
     });
+
+    if (await startFlowPayment(result, payload)) return;
 
     form.style.display = 'none';
     const success = document.getElementById('success-msg');

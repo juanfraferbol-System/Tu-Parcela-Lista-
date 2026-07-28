@@ -333,6 +333,28 @@
     </section>`;
   }
 
+
+  function renderPartnerPanel(partner) {
+    if (!partner?.isPartner) return '';
+    const publicUrl = partner.publicSlug ? `/plataforma/partners/perfil.html?slug=${encodeURIComponent(partner.publicSlug)}` : '';
+    const curriculumUrl = partner.publicSlug ? `/plataforma/partners/curriculum.html?slug=${encodeURIComponent(partner.publicSlug)}` : '';
+    const items = [
+      ['Talento o actividad', partner.talent || 'Pendiente'],
+      ['Plan activo', partner.plan || 'partner'],
+      ['Anticipo habitual', `${Number(partner.depositPercent || 0)}%`],
+      ['Garantía', partner.warranty || 'No informada']
+    ];
+    const chips = (values, empty) => Array.isArray(values) && values.length
+      ? `<div class="tpl-tool-list">${values.map(value => `<span>${esc(value)}</span>`).join('')}</div>`
+      : `<p class="tpl-inline-note">${esc(empty)}</p>`;
+    return `<section class="tpl-section tpl-partner-section" id="perfil-partner">
+      ${sectionHeading('Mi negocio', 'Perfil profesional Partner', 'Esta información alimenta tu landing, currículum y futuras recomendaciones de oportunidades.')}
+      <div class="tpl-account-card">${items.map(([label,value]) => `<div>${icon('check')}<span><small>${esc(label)}</small><strong>${esc(value)}</strong></span></div>`).join('')}</div>
+      <div class="tpl-health-card"><div class="tpl-health-list"><h3>Actividades que ofrezco</h3>${chips(partner.activities,'Aún no hay actividades registradas.')}</div><div class="tpl-health-list"><h3>Etapas de mi servicio</h3>${chips(partner.serviceStages,'Aún no hay etapas registradas.')}</div><div class="tpl-health-list"><h3>Modalidades de pago</h3>${chips(partner.paymentMethods,'Aún no hay modalidades registradas.')}</div></div>
+      <div class="tpl-landing-actions">${publicUrl ? `<a class="tpl-button" href="${esc(publicUrl)}" target="_blank" rel="noopener">Ver mi perfil público</a><button class="tpl-button tpl-button-secondary" type="button" data-partner-visibility="${partner.publicVisible ? 'false' : 'true'}">${partner.publicVisible ? 'Ocultar perfil' : 'Publicar perfil'}</button>` : '<span class="tpl-inline-note">Tu perfil público todavía está pendiente.</span>'}${curriculumUrl ? `<a class="tpl-button tpl-button-secondary" href="${esc(curriculumUrl)}" target="_blank" rel="noopener">Ver y guardar currículum PDF</a>` : '<span class="tpl-inline-note">Currículum pendiente de generación.</span>'}<a class="tpl-button tpl-button-secondary" href="/plataforma/studio/index.html?origen=tpl-business-partner">Impulsar mi negocio con TPL Studio</a></div>
+    </section>`;
+  }
+
   function renderRequests(requests) {
     return `<section class="tpl-section tpl-requests-section" id="solicitudes">
       ${sectionHeading('Seguimiento', config.copy.requestsTitle, 'Revisa las mejoras y activaciones que has solicitado al equipo comercial.')}
@@ -357,13 +379,14 @@
     const project = data.project;
     const account = data.account;
     const user = state.portalSession.user || {};
+    const isPartner = Boolean(data.partner?.isPartner);
     setDocumentTitle(account.name || project.name);
 
     root.innerHTML = `
       ${state.adminPreview ? '<aside class="tpl-admin-preview" role="status">Vista administrativa segura. Estás revisando la experiencia del cliente; las solicitudes están deshabilitadas.</aside>' : ''}
       <header class="tpl-header">
         <a class="tpl-brand" href="#inicio" aria-label="TPL Business, Mi Proyecto"><span class="tpl-brand-mark">TPL</span><span><strong>${esc(config.brand.name)}</strong><small>${esc(config.brand.eyebrow)}</small></span></a>
-        <nav aria-label="Navegación principal"><a href="#landing">Mi Landing</a><a href="#resultados">Resultados</a><a href="#crecimiento">Cómo crecer</a><a href="#solicitudes">Solicitudes</a></nav>
+        <nav aria-label="Navegación principal">${isPartner ? '<a href="#perfil-partner">Mi perfil</a>' : '<a href="#landing">Mi Landing</a>'}<a href="#resultados">Resultados</a><a href="#crecimiento">Cómo crecer</a><a href="#solicitudes">Solicitudes</a></nav>
         <div class="tpl-account-area">
           ${projectSelector()}
           <button class="tpl-account-button" type="button" data-account-menu aria-expanded="false">${icon('user')}<span>${esc(user.name || user.email || 'Mi cuenta')}</span>${icon('menu')}</button>
@@ -376,14 +399,15 @@
       <main id="contenido">
         <section class="tpl-hero" id="inicio">
           <div class="tpl-orb tpl-orb-one"></div><div class="tpl-orb tpl-orb-two"></div>
-          <div class="tpl-hero-copy"><span class="tpl-eyebrow"><i></i>${esc(config.copy.heroEyebrow)}</span><h1>${esc(account.name || project.name)}</h1><p>${esc(config.copy.heroSubtitle)}</p><a class="tpl-button" href="#landing">${esc(config.copy.heroCta)}</a></div>
+          <div class="tpl-hero-copy"><span class="tpl-eyebrow"><i></i>${esc(isPartner ? 'Tu centro profesional' : config.copy.heroEyebrow)}</span><h1>${esc(account.name || project.name)}</h1><p>${esc(isPartner ? 'Administra tu perfil, servicios, oportunidades y herramientas para conseguir nuevos clientes.' : config.copy.heroSubtitle)}</p><a class="tpl-button" href="${isPartner ? '#perfil-partner' : '#landing'}">${esc(isPartner ? 'Ver mi perfil profesional' : config.copy.heroCta)}</a></div>
           <div class="tpl-hero-visual"><div class="tpl-project-card">
             <div class="tpl-project-card-head"><span>${esc(project.name)}</span><i>${esc(statusLabel(project.status))}</i></div>
             <div class="tpl-property-visual"><span class="tpl-property-line wide"></span><span class="tpl-property-line"></span><div class="tpl-property-hill"></div><div class="tpl-property-sun"></div></div>
             <div class="tpl-project-card-foot"><span><i></i>Proyecto ${esc(statusLabel(project.status).toLowerCase())}</span><strong>${esc(project.propertyCode || '')}</strong></div>
           </div></div>
         </section>
-        ${renderLanding(data.landing)}
+        ${renderPartnerPanel(data.partner)}
+        ${isPartner ? '' : renderLanding(data.landing)}
         ${renderStatus(data.modules)}
         ${renderMetrics(data.metrics)}
         ${renderHealth(data.health)}
@@ -644,6 +668,22 @@
 
     const growth = target.closest('[data-growth-group]');
     if (growth) return openGrowthDialog(growth.dataset.growthGroup, growth);
+
+    const visibilityButton = target.closest('[data-partner-visibility]');
+    if (visibilityButton) {
+      visibilityButton.disabled = true;
+      try {
+        await service.setPartnerVisibility(visibilityButton.dataset.partnerVisibility === 'true');
+        const selected = state.project?.project?.code || state.project?.project?.codigo || null;
+        state.project = await service.getProject(selected, Boolean(state.portalSession?.isAdmin));
+        renderApp();
+        showToast(visibilityButton.dataset.partnerVisibility === 'true' ? 'Perfil publicado correctamente.' : 'Perfil ocultado correctamente.');
+      } catch (error) {
+        visibilityButton.disabled = false;
+        showToast(error.message || 'No fue posible actualizar tu perfil.', true);
+      }
+      return;
+    }
 
     const moduleButton = target.closest('[data-request-module]');
     if (moduleButton) return submitRequest({ type: 'modulo', moduleCode: moduleButton.dataset.requestModule }, moduleButton);

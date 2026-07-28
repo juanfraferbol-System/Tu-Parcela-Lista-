@@ -42,18 +42,17 @@
 
   async function getProject(projectCode, adminPreview) {
     const safeCode = String(projectCode || '').trim().slice(0, 120) || null;
-    if (adminPreview) {
-      return rpc(
-        'tpl_business_vista_cliente_admin',
-        { p_proyecto_codigo: safeCode },
-        'No fue posible abrir la vista administrativa.'
-      );
+    const data = adminPreview
+      ? await rpc('tpl_business_vista_cliente_admin', { p_proyecto_codigo: safeCode }, 'No fue posible abrir la vista administrativa.')
+      : await rpc('tpl_business_proyecto_actual', { p_proyecto_codigo: safeCode }, 'No fue posible cargar tu proyecto.');
+    if (data?.project?.id) {
+      try {
+        data.partner = await rpc('tpl_business_partner_contexto', { p_proyecto_id: data.project.id }, '');
+      } catch (_) {
+        data.partner = { isPartner: false };
+      }
     }
-    return rpc(
-      'tpl_business_proyecto_actual',
-      { p_proyecto_codigo: safeCode },
-      'No fue posible cargar tu proyecto.'
-    );
+    return data;
   }
 
   async function requestActivation(input) {
@@ -71,12 +70,22 @@
     return rpc('tpl_business_registrar_cierre_sesion', {}, 'No fue posible registrar el cierre de sesión.');
   }
 
+  async function setPartnerVisibility(visible) {
+    return rpc('tpl_partner_configurar_publicacion', { p_visible: Boolean(visible) }, 'No fue posible actualizar la publicación del perfil.');
+  }
+
+  async function getMyPartnerProfile() {
+    return rpc('tpl_partner_mi_perfil', {}, 'No fue posible cargar tu perfil Partner.');
+  }
+
   window.TPLBusinessService = Object.freeze({
     readableError,
     sanitizeLocalUrl,
     getPortalSession,
     getProject,
     requestActivation,
+    setPartnerVisibility,
+    getMyPartnerProfile,
     logLogout
   });
 })(window);

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta name="robots" content="noindex,nofollow,noarchive">
+<meta content="noindex,nofollow,noarchive" name="robots"/>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -9,449 +10,588 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-WK4M33H4');</script>
 <!-- End Google Tag Manager -->
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRM Moderación - Tu Parcela Lista</title>
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- CRM CSS -->
-  <link rel="stylesheet" href="/plataforma/crm/crm.css?v=20260722-3">
-  <link rel="stylesheet" href="/plataforma/crm/crm-business.css?v=20260724-4">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CRM Moderación - Tu Parcela Lista</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- CRM CSS -->
+<link href="/plataforma/crm/crm.css?v=20260722-3" rel="stylesheet"/>
+<link href="/plataforma/crm/crm-business.css?v=20260724-4" rel="stylesheet"/>
 <style>
 .launch-panel{margin:24px 0;padding:24px;border:1px solid #dbe5ef;border-radius:18px;background:#f8fbfd}.launch-panel-heading{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.launch-panel-heading h2{margin:4px 0 6px}.launch-panel-heading p{margin:0;color:#64748b}.eyebrow{text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;font-weight:800;color:#0f766e}.launch-status{padding:12px;border-radius:10px;background:#fff7ed;color:#9a3412}.launch-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:20px 0}.launch-metrics article{padding:16px;border:1px solid #e2e8f0;border-radius:12px;background:white}.launch-metrics strong{display:block;font-size:1.6rem;color:#0f172a}.launch-metrics span{font-size:.82rem;color:#64748b}.launch-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}.launch-actions a,.launch-actions button{padding:9px 12px;border:1px solid #cbd5e1;border-radius:9px;background:white;color:#0f3d65;text-decoration:none;font-weight:700}.launch-actions button:disabled{opacity:.5}.launch-grid{display:grid;grid-template-columns:1fr 1.25fr;gap:16px}.launch-panel h3{margin:0 0 12px;font-size:1rem}.launch-empty{text-align:center;padding:24px;color:#64748b}.landing-engine-status{min-height:1.5rem;color:#475569;font-weight:700}.landing-engine-status.success{color:#047857}.landing-engine-status.error{color:#b91c1c}@media(max-width:900px){.launch-grid{grid-template-columns:1fr}.launch-panel-heading{display:block}.launch-panel-heading button{margin-top:12px}}
 </style></head>
 <body>
 <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WK4M33H4"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-WK4M33H4" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+<div id="login-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f8fafc;">
+<div style="background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; max-width: 400px; width: 100%;">
+<img alt="TPL" src="../../assets/logo-tu-parcela-lista.png" style="height: 60px; margin-bottom: 20px;"/>
+<h2 style="color: #003f7a; margin-top: 0;">Administración CRM</h2>
+<p style="color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">Ingresa tus credenciales de administrador.</p>
+<form id="login-form">
+<input id="login-email" placeholder="Correo Electrónico" required="" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; font-family: 'Inter'; box-sizing: border-box;" type="email"/>
+<input id="login-password" placeholder="Contraseña" required="" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; font-family: 'Inter'; box-sizing: border-box;" type="password"/>
+<button class="btn-primary-submit" id="btn-login" style="width: 100%;" type="submit">Ingresar</button>
+</form>
+<div id="login-msg" style="margin-top: 15px; font-size: 0.85rem; color: #ef4444;"></div>
+</div>
+</div>
+<!-- Dashboard Principal -->
+<div class="app-container" id="app-container" style="display: none;">
+<aside class="sidebar">
+<div class="sidebar-brand">TPL Admin</div>
+<nav class="sidebar-nav">
+<div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:10px 15px; font-weight:800; letter-spacing:0.05em;">Operativa</div>
+<a class="nav-item active" data-target="view-pendientes" href="#"><i data-lucide="bell"></i> Panel de Pendientes</a>
+<div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:15px 15px 5px; font-weight:800; letter-spacing:0.05em;">Gestión Comercial</div>
+<a class="nav-item" data-target="view-cotizaciones" href="#"><i data-lucide="briefcase"></i> Centro de Cotizaciones (Leads)</a>
+<a class="nav-item" data-target="view-solicitudes" href="#"><i data-lucide="map-pinned"></i> Inventario de Parcelas</a>
+<a class="nav-item" data-target="view-casas" href="#"><i data-lucide="house"></i> Inventario de Casas</a>
+<div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:15px 15px 5px; font-weight:800; letter-spacing:0.05em;">Herramientas TPL</div>
+<a class="nav-item" href="/plataforma/studio/"><i data-lucide="wand-sparkles"></i> Creador de Landings</a>
+<a class="nav-item" data-target="view-tasador" href="#"><i data-lucide="calculator"></i> Tasador Inteligente</a>
+<a class="nav-item" data-target="view-mercado" href="#"><i data-lucide="bar-chart-3"></i> Índice de Mercado TPL</a>
+<a class="nav-item" data-target="view-extras" href="#"><i data-lucide="list-plus"></i> Catálogo de Extras</a>
+<div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:15px 15px 5px; font-weight:800; letter-spacing:0.05em;">Ecosistema</div>
+<a class="nav-item" data-target="view-contratistas" href="#"><i data-lucide="users"></i> Red de Partners</a>
+<a class="nav-item" data-target="view-partner-postulaciones" href="#"><i data-lucide="user-check"></i> Postulaciones Partner <span class="nav-badge" hidden="" id="partner-pending-badge">0</span></a>
+</nav>
+<div class="sidebar-bottom">
+<button id="btn-logout"><i data-lucide="log-out"></i> Cerrar sesión</button>
+</div>
+</aside>
+<main class="main-content">
+<header class="topbar">
+<h1 id="topbar-title">Pendientes Operativos</h1>
+<div class="user-info">
+<span id="user-name-display">Cargando...</span>
+<div class="avatar"><i data-lucide="user"></i></div>
+</div>
+</header>
+<!-- VISTA PENDIENTES OPERATIVOS -->
+<div class="dashboard-section active-section" id="view-pendientes">
+<section class="metrics-grid">
+<div class="metric-card warning">
+<div class="metric-icon"><i data-lucide="user-plus"></i></div>
+<div class="metric-data">
+<span class="metric-value" id="metric-pendientes-clientes">0</span>
+<span class="metric-label">Leads por contactar</span>
+</div>
+</div>
+<div class="metric-card info">
+<div class="metric-icon"><i data-lucide="file-text"></i></div>
+<div class="metric-data">
+<span class="metric-value" id="metric-pendientes-publicaciones">0</span>
+<span class="metric-label">Parcelas por revisar</span>
+</div>
+</div>
+<div class="metric-card danger">
+<div class="metric-icon"><i data-lucide="briefcase"></i></div>
+<div class="metric-data">
+<span class="metric-value" id="metric-pendientes-cotizaciones">0</span>
+<span class="metric-label">Cotizaciones huérfanas</span>
+</div>
+</div>
+</section>
+<section class="launch-panel" id="launch-daily-panel">
+<div class="launch-panel-heading">
+<div><span class="eyebrow">Operación comercial</span><h2>Panel diario de lanzamiento</h2><p>Prioriza lo que necesita atención sin revisar tablas manualmente.</p></div>
+<button class="btn-action" id="launch-refresh" type="button">Actualizar panel</button>
+</div>
+<p class="launch-status" hidden="" id="launch-dashboard-status"></p>
+<div class="launch-metrics">
+<article><strong id="launch-new-leads">0</strong><span>Interesados nuevos</span></article>
+<article><strong id="launch-uncontacted">0</strong><span>Sin contactar</span></article>
+<article><strong id="launch-overdue">0</strong><span>Tareas vencidas</span></article>
+<article><strong id="launch-visits">0</strong><span>Visitas por confirmar</span></article>
+<article><strong id="launch-recent-quotes">0</strong><span>Cotizaciones recientes</span></article>
+<article><strong id="launch-stale-quotes">0</strong><span>Cotizaciones detenidas</span></article>
+<article><strong id="launch-active-projects">0</strong><span>Proyectos activados</span></article>
+<article><strong id="launch-pending-publications">0</strong><span>Publicaciones pendientes</span></article>
+<article><strong id="launch-errors">0</strong><span>Errores del sistema</span></article>
+<article><strong id="launch-automation-failures">0</strong><span>Automatizaciones fallidas</span></article>
+<article><strong id="launch-security-alerts">0</strong><span>Alertas de seguridad</span></article>
+<article><strong id="launch-activity-count">0</strong><span>Actividad últimas 24 h</span></article>
+</div>
+<div aria-label="Acciones rápidas" class="launch-actions">
+<a data-target="view-cotizaciones" href="#view-cotizaciones">Abrir cliente / proyecto</a>
+<a data-target="view-solicitudes" href="#view-solicitudes">Abrir publicación</a>
+<button id="launch-create-task" type="button">Crear tarea</button>
+<button id="launch-register-contact" type="button">Registrar contacto</button>
+</div>
+<div class="launch-grid">
+<section class="table-container"><h3>Embudo comercial</h3><table class="data-table"><thead><tr><th>Etapa</th><th>Personas</th><th>Conversión</th><th>Tiempo promedio</th></tr></thead><tbody id="launch-funnel-body"></tbody></table></section>
+<section class="table-container"><h3>Tareas prioritarias</h3><table class="data-table"><thead><tr><th>Prioridad</th><th>Tarea</th><th>Cliente</th><th>Vence</th><th>Acción</th></tr></thead><tbody id="launch-task-body"></tbody></table></section>
+</div>
+<section class="table-container"><h3>Prioridad de oportunidades</h3><table class="data-table"><thead><tr><th>Cliente</th><th>Etapa</th><th>Puntaje</th><th>Clasificación</th><th>Explicación</th></tr></thead><tbody id="launch-opportunity-body"></tbody></table></section> <section class="table-container"><h3>Actividad de las últimas 24 horas</h3><table class="data-table"><thead><tr><th>Fecha</th><th>Evento</th><th>Origen</th><th>Página</th></tr></thead><tbody id="launch-activity-body"></tbody></table></section>
+</section>
+<section class="table-container">
+<h2 style="margin-bottom: 15px; font-size: 1.2rem; color: #1e293b;">Acciones Requeridas</h2>
+<table class="data-table">
+<thead>
+<tr>
+<th>Tipo</th>
+<th>Fecha</th>
+<th>Descripción / Tarea</th>
+<th>Estado</th>
+<th>Acción Rápida</th>
+</tr>
+</thead>
+<tbody id="table-body-pendientes">
+<tr><td colspan="5" style="text-align:center; padding:30px; color:#64748b;">No hay tareas operativas pendientes.</td></tr>
+</tbody>
+</table>
+</section>
+</div>
+<!-- VISTA SOLICITUDES (PUBLICACIONES) -->
+<div class="dashboard-section" id="view-solicitudes" style="display:none;">
+<!-- Métricas -->
+<section class="metrics-grid">
+<div class="metric-card warning">
+<div class="metric-icon"><i data-lucide="clock"></i></div>
+<div class="metric-data">
+<span class="metric-value" id="metric-pendientes">-</span>
+<span class="metric-label">Pendientes</span>
+</div>
+</div>
+<div class="metric-card info">
+<div class="metric-icon"><i data-lucide="alert-circle"></i></div>
+<div class="metric-data">
+<span class="metric-value" id="metric-corregir">-</span>
+<span class="metric-label">En Corrección</span>
+</div>
+</div>
+<div class="metric-card success">
+<div class="metric-icon"><i data-lucide="check-circle"></i></div>
+<div class="metric-data">
+<span class="metric-value" id="metric-aprobadas">-</span>
+<span class="metric-label">Aprobadas</span>
+</div>
+</div>
+<div class="metric-card danger">
+<div class="metric-icon"><i data-lucide="x-circle"></i></div>
+<div class="metric-data">
+<span class="metric-value" id="metric-rechazadas">-</span>
+<span class="metric-label">Rechazadas</span>
+</div>
+</div>
+</section>
+<!-- Filtros -->
+<section class="filters-bar" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+<input id="search-input" placeholder="Buscar por código, nombre o comuna..." style="padding:8px 12px; border:1px solid #ccc; border-radius:6px; flex:1; min-width:200px;" type="text"/>
+<select id="filter-estado" style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+<option value="">Todos los estados</option>
+<option selected="" value="pendiente_revision">Pendientes de Revisión</option>
+<option value="requiere_cambios">Requiere Cambios</option>
+<option value="aprobada">Aprobadas</option>
+<option value="rechazada">Rechazadas</option>
+</select>
+<button id="btn-refresh" style="padding:8px 15px; border-radius:6px; cursor:pointer;"><i data-lucide="refresh-cw" style="width:16px; height:16px; vertical-align:middle;"></i> Actualizar</button>
+</section>
+<!-- Tabla -->
+<section class="table-container">
+<table class="data-table">
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Propiedad</th>
+<th>Corredor / Dueño</th>
+<th>Comuna</th>
+<th>Plan</th>
+<th>Estado</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody id="table-body">
+<!-- Filas dinámicas -->
+</tbody>
+</table>
+</section>
+</div>
+<!-- VISTA CASAS -->
+<div class="dashboard-section" id="view-casas" style="display:none;">
+<section class="filters-bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+<div style="margin-right:auto;">
+<h2 style="margin:0;">Catálogo de casas</h2>
+<p style="margin:4px 0 0;color:#64748b;">Crea, completa y edita las casas disponibles en los cotizadores.</p>
+</div>
+<button class="btn-primary" id="btn-new-house"><i data-lucide="plus"></i> Nueva casa</button>
+<button id="btn-refresh-casas"><i data-lucide="refresh-cw"></i> Actualizar</button>
+</section>
+<p class="catalog-status" hidden="" id="catalog-status"></p>
+<section class="table-container">
+<table class="data-table">
+<thead><tr><th>Imagen</th><th>Casa</th><th>Superficie</th><th>Habitaciones</th><th>Baños</th><th>Precio base</th><th>Estado</th><th>Acción</th></tr></thead>
+<tbody id="table-body-casas"><tr><td colspan="8">Abre esta sección para cargar las casas.</td></tr></tbody>
+</table>
+</section>
+</div>
+<!-- VISTA EXTRAS -->
+<div class="dashboard-section" id="view-extras" style="display:none;">
+<section class="filters-bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+<div style="margin-right:auto;"><h2 style="margin:0;">Extras y fundaciones</h2><p style="margin:4px 0 0;color:#64748b;">Fuente única del cotizador público.</p></div>
+<button class="btn-primary" id="btn-new-extra"><i data-lucide="plus"></i> Nuevo extra</button>
+<button id="btn-refresh-extras"><i data-lucide="refresh-cw"></i> Actualizar</button>
+</section>
+<section class="table-container"><table class="data-table">
+<thead><tr><th>Nombre</th><th>Categoría</th><th>Cálculo</th><th>Precio base</th><th>Estado</th><th>Acción</th></tr></thead>
+<tbody id="table-body-extras"><tr><td colspan="6">Abre esta sección para cargar el catálogo.</td></tr></tbody>
+</table></section>
+</div>
+<div class="dashboard-section" id="view-tasador" style="display:none;">
+<section class="tasador-admin-heading">
+<div><span class="eyebrow">Estimaciones referenciales</span><h2>Tasador TPL – Tu Parcela Lista</h2><p>Revisa cobertura, confianza y decisiones sin exponer coordenadas ni datos privados.</p></div>
+<button class="btn-action" id="btn-refresh-tasador" type="button">Actualizar</button>
+</section>
+<p class="launch-status" hidden="" id="tasador-admin-status"></p>
+<section class="metrics-grid">
+<div class="metric-card info"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-total">0</span><span class="metric-label">Tasaciones</span></div></div>
+<div class="metric-card warning"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-baja">0</span><span class="metric-label">Cobertura baja o insuficiente</span></div></div>
+<div class="metric-card danger"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-fuera">0</span><span class="metric-label">Precio sobre el rango</span></div></div>
+<div class="metric-card success"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-aceptadas">0</span><span class="metric-label">Recomendación adoptada</span></div></div>
+</section>
+<section class="tasador-config-card"><div><strong>Configuración activa</strong><span id="tasador-config-version">Sin desplegar</span></div><p id="tasador-config-summary">Los cambios de parámetros deben publicarse como una nueva versión auditable.</p><button disabled="" title="Se habilitará después de desplegar y validar el MVP" type="button">Crear nueva versión</button></section>
+<section class="table-container">
+<table class="data-table"><thead><tr><th>Fecha</th><th>Comuna</th><th>Precio ingresado</th><th>Rango</th><th>Confianza</th><th>Cobertura</th><th>Decisión</th></tr></thead><tbody id="table-body-tasaciones"><tr><td class="launch-empty" colspan="7">El módulo todavía no está desplegado.</td></tr></tbody></table>
+</section>
+</div>
+<!-- VISTA ÍNDICE DE MERCADO TPL -->
+<div class="dashboard-section" id="view-mercado" style="display:none;">
+<section class="tasador-admin-heading">
+  <div>
+    <span class="eyebrow">Gestión de Fuente Canónica</span>
+    <h2>Índice de Mercado TPL (SSOT Comunal)</h2>
+    <p>Administra los valores por m² por comuna, alias territoriales y niveles de confianza sin tocar código JavaScript ni HTML.</p>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <button class="btn-secondary" id="btn-refresh-mercado" type="button"><i data-lucide="refresh-cw"></i> Actualizar</button>
+    <button class="btn-primary" id="btn-new-mercado" type="button"><i data-lucide="plus"></i> Nueva Comuna</button>
+  </div>
+</section>
+<section class="filters-bar" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:16px 0;">
+  <input id="search-mercado" placeholder="Buscar comuna, región o alias..." style="padding:8px 12px; border:1px solid #ccc; border-radius:6px; flex:1; min-width:220px;" type="text"/>
+  <select id="filter-estado-mercado" style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+    <option value="all">Todas (Activas e Inactivas)</option>
+    <option selected="" value="true">Solo Activas</option>
+    <option value="false">Solo Inactivas</option>
+  </select>
+</section>
+<section class="table-container">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Región / Comuna</th>
+        <th>Aliases</th>
+        <th>Promedio / m²</th>
+        <th>Parcela Tipo (5.000m²)</th>
+        <th>Rango / m²</th>
+        <th>Comparables</th>
+        <th>Confianza</th>
+        <th>Versión</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="table-body-mercado">
+      <tr><td class="launch-empty" colspan="10">Cargando índice canónico de mercado...</td></tr>
+    </tbody>
+  </table>
+</section>
+</div>
 
-  <div id="login-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f8fafc;">
-    <div style="background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; max-width: 400px; width: 100%;">
-      <img src="../../image/logo-tu-parcela-lista.png" alt="TPL" style="height: 60px; margin-bottom: 20px;">
-      <h2 style="color: #003f7a; margin-top: 0;">Administración CRM</h2>
-      <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">Ingresa tus credenciales de administrador.</p>
-      
-      <form id="login-form">
-        <input type="email" id="login-email" placeholder="Correo Electrónico" required style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; font-family: 'Inter'; box-sizing: border-box;">
-        <input type="password" id="login-password" placeholder="Contraseña" required style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; font-family: 'Inter'; box-sizing: border-box;">
-        
-        <button type="submit" id="btn-login" class="btn-primary-submit" style="width: 100%;">Ingresar</button>
-      </form>
-      
-      <div id="login-msg" style="margin-top: 15px; font-size: 0.85rem; color: #ef4444;"></div>
+<!-- MODAL CREAR / EDITAR COMUNA MERCADO -->
+<div class="modal" id="modal-mercado-form" style="display:none;">
+  <div class="modal-content" style="max-width:650px;">
+    <div class="modal-header">
+      <h2 id="mercado-form-title">Nueva Comuna de Mercado</h2>
+      <button class="modal-close" id="btn-close-mercado-form"><i data-lucide="x"></i></button>
+    </div>
+    <form id="form-mercado-comuna" onsubmit="return false;">
+      <input id="mercado-id" type="hidden"/>
+      <div class="modal-body" style="display:grid; grid-template-columns:1fr 1fr; gap:14px; max-height:70vh; overflow-y:auto; padding:10px;">
+        <div class="input-group">
+          <label>Región <span style="color:red">*</span></label>
+          <input id="mercado-region" placeholder="Ej: Biobío, Ñuble..." required="" type="text"/>
+        </div>
+        <div class="input-group">
+          <label>Comuna <span style="color:red">*</span></label>
+          <input id="mercado-comuna" placeholder="Ej: Florida, Ránquil..." required="" type="text"/>
+        </div>
+        <div class="input-group" style="grid-column: span 2;">
+          <label>Aliases o localidades equivalentes (separadas por coma)</label>
+          <input id="mercado-aliases" placeholder="Ej: Ranquil, Ñipas, Nipas" type="text"/>
+          <small style="color:#64748b; font-size:0.75rem;">El sistema normalizará y reconocerá estos nombres alternativos como la misma comuna.</small>
+        </div>
+        <div class="input-group">
+          <label>Valor promedio por m² ($) <span style="color:red">*</span></label>
+          <input id="mercado-val-m2" min="1" required="" type="number"/>
+        </div>
+        <div class="input-group">
+          <label>Valor parcela tipo 5.000 m² ($)</label>
+          <input id="mercado-val-5000" min="1" placeholder="Autocalculado si está vacío" type="number"/>
+        </div>
+        <div class="input-group">
+          <label>Rango bajo por m² ($) <span style="color:red">*</span></label>
+          <input id="mercado-rango-bajo" min="1" required="" type="number"/>
+        </div>
+        <div class="input-group">
+          <label>Rango alto por m² ($) <span style="color:red">*</span></label>
+          <input id="mercado-rango-alto" min="1" required="" type="number"/>
+        </div>
+        <div class="input-group">
+          <label>Comparables revisados</label>
+          <input id="mercado-comp-rev" min="0" type="number" value="0"/>
+        </div>
+        <div class="input-group">
+          <label>Comparables válidos</label>
+          <input id="mercado-comp-val" min="0" type="number" value="0"/>
+        </div>
+        <div class="input-group">
+          <label>Nivel de confianza <span style="color:red">*</span></label>
+          <select id="mercado-confianza" required="">
+            <option value="Alta">Alta</option>
+            <option value="Media-Alta">Media-Alta</option>
+            <option value="Media">Media</option>
+            <option value="Media-Baja">Media-Baja</option>
+            <option value="Baja">Baja</option>
+            <option value="Preliminar">Preliminar</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Versión del Índice <span style="color:red">*</span></label>
+          <input id="mercado-version" required="" type="text" value="IM-TPL-2026-07"/>
+        </div>
+        <div class="input-group">
+          <label>Fecha de actualización <span style="color:red">*</span></label>
+          <input id="mercado-fecha-act" required="" type="date"/>
+        </div>
+        <div class="input-group">
+          <label>Próxima fecha de revisión</label>
+          <input id="mercado-fecha-rev" type="date"/>
+        </div>
+        <div class="input-group" style="grid-column: span 2;">
+          <label>Fuentes utilizadas (separadas por coma)</label>
+          <input id="mercado-fuentes" placeholder="Ej: CBR Biobío, Portales 2026, Tasaciones internas" type="text"/>
+        </div>
+        <div class="input-group" style="grid-column: span 2;">
+          <label>Notas internas (solo administador)</label>
+          <textarea id="mercado-notas" placeholder="Observaciones de calibración o motivos de ajuste..." rows="2"></textarea>
+        </div>
+        <div class="input-group" style="grid-column: span 2; display:flex; align-items:center; gap:8px;">
+          <input checked="" id="mercado-activo" type="checkbox"/>
+          <label for="mercado-activo" style="margin:0; cursor:pointer; font-weight:600;">Comuna activa en motor público</label>
+        </div>
+      </div>
+      <p class="error-msg" id="mercado-error-msg" style="color:#ef4444; font-size:0.85rem; padding:0 15px; margin:0;"></p>
+      <div class="modal-footer" style="padding:15px; display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn-secondary" id="btn-cancel-mercado-form" type="button">Cancelar</button>
+        <button class="btn-primary" id="btn-save-mercado-form" type="submit">Guardar Índice</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL HISTORIAL DE MERCADO -->
+<div class="modal" id="modal-mercado-historial" style="display:none;">
+  <div class="modal-content" style="max-width:750px;">
+    <div class="modal-header">
+      <h2 id="mercado-historial-title">Historial de Actualizaciones</h2>
+      <button class="modal-close" id="btn-close-mercado-historial"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body" style="max-height:65vh; overflow-y:auto; padding:15px;">
+      <p style="color:#64748b; font-size:0.85rem; margin-top:0;">Versiones históricas preservadas en base de datos. Toda modificación queda registrada sin borrar el historial anterior.</p>
+      <table class="data-table" style="font-size:0.82rem;">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Promedio</th>
+            <th>Parcela 5.000m²</th>
+            <th>Rango</th>
+            <th>Confianza</th>
+            <th>Versión</th>
+            <th>Modificado por</th>
+          </tr>
+        </thead>
+        <tbody id="table-body-historial-mercado">
+          <tr><td colspan="7" style="text-align:center;">Cargando historial...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer" style="padding:15px; display:flex; justify-content:flex-end;">
+      <button class="btn-secondary" id="btn-close-mercado-historial-2" type="button">Cerrar</button>
     </div>
   </div>
-
-  <!-- Dashboard Principal -->
-  <div id="app-container" class="app-container" style="display: none;">
-    <aside class="sidebar">
-      <div class="sidebar-brand">TPL Admin</div>
-      <nav class="sidebar-nav">
-        <div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:10px 15px; font-weight:800; letter-spacing:0.05em;">Operativa</div>
-        <a href="#" class="nav-item active" data-target="view-pendientes"><i data-lucide="bell"></i> Panel de Pendientes</a>
-        
-        <div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:15px 15px 5px; font-weight:800; letter-spacing:0.05em;">Gestión Comercial</div>
-        <a href="#" class="nav-item" data-target="view-cotizaciones"><i data-lucide="briefcase"></i> Centro de Cotizaciones (Leads)</a>
-        <a href="#" class="nav-item" data-target="view-solicitudes"><i data-lucide="map-pinned"></i> Inventario de Parcelas</a>
-        <a href="#" class="nav-item" data-target="view-casas"><i data-lucide="house"></i> Inventario de Casas</a>
-        
-        <div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:15px 15px 5px; font-weight:800; letter-spacing:0.05em;">Herramientas TPL</div>
-        <a href="/plataforma/studio/" class="nav-item"><i data-lucide="wand-sparkles"></i> Creador de Landings</a>
-        <a href="#" class="nav-item" data-target="view-tasador"><i data-lucide="calculator"></i> Tasador Inteligente</a>
-        <a href="#" class="nav-item" data-target="view-extras"><i data-lucide="list-plus"></i> Catálogo de Extras</a>
-        
-        <div class="nav-section-title" style="font-size:0.7rem; text-transform:uppercase; color:#64748b; padding:15px 15px 5px; font-weight:800; letter-spacing:0.05em;">Ecosistema</div>
-        <a href="#" class="nav-item" data-target="view-contratistas"><i data-lucide="users"></i> Red de Partners</a>
-        <a href="#" class="nav-item" data-target="view-partner-postulaciones"><i data-lucide="user-check"></i> Postulaciones Partner <span id="partner-pending-badge" class="nav-badge" hidden>0</span></a>
-      </nav>
-      <div class="sidebar-bottom">
-        <button id="btn-logout"><i data-lucide="log-out"></i> Cerrar sesión</button>
-      </div>
-    </aside>
-
-    <main class="main-content">
-      <header class="topbar">
-        <h1 id="topbar-title">Pendientes Operativos</h1>
-        <div class="user-info">
-          <span id="user-name-display">Cargando...</span>
-          <div class="avatar"><i data-lucide="user"></i></div>
-        </div>
-      </header>
-
-      <!-- VISTA PENDIENTES OPERATIVOS -->
-      <div id="view-pendientes" class="dashboard-section active-section">
-        <section class="metrics-grid">
-          <div class="metric-card warning">
-            <div class="metric-icon"><i data-lucide="user-plus"></i></div>
-            <div class="metric-data">
-              <span class="metric-value" id="metric-pendientes-clientes">0</span>
-              <span class="metric-label">Leads por contactar</span>
-            </div>
-          </div>
-          <div class="metric-card info">
-            <div class="metric-icon"><i data-lucide="file-text"></i></div>
-            <div class="metric-data">
-              <span class="metric-value" id="metric-pendientes-publicaciones">0</span>
-              <span class="metric-label">Parcelas por revisar</span>
-            </div>
-          </div>
-          <div class="metric-card danger">
-            <div class="metric-icon"><i data-lucide="briefcase"></i></div>
-            <div class="metric-data">
-              <span class="metric-value" id="metric-pendientes-cotizaciones">0</span>
-              <span class="metric-label">Cotizaciones huérfanas</span>
-            </div>
-          </div>
-        </section>
-
-        <section id="launch-daily-panel" class="launch-panel">
-          <div class="launch-panel-heading">
-            <div><span class="eyebrow">Operación comercial</span><h2>Panel diario de lanzamiento</h2><p>Prioriza lo que necesita atención sin revisar tablas manualmente.</p></div>
-            <button id="launch-refresh" class="btn-action" type="button">Actualizar panel</button>
-          </div>
-          <p id="launch-dashboard-status" class="launch-status" hidden></p>
-          <div class="launch-metrics">
-            <article><strong id="launch-new-leads">0</strong><span>Interesados nuevos</span></article>
-            <article><strong id="launch-uncontacted">0</strong><span>Sin contactar</span></article>
-            <article><strong id="launch-overdue">0</strong><span>Tareas vencidas</span></article>
-            <article><strong id="launch-visits">0</strong><span>Visitas por confirmar</span></article>
-            <article><strong id="launch-recent-quotes">0</strong><span>Cotizaciones recientes</span></article>
-            <article><strong id="launch-stale-quotes">0</strong><span>Cotizaciones detenidas</span></article>
-            <article><strong id="launch-active-projects">0</strong><span>Proyectos activados</span></article>
-            <article><strong id="launch-pending-publications">0</strong><span>Publicaciones pendientes</span></article>
-            <article><strong id="launch-errors">0</strong><span>Errores del sistema</span></article>
-            <article><strong id="launch-automation-failures">0</strong><span>Automatizaciones fallidas</span></article>
-            <article><strong id="launch-security-alerts">0</strong><span>Alertas de seguridad</span></article>
-            <article><strong id="launch-activity-count">0</strong><span>Actividad últimas 24 h</span></article>
-          </div>
-          <div class="launch-actions" aria-label="Acciones rápidas">
-            <a href="#view-cotizaciones" data-target="view-cotizaciones">Abrir cliente / proyecto</a>
-            <a href="#view-solicitudes" data-target="view-solicitudes">Abrir publicación</a>
-            <button id="launch-create-task" type="button">Crear tarea</button>
-            <button id="launch-register-contact" type="button">Registrar contacto</button>
-          </div>
-          <div class="launch-grid">
-            <section class="table-container"><h3>Embudo comercial</h3><table class="data-table"><thead><tr><th>Etapa</th><th>Personas</th><th>Conversión</th><th>Tiempo promedio</th></tr></thead><tbody id="launch-funnel-body"></tbody></table></section>
-            <section class="table-container"><h3>Tareas prioritarias</h3><table class="data-table"><thead><tr><th>Prioridad</th><th>Tarea</th><th>Cliente</th><th>Vence</th><th>Acción</th></tr></thead><tbody id="launch-task-body"></tbody></table></section>
-          </div>
-          <section class="table-container"><h3>Prioridad de oportunidades</h3><table class="data-table"><thead><tr><th>Cliente</th><th>Etapa</th><th>Puntaje</th><th>Clasificación</th><th>Explicación</th></tr></thead><tbody id="launch-opportunity-body"></tbody></table></section>          <section class="table-container"><h3>Actividad de las últimas 24 horas</h3><table class="data-table"><thead><tr><th>Fecha</th><th>Evento</th><th>Origen</th><th>Página</th></tr></thead><tbody id="launch-activity-body"></tbody></table></section>
-        </section>
-        <section class="table-container">
-          <h2 style="margin-bottom: 15px; font-size: 1.2rem; color: #1e293b;">Acciones Requeridas</h2>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Tipo</th>
-                <th>Fecha</th>
-                <th>Descripción / Tarea</th>
-                <th>Estado</th>
-                <th>Acción Rápida</th>
-              </tr>
-            </thead>
-            <tbody id="table-body-pendientes">
-              <tr><td colspan="5" style="text-align:center; padding:30px; color:#64748b;">No hay tareas operativas pendientes.</td></tr>
-            </tbody>
-          </table>
-        </section>
-      </div>
-
-      <!-- VISTA SOLICITUDES (PUBLICACIONES) -->
-      <div id="view-solicitudes" class="dashboard-section" style="display:none;">
-        <!-- Métricas -->
-        <section class="metrics-grid">
-          <div class="metric-card warning">
-            <div class="metric-icon"><i data-lucide="clock"></i></div>
-            <div class="metric-data">
-              <span class="metric-value" id="metric-pendientes">-</span>
-              <span class="metric-label">Pendientes</span>
-            </div>
-          </div>
-          <div class="metric-card info">
-            <div class="metric-icon"><i data-lucide="alert-circle"></i></div>
-            <div class="metric-data">
-              <span class="metric-value" id="metric-corregir">-</span>
-              <span class="metric-label">En Corrección</span>
-            </div>
-          </div>
-          <div class="metric-card success">
-            <div class="metric-icon"><i data-lucide="check-circle"></i></div>
-            <div class="metric-data">
-              <span class="metric-value" id="metric-aprobadas">-</span>
-              <span class="metric-label">Aprobadas</span>
-            </div>
-          </div>
-          <div class="metric-card danger">
-            <div class="metric-icon"><i data-lucide="x-circle"></i></div>
-            <div class="metric-data">
-              <span class="metric-value" id="metric-rechazadas">-</span>
-              <span class="metric-label">Rechazadas</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Filtros -->
-        <section class="filters-bar" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-          <input type="text" id="search-input" placeholder="Buscar por código, nombre o comuna..." style="padding:8px 12px; border:1px solid #ccc; border-radius:6px; flex:1; min-width:200px;">
-          <select id="filter-estado" style="padding:8px; border:1px solid #ccc; border-radius:6px;">
-            <option value="">Todos los estados</option>
-            <option value="pendiente_revision" selected>Pendientes de Revisión</option>
-            <option value="requiere_cambios">Requiere Cambios</option>
-            <option value="aprobada">Aprobadas</option>
-            <option value="rechazada">Rechazadas</option>
-          </select>
-          <button id="btn-refresh" style="padding:8px 15px; border-radius:6px; cursor:pointer;"><i data-lucide="refresh-cw" style="width:16px; height:16px; vertical-align:middle;"></i> Actualizar</button>
-        </section>
-
-        <!-- Tabla -->
-        <section class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Propiedad</th>
-                <th>Corredor / Dueño</th>
-                <th>Comuna</th>
-                <th>Plan</th>
-                <th>Estado</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody id="table-body">
-              <!-- Filas dinámicas -->
-            </tbody>
-          </table>
-        </section>
-      </div>
-
-      
-      <!-- VISTA CASAS -->
-      <div id="view-casas" class="dashboard-section" style="display:none;">
-        <section class="filters-bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <div style="margin-right:auto;">
-            <h2 style="margin:0;">Catálogo de casas</h2>
-            <p style="margin:4px 0 0;color:#64748b;">Crea, completa y edita las casas disponibles en los cotizadores.</p>
-          </div>
-          <button id="btn-new-house" class="btn-primary"><i data-lucide="plus"></i> Nueva casa</button>
-          <button id="btn-refresh-casas"><i data-lucide="refresh-cw"></i> Actualizar</button>
-        </section>
-        <p id="catalog-status" class="catalog-status" hidden></p>
-        <section class="table-container">
-          <table class="data-table">
-            <thead><tr><th>Imagen</th><th>Casa</th><th>Superficie</th><th>Habitaciones</th><th>Baños</th><th>Precio base</th><th>Estado</th><th>Acción</th></tr></thead>
-            <tbody id="table-body-casas"><tr><td colspan="8">Abre esta sección para cargar las casas.</td></tr></tbody>
-          </table>
-        </section>
-      </div>
-
-      <!-- VISTA EXTRAS -->
-      <div id="view-extras" class="dashboard-section" style="display:none;">
-        <section class="filters-bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <div style="margin-right:auto;"><h2 style="margin:0;">Extras y fundaciones</h2><p style="margin:4px 0 0;color:#64748b;">Fuente única del cotizador público.</p></div>
-          <button id="btn-new-extra" class="btn-primary"><i data-lucide="plus"></i> Nuevo extra</button>
-          <button id="btn-refresh-extras"><i data-lucide="refresh-cw"></i> Actualizar</button>
-        </section>
-        <section class="table-container"><table class="data-table">
-          <thead><tr><th>Nombre</th><th>Categoría</th><th>Cálculo</th><th>Precio base</th><th>Estado</th><th>Acción</th></tr></thead>
-          <tbody id="table-body-extras"><tr><td colspan="6">Abre esta sección para cargar el catálogo.</td></tr></tbody>
-        </table></section>
-      </div>
-
-      <div id="view-tasador" class="dashboard-section" style="display:none;">
-        <section class="tasador-admin-heading">
-          <div><span class="eyebrow">Estimaciones referenciales</span><h2>Tasador TPL – Tu Parcela Lista</h2><p>Revisa cobertura, confianza y decisiones sin exponer coordenadas ni datos privados.</p></div>
-          <button id="btn-refresh-tasador" class="btn-action" type="button">Actualizar</button>
-        </section>
-        <p id="tasador-admin-status" class="launch-status" hidden></p>
-        <section class="metrics-grid">
-          <div class="metric-card info"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-total">0</span><span class="metric-label">Tasaciones</span></div></div>
-          <div class="metric-card warning"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-baja">0</span><span class="metric-label">Cobertura baja o insuficiente</span></div></div>
-          <div class="metric-card danger"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-fuera">0</span><span class="metric-label">Precio sobre el rango</span></div></div>
-          <div class="metric-card success"><div class="metric-data"><span class="metric-value" id="metric-tasaciones-aceptadas">0</span><span class="metric-label">Recomendación adoptada</span></div></div>
-        </section>
-        <section class="tasador-config-card"><div><strong>Configuración activa</strong><span id="tasador-config-version">Sin desplegar</span></div><p id="tasador-config-summary">Los cambios de parámetros deben publicarse como una nueva versión auditable.</p><button type="button" disabled title="Se habilitará después de desplegar y validar el MVP">Crear nueva versión</button></section>
-        <section class="table-container">
-          <table class="data-table"><thead><tr><th>Fecha</th><th>Comuna</th><th>Precio ingresado</th><th>Rango</th><th>Confianza</th><th>Cobertura</th><th>Decisión</th></tr></thead><tbody id="table-body-tasaciones"><tr><td colspan="7" class="launch-empty">El módulo todavía no está desplegado.</td></tr></tbody></table>
-        </section>
-      </div>
-
-      <!-- VISTA PROMOCIONES Y ADS: reservada, no se expone hasta implementar su controlador real. -->
-      <div id="view-promociones" class="dashboard-section" style="display:none;" hidden aria-hidden="true">
-        <section class="filters-bar" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-          <input type="text" id="search-promos" placeholder="Buscar promoción..." style="padding:8px 12px; border:1px solid #ccc; border-radius:6px; flex:1; min-width:200px;">
-          <select id="filter-estado-promo" style="padding:8px; border:1px solid #ccc; border-radius:6px;">
-            <option value="">Todos los estados</option>
-            <option value="pending_review" selected>Pendientes de Revisión</option>
-            <option value="active">Activas en Meta/Google</option>
-            <option value="completed">Finalizadas</option>
-          </select>
-          <button id="btn-refresh-promos" style="padding:8px 15px; border-radius:6px; cursor:pointer;"><i data-lucide="refresh-cw" style="width:16px; height:16px; vertical-align:middle;"></i> Actualizar</button>
-        </section>
-
-        <section class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Publicación ID</th>
-                <th>Plan</th>
-                <th>Presupuesto Medios</th>
-                <th>Estado</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody id="table-body-promos">
-              <tr>
-                <td colspan="6" style="text-align:center; padding:40px; color:#64748b;">
+</div>
+<!-- VISTA PROMOCIONES Y ADS: reservada, no se expone hasta implementar su controlador real. -->
+<div aria-hidden="true" class="dashboard-section" hidden="" id="view-promociones" style="display:none;">
+<section class="filters-bar" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+<input id="search-promos" placeholder="Buscar promoción..." style="padding:8px 12px; border:1px solid #ccc; border-radius:6px; flex:1; min-width:200px;" type="text"/>
+<select id="filter-estado-promo" style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+<option value="">Todos los estados</option>
+<option selected="" value="pending_review">Pendientes de Revisión</option>
+<option value="active">Activas en Meta/Google</option>
+<option value="completed">Finalizadas</option>
+</select>
+<button id="btn-refresh-promos" style="padding:8px 15px; border-radius:6px; cursor:pointer;"><i data-lucide="refresh-cw" style="width:16px; height:16px; vertical-align:middle;"></i> Actualizar</button>
+</section>
+<section class="table-container">
+<table class="data-table">
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Publicación ID</th>
+<th>Plan</th>
+<th>Presupuesto Medios</th>
+<th>Estado</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody id="table-body-promos">
+<tr>
+<td colspan="6" style="text-align:center; padding:40px; color:#64748b;">
                   Módulo de Promociones (Fase 1). Las solicitudes de pago de Impulso aparecerán aquí para revisión manual.
                 </td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-      </div>
-
-      <!-- VISTA COTIZACIONES -->
-      <div id="view-cotizaciones" class="dashboard-section" style="display:none;">
-        <section class="filters-bar">
-          <select id="filter-estado-cotizacion">
-            <option value="">Todos los estados</option>
-            <option value="cotizacion_generada" selected>Cotización generada</option>
-            <option value="activo">Proyecto activo</option>
-            <option value="cerrado">Cerrado</option>
-          </select>
-          <button id="btn-refresh-cotizaciones"><i data-lucide="refresh-cw"></i> Actualizar</button>
-        </section>
-        <section class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Cliente</th>
-                <th>Parcela/Comuna</th>
-                <th>Instalación</th>
-                <th>Estado</th>
-                <th>Smart Match</th>
-              </tr>
-            </thead>
-            <tbody id="table-body-cotizaciones">
-              <!-- Filas dinámicas -->
-            </tbody>
-          </table>
-        </section>
-      </div>
-
-      <!-- VISTA CONTRATISTAS -->
-      <div id="view-contratistas" class="dashboard-section" style="display:none;">
-        <section class="filters-bar">
-          <button id="btn-new-contratista" class="btn-primary" style="margin-right:auto;"><i data-lucide="plus"></i> Nuevo Contratista</button>
-          <select id="filter-estado-contratista">
-            <option value="">Todos</option>
-            <option value="Activo" selected>Activos</option>
-            <option value="Inactivo">Inactivos</option>
-          </select>
-          <button id="btn-refresh-contratistas"><i data-lucide="refresh-cw"></i> Actualizar</button>
-        </section>
-        <section class="table-container">
-          <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Nombre & Plan</th>
-                  <th>Cobertura</th>
-                  <th>Servicio</th>
-                  <th>Contacto</th>
-                  <th>Rating</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-            <tbody id="table-body-contratistas">
-              <!-- Filas dinámicas -->
-            </tbody>
-          </table>
-        </section>
-      </div>
-
-      <div id="view-partner-postulaciones" class="dashboard-section" style="display:none;">
-        <section class="partner-admin-head">
-          <div><p class="eyebrow">RED PARTNER</p><h2>Postulaciones y verificación</h2><p>Revisa antecedentes antes de crear el Partner. Aprobar no activa automáticamente un plan pagado ni un perfil público.</p></div>
-          <button id="btn-refresh-partner-applications" class="btn-secondary"><i data-lucide="refresh-cw"></i> Actualizar</button>
-        </section>
-        <section class="metrics-grid partner-metrics">
-          <article class="metric-card"><span>Pendientes</span><strong id="partner-count-pending">0</strong></article>
-          <article class="metric-card"><span>Solicitan antecedentes</span><strong id="partner-count-info">0</strong></article>
-          <article class="metric-card"><span>Aprobadas</span><strong id="partner-count-approved">0</strong></article>
-          <article class="metric-card"><span>Rechazadas</span><strong id="partner-count-rejected">0</strong></article>
-        </section>
-        <section class="filters-bar partner-filters">
-          <select id="partner-application-filter">
-            <option value="pendiente">Pendientes</option><option value="antecedentes">Antecedentes solicitados</option>
-            <option value="aprobada">Aprobadas</option><option value="rechazada">Rechazadas</option><option value="">Todas</option>
-          </select>
-          <input id="partner-application-search" type="search" placeholder="Buscar empresa, responsable o correo">
-        </section>
-        <section class="table-container">
-          <table class="data-table"><thead><tr><th>Postulación</th><th>Empresa</th><th>Servicio y cobertura</th><th>Plan solicitado</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
-          <tbody id="partner-applications-body"><tr><td colspan="7">Cargando postulaciones…</td></tr></tbody></table>
-        </section>
-      </div>
-
-    </main>
-  </div>
-
-  <!-- Modal Detalle Publicación -->
-  <div id="modal-detalle" class="modal-overlay">
-    <div class="modal-box modal-lg">
-      <div class="modal-header">
-        <h2>Ficha administrativa</h2>
-        <button class="modal-close" id="btn-close-modal"><i data-lucide="x"></i></button>
-      </div>
-      <div class="modal-body" id="modal-content">
-        <!-- Detalle cargado por JS -->
-      </div>
-      <div class="modal-footer" id="modal-actions">
-        <!-- Botones dinámicos -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal de Rechazo/Corrección -->
-  <div id="modal-feedback" class="modal-overlay">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h2 id="feedback-title">Indicar Motivo</h2>
-        <button class="modal-close" id="btn-close-feedback"><i data-lucide="x"></i></button>
-      </div>
-      <div class="modal-body">
-        <div class="input-group">
-          <label>Motivo detallado para el corredor</label>
-          <textarea id="feedback-motivo" rows="4" placeholder="Ej: Las fotos están borrosas..."></textarea>
-        </div>
-        <p id="feedback-error" class="error-msg"></p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" id="btn-cancel-feedback">Cancelar</button>
-        <button class="btn-primary" id="btn-confirm-feedback">Confirmar Acción</button>
-      </div>
-    </div>
-  </div>
+</tr>
+</tbody>
+</table>
+</section>
+</div>
+<!-- VISTA COTIZACIONES -->
+<div class="dashboard-section" id="view-cotizaciones" style="display:none;">
+<section class="filters-bar">
+<select id="filter-estado-cotizacion">
+<option value="">Todos los estados</option>
+<option selected="" value="cotizacion_generada">Cotización generada</option>
+<option value="activo">Proyecto activo</option>
+<option value="cerrado">Cerrado</option>
+</select>
+<button id="btn-refresh-cotizaciones"><i data-lucide="refresh-cw"></i> Actualizar</button>
+</section>
+<section class="table-container">
+<table class="data-table">
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Cliente</th>
+<th>Parcela/Comuna</th>
+<th>Instalación</th>
+<th>Estado</th>
+<th>Smart Match</th>
+</tr>
+</thead>
+<tbody id="table-body-cotizaciones">
+<!-- Filas dinámicas -->
+</tbody>
+</table>
+</section>
+</div>
+<!-- VISTA CONTRATISTAS -->
+<div class="dashboard-section" id="view-contratistas" style="display:none;">
+<section class="filters-bar">
+<button class="btn-primary" id="btn-new-contratista" style="margin-right:auto;"><i data-lucide="plus"></i> Nuevo Contratista</button>
+<select id="filter-estado-contratista">
+<option value="">Todos</option>
+<option selected="" value="Activo">Activos</option>
+<option value="Inactivo">Inactivos</option>
+</select>
+<button id="btn-refresh-contratistas"><i data-lucide="refresh-cw"></i> Actualizar</button>
+</section>
+<section class="table-container">
+<table class="data-table">
+<thead>
+<tr>
+<th>Nombre &amp; Plan</th>
+<th>Cobertura</th>
+<th>Servicio</th>
+<th>Contacto</th>
+<th>Rating</th>
+<th>Estado</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<tbody id="table-body-contratistas">
+<!-- Filas dinámicas -->
+</tbody>
+</table>
+</section>
+</div>
+<div class="dashboard-section" id="view-partner-postulaciones" style="display:none;">
+<section class="partner-admin-head">
+<div><p class="eyebrow">RED PARTNER</p><h2>Postulaciones y verificación</h2><p>Revisa antecedentes antes de crear el Partner. Aprobar no activa automáticamente un plan pagado ni un perfil público.</p></div>
+<button class="btn-secondary" id="btn-refresh-partner-applications"><i data-lucide="refresh-cw"></i> Actualizar</button>
+</section>
+<section class="metrics-grid partner-metrics">
+<article class="metric-card"><span>Pendientes</span><strong id="partner-count-pending">0</strong></article>
+<article class="metric-card"><span>Solicitan antecedentes</span><strong id="partner-count-info">0</strong></article>
+<article class="metric-card"><span>Aprobadas</span><strong id="partner-count-approved">0</strong></article>
+<article class="metric-card"><span>Rechazadas</span><strong id="partner-count-rejected">0</strong></article>
+</section>
+<section class="filters-bar partner-filters">
+<select id="partner-application-filter">
+<option value="pendiente">Pendientes</option><option value="antecedentes">Antecedentes solicitados</option>
+<option value="aprobada">Aprobadas</option><option value="rechazada">Rechazadas</option><option value="">Todas</option>
+</select>
+<input id="partner-application-search" placeholder="Buscar empresa, responsable o correo" type="search"/>
+</section>
+<section class="table-container">
+<table class="data-table"><thead><tr><th>Postulación</th><th>Empresa</th><th>Servicio y cobertura</th><th>Plan solicitado</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
+<tbody id="partner-applications-body"><tr><td colspan="7">Cargando postulaciones…</td></tr></tbody></table>
+</section>
+</div>
+</main>
+</div>
+<!-- Modal Detalle Publicación -->
+<div class="modal-overlay" id="modal-detalle">
+<div class="modal-box modal-lg">
+<div class="modal-header">
+<h2>Ficha administrativa</h2>
+<button class="modal-close" id="btn-close-modal"><i data-lucide="x"></i></button>
+</div>
+<div class="modal-body" id="modal-content">
+<!-- Detalle cargado por JS -->
+</div>
+<div class="modal-footer" id="modal-actions">
+<!-- Botones dinámicos -->
+</div>
+</div>
+</div>
+<!-- Modal de Rechazo/Corrección -->
+<div class="modal-overlay" id="modal-feedback">
+<div class="modal-box">
+<div class="modal-header">
+<h2 id="feedback-title">Indicar Motivo</h2>
+<button class="modal-close" id="btn-close-feedback"><i data-lucide="x"></i></button>
+</div>
+<div class="modal-body">
+<div class="input-group">
+<label>Motivo detallado para el corredor</label>
+<textarea id="feedback-motivo" placeholder="Ej: Las fotos están borrosas..." rows="4"></textarea>
+</div>
+<p class="error-msg" id="feedback-error"></p>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="btn-cancel-feedback">Cancelar</button>
+<button class="btn-primary" id="btn-confirm-feedback">Confirmar Acción</button>
+</div>
+</div>
+</div>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="/plataforma/crm/crm-config.js?v=20260722-2"></script>
 <script src="/plataforma/crm/crm.js?v=20260722-2"></script>
 <script src="/plataforma/crm/crm-catalogos.js?v=20260724-catalog-v4"></script>
-<script src="/plataforma/crm/crm-launch-dashboard.js?v=20260722-2" defer></script>
-<script src="/plataforma/crm/crm-automatizacion.js?v=20260722-3" defer></script>
-<script src="/plataforma/crm/crm-partners.js?v=20260722-1" defer></script>
-<script src="/plataforma/crm/crm-business-service.js?v=20260724-5" defer></script>
-<script src="/plataforma/crm/crm-business.js?v=20260724-5" defer></script>
-<script src="/plataforma/landing/landing-config.js?v=20260723-7" defer></script>
-<script src="/plataforma/crm/crm-landing-engine.js?v=20260723-8" defer></script>
+<script defer="" src="/plataforma/crm/crm-launch-dashboard.js?v=20260722-2"></script>
+<script defer="" src="/plataforma/crm/crm-automatizacion.js?v=20260722-3"></script>
+<script defer="" src="/plataforma/crm/crm-partners.js?v=20260722-1"></script>
+<script defer="" src="/plataforma/crm/crm-business-service.js?v=20260724-5"></script>
+<script defer="" src="/plataforma/crm/crm-business.js?v=20260724-5"></script>
+<script defer="" src="/plataforma/landing/landing-config.js?v=20260723-7"></script>
+<script defer="" src="/plataforma/crm/crm-landing-engine.js?v=20260723-8"></script>
+<script defer="" src="/plataforma/crm/crm-mercado.js?v=20260727-1"></script>
 </body>
 </html>

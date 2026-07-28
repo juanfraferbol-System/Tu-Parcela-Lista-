@@ -1,0 +1,33 @@
+PARTNER TPL - ETAPA 4: PAGO FLOW Y ACTIVACIÓN SEGURA
+
+QUÉ COMPLETA
+- Mantiene el formulario por talento, actividades, etapas y modalidades de pago.
+- Mantiene CRM, TPL Business, landing y currículum de las etapas anteriores.
+- Crea órdenes Flow desde el servidor.
+- Registra la orden antes de redirigir al checkout.
+- Confirma el pago exclusivamente en el callback servidor-servidor.
+- Activa el plan pagado en contratistas cuando el Partner ya fue aprobado.
+- Si el pago ocurre antes de la aprobación, lo conserva conciliado y la aprobación podrá reconocerlo.
+
+INSTALACIÓN
+1. Ejecuta supabase/migrations/202607280004_partner_pagos_flow.sql.
+2. Copia api/flow-create.js, api/flow-confirm.js y lib/ al proyecto (Vercel).
+3. Conserva/reemplaza los archivos frontend incluidos según corresponda.
+4. Configura en Vercel:
+   FLOW_API_KEY
+   FLOW_SECRET_KEY
+   FLOW_API_URL=https://sandbox.flow.cl/api   (pruebas)
+   SUPABASE_URL
+   SUPABASE_SERVICE_ROLE_KEY
+   PUBLIC_BASE_URL=https://www.parcelalista.cl
+5. Redeploy.
+6. Prueba primero con Flow Sandbox.
+
+SEGURIDAD
+- Nunca pongas FLOW_SECRET_KEY ni SUPABASE_SERVICE_ROLE_KEY en HTML o JavaScript público.
+- El regreso del navegador no activa el plan.
+- Solo /api/flow-confirm consulta payment/getStatus y ejecuta la RPC de conciliación.
+
+IMPORTANTE
+El frontend actual llama /api/flow-create, por lo que no debes cambiar esa ruta.
+Los valores actuales son: Ideal $29.990, Empresa $69.990, Premium $120.000 CLP.

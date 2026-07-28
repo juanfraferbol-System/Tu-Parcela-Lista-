@@ -210,4 +210,5 @@
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
+  <url><loc>https://www.parcelalista.cl/plataforma/publicar/tasador.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
 </urlset>

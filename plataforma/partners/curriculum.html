@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,follow">
+  <title>Currículum Partner TPL</title>
+  <style>
+    :root{--blue:#063b71;--yellow:#f4c542;--text:#142033;--muted:#5e6b7e;--line:#dce3eb}
+    *{box-sizing:border-box}body{margin:0;background:#eef2f6;color:var(--text);font-family:Arial,Helvetica,sans-serif}
+    .toolbar{max-width:900px;margin:20px auto 0;padding:0 18px;display:flex;gap:12px;justify-content:flex-end}
+    button,a.button{border:0;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;text-decoration:none;background:var(--blue);color:#fff}
+    .sheet{width:min(900px,calc(100% - 36px));margin:18px auto 40px;background:#fff;box-shadow:0 16px 44px rgba(15,35,60,.12)}
+    header{padding:36px 42px;background:linear-gradient(135deg,var(--blue),#0d6097);color:#fff;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+    h1{margin:0 0 8px;font-size:34px}.talent{font-size:18px;font-weight:700;color:#fff3b0}.badge{padding:9px 12px;background:var(--yellow);color:#352b00;border-radius:999px;font-weight:800}
+    main{padding:34px 42px}.summary{font-size:17px;line-height:1.65;margin:0 0 30px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}.section{border-top:3px solid var(--blue);padding-top:12px;margin-bottom:22px}.section h2{font-size:17px;color:var(--blue);margin:0 0 12px}.section ul,.steps{margin:0;padding-left:20px;line-height:1.65}.steps{counter-reset:item;list-style:none;padding:0}.steps li{counter-increment:item;display:grid;grid-template-columns:28px 1fr;gap:8px;margin:0 0 9px}.steps li:before{content:counter(item);width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--blue);color:#fff;font-size:12px;font-weight:800}.meta{display:flex;flex-wrap:wrap;gap:8px}.meta span{border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:var(--muted);font-size:13px}.contact{padding:22px 42px;background:#f7f9fb;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}.empty{padding:80px 20px;text-align:center}
+    @media(max-width:650px){header{grid-template-columns:1fr;padding:28px 24px}main{padding:26px 24px}.grid{grid-template-columns:1fr}.contact{padding:20px 24px}.toolbar{justify-content:center}}
+    @media print{body{background:#fff}.toolbar{display:none}.sheet{width:100%;margin:0;box-shadow:none}header{-webkit-print-color-adjust:exact;print-color-adjust:exact}.badge,.steps li:before{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:A4;margin:0}}
+  </style>
+<link rel="stylesheet" href="../../css/tpl-site-shell.css?v=20260728-2">
+</head>
+<body>
+  <div class="toolbar"><a class="button" id="profile-link" href="#">Ver perfil</a><button type="button" onclick="window.print()">Guardar como PDF</button></div>
+  <article class="sheet" id="cv" hidden>
+    <header><div><h1 id="name"></h1><div class="talent" id="talent"></div></div><div class="badge">Partner TPL verificado</div></header>
+    <main>
+      <p class="summary" id="description"></p>
+      <div class="meta" id="meta"></div>
+      <div class="grid" style="margin-top:30px">
+        <div>
+          <section class="section"><h2>Actividades y servicios</h2><ul id="activities"></ul></section>
+          <section class="section"><h2>Especialidades</h2><ul id="specialties"></ul></section>
+          <section class="section"><h2>Cobertura</h2><ul id="coverage"></ul></section>
+        </div>
+        <div>
+          <section class="section"><h2>Etapas del servicio</h2><ol class="steps" id="stages"></ol></section>
+          <section class="section"><h2>Modalidades de pago</h2><ul id="payments"></ul></section>
+          <section class="section"><h2>Condiciones informadas</h2><ul id="conditions"></ul></section>
+        </div>
+      </div>
+    </main>
+    <footer class="contact"><strong id="responsible"></strong><span id="contact"></span><span>Generado por Tu Parcela Lista</span></footer>
+  </article>
+  <div class="empty" id="status">Preparando currículum…</div>
+<script>
+const SUPABASE_URL='https://qxavbqhyqaqalpzbhwmh.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJxeGF2YnFoeXFhcWFscHpiaHdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Nzc4MTIsImV4cCI6MjA5OTU1MzgxMn0.7-z6nCdXzurbVbkWQrL7hylblqj7SFPK8oyndLOeZEA';
+const escText=v=>String(v||'').trim();
+function fill(id,values,ordered=false){const node=document.getElementById(id);node.replaceChildren();[...new Set((values||[]).map(escText).filter(Boolean))].forEach(v=>{const li=document.createElement('li');li.textContent=v;node.appendChild(li)});if(!node.children.length){const li=document.createElement('li');li.textContent='No informado';node.appendChild(li)}}
+async function load(){const slug=(new URLSearchParams(location.search).get('slug')||'').trim();if(!/^[a-z0-9-]{3,100}$/i.test(slug))return fail();const fields='nombre_comercial,nombre_responsable,descripcion_servicios,tipo_servicio,especialidades,actividades,etapas_servicio,modalidades_pago,porcentaje_anticipo,garantia_servicio,region,comunas_atendidas,anos_experiencia,disponibilidad,emite_factura,whatsapp,correo,slug,curriculum_publicado';try{const r=await fetch(`${SUPABASE_URL}/rest/v1/partners_publicos?slug=eq.${encodeURIComponent(slug)}&select=${fields}&limit=1`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});if(!r.ok)throw 0;const rows=await r.json();const p=rows[0];if(!p||p.curriculum_publicado===false)return fail();render(p)}catch(e){fail()}}
+function render(p){document.title=`Currículum de ${p.nombre_comercial} | Partner TPL`;document.getElementById('name').textContent=p.nombre_comercial||'Partner TPL';document.getElementById('talent').textContent=p.tipo_servicio||'Profesional Partner';document.getElementById('description').textContent=p.descripcion_servicios||'';document.getElementById('responsible').textContent=p.nombre_responsable||p.nombre_comercial||'';document.getElementById('contact').textContent=[p.whatsapp,p.correo].filter(Boolean).join(' · ');document.getElementById('profile-link').href=`/plataforma/partners/perfil.html?slug=${encodeURIComponent(p.slug)}`;fill('activities',p.actividades);fill('specialties',p.especialidades);fill('coverage',[p.region,...(p.comunas_atendidas||[])]);fill('stages',p.etapas_servicio,true);fill('payments',p.modalidades_pago);const conditions=[];if(Number(p.porcentaje_anticipo||0)>0)conditions.push(`Anticipo habitual: ${Number(p.porcentaje_anticipo)}%`);if(p.garantia_servicio)conditions.push(`Garantía: ${p.garantia_servicio}`);if(p.emite_factura)conditions.push('Emite factura');fill('conditions',conditions);const meta=[`${Number(p.anos_experiencia||0)} años de experiencia`,p.disponibilidad].filter(Boolean);const m=document.getElementById('meta');meta.forEach(v=>{const s=document.createElement('span');s.textContent=v;m.appendChild(s)});document.getElementById('status').hidden=true;document.getElementById('cv').hidden=false}
+function fail(){document.getElementById('status').textContent='Este currículum no está disponible.'}
+load();
+</script>
+<script defer src="../../js/tpl-site-shell.js?v=20260728-2"></script>
+</body>
+</html>

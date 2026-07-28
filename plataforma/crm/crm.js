@@ -766,6 +766,7 @@ navItems.forEach(item => {
       if (targetId === 'view-solicitudes') topbarTitle.textContent = 'Parcelas y publicaciones';
       if (targetId === 'view-casas') topbarTitle.textContent = 'Catálogo de casas';
       if (targetId === 'view-tasador') topbarTitle.textContent = 'Tasador TPL';
+      if (targetId === 'view-mercado') topbarTitle.textContent = 'Índice de Mercado TPL';
       if (targetId === 'view-cotizaciones') topbarTitle.textContent = 'Cotizaciones y Smart Match';
       if (targetId === 'view-contratistas') topbarTitle.textContent = 'Gestión de Contratistas';
     }
@@ -1046,6 +1047,7 @@ document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
     if (targetId === 'view-contratistas' && contratistasCache.length === 0) loadContratistas();
     if (targetId === 'view-cotizaciones' && cotizacionesCache.length === 0) loadCotizaciones();
     if (targetId === 'view-tasador') loadTasadorPanel();
+    if (targetId === 'view-mercado' && window.TPLMercadoAdmin && typeof window.TPLMercadoAdmin.load === 'function') window.TPLMercadoAdmin.load();
   });
 });
 

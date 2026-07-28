@@ -1,420 +1,392 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta name="robots" content="index,follow">
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Publica tu parcela, campo o casa | Tu Parcela Lista</title>
-  <meta name="description" content="Publica una parcela, campo o casa mediante el asistente de Tu Parcela Lista y llega a compradores interesados.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="styles.css?v=20260723-tasador-v2">
-<link rel="stylesheet" href="../../css/tpl-lead-advisor.css?v=20260720-2">
-  <link rel="stylesheet" href="../../css/tpl-header-unified.css">
-  <link rel="canonical" href="https://www.parcelalista.cl/plataforma/publicar/">
-</head>
+<meta content="index,follow" name="robots"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Publicar y vender una parcela en internet | Tu Parcela Lista</title>
+<meta content="Publica tu parcela, campo o casa en internet. Obtén apoyo para definir el precio, preparar el anuncio y conectar la propiedad con compradores." name="description"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;family=Outfit:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link crossorigin="" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+<link href="styles.css?v=20260723-tasador-v2" rel="stylesheet"/>
+<link href="../../css/tpl-lead-advisor.css?v=20260720-2" rel="stylesheet"/>
+<link href="../../css/tpl-header-unified.css" rel="stylesheet"/>
+<link href="https://www.parcelalista.cl/plataforma/publicar/" rel="canonical"/>
+<link href="../../css/tpl-site-shell.css?v=20260728-2" rel="stylesheet"/></head>
 <body>
 <header class="site-header">
-  <div class="header-inner">
-    <a class="brand" href="../../index.html" aria-label="Volver al inicio"><img src="assets/logo_compartir.png" alt="Tu Parcela Lista"></a>
-    <div class="tpl-mobile-primary-actions" aria-label="Acciones principales">
-  <a class="tpl-mobile-publish" href="index.html">Publicar</a>
-  <a class="tpl-mobile-partners" href="../partners/index.html">Partners</a>
+<div class="header-inner">
+<a aria-label="Volver al inicio" class="brand" href="../../index.html"><img alt="Tu Parcela Lista" src="assets/logo_compartir.png"/></a>
+<div aria-label="Acciones principales" class="tpl-mobile-primary-actions">
+<a class="tpl-mobile-publish" href="index.html">Publicar</a>
+<a class="tpl-mobile-partners" href="../partners/index.html">Partners</a>
 </div>
-    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button>
-    <nav class="main-nav" id="mainNav" aria-label="Navegación principal">
-      <a href="../../index.html">Inicio</a><a href="../../index.html#parcelas-anchor">Parcelas</a><a href="../../index.html#casas-section">Casas</a><a href="../../index.html#mejores-alternativas">Mejores alternativas</a><a href="../../como-comprar.html">Cómo comprar</a><a href="../partners/index.html">Red de Partners</a><a href="../../index.html#quienes-somos">Quiénes somos</a><a href="../../index.html#contacto">Contacto</a>
-    </nav>
-    <span class="save-state" id="saveState">Borrador automático</span>
-  </div>
+<button aria-expanded="false" aria-label="Abrir menú" class="menu-toggle" id="menuToggle" type="button">☰</button>
+<nav aria-label="Navegación principal" class="main-nav" id="mainNav">
+<a href="../../index.html">Inicio</a><a href="../../index.html#parcelas-anchor">Parcelas</a><a href="../../index.html#casas-section">Casas</a><a href="../../index.html#mejores-alternativas">Mejores alternativas</a><a href="../../como-comprar.html">Cómo comprar</a><a href="../partners/index.html">Red de Partners</a><a href="../../index.html#quienes-somos">Quiénes somos</a><a href="../../index.html#contacto">Contacto</a>
+</nav>
+<span class="save-state" id="saveState">Borrador automático</span>
+</div>
 </header>
-<div id="startupError" class="startup-error" hidden></div>
+<div class="startup-error" hidden="" id="startupError"></div>
 <main class="publisher-layout">
-  <aside class="progress-sidebar" aria-label="Avance de publicación">
-    <div class="progress-card">
-      <p class="progress-kicker">Tu publicación</p>
-      <div class="progress-ring" id="progressRing"><strong id="progressPercent">0%</strong><span>completado</span></div>
-      <nav class="progress-steps" id="progressSteps">
-        <button type="button" data-target="tipo" class="current"><i>1</i><span>Tipo de propiedad</span></button>
-        <button type="button" data-target="datos"><i>2</i><span>Características</span></button>
-        <button type="button" data-target="ubicacion"><i>3</i><span>Ubicación</span></button>
-        <button type="button" data-target="fotos"><i>4</i><span>Fotografías</span></button>
-        <button type="button" data-target="precio"><i>5</i><span>Precio y tasación</span></button>
-        <button type="button" data-target="vista"><i>6</i><span>Anuncio generado</span></button>
-        <button type="button" data-target="anunciante"><i>7</i><span>Quién publica</span></button>
-        <button type="button" data-target="planes"><i>8</i><span>Plan</span></button>
-        <button type="button" data-target="publicar"><i>9</i><span>Publicar</span></button>
-      </nav>
-    </div>
-  </aside>
-
-  <div class="publisher-content">
-    <section class="hero-intro">
-      <p class="eyebrow">Asistente inteligente de publicación</p>
-      <h1>Completa los datos. Nosotros creamos el anuncio.</h1>
-      <p>Selecciona las características reales de tu propiedad. Tu Parcela Lista preparará automáticamente un título comercial, una descripción clara y una vista previa lista para vender.</p>
-    </section>
-
-    <form id="publisherForm" novalidate>
-      <input type="hidden" id="titulo" name="titulo"><input type="hidden" id="descripcionFinal" name="descripcionFinal">
-      
-      <!-- Anti-Bot Honeypot: Do not fill this field -->
-      <div style="opacity: 0; position: absolute; top: 0; left: 0; height: 0; width: 0; z-index: -1;">
-        <label for="user_contact_website">Si eres humano, deja este campo vacío</label>
-        <input type="text" id="user_contact_website" name="user_contact_website" tabindex="-1" autocomplete="off">
-      </div>
-
-      <section class="form-section observable" id="tipo" data-step="tipo">
-        <header class="section-heading"><span>01</span><div><p class="eyebrow">Comencemos</p><h2>¿Qué deseas publicar?</h2><p>Los campos cambiarán automáticamente según el tipo de propiedad.</p></div></header>
-        <div class="property-types" role="radiogroup">
-          <label class="property-card property-card-land"><input type="radio" name="tipo" value="parcela"><img src="assets/decision-campo-fondo.webp" alt="Campo y parcela"><span class="property-shade"></span><span class="property-copy"><small>Terreno rural</small><strong>Parcela o campo</strong><em>Terreno sin vivienda principal.</em></span><span class="property-check">✓</span></label>
-          <label class="property-card property-card-land-house"><input type="radio" name="tipo" value="parcela_con_casa"><img src="assets/btn_casa_modern.jpg" alt="Parcela con casa"><span class="property-shade"></span><span class="property-copy"><small>Propiedad completa</small><strong>Parcela con casa</strong><em>Terreno y vivienda se venden juntos.</em></span><span class="property-check">✓</span></label>
-          <label class="property-card property-card-house"><input type="radio" name="tipo" value="casa"><img src="assets/btn_casa_modern.jpg" alt="Casa"><span class="property-shade"></span><span class="property-copy"><small>Vivienda</small><strong>Casa</strong><em>Vivienda sin ofrecerse como parcela.</em></span><span class="property-check">✓</span></label>
-        </div>
-        <p class="field-error" data-error-for="tipo"></p>
-        <div class="section-actions"><button type="button" class="btn primary next-section" data-next="datos">Comenzar publicación</button></div>
-      </section>
-
-      <section class="form-section observable" id="datos" data-step="datos">
-        <header class="section-heading"><span>02</span><div><p class="eyebrow">Información detallada</p><h2 id="detailsTitle">Completa las características</h2><p>Mientras más información entregues, mejor será el título, la descripción y la recomendación de precio.</p></div></header>
-        <div class="form-grid">
-          <label class="field"><span>Región</span><select id="region" name="region"><option value="">Selecciona</option></select><small class="field-error" data-error-for="region"></small></label>
-          <label class="field"><span>Comuna</span><select id="comuna" name="comuna" disabled><option value="">Selecciona</option></select><small class="field-error" data-error-for="comuna"></small></label>
-          <label class="field span-2"><span>Sector, camino o localidad</span><input id="localidad" name="localidad" placeholder="Ej. Río Claro, camino interior"><small class="field-error" data-error-for="localidad"></small></label>
-
-          <div class="parcel-fields contents">
-            <div class="field-group span-2"><h3>Dimensiones y situación legal</h3><p>Información esencial para clasificar correctamente la propiedad.</p></div>
-            <label class="field"><span>Superficie del terreno</span><div class="with-suffix"><input id="superficie" name="superficie" inputmode="numeric"><b>m²</b></div><small class="field-error" data-error-for="superficie"></small></label>
-            <label class="field"><span>Tipo de terreno</span><select id="tipoTerreno" name="tipoTerreno"><option value="">Automático según superficie</option><option>Parcela</option><option>Campo</option><option>Fundo</option><option>Sitio rural</option><option>Predio agrícola</option></select></label>
-            <label class="field"><span>Situación del rol</span><select id="rol" name="rol"><option value="">Selecciona</option><option>Rol propio</option><option>Rol compartido</option><option>En trámite</option><option>No lo sé</option></select></label>
-            <label class="field"><span>¿Está dentro de un condominio o loteo?</span><select id="condominio" name="condominio"><option value="">Selecciona</option><option value="Sí">Sí</option><option value="No">No</option><option value="No lo sé">No lo sé</option></select></label>
-            <label class="field"><span>Subdivisión</span><select id="subdivision" name="subdivision"><option value="">Selecciona</option><option>Subdivisión aprobada</option><option>Predio original</option><option>En proceso de subdivisión</option><option>No aplica</option><option>No lo sé</option></select></label>
-            <label class="field"><span>Uso principal</span><select id="usoSuelo" name="usoSuelo"><option value="">Selecciona</option><option>Habitacional</option><option>Agrícola</option><option>Ganadero</option><option>Forestal</option><option>Turístico</option><option>Mixto</option><option>No lo sé</option></select></label>
-            <label class="field"><span>Clasificación turística del sector</span><select id="zonaTuristica" name="zonaTuristica"><option value="">No aplica o no lo sé</option><option value="local">Sector turístico local (+20%)</option><option value="nacional">Destino turístico nacional (+300%)</option></select><small>Este antecedente modifica el cálculo orientativo y debe poder respaldarse durante la revisión.</small></label>
-            <label class="field"><span>Factibilidad de construcción</span><select id="construccion" name="construccion"><option value="">Selecciona</option><option>Apta para construir</option><option>Con factibilidad informada</option><option>Requiere evaluación</option><option>No lo sé</option></select></label>
-
-            <div class="field-group span-2"><h3>Relieve, suelo y entorno natural</h3><p>Estas características ayudan a destacar el verdadero valor del terreno.</p></div>
-            <label class="field"><span>Topografía</span><select id="topografia" name="topografia"><option value="">Selecciona</option><option>Completamente plana</option><option>Mayormente plana</option><option>Mixta</option><option>Lomaje suave</option><option>Con pendiente</option><option>Escarpada</option></select></label>
-            <label class="field"><span>Condición del suelo</span><select id="condicionSuelo" name="condicionSuelo"><option value="">Selecciona</option><option>Seco y firme</option><option>Pradera</option><option>Suelo agrícola</option><option>Húmedo</option><option>Pedregoso</option><option>Arenoso</option><option>No evaluado</option></select></label>
-            <label class="field"><span>Vegetación predominante</span><select id="vegetacion" name="vegetacion"><option value="">Selecciona</option><option>Pradera despejada</option><option>Bosque nativo</option><option>Bosque mixto</option><option>Plantación forestal</option><option>Pinos o eucaliptus</option><option>Árboles frutales</option><option>Matorral</option><option>Sin vegetación relevante</option></select></label>
-            <label class="field"><span>Vista principal</span><select id="vistaPrincipal" name="vistaPrincipal"><option value="">Selecciona</option><option>Vista a cordillera</option><option>Vista a valle</option><option>Vista al mar</option><option>Vista a lago o laguna</option><option>Vista al río</option><option>Vista panorámica</option><option>Entorno interior protegido</option></select></label>
-            <label class="field"><span>Orientación / asoleamiento</span><select id="orientacion" name="orientacion"><option value="">Selecciona</option><option>Norte</option><option>Nororiente</option><option>Norponiente</option><option>Oriente</option><option>Poniente</option><option>Sur</option><option>Buena exposición solar</option></select></label>
-            <label class="field"><span>Privacidad</span><select id="privacidad" name="privacidad"><option value="">Selecciona</option><option>Alta privacidad</option><option>Vecinos distantes</option><option>Sector consolidado</option><option>Condominio o loteo</option><option>Zona aislada</option></select></label>
-
-            <div class="field-group span-2"><h3>Agua y elementos naturales</h3><p>Marca todo lo que realmente existe o está disponible.</p></div>
-            <div class="field span-2"><span>Fuentes de agua y atractivos naturales</span><div class="choice-grid">
-              <label><input type="checkbox" name="naturaleza" value="Río dentro o junto a la propiedad"><span>Río</span></label>
-              <label><input type="checkbox" name="naturaleza" value="Estero"><span>Estero</span></label>
-              <label><input type="checkbox" name="naturaleza" value="Vertiente natural"><span>Vertiente</span></label>
-              <label><input type="checkbox" name="naturaleza" value="Laguna o tranque"><span>Laguna o tranque</span></label>
-              <label><input type="checkbox" name="naturaleza" value="Lago con borde o acceso"><span>Lago con borde o acceso</span></label>
-              <label><input type="checkbox" name="naturaleza" value="Bosque nativo"><span>Bosque nativo</span></label>
-              <label><input type="checkbox" name="naturaleza" value="Senderos interiores"><span>Senderos</span></label>
-            </div></div>
-            <label class="field"><span>Abastecimiento de agua</span><select id="agua" name="agua"><option value="">Selecciona</option><option>Pozo inscrito</option><option>Pozo</option><option>APR conectada</option><option>APR cercana</option><option>Vertiente</option><option>Derechos de agua</option><option>Factibilidad</option><option>Sin agua habilitada</option><option>No lo sé</option></select></label>
-            <label class="field"><span>Electricidad</span><select id="luz" name="luz"><option value="">Selecciona</option><option>Conectada</option><option>Empalme instalado</option><option>Postación en el frente</option><option>Postación cercana</option><option>Factibilidad</option><option>Sistema solar</option><option>Sin electricidad</option><option>No lo sé</option></select></label>
-
-            <div class="field-group span-2"><h3>Acceso e infraestructura</h3><p>Describe cómo se llega y qué mejoras ya tiene.</p></div>
-            <label class="field"><span>Tipo de acceso</span><select id="acceso" name="acceso"><option value="">Selecciona</option><option>Camino pavimentado</option><option>Ripio en buen estado</option><option>Ripio transitable</option><option>Camino de tierra</option><option>Servidumbre inscrita</option><option>Acceso por mejorar</option></select></label>
-            <label class="field"><span>Distancia a ruta o carretera principal</span><div class="with-suffix"><input id="distanciaRutaPrincipalKm" name="distanciaRutaPrincipalKm" type="number" min="0" max="999" step="0.1" inputmode="decimal" placeholder="Ej. 12"><b>km</b></div><small>Indica la distancia aproximada hasta la ruta o carretera principal más cercana.</small></label>
-            <label class="field"><span>Cierre perimetral</span><select id="cierre" name="cierre"><option value="">Selecciona</option><option>Completamente cercada</option><option>Parcialmente cercada</option><option>Deslindes marcados</option><option>Sin cierre</option></select></label>
-            <label class="field"><span>Acceso privado</span><select id="porton" name="porton"><option value="">Selecciona</option><option>Portón instalado</option><option>Portón automático</option><option>Acceso controlado</option><option>Sin portón</option></select></label>
-            <label class="field"><span>Frente aproximado</span><div class="with-suffix"><input id="frente" name="frente" inputmode="numeric"><b>m</b></div></label>
-            <label class="field"><span>Forma del terreno</span><select id="formaTerreno" name="formaTerreno"><option value="">Selecciona</option><option>Regular</option><option>Rectangular</option><option>Irregular</option><option>Amplio frente</option><option>Fondo largo</option></select></label>
-          </div>
-
-          <div class="house-fields contents">
-            <div class="field-group span-2"><h3>Dimensiones y distribución</h3></div>
-            <label class="field"><span>Tipo de propiedad</span><select id="tipoCasa" name="tipoCasa"><option value="">Selecciona</option><option>Casa urbana</option><option>Casa rural</option><option>Casa con parcela</option><option>Casa en condominio</option><option>Casa prefabricada instalada</option><option>Parcela con casa</option></select></label>
-            <label class="field"><span>Superficie construida</span><div class="with-suffix"><input id="casaSuperficie" name="casaSuperficie" inputmode="numeric"><b>m²</b></div><small class="field-error" data-error-for="casaSuperficie"></small></label>
-            <label class="field"><span>Superficie del terreno</span><div class="with-suffix"><input id="casaTerreno" name="casaTerreno" inputmode="numeric"><b>m²</b></div></label>
-            <label class="field"><span>Dormitorios</span><select id="habitaciones" name="habitaciones"><option value="">Selecciona</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option value="6">6 o más</option></select></label>
-            <label class="field"><span>Baños</span><select id="banos" name="banos"><option value="">Selecciona</option><option>1</option><option>2</option><option>3</option><option value="4">4 o más</option></select></label>
-            <label class="field"><span>Número de pisos</span><select id="pisos" name="pisos"><option value="">Selecciona</option><option>1 piso</option><option>2 pisos</option><option>3 o más pisos</option></select></label>
-            <div class="field-group span-2"><h3>Construcción y estado</h3></div>
-            <label class="field"><span>Material principal</span><select id="material" name="material"><option value="">Selecciona</option><option>Madera</option><option>Metalcon</option><option>SIP</option><option>Albañilería</option><option>Hormigón</option><option>Mixta</option></select></label>
-            <label class="field"><span>Estado de conservación</span><select id="estadoCasa" name="estadoCasa"><option value="">Selecciona</option><option>Nueva</option><option>Excelente</option><option>Muy buena</option><option>Buena</option><option>Necesita mejoras</option><option>Para remodelar</option></select></label>
-            <label class="field"><span>Regularización</span><select id="regularizacion" name="regularizacion"><option value="">Selecciona</option><option>Recepción final</option><option>Totalmente regularizada</option><option>Regularizada parcialmente</option><option>En trámite</option><option>Sin regularizar</option><option>No lo sé</option></select></label>
-            <label class="field"><span>Año aproximado</span><input id="anioCasa" name="anioCasa" inputmode="numeric" maxlength="4" placeholder="Ej. 2018"></label>
-            <label class="field"><span>Calidad constructiva</span><select id="calidadCasa" name="calidadCasa"><option value="">Selecciona</option><option>Económica</option><option>Estándar</option><option>Buena</option><option>Premium</option></select></label>
-            <label class="field"><span>Remodelación</span><select id="remodelacionCasa" name="remodelacionCasa"><option value="">Sin remodelación informada</option><option>Parcial</option><option>Importante</option><option>Integral</option></select></label>
-            <label class="field"><span>Año de remodelación</span><input id="anioRemodelacionCasa" name="anioRemodelacionCasa" inputmode="numeric" maxlength="4" placeholder="Ej. 2023"></label>
-            <div class="field-group span-2"><h3>Conectividad para el tasador de casa</h3><p>Usaremos una sola referencia urbana para no duplicar el efecto de cercanía.</p></div>
-            <label class="field"><span>Centro urbano o Plaza de Armas de referencia</span><input id="centroUrbanoCasa" name="centroUrbanoCasa" placeholder="Ej. Plaza de Armas de Yumbel"></label>
-            <label class="field"><span>Tiempo aproximado al centro</span><div class="with-suffix"><input id="minutosCentroCasa" name="minutosCentroCasa" type="number" min="0" max="300" step="1" inputmode="numeric" placeholder="Ej. 18"><b>min</b></div></label>
-            <label class="field"><span>Distancia aproximada al centro</span><div class="with-suffix"><input id="kmCentroCasa" name="kmCentroCasa" type="number" min="0" max="500" step="0.1" inputmode="decimal" placeholder="Ej. 12"><b>km</b></div><small>Solo se usa si no indicas minutos.</small></label>
-            <label class="field"><span>Camino principal hasta la vivienda</span><select id="caminoCasa" name="caminoCasa"><option value="">Selecciona</option><option>Pavimentado</option><option>Ripio en buen estado</option><option>Ripio transitable</option><option>Tierra en buen estado</option><option>Acceso difícil</option></select></label>
-            <label class="field"><span>Aislación térmica</span><select id="aislacionCasa" name="aislacionCasa"><option value="">No informado</option><option>Buena</option><option>Estándar</option><option>Deficiente</option></select></label>
-            <label class="field"><span>Ventanas</span><select id="ventanasCasa" name="ventanasCasa"><option value="">No informado</option><option>Termopanel</option><option>Vidrio simple en buen estado</option><option>Vidrio simple antiguo</option></select></label>
-            <div class="field-group span-2 house-valuation-note"><h3>Tasador TPL de Casa · Piloto</h3><p>La vivienda se calcula por separado. El tasador de parcelas existente no se modifica y el valor del terreno no se suma en esta etapa.</p></div>
-            <div class="field-group span-2"><h3>Servicios y equipamiento</h3></div>
-            <label class="field"><span>Agua</span><select id="aguaCasa" name="aguaCasa"><option value="">Selecciona</option><option>Red pública</option><option>APR</option><option>Pozo</option><option>Vertiente</option><option>Mixta</option></select></label>
-            <label class="field"><span>Sistema sanitario</span><select id="sanitarioCasa" name="sanitarioCasa"><option value="">Selecciona</option><option>Alcantarillado</option><option>Fosa séptica</option><option>Planta de tratamiento</option><option>Pozo negro</option><option>No lo sé</option></select></label>
-            <label class="field"><span>Calefacción</span><select id="calefaccion" name="calefaccion"><option value="">Selecciona</option><option>Estufa a leña</option><option>Combustión lenta</option><option>Pellet</option><option>Gas</option><option>Eléctrica</option><option>Calefacción central</option><option>Sin calefacción fija</option></select></label>
-            <label class="field"><span>Estacionamientos</span><select id="estacionamientos" name="estacionamientos"><option value="">Selecciona</option><option>1</option><option>2</option><option>3</option><option value="4">4 o más</option><option>Sin estacionamiento</option></select></label>
-            <div class="field span-2"><span>Espacios y atributos destacados</span><div class="choice-grid">
-              <label><input type="checkbox" name="extrasCasa" value="Terraza"><span>Terraza</span></label><label><input type="checkbox" name="extrasCasa" value="Quincho"><span>Quincho</span></label><label><input type="checkbox" name="extrasCasa" value="Piscina"><span>Piscina</span></label><label><input type="checkbox" name="extrasCasa" value="Bodega"><span>Bodega</span></label><label><input type="checkbox" name="extrasCasa" value="Logia"><span>Logia</span></label><label><input type="checkbox" name="extrasCasa" value="Chimenea"><span>Chimenea</span></label><label><input type="checkbox" name="extrasCasa" value="Jardín formado"><span>Jardín</span></label><label><input type="checkbox" name="extrasCasa" value="Vista panorámica"><span>Vista panorámica</span></label><label><input type="checkbox" name="extrasCasa" value="Acceso a río o lago"><span>Río o lago</span></label><label><input type="checkbox" name="extrasCasa" value="Bosque o entorno nativo"><span>Bosque</span></label>
-            </div></div>
-          </div>
-        </div>
-        <section class="generated-copy compact" aria-live="polite"><div><p class="eyebrow">Anuncio en construcción</p><h3 id="generatedTitle">Completa algunos datos para crear el título</h3><p id="generatedDescription">La descripción comercial se irá formando automáticamente aquí.</p></div><button type="button" class="btn secondary" id="regenerateCopy">Regenerar texto</button></section>
-        <div class="section-actions"><button type="button" class="btn ghost previous-section" data-prev="tipo">Volver</button><button type="button" class="btn primary next-section" data-next="ubicacion">Continuar a ubicación</button></div>
-      </section>
-
-      <section class="form-section observable" id="ubicacion" data-step="ubicacion">
-        <header class="section-heading"><span>03</span><div><p class="eyebrow">Ubicación inteligente</p><h2>¿Dónde se encuentra?</h2><p>Pega un enlace de Google Maps, usa tu ubicación si estás en la propiedad o busca y marca el punto en el mapa.</p></div></header>
-        <div class="maps-link-box">
-          <label class="field"><span>Pegar enlace de Google Maps</span><div class="maps-link-row"><input id="googleMapsLink" type="url" inputmode="url" placeholder="https://maps.google.com/... o https://www.google.com/maps/..."><button type="button" class="btn secondary" id="useGoogleMapsLink">Usar enlace</button></div><small>Abre el lugar en Google Maps, selecciona Compartir y pega aquí el enlace. También puedes pegar coordenadas como -37.12345, -72.12345.</small></label>
-          <p class="field-error" data-error-for="googleMapsLink"></p>
-        </div>
-        <div class="location-help-title">Si no tienes el enlace:</div>
-        <div class="location-actions"><button type="button" class="method-card" id="useGps"><strong>Estoy en el lugar</strong><span>Haz clic para usar el GPS de tu teléfono o computador.</span></button><button type="button" class="method-card" id="focusMapSearch"><strong>Necesito buscarlo</strong><span>Escribe sector, comuna, camino o referencia.</span></button><button type="button" class="method-card" id="focusMap"><strong>Marcar manualmente</strong><span>Haz clic directamente sobre el punto en el mapa.</span></button></div>
-        <div class="map-search"><input id="mapSearch" placeholder="Ej. Río Claro, Yumbel, Biobío"><button type="button" class="btn secondary" id="searchMap">Buscar</button></div><div id="map" class="map"></div><div class="location-status" id="locationStatus">Todavía no has indicado una ubicación. Puedes pegar un enlace, usar GPS, buscar o marcar directamente en el mapa.</div><label class="check-row"><input type="checkbox" id="publicApproximate" checked><span>Mostrar al público solo una ubicación aproximada</span></label>
-        <div class="section-actions"><button type="button" class="btn ghost previous-section" data-prev="datos">Volver</button><button type="button" class="btn primary next-section" data-next="fotos">Continuar a fotografías</button></div>
-      </section>
-
-      <section class="form-section observable" id="fotos" data-step="fotos">
-        <header class="section-heading"><span>04</span><div><p class="eyebrow">Haz que destaque</p><h2>Agrega fotografías</h2><p>La primera imagen será la portada. Puedes subir hasta 12 fotografías.</p></div></header>
-        <label class="photo-drop" id="photoDrop" for="fotosInput"><input id="fotosInput" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden><strong>Seleccionar o arrastrar fotografías</strong><span>Hasta 12 imágenes. Las optimizaremos automáticamente a WebP.</span></label>
-        <div class="photo-processing" id="photoProcessing" hidden aria-live="polite"><div class="photo-processing-head"><strong id="photoProcessingTitle">Preparando fotografías…</strong><span id="photoProcessingCount">0 de 0</span></div><div class="photo-progress"><i id="photoProgressBar"></i></div><small id="photoProcessingDetail">Redimensionando y comprimiendo sin perder calidad visible.</small></div>
-        <div class="photo-summary" id="photoSummary" hidden></div>
-        <div class="photo-location-fallback" id="photoLocationFallback" hidden>
-          <div><strong>Falta completar la ubicación</strong><p>Podemos revisar si alguna fotografía contiene la ubicación guardada por el teléfono. Esto solo funciona cuando la cámara tenía activado el GPS.</p><span id="photoLocationMessage"></span></div>
-          <div class="photo-location-actions"><button type="button" class="btn small secondary" id="tryPhotoLocation">Buscar ubicación en las fotos</button><button type="button" class="btn small primary" id="usePhotoLocation" hidden>Usar ubicación encontrada</button><button type="button" class="btn small ghost" id="backToLocation">Volver a ubicación</button></div>
-        </div>
-        <div class="photo-grid" id="photoGrid"></div><p class="field-error" data-error-for="fotos"></p>
-        
-        <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
-          <h3 style="margin-bottom: 8px;">Video de la propiedad (Opcional)</h3>
-          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">Ingresa el enlace de YouTube o Vimeo. Si lo dejas en blanco, la sección de video no aparecerá en la página de la propiedad.</p>
-          <label class="field"><input type="url" id="videoUrl" name="videoUrl" placeholder="https://www.youtube.com/watch?v=..."></label>
-        </div>
-
-        <div class="section-actions"><button type="button" class="btn ghost previous-section" data-prev="ubicacion">Volver</button><button type="button" class="btn primary next-section" data-next="precio">Continuar al precio</button></div>
-      </section>
-
-      <section class="form-section observable" id="precio" data-step="precio">
-        <header class="section-heading"><span>05</span><div><p class="eyebrow">Tasador orientativo TPL</p><h2>Define el precio de venta</h2><p>Compararemos la propiedad con información disponible en Tu Parcela Lista.</p></div></header>
-        <div class="price-layout"><label class="price-input"><span>Precio de venta</span><div><b>$</b><input id="precioVenta" name="precio" inputmode="numeric" placeholder="25.000.000"></div><small class="field-error" data-error-for="precio"></small></label><button type="button" class="btn primary valuation-launch-btn" id="runValuation"><span>✦</span> Calcular precio recomendado</button></div><p class="valuation-data-note">El cálculo es una orientación comercial. Considera los antecedentes informados, incluida la clasificación turística y el acceso a río cuando corresponda; estos atributos serán revisados antes de aprobar la publicación.</p><div id="valuationResult" class="valuation-result" hidden></div>
-        <section class="urgency-module" aria-labelledby="urgencyTitle">
-          <div class="urgency-heading"><div><p class="eyebrow">Estrategia de venta</p><h3 id="urgencyTitle">¿Qué tan pronto necesitas vender?</h3><p>Esta respuesta no cambia el valor real de la propiedad. Nos permite recomendar una estrategia, priorizar el seguimiento y sugerirte el plan más conveniente.</p></div><span class="urgency-status" id="urgencyStatus">Sin seleccionar</span></div>
-          <div class="urgency-options" role="radiogroup" aria-label="Nivel de urgencia de venta">
-            <label><input type="radio" name="urgencia" value="baja"><span><small>URGENCIA BAJA</small><strong>Sin apuro</strong><em>Puedo esperar una buena oportunidad.</em></span></label>
-            <label><input type="radio" name="urgencia" value="leve"><span><small>URGENCIA LEVE</small><strong>Quiero comenzar a moverla</strong><em>Quiero recibir interesados durante los próximos meses.</em></span></label>
-            <label><input type="radio" name="urgencia" value="alta"><span><small>URGENCIA ALTA</small><strong>Necesito vender pronto</strong><em>Quiero acelerar consultas y visitas.</em></span></label>
-            <label><input type="radio" name="urgencia" value="critica"><span><small>URGENCIA MUY ALTA</small><strong>Quiero máxima exposición</strong><em>Necesito una estrategia intensiva.</em></span></label>
-          </div>
-          <div class="urgency-details">
-            <label class="field"><span>¿En qué plazo esperas vender?</span><select id="plazoVenta" name="plazoVenta"><option value="">Selecciona</option><option>No tengo plazo</option><option>Durante los próximos 6 meses</option><option>Durante los próximos 3 meses</option><option>Durante el próximo mes</option></select></label>
-            <label class="field"><span>¿Hace cuánto intentas vender?</span><select id="tiempoEnVenta" name="tiempoEnVenta"><option value="">Selecciona</option><option>Aún no la he publicado</option><option>Menos de 3 meses</option><option>Entre 3 y 6 meses</option><option>Más de 6 meses</option></select></label>
-            <label class="field"><span>¿Cómo prefieres negociar?</span><select id="negociacionPrecio" name="negociacionPrecio"><option value="">Selecciona</option><option value="precio_fijo">El precio es fijo</option><option value="ofertas">Sí, puedo evaluar ofertas</option><option value="mejoras">Prefiero mantener el precio, pero puedo incluir mejoras</option><option value="ofertas_y_mejoras">Puedo evaluar ofertas o incluir mejoras</option></select></label>
-            <label class="field"><span>Disponibilidad para visitas</span><select id="disponibilidadVisitas" name="disponibilidadVisitas"><option value="">Selecciona</option><option>Con coordinación previa</option><option>Durante la semana</option><option>Fines de semana</option><option>Tengo alta disponibilidad</option><option>Necesito que TPL coordine todo</option></select></label>
-          </div>
-          <section class="owner-improvements" id="ownerImprovements" hidden aria-labelledby="ownerImprovementsTitle">
-            <div class="owner-improvements-heading">
-              <div><p class="eyebrow">Negociación con valor agregado</p><h3 id="ownerImprovementsTitle">¿Qué mejoras podrías ofrecer para facilitar la venta?</h3><p>Estas opciones se mostrarán como beneficios disponibles para negociar. No serán un compromiso definitivo hasta incorporarlas formalmente a una reserva o contrato.</p></div>
-              <span class="owner-improvements-badge">Beneficio TPL</span>
-            </div>
-            <div class="improvement-options">
-              <label><input type="checkbox" name="mejorasOfrecidas" value="empalme_electrico"><span><strong>Empalme eléctrico</strong><small>Gestionar o aportar a la instalación.</small></span></label>
-              <label><input type="checkbox" name="mejorasOfrecidas" value="cerco_perimetral"><span><strong>Cerco perimetral</strong><small>Construir o completar el cierre.</small></span></label>
-              <label><input type="checkbox" name="mejorasOfrecidas" value="porton_acceso"><span><strong>Portón de acceso</strong><small>Instalar acceso principal.</small></span></label>
-              <label><input type="checkbox" name="mejorasOfrecidas" value="camino_acceso"><span><strong>Mejorar camino</strong><small>Ripio, estabilizado o limpieza del acceso.</small></span></label>
-              <label><input type="checkbox" name="mejorasOfrecidas" value="agua"><span><strong>Solución de agua</strong><small>Pozo, puntera, estanque o aporte.</small></span></label>
-              <label><input type="checkbox" name="mejorasOfrecidas" value="limpieza_terreno"><span><strong>Limpieza del terreno</strong><small>Despeje o retiro de residuos.</small></span></label>
-              <label><input type="checkbox" name="mejorasOfrecidas" value="topografia"><span><strong>Estudio topográfico</strong><small>Levantamiento para planificar el proyecto.</small></span></label>
-              <label><input type="checkbox" name="mejorasOfrecidas" value="aporte_fosa"><span><strong>Aporte para fosa séptica</strong><small>Financiar una parte o totalidad según acuerdo.</small></span></label>
-            </div>
-            <div class="owner-improvements-details">
-              <label class="field"><span>Monto máximo referencial</span><select id="montoMaximoMejoras" name="montoMaximoMejoras"><option value="">Sin definir todavía</option><option value="500000">Hasta $500.000</option><option value="1000000">Hasta $1.000.000</option><option value="2000000">Hasta $2.000.000</option><option value="3000000">Hasta $3.000.000</option><option value="personalizado">Otro monto</option></select></label>
-              <label class="field"><span>Momento de ejecución</span><select id="momentoMejoras" name="momentoMejoras"><option value="">A definir en la negociación</option><option value="antes_promesa">Antes de firmar la promesa</option><option value="antes_compraventa">Antes de la compraventa</option><option value="despues_compraventa">Después de la compraventa</option><option value="aporte_monetario">Como aporte monetario al comprador</option></select></label>
-              <label class="field span-2"><span>Condiciones o detalle</span><textarea id="detalleMejoras" name="detalleMejoras" rows="3" placeholder="Ej. Instalaré el empalme una vez firmada la compraventa, sujeto a factibilidad técnica y hasta un máximo acordado."></textarea></label>
-            </div>
-            <div class="detected-needs" id="detectedPartnerNeeds" hidden></div>
-          </section>
-          <div class="urgency-recommendation" id="urgencyRecommendation" hidden></div>
-          <p class="field-error" data-error-for="urgencia"></p>
-        </section>
-        <div class="section-actions"><button type="button" class="btn ghost previous-section" data-prev="fotos">Volver</button><button type="button" class="btn primary next-section" data-next="vista">Crear anuncio</button></div>
-      </section>
-
-      <section class="form-section observable" id="vista" data-step="vista">
-        <header class="section-heading"><span>06</span><div><p class="eyebrow">Redacción automática</p><h2>Tu anuncio está listo para revisar</h2><p>El título y la descripción se construyeron con las características que seleccionaste.</p></div></header>
-        <article class="listing-preview site-listing-preview" id="listingPreview">
-          <div class="preview-image preview-image-empty" id="previewImageWrap">
-            <img id="previewPhoto" alt="Vista previa del anuncio" hidden>
-            <div class="preview-placeholder" id="previewPlaceholder">
-              <span class="preview-placeholder-icon">⌂</span>
-              <strong>Tu anuncio tendrá aquí su fotografía principal</strong>
-              <small>Mientras tanto puedes revisar cómo se verá publicado dentro de Tu Parcela Lista.</small>
-            </div>
-            <div class="preview-topline"><span id="previewType">Parcela o campo</span><b>Vista previa</b></div>
-          </div>
-          <div class="preview-body">
-            <div class="preview-brandline"><span>Tu Parcela Lista</span><small>Anuncio en preparación</small></div>
-            <p id="previewLocation">Ubicación por completar</p>
-            <h3 id="previewTitle">Tu propiedad aparecerá aquí</h3>
-            <strong id="previewPrice">Precio por completar</strong><div id="previewTplValueBadge" class="preview-tpl-value-badge" hidden><span>✓ Valor respaldado por Tu Parcela Lista</span><small>Precio recomendado</small></div>
-            <div class="preview-features" id="previewFeatures"></div>
-            <p id="previewDescription">La descripción comercial aparecerá aquí.</p>
-            <div class="preview-footer"><span>Información entregada por el anunciante</span><button type="button" disabled>Contactar</button></div>
-          </div>
-        </article>
-        <div class="generated-editor"><label class="field"><span>Título comercial generado</span><input id="tituloEditable" maxlength="90"></label><label class="field"><span>Descripción comercial generada</span><textarea id="descripcionEditable" rows="10" maxlength="1800"></textarea></label><div class="editor-actions"><small>Puedes corregir el texto, pero no necesitas redactarlo desde cero.</small><button type="button" class="btn secondary" id="restoreGenerated">Volver a generar</button></div></div>
-        <div class="section-actions"><button type="button" class="btn ghost previous-section" data-prev="precio">Corregir información</button><button type="button" class="btn primary next-section" data-next="anunciante">Continuar</button></div>
-      </section>
-
-      <section class="form-section observable" id="anunciante" data-step="anunciante">
-        <header class="section-heading"><span>07</span><div><p class="eyebrow">Para ofrecerte la mejor modalidad</p><h2>¿Quién está publicando?</h2><p>Los planes cambian según seas propietario o corredor.</p></div></header>
-        <div class="publisher-types"><label><input type="radio" name="anunciante" value="propietario"><span><strong>Soy propietario</strong><small>Quiero vender mi propia propiedad.</small></span></label><label><input type="radio" name="anunciante" value="corredor"><span><strong>Soy corredor de propiedades</strong><small>Publico para clientes o mi cartera.</small></span></label></div><p class="field-error" data-error-for="anunciante"></p>
-        <div class="contact-grid"><label class="field"><span>Nombre</span><input name="nombre" id="nombre"></label><label class="field"><span>Teléfono / WhatsApp</span><input name="telefono" id="telefono" inputmode="tel"></label><label class="field span-2"><span>Correo electrónico</span><input name="email" id="email" type="email"></label></div>
-        <div class="section-actions"><button type="button" class="btn ghost previous-section" data-prev="vista">Volver</button><button type="button" class="btn primary next-section" data-next="planes">Ver planes</button></div>
-      </section>
-
-      <section class="form-section observable" id="planes" data-step="planes">
-        <header class="section-heading"><span>08</span><div><p class="eyebrow">Elige cómo quieres vender</p><h2 id="plansTitle">Planes de publicación</h2><p id="plansIntro">Selecciona primero si eres propietario o corredor.</p></div></header><div class="plan-promise" id="planPromise"><strong>Elige tu modalidad.</strong><span>Los planes se adaptarán según publiques como propietario o corredor.</span></div><input type="hidden" id="selectedPlanInput" name="plan" value=""><div class="plans-grid" id="plansGrid"></div><div class="plans-comparison" id="plansComparison"></div><div class="flow-ready"><div><strong>Pago seguro con Flow</strong><span>Los planes con pago quedarán preparados para crear una orden y volver al publicador después del pago. La activación real requiere configurar las credenciales privadas en el servidor.</span></div><span class="flow-status" id="flowStatus">Preparado</span></div><p class="legal-note">Los valores, servicios, duración de campañas, comisiones y descuentos deberán quedar aceptados expresamente en la orden de corretaje o contratación. La inversión de los planes de propietario se abona a la comisión únicamente cuando la venta se concreta mediante Tu Parcela Lista.</p>
-        <div class="section-actions"><button type="button" class="btn ghost previous-section" data-prev="anunciante">Volver</button><button type="button" class="btn primary next-section" data-next="publicar">Revisar y publicar</button></div>
-      </section>
-
-      <section class="form-section observable" id="publicar" data-step="publicar">
-        <header class="section-heading"><span>09</span><div><p class="eyebrow">Último paso</p><h2>Revisa tu elección antes de enviar</h2><p>Aquí verás por separado tu prioridad de venta y el plan que elegiste. Nada se publicará ni se cobrará sin tu confirmación.</p></div></header>
-        <div class="final-plan-confirmation" id="finalSummary"></div>
-        <p class="field-error final-plan-error" id="finalPlanError" aria-live="polite"></p>
-        <label class="check-row final-consent"><input type="checkbox" id="acceptTerms"><span><strong>Confirmo que revisé el plan y sus condiciones.</strong> Autorizo a Tu Parcela Lista a guardar mis datos para gestionar esta publicación y contactarme sobre su revisión, consultas y servicio comercial.</span></label>
-        <p class="consent-note">La publicación quedará pendiente de revisión. Si el plan elegido requiere pago, primero se mostrará el proceso de pago seguro; el anuncio no se activará automáticamente.</p>
-        <div class="submit-state" id="submitState" aria-live="polite"></div><div class="section-actions final-actions"><button type="button" class="btn ghost previous-section" data-prev="planes">Volver y revisar</button><button type="submit" class="btn publish-btn" id="submitBtn">Enviar publicación a revisión</button></div>
-      </section>
-    </form>
-  </div>
+<aside aria-label="Avance de publicación" class="progress-sidebar">
+<div class="progress-card">
+<p class="progress-kicker">Tu publicación</p>
+<div class="progress-ring" id="progressRing"><strong id="progressPercent">0%</strong><span>completado</span></div>
+<nav class="progress-steps" id="progressSteps">
+<button class="current" data-target="tipo" type="button"><i>1</i><span>Tipo de propiedad</span></button>
+<button data-target="datos" type="button"><i>2</i><span>Características</span></button>
+<button data-target="ubicacion" type="button"><i>3</i><span>Ubicación</span></button>
+<button data-target="fotos" type="button"><i>4</i><span>Fotografías</span></button>
+<button data-target="precio" type="button"><i>5</i><span>Precio y tasación</span></button>
+<button data-target="vista" type="button"><i>6</i><span>Anuncio generado</span></button>
+<button data-target="anunciante" type="button"><i>7</i><span>Quién publica</span></button>
+<button data-target="planes" type="button"><i>8</i><span>Plan</span></button>
+<button data-target="publicar" type="button"><i>9</i><span>Publicar</span></button>
+</nav>
+</div>
+</aside>
+<div class="publisher-content">
+<section class="hero-intro">
+<p class="eyebrow">Asistente inteligente de publicación</p>
+<h1>Completa los datos. Nosotros creamos el anuncio.</h1>
+<p>Selecciona las características reales de tu propiedad. Tu Parcela Lista preparará automáticamente un título comercial, una descripción clara y una vista previa lista para vender.</p>
+</section>
+<form id="publisherForm" novalidate="">
+<input id="titulo" name="titulo" type="hidden"/><input id="descripcionFinal" name="descripcionFinal" type="hidden"/>
+<!-- Anti-Bot Honeypot: Do not fill this field -->
+<div style="opacity: 0; position: absolute; top: 0; left: 0; height: 0; width: 0; z-index: -1;">
+<label for="user_contact_website">Si eres humano, deja este campo vacío</label>
+<input autocomplete="off" id="user_contact_website" name="user_contact_website" tabindex="-1" type="text"/>
+</div>
+<section class="form-section observable" data-step="tipo" id="tipo">
+<header class="section-heading"><span>01</span><div><p class="eyebrow">Comencemos</p><h2>¿Qué deseas publicar?</h2><p>Los campos cambiarán automáticamente según el tipo de propiedad.</p></div></header>
+<div class="property-types" role="radiogroup">
+<label class="property-card property-card-land"><input name="tipo" type="radio" value="parcela"/><img alt="Campo y parcela" src="assets/decision-campo-fondo.webp"/><span class="property-shade"></span><span class="property-copy"><small>Terreno rural</small><strong>Parcela o campo</strong><em>Terreno sin vivienda principal.</em></span><span class="property-check">✓</span></label>
+<label class="property-card property-card-land-house"><input name="tipo" type="radio" value="parcela_con_casa"/><img alt="Parcela con casa" src="assets/btn_casa_modern.jpg"/><span class="property-shade"></span><span class="property-copy"><small>Propiedad completa</small><strong>Parcela con casa</strong><em>Terreno y vivienda se venden juntos.</em></span><span class="property-check">✓</span></label>
+<label class="property-card property-card-house"><input name="tipo" type="radio" value="casa"/><img alt="Casa" src="assets/btn_casa_modern.jpg"/><span class="property-shade"></span><span class="property-copy"><small>Vivienda</small><strong>Casa</strong><em>Vivienda sin ofrecerse como parcela.</em></span><span class="property-check">✓</span></label>
+</div>
+<p class="field-error" data-error-for="tipo"></p>
+<div class="section-actions"><button class="btn primary next-section" data-next="datos" type="button">Comenzar publicación</button></div>
+</section>
+<section class="form-section observable" data-step="datos" id="datos">
+<header class="section-heading"><span>02</span><div><p class="eyebrow">Información detallada</p><h2 id="detailsTitle">Completa las características</h2><p>Mientras más información entregues, mejor será el título, la descripción y la recomendación de precio.</p></div></header>
+<div class="form-grid">
+<label class="field"><span>Región</span><select id="region" name="region"><option value="">Selecciona</option></select><small class="field-error" data-error-for="region"></small></label>
+<label class="field"><span>Comuna</span><select disabled="" id="comuna" name="comuna"><option value="">Selecciona</option></select><small class="field-error" data-error-for="comuna"></small></label>
+<label class="field span-2"><span>Sector, camino o localidad</span><input id="localidad" name="localidad" placeholder="Ej. Río Claro, camino interior"/><small class="field-error" data-error-for="localidad"></small></label>
+<div class="parcel-fields contents">
+<div class="field-group span-2"><h3>Dimensiones y situación legal</h3><p>Información esencial para clasificar correctamente la propiedad.</p></div>
+<label class="field"><span>Superficie del terreno</span><div class="with-suffix"><input id="superficie" inputmode="numeric" name="superficie"/><b>m²</b></div><small class="field-error" data-error-for="superficie"></small></label>
+<label class="field"><span>Tipo de terreno</span><select id="tipoTerreno" name="tipoTerreno"><option value="">Automático según superficie</option><option>Parcela</option><option>Campo</option><option>Fundo</option><option>Sitio rural</option><option>Predio agrícola</option></select></label>
+<label class="field"><span>Situación del rol</span><select id="rol" name="rol"><option value="">Selecciona</option><option>Rol propio</option><option>Rol compartido</option><option>En trámite</option><option>No lo sé</option></select></label>
+<label class="field"><span>¿Está dentro de un condominio o loteo?</span><select id="condominio" name="condominio"><option value="">Selecciona</option><option value="Sí">Sí</option><option value="No">No</option><option value="No lo sé">No lo sé</option></select></label>
+<label class="field"><span>Subdivisión</span><select id="subdivision" name="subdivision"><option value="">Selecciona</option><option>Subdivisión aprobada</option><option>Predio original</option><option>En proceso de subdivisión</option><option>No aplica</option><option>No lo sé</option></select></label>
+<label class="field"><span>Uso principal</span><select id="usoSuelo" name="usoSuelo"><option value="">Selecciona</option><option>Habitacional</option><option>Agrícola</option><option>Ganadero</option><option>Forestal</option><option>Turístico</option><option>Mixto</option><option>No lo sé</option></select></label>
+<label class="field"><span>Clasificación turística del sector</span><select id="zonaTuristica" name="zonaTuristica"><option value="">No aplica o no lo sé</option><option value="local">Sector turístico local (+20%)</option><option value="nacional">Destino turístico nacional (+300%)</option></select><small>Este antecedente modifica el cálculo orientativo y debe poder respaldarse durante la revisión.</small></label>
+<label class="field"><span>Factibilidad de construcción</span><select id="construccion" name="construccion"><option value="">Selecciona</option><option>Apta para construir</option><option>Con factibilidad informada</option><option>Requiere evaluación</option><option>No lo sé</option></select></label>
+<div class="field-group span-2"><h3>Relieve, suelo y entorno natural</h3><p>Estas características ayudan a destacar el verdadero valor del terreno.</p></div>
+<label class="field"><span>Topografía</span><select id="topografia" name="topografia"><option value="">Selecciona</option><option>Completamente plana</option><option>Mayormente plana</option><option>Mixta</option><option>Lomaje suave</option><option>Con pendiente</option><option>Escarpada</option></select></label>
+<label class="field"><span>Condición del suelo</span><select id="condicionSuelo" name="condicionSuelo"><option value="">Selecciona</option><option>Seco y firme</option><option>Pradera</option><option>Suelo agrícola</option><option>Húmedo</option><option>Pedregoso</option><option>Arenoso</option><option>No evaluado</option></select></label>
+<label class="field"><span>Vegetación predominante</span><select id="vegetacion" name="vegetacion"><option value="">Selecciona</option><option>Pradera despejada</option><option>Bosque nativo</option><option>Bosque mixto</option><option>Plantación forestal</option><option>Pinos o eucaliptus</option><option>Árboles frutales</option><option>Matorral</option><option>Sin vegetación relevante</option></select></label>
+<label class="field"><span>Vista principal</span><select id="vistaPrincipal" name="vistaPrincipal"><option value="">Selecciona</option><option>Vista a cordillera</option><option>Vista a valle</option><option>Vista al mar</option><option>Vista a lago o laguna</option><option>Vista al río</option><option>Vista panorámica</option><option>Entorno interior protegido</option></select></label>
+<label class="field"><span>Orientación / asoleamiento</span><select id="orientacion" name="orientacion"><option value="">Selecciona</option><option>Norte</option><option>Nororiente</option><option>Norponiente</option><option>Oriente</option><option>Poniente</option><option>Sur</option><option>Buena exposición solar</option></select></label>
+<label class="field"><span>Privacidad</span><select id="privacidad" name="privacidad"><option value="">Selecciona</option><option>Alta privacidad</option><option>Vecinos distantes</option><option>Sector consolidado</option><option>Condominio o loteo</option><option>Zona aislada</option></select></label>
+<div class="field-group span-2"><h3>Agua y elementos naturales</h3><p>Marca todo lo que realmente existe o está disponible.</p></div>
+<div class="field span-2"><span>Fuentes de agua y atractivos naturales</span><div class="choice-grid">
+<label><input name="naturaleza" type="checkbox" value="Río dentro o junto a la propiedad"/><span>Río</span></label>
+<label><input name="naturaleza" type="checkbox" value="Estero"/><span>Estero</span></label>
+<label><input name="naturaleza" type="checkbox" value="Vertiente natural"/><span>Vertiente</span></label>
+<label><input name="naturaleza" type="checkbox" value="Laguna o tranque"/><span>Laguna o tranque</span></label>
+<label><input name="naturaleza" type="checkbox" value="Lago con borde o acceso"/><span>Lago con borde o acceso</span></label>
+<label><input name="naturaleza" type="checkbox" value="Bosque nativo"/><span>Bosque nativo</span></label>
+<label><input name="naturaleza" type="checkbox" value="Senderos interiores"/><span>Senderos</span></label>
+</div></div>
+<label class="field"><span>Abastecimiento de agua</span><select id="agua" name="agua"><option value="">Selecciona</option><option>Pozo inscrito</option><option>Pozo</option><option>APR conectada</option><option>APR cercana</option><option>Vertiente</option><option>Derechos de agua</option><option>Factibilidad</option><option>Sin agua habilitada</option><option>No lo sé</option></select></label>
+<label class="field"><span>Electricidad</span><select id="luz" name="luz"><option value="">Selecciona</option><option>Conectada</option><option>Empalme instalado</option><option>Postación en el frente</option><option>Postación cercana</option><option>Factibilidad</option><option>Sistema solar</option><option>Sin electricidad</option><option>No lo sé</option></select></label>
+<div class="field-group span-2"><h3>Acceso e infraestructura</h3><p>Describe cómo se llega y qué mejoras ya tiene.</p></div>
+<label class="field"><span>Tipo de acceso</span><select id="acceso" name="acceso"><option value="">Selecciona</option><option>Camino pavimentado</option><option>Ripio en buen estado</option><option>Ripio transitable</option><option>Camino de tierra</option><option>Servidumbre inscrita</option><option>Acceso por mejorar</option></select></label>
+<label class="field"><span>Distancia a ruta o carretera principal</span><div class="with-suffix"><input id="distanciaRutaPrincipalKm" inputmode="decimal" max="999" min="0" name="distanciaRutaPrincipalKm" placeholder="Ej. 12" step="0.1" type="number"/><b>km</b></div><small>Indica la distancia aproximada hasta la ruta o carretera principal más cercana.</small></label>
+<label class="field"><span>Cierre perimetral</span><select id="cierre" name="cierre"><option value="">Selecciona</option><option>Completamente cercada</option><option>Parcialmente cercada</option><option>Deslindes marcados</option><option>Sin cierre</option></select></label>
+<label class="field"><span>Acceso privado</span><select id="porton" name="porton"><option value="">Selecciona</option><option>Portón instalado</option><option>Portón automático</option><option>Acceso controlado</option><option>Sin portón</option></select></label>
+<label class="field"><span>Frente aproximado</span><div class="with-suffix"><input id="frente" inputmode="numeric" name="frente"/><b>m</b></div></label>
+<label class="field"><span>Forma del terreno</span><select id="formaTerreno" name="formaTerreno"><option value="">Selecciona</option><option>Regular</option><option>Rectangular</option><option>Irregular</option><option>Amplio frente</option><option>Fondo largo</option></select></label>
+</div>
+<div class="house-fields contents">
+<div class="field-group span-2"><h3>Dimensiones y distribución</h3></div>
+<label class="field"><span>Tipo de propiedad</span><select id="tipoCasa" name="tipoCasa"><option value="">Selecciona</option><option>Casa urbana</option><option>Casa rural</option><option>Casa con parcela</option><option>Casa en condominio</option><option>Casa prefabricada instalada</option><option>Parcela con casa</option></select></label>
+<label class="field"><span>Superficie construida</span><div class="with-suffix"><input id="casaSuperficie" inputmode="numeric" name="casaSuperficie"/><b>m²</b></div><small class="field-error" data-error-for="casaSuperficie"></small></label>
+<label class="field"><span>Superficie del terreno</span><div class="with-suffix"><input id="casaTerreno" inputmode="numeric" name="casaTerreno"/><b>m²</b></div></label>
+<label class="field"><span>Dormitorios</span><select id="habitaciones" name="habitaciones"><option value="">Selecciona</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option value="6">6 o más</option></select></label>
+<label class="field"><span>Baños</span><select id="banos" name="banos"><option value="">Selecciona</option><option>1</option><option>2</option><option>3</option><option value="4">4 o más</option></select></label>
+<label class="field"><span>Número de pisos</span><select id="pisos" name="pisos"><option value="">Selecciona</option><option>1 piso</option><option>2 pisos</option><option>3 o más pisos</option></select></label>
+<div class="field-group span-2"><h3>Construcción y estado</h3></div>
+<label class="field"><span>Material principal</span><select id="material" name="material"><option value="">Selecciona</option><option>Madera</option><option>Metalcon</option><option>SIP</option><option>Albañilería</option><option>Hormigón</option><option>Mixta</option></select></label>
+<label class="field"><span>Estado de conservación</span><select id="estadoCasa" name="estadoCasa"><option value="">Selecciona</option><option>Nueva</option><option>Excelente</option><option>Muy buena</option><option>Buena</option><option>Necesita mejoras</option><option>Para remodelar</option></select></label>
+<label class="field"><span>Regularización</span><select id="regularizacion" name="regularizacion"><option value="">Selecciona</option><option>Recepción final</option><option>Totalmente regularizada</option><option>Regularizada parcialmente</option><option>En trámite</option><option>Sin regularizar</option><option>No lo sé</option></select></label>
+<label class="field"><span>Año aproximado</span><input id="anioCasa" inputmode="numeric" maxlength="4" name="anioCasa" placeholder="Ej. 2018"/></label>
+<label class="field"><span>Calidad constructiva</span><select id="calidadCasa" name="calidadCasa"><option value="">Selecciona</option><option>Económica</option><option>Estándar</option><option>Buena</option><option>Premium</option></select></label>
+<label class="field"><span>Remodelación</span><select id="remodelacionCasa" name="remodelacionCasa"><option value="">Sin remodelación informada</option><option>Parcial</option><option>Importante</option><option>Integral</option></select></label>
+<label class="field"><span>Año de remodelación</span><input id="anioRemodelacionCasa" inputmode="numeric" maxlength="4" name="anioRemodelacionCasa" placeholder="Ej. 2023"/></label>
+<div class="field-group span-2"><h3>Conectividad para el tasador de casa</h3><p>Usaremos una sola referencia urbana para no duplicar el efecto de cercanía.</p></div>
+<label class="field"><span>Centro urbano o Plaza de Armas de referencia</span><input id="centroUrbanoCasa" name="centroUrbanoCasa" placeholder="Ej. Plaza de Armas de Yumbel"/></label>
+<label class="field"><span>Tiempo aproximado al centro</span><div class="with-suffix"><input id="minutosCentroCasa" inputmode="numeric" max="300" min="0" name="minutosCentroCasa" placeholder="Ej. 18" step="1" type="number"/><b>min</b></div></label>
+<label class="field"><span>Distancia aproximada al centro</span><div class="with-suffix"><input id="kmCentroCasa" inputmode="decimal" max="500" min="0" name="kmCentroCasa" placeholder="Ej. 12" step="0.1" type="number"/><b>km</b></div><small>Solo se usa si no indicas minutos.</small></label>
+<label class="field"><span>Camino principal hasta la vivienda</span><select id="caminoCasa" name="caminoCasa"><option value="">Selecciona</option><option>Pavimentado</option><option>Ripio en buen estado</option><option>Ripio transitable</option><option>Tierra en buen estado</option><option>Acceso difícil</option></select></label>
+<label class="field"><span>Aislación térmica</span><select id="aislacionCasa" name="aislacionCasa"><option value="">No informado</option><option>Buena</option><option>Estándar</option><option>Deficiente</option></select></label>
+<label class="field"><span>Ventanas</span><select id="ventanasCasa" name="ventanasCasa"><option value="">No informado</option><option>Termopanel</option><option>Vidrio simple en buen estado</option><option>Vidrio simple antiguo</option></select></label>
+<div class="field-group span-2 house-valuation-note"><h3>Tasador TPL de Casa · Piloto</h3><p>La vivienda se calcula por separado. El tasador de parcelas existente no se modifica y el valor del terreno no se suma en esta etapa.</p></div>
+<div class="field-group span-2"><h3>Servicios y equipamiento</h3></div>
+<label class="field"><span>Agua</span><select id="aguaCasa" name="aguaCasa"><option value="">Selecciona</option><option>Red pública</option><option>APR</option><option>Pozo</option><option>Vertiente</option><option>Mixta</option></select></label>
+<label class="field"><span>Sistema sanitario</span><select id="sanitarioCasa" name="sanitarioCasa"><option value="">Selecciona</option><option>Alcantarillado</option><option>Fosa séptica</option><option>Planta de tratamiento</option><option>Pozo negro</option><option>No lo sé</option></select></label>
+<label class="field"><span>Calefacción</span><select id="calefaccion" name="calefaccion"><option value="">Selecciona</option><option>Estufa a leña</option><option>Combustión lenta</option><option>Pellet</option><option>Gas</option><option>Eléctrica</option><option>Calefacción central</option><option>Sin calefacción fija</option></select></label>
+<label class="field"><span>Estacionamientos</span><select id="estacionamientos" name="estacionamientos"><option value="">Selecciona</option><option>1</option><option>2</option><option>3</option><option value="4">4 o más</option><option>Sin estacionamiento</option></select></label>
+<div class="field span-2"><span>Espacios y atributos destacados</span><div class="choice-grid">
+<label><input name="extrasCasa" type="checkbox" value="Terraza"/><span>Terraza</span></label><label><input name="extrasCasa" type="checkbox" value="Quincho"/><span>Quincho</span></label><label><input name="extrasCasa" type="checkbox" value="Piscina"/><span>Piscina</span></label><label><input name="extrasCasa" type="checkbox" value="Bodega"/><span>Bodega</span></label><label><input name="extrasCasa" type="checkbox" value="Logia"/><span>Logia</span></label><label><input name="extrasCasa" type="checkbox" value="Chimenea"/><span>Chimenea</span></label><label><input name="extrasCasa" type="checkbox" value="Jardín formado"/><span>Jardín</span></label><label><input name="extrasCasa" type="checkbox" value="Vista panorámica"/><span>Vista panorámica</span></label><label><input name="extrasCasa" type="checkbox" value="Acceso a río o lago"/><span>Río o lago</span></label><label><input name="extrasCasa" type="checkbox" value="Bosque o entorno nativo"/><span>Bosque</span></label>
+</div></div>
+</div>
+</div>
+<section aria-live="polite" class="generated-copy compact"><div><p class="eyebrow">Anuncio en construcción</p><h3 id="generatedTitle">Completa algunos datos para crear el título</h3><p id="generatedDescription">La descripción comercial se irá formando automáticamente aquí.</p></div><button class="btn secondary" id="regenerateCopy" type="button">Regenerar texto</button></section>
+<div class="section-actions"><button class="btn ghost previous-section" data-prev="tipo" type="button">Volver</button><button class="btn primary next-section" data-next="ubicacion" type="button">Continuar a ubicación</button></div>
+</section>
+<section class="form-section observable" data-step="ubicacion" id="ubicacion">
+<header class="section-heading"><span>03</span><div><p class="eyebrow">Ubicación inteligente</p><h2>¿Dónde se encuentra?</h2><p>Pega un enlace de Google Maps, usa tu ubicación si estás en la propiedad o busca y marca el punto en el mapa.</p></div></header>
+<div class="maps-link-box">
+<label class="field"><span>Pegar enlace de Google Maps</span><div class="maps-link-row"><input id="googleMapsLink" inputmode="url" placeholder="https://maps.google.com/... o https://www.google.com/maps/..." type="url"/><button class="btn secondary" id="useGoogleMapsLink" type="button">Usar enlace</button></div><small>Abre el lugar en Google Maps, selecciona Compartir y pega aquí el enlace. También puedes pegar coordenadas como -37.12345, -72.12345.</small></label>
+<p class="field-error" data-error-for="googleMapsLink"></p>
+</div>
+<div class="location-help-title">Si no tienes el enlace:</div>
+<div class="location-actions"><button class="method-card" id="useGps" type="button"><strong>Estoy en el lugar</strong><span>Haz clic para usar el GPS de tu teléfono o computador.</span></button><button class="method-card" id="focusMapSearch" type="button"><strong>Necesito buscarlo</strong><span>Escribe sector, comuna, camino o referencia.</span></button><button class="method-card" id="focusMap" type="button"><strong>Marcar manualmente</strong><span>Haz clic directamente sobre el punto en el mapa.</span></button></div>
+<div class="map-search"><input id="mapSearch" placeholder="Ej. Río Claro, Yumbel, Biobío"/><button class="btn secondary" id="searchMap" type="button">Buscar</button></div><div class="map" id="map"></div><div class="location-status" id="locationStatus">Todavía no has indicado una ubicación. Puedes pegar un enlace, usar GPS, buscar o marcar directamente en el mapa.</div><label class="check-row"><input checked="" id="publicApproximate" type="checkbox"/><span>Mostrar al público solo una ubicación aproximada</span></label>
+<div class="section-actions"><button class="btn ghost previous-section" data-prev="datos" type="button">Volver</button><button class="btn primary next-section" data-next="fotos" type="button">Continuar a fotografías</button></div>
+</section>
+<section class="form-section observable" data-step="fotos" id="fotos">
+<header class="section-heading"><span>04</span><div><p class="eyebrow">Haz que destaque</p><h2>Agrega fotografías</h2><p>La primera imagen será la portada. Puedes subir hasta 12 fotografías.</p></div></header>
+<label class="photo-drop" for="fotosInput" id="photoDrop"><input accept="image/jpeg,image/png,image/webp,image/heic,image/heif" hidden="" id="fotosInput" multiple="" type="file"/><strong>Seleccionar o arrastrar fotografías</strong><span>Hasta 12 imágenes. Las optimizaremos automáticamente a WebP.</span></label>
+<div aria-live="polite" class="photo-processing" hidden="" id="photoProcessing"><div class="photo-processing-head"><strong id="photoProcessingTitle">Preparando fotografías…</strong><span id="photoProcessingCount">0 de 0</span></div><div class="photo-progress"><i id="photoProgressBar"></i></div><small id="photoProcessingDetail">Redimensionando y comprimiendo sin perder calidad visible.</small></div>
+<div class="photo-summary" hidden="" id="photoSummary"></div>
+<div class="photo-location-fallback" hidden="" id="photoLocationFallback">
+<div><strong>Falta completar la ubicación</strong><p>Podemos revisar si alguna fotografía contiene la ubicación guardada por el teléfono. Esto solo funciona cuando la cámara tenía activado el GPS.</p><span id="photoLocationMessage"></span></div>
+<div class="photo-location-actions"><button class="btn small secondary" id="tryPhotoLocation" type="button">Buscar ubicación en las fotos</button><button class="btn small primary" hidden="" id="usePhotoLocation" type="button">Usar ubicación encontrada</button><button class="btn small ghost" id="backToLocation" type="button">Volver a ubicación</button></div>
+</div>
+<div class="photo-grid" id="photoGrid"></div><p class="field-error" data-error-for="fotos"></p>
+<div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+<h3 style="margin-bottom: 8px;">Video de la propiedad (Opcional)</h3>
+<p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">Ingresa el enlace de YouTube o Vimeo. Si lo dejas en blanco, la sección de video no aparecerá en la página de la propiedad.</p>
+<label class="field"><input id="videoUrl" name="videoUrl" placeholder="https://www.youtube.com/watch?v=..." type="url"/></label>
+</div>
+<div class="section-actions"><button class="btn ghost previous-section" data-prev="ubicacion" type="button">Volver</button><button class="btn primary next-section" data-next="precio" type="button">Continuar al precio</button></div>
+</section>
+<section class="form-section observable" data-step="precio" id="precio">
+<header class="section-heading"><span>05</span><div><p class="eyebrow">Tasador orientativo TPL</p><h2>Define el precio de venta</h2><p>Compararemos la propiedad con información disponible en Tu Parcela Lista.</p></div></header>
+<div class="price-layout"><label class="price-input"><span>Precio de venta</span><div><b>$</b><input id="precioVenta" inputmode="numeric" name="precio" placeholder="25.000.000"/></div><small class="field-error" data-error-for="precio"></small></label><button class="btn primary valuation-launch-btn" id="runValuation" type="button"><span>✦</span> Calcular precio recomendado</button></div><p class="valuation-data-note">El cálculo es una orientación comercial. Considera los antecedentes informados, incluida la clasificación turística y el acceso a río cuando corresponda; estos atributos serán revisados antes de aprobar la publicación.</p><div class="valuation-result" hidden="" id="valuationResult"></div>
+<section aria-labelledby="urgencyTitle" class="urgency-module">
+<div class="urgency-heading"><div><p class="eyebrow">Estrategia de venta</p><h3 id="urgencyTitle">¿Qué tan pronto necesitas vender?</h3><p>Esta respuesta no cambia el valor real de la propiedad. Nos permite recomendar una estrategia, priorizar el seguimiento y sugerirte el plan más conveniente.</p></div><span class="urgency-status" id="urgencyStatus">Sin seleccionar</span></div>
+<div aria-label="Nivel de urgencia de venta" class="urgency-options" role="radiogroup">
+<label><input name="urgencia" type="radio" value="baja"/><span><small>URGENCIA BAJA</small><strong>Sin apuro</strong><em>Puedo esperar una buena oportunidad.</em></span></label>
+<label><input name="urgencia" type="radio" value="leve"/><span><small>URGENCIA LEVE</small><strong>Quiero comenzar a moverla</strong><em>Quiero recibir interesados durante los próximos meses.</em></span></label>
+<label><input name="urgencia" type="radio" value="alta"/><span><small>URGENCIA ALTA</small><strong>Necesito vender pronto</strong><em>Quiero acelerar consultas y visitas.</em></span></label>
+<label><input name="urgencia" type="radio" value="critica"/><span><small>URGENCIA MUY ALTA</small><strong>Quiero máxima exposición</strong><em>Necesito una estrategia intensiva.</em></span></label>
+</div>
+<div class="urgency-details">
+<label class="field"><span>¿En qué plazo esperas vender?</span><select id="plazoVenta" name="plazoVenta"><option value="">Selecciona</option><option>No tengo plazo</option><option>Durante los próximos 6 meses</option><option>Durante los próximos 3 meses</option><option>Durante el próximo mes</option></select></label>
+<label class="field"><span>¿Hace cuánto intentas vender?</span><select id="tiempoEnVenta" name="tiempoEnVenta"><option value="">Selecciona</option><option>Aún no la he publicado</option><option>Menos de 3 meses</option><option>Entre 3 y 6 meses</option><option>Más de 6 meses</option></select></label>
+<label class="field"><span>¿Cómo prefieres negociar?</span><select id="negociacionPrecio" name="negociacionPrecio"><option value="">Selecciona</option><option value="precio_fijo">El precio es fijo</option><option value="ofertas">Sí, puedo evaluar ofertas</option><option value="mejoras">Prefiero mantener el precio, pero puedo incluir mejoras</option><option value="ofertas_y_mejoras">Puedo evaluar ofertas o incluir mejoras</option></select></label>
+<label class="field"><span>Disponibilidad para visitas</span><select id="disponibilidadVisitas" name="disponibilidadVisitas"><option value="">Selecciona</option><option>Con coordinación previa</option><option>Durante la semana</option><option>Fines de semana</option><option>Tengo alta disponibilidad</option><option>Necesito que TPL coordine todo</option></select></label>
+</div>
+<section aria-labelledby="ownerImprovementsTitle" class="owner-improvements" hidden="" id="ownerImprovements">
+<div class="owner-improvements-heading">
+<div><p class="eyebrow">Negociación con valor agregado</p><h3 id="ownerImprovementsTitle">¿Qué mejoras podrías ofrecer para facilitar la venta?</h3><p>Estas opciones se mostrarán como beneficios disponibles para negociar. No serán un compromiso definitivo hasta incorporarlas formalmente a una reserva o contrato.</p></div>
+<span class="owner-improvements-badge">Beneficio TPL</span>
+</div>
+<div class="improvement-options">
+<label><input name="mejorasOfrecidas" type="checkbox" value="empalme_electrico"/><span><strong>Empalme eléctrico</strong><small>Gestionar o aportar a la instalación.</small></span></label>
+<label><input name="mejorasOfrecidas" type="checkbox" value="cerco_perimetral"/><span><strong>Cerco perimetral</strong><small>Construir o completar el cierre.</small></span></label>
+<label><input name="mejorasOfrecidas" type="checkbox" value="porton_acceso"/><span><strong>Portón de acceso</strong><small>Instalar acceso principal.</small></span></label>
+<label><input name="mejorasOfrecidas" type="checkbox" value="camino_acceso"/><span><strong>Mejorar camino</strong><small>Ripio, estabilizado o limpieza del acceso.</small></span></label>
+<label><input name="mejorasOfrecidas" type="checkbox" value="agua"/><span><strong>Solución de agua</strong><small>Pozo, puntera, estanque o aporte.</small></span></label>
+<label><input name="mejorasOfrecidas" type="checkbox" value="limpieza_terreno"/><span><strong>Limpieza del terreno</strong><small>Despeje o retiro de residuos.</small></span></label>
+<label><input name="mejorasOfrecidas" type="checkbox" value="topografia"/><span><strong>Estudio topográfico</strong><small>Levantamiento para planificar el proyecto.</small></span></label>
+<label><input name="mejorasOfrecidas" type="checkbox" value="aporte_fosa"/><span><strong>Aporte para fosa séptica</strong><small>Financiar una parte o totalidad según acuerdo.</small></span></label>
+</div>
+<div class="owner-improvements-details">
+<label class="field"><span>Monto máximo referencial</span><select id="montoMaximoMejoras" name="montoMaximoMejoras"><option value="">Sin definir todavía</option><option value="500000">Hasta $500.000</option><option value="1000000">Hasta $1.000.000</option><option value="2000000">Hasta $2.000.000</option><option value="3000000">Hasta $3.000.000</option><option value="personalizado">Otro monto</option></select></label>
+<label class="field"><span>Momento de ejecución</span><select id="momentoMejoras" name="momentoMejoras"><option value="">A definir en la negociación</option><option value="antes_promesa">Antes de firmar la promesa</option><option value="antes_compraventa">Antes de la compraventa</option><option value="despues_compraventa">Después de la compraventa</option><option value="aporte_monetario">Como aporte monetario al comprador</option></select></label>
+<label class="field span-2"><span>Condiciones o detalle</span><textarea id="detalleMejoras" name="detalleMejoras" placeholder="Ej. Instalaré el empalme una vez firmada la compraventa, sujeto a factibilidad técnica y hasta un máximo acordado." rows="3"></textarea></label>
+</div>
+<div class="detected-needs" hidden="" id="detectedPartnerNeeds"></div>
+</section>
+<div class="urgency-recommendation" hidden="" id="urgencyRecommendation"></div>
+<p class="field-error" data-error-for="urgencia"></p>
+</section>
+<div class="section-actions"><button class="btn ghost previous-section" data-prev="fotos" type="button">Volver</button><button class="btn primary next-section" data-next="vista" type="button">Crear anuncio</button></div>
+</section>
+<section class="form-section observable" data-step="vista" id="vista">
+<header class="section-heading"><span>06</span><div><p class="eyebrow">Redacción automática</p><h2>Tu anuncio está listo para revisar</h2><p>El título y la descripción se construyeron con las características que seleccionaste.</p></div></header>
+<article class="listing-preview site-listing-preview" id="listingPreview">
+<div class="preview-image preview-image-empty" id="previewImageWrap">
+<img alt="Vista previa del anuncio" hidden="" id="previewPhoto"/>
+<div class="preview-placeholder" id="previewPlaceholder">
+<span class="preview-placeholder-icon">⌂</span>
+<strong>Tu anuncio tendrá aquí su fotografía principal</strong>
+<small>Mientras tanto puedes revisar cómo se verá publicado dentro de Tu Parcela Lista.</small>
+</div>
+<div class="preview-topline"><span id="previewType">Parcela o campo</span><b>Vista previa</b></div>
+</div>
+<div class="preview-body">
+<div class="preview-brandline"><span>Tu Parcela Lista</span><small>Anuncio en preparación</small></div>
+<p id="previewLocation">Ubicación por completar</p>
+<h3 id="previewTitle">Tu propiedad aparecerá aquí</h3>
+<strong id="previewPrice">Precio por completar</strong><div class="preview-tpl-value-badge" hidden="" id="previewTplValueBadge"><span>✓ Valor respaldado por Tu Parcela Lista</span><small>Precio recomendado</small></div>
+<div class="preview-features" id="previewFeatures"></div>
+<p id="previewDescription">La descripción comercial aparecerá aquí.</p>
+<div class="preview-footer"><span>Información entregada por el anunciante</span><button disabled="" type="button">Contactar</button></div>
+</div>
+</article>
+<div class="generated-editor"><label class="field"><span>Título comercial generado</span><input id="tituloEditable" maxlength="90"/></label><label class="field"><span>Descripción comercial generada</span><textarea id="descripcionEditable" maxlength="1800" rows="10"></textarea></label><div class="editor-actions"><small>Puedes corregir el texto, pero no necesitas redactarlo desde cero.</small><button class="btn secondary" id="restoreGenerated" type="button">Volver a generar</button></div></div>
+<div class="section-actions"><button class="btn ghost previous-section" data-prev="precio" type="button">Corregir información</button><button class="btn primary next-section" data-next="anunciante" type="button">Continuar</button></div>
+</section>
+<section class="form-section observable" data-step="anunciante" id="anunciante">
+<header class="section-heading"><span>07</span><div><p class="eyebrow">Para ofrecerte la mejor modalidad</p><h2>¿Quién está publicando?</h2><p>Los planes cambian según seas propietario o corredor.</p></div></header>
+<div class="publisher-types"><label><input name="anunciante" type="radio" value="propietario"/><span><strong>Soy propietario</strong><small>Quiero vender mi propia propiedad.</small></span></label><label><input name="anunciante" type="radio" value="corredor"/><span><strong>Soy corredor de propiedades</strong><small>Publico para clientes o mi cartera.</small></span></label></div><p class="field-error" data-error-for="anunciante"></p>
+<div class="contact-grid"><label class="field"><span>Nombre</span><input id="nombre" name="nombre"/></label><label class="field"><span>Teléfono / WhatsApp</span><input id="telefono" inputmode="tel" name="telefono"/></label><label class="field span-2"><span>Correo electrónico</span><input id="email" name="email" type="email"/></label></div>
+<div class="section-actions"><button class="btn ghost previous-section" data-prev="vista" type="button">Volver</button><button class="btn primary next-section" data-next="planes" type="button">Ver planes</button></div>
+</section>
+<section class="form-section observable" data-step="planes" id="planes">
+<header class="section-heading"><span>08</span><div><p class="eyebrow">Elige cómo quieres vender</p><h2 id="plansTitle">Planes de publicación</h2><p id="plansIntro">Selecciona primero si eres propietario o corredor.</p></div></header><div class="plan-promise" id="planPromise"><strong>Elige tu modalidad.</strong><span>Los planes se adaptarán según publiques como propietario o corredor.</span></div><input id="selectedPlanInput" name="plan" type="hidden" value=""/><div class="plans-grid" id="plansGrid"></div><div class="plans-comparison" id="plansComparison"></div><div class="flow-ready"><div><strong>Pago seguro con Flow</strong><span>Los planes con pago quedarán preparados para crear una orden y volver al publicador después del pago. La activación real requiere configurar las credenciales privadas en el servidor.</span></div><span class="flow-status" id="flowStatus">Preparado</span></div><p class="legal-note">Los valores, servicios, duración de campañas, comisiones y descuentos deberán quedar aceptados expresamente en la orden de corretaje o contratación. La inversión de los planes de propietario se abona a la comisión únicamente cuando la venta se concreta mediante Tu Parcela Lista.</p>
+<div class="section-actions"><button class="btn ghost previous-section" data-prev="anunciante" type="button">Volver</button><button class="btn primary next-section" data-next="publicar" type="button">Revisar y publicar</button></div>
+</section>
+<section class="form-section observable" data-step="publicar" id="publicar">
+<header class="section-heading"><span>09</span><div><p class="eyebrow">Último paso</p><h2>Revisa tu elección antes de enviar</h2><p>Aquí verás por separado tu prioridad de venta y el plan que elegiste. Nada se publicará ni se cobrará sin tu confirmación.</p></div></header>
+<div class="final-plan-confirmation" id="finalSummary"></div>
+<p aria-live="polite" class="field-error final-plan-error" id="finalPlanError"></p>
+<label class="check-row final-consent"><input id="acceptTerms" type="checkbox"/><span><strong>Confirmo que revisé el plan y sus condiciones.</strong> Autorizo a Tu Parcela Lista a guardar mis datos para gestionar esta publicación y contactarme sobre su revisión, consultas y servicio comercial.</span></label>
+<p class="consent-note">La publicación quedará pendiente de revisión. Si el plan elegido requiere pago, primero se mostrará el proceso de pago seguro; el anuncio no se activará automáticamente.</p>
+<div aria-live="polite" class="submit-state" id="submitState"></div><div class="section-actions final-actions"><button class="btn ghost previous-section" data-prev="planes" type="button">Volver y revisar</button><button class="btn publish-btn" id="submitBtn" type="submit">Enviar publicación a revisión</button></div>
+</section>
+</form>
+</div>
 </main>
-<template id="successTemplate"><section class="success-screen"><div class="success-icon">✓</div><p class="eyebrow">Publicación guardada</p><h1>Recibimos tu propiedad</h1><p>La información quedó guardada localmente para esta etapa de pruebas.</p><strong class="success-code"></strong><a href="../../index.html" class="btn primary">Volver al inicio</a></section></template>
-
-  <div class="valuation-modal" id="valuationModal" hidden aria-hidden="true">
-    <div class="valuation-modal-backdrop" data-close-valuation></div>
-    <section class="valuation-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="valuationModalTitle">
-      <button type="button" class="valuation-modal-close" data-close-valuation aria-label="Cerrar tasador">×</button>
-      <div class="valuation-modal-brand"><span>✦</span><div><small>ASESOR DE PRECIO Y VENTA TPL</small><strong id="valuationModalTitle">Encontrando el valor de tu propiedad</strong></div></div>
-      <div id="valuationLoading" class="valuation-loading">
-        <div class="valuation-orbit" aria-hidden="true"><i></i><b></b><span>⌂</span></div>
-        <div class="valuation-thinking">
-          <p id="valuationThinkingText">Revisando ubicación y superficie…</p>
-          <div class="valuation-thinking-bar"><i id="valuationThinkingBar"></i></div>
-          <small>Estamos combinando los antecedentes de tu propiedad con la información disponible en Tu Parcela Lista.</small>
-        </div>
-        <div class="valuation-signals" id="valuationSignals"></div>
-      </div>
-      <div id="valuationResults" class="valuation-results" hidden></div>
-      <div id="valuationModalError" class="valuation-results valuation-error" hidden role="alert"></div>
-    </section>
-  </div>
-
-  <!-- Modal de Captura Comercial TPL Business (Tarea A-1) -->
-  <div class="valuation-modal" id="tplCommercialModal" hidden aria-hidden="true">
-    <div class="valuation-modal-backdrop" id="closeTplCommercialBackdrop"></div>
-    <section class="valuation-modal-dialog tpl-commercial-dialog" role="dialog" aria-modal="true" aria-labelledby="tplCommercialTitle">
-      <button type="button" class="valuation-modal-close" id="closeTplCommercialBtn" aria-label="Cerrar ventana">×</button>
-      <div class="valuation-modal-brand"><span>✦</span><div><small>INFORMES PROFESIONALES TU PARCELA LISTA</small><strong id="tplCommercialTitle">Respalda y defiende tu precio</strong></div></div>
-      
-      <!-- Estado 0/1: Formulario de Captura -->
-      <div id="tplCommercialFormView">
-        <div class="tpl-commercial-summary">
-          <p class="eyebrow">RESUMEN DE TU PROPIEDAD</p>
-          <h4 id="tplCommLocation">Tu propiedad en valoración</h4>
-          <div class="tpl-comm-metrics">
-            <div><small>VALOR REFERENCIAL</small><strong id="tplCommPrice">$0</strong></div>
-            <div><small>NIVEL DE CONFIANZA</small><strong id="tplCommConfidence">Alta</strong></div>
-          </div>
-          <p class="tpl-comm-note">Estás a un paso de obtener un Informe Profesional en PDF con el valor referencial, los principales factores de la propiedad y estrategias de venta.</p>
-        </div>
-
-        <form id="tplCommercialForm" class="tpl-commercial-form" novalidate>
-          <div class="form-grid">
-            <label class="field">
-              <span>Nombre y Apellido <b class="req">*</b></span>
-              <input type="text" id="tplLeadName" required placeholder="Ej. Juan Pérez González">
-            </label>
-            <label class="field">
-              <span>Correo electrónico (para enviarte el PDF) <b class="req">*</b></span>
-              <input type="email" id="tplLeadEmail" required placeholder="Ej. jperez@correo.com">
-            </label>
-            <label class="field">
-              <span>Teléfono / WhatsApp <b class="req">*</b></span>
-              <input type="tel" id="tplLeadPhone" required placeholder="Ej. +56 9 1234 5678">
-            </label>
-            <label class="field">
-              <span>¿Para qué usarás el informe? <small>(Opcional)</small></span>
-              <select id="tplLeadGoal">
-                <option value="">Selecciona una opción...</option>
-                <option value="vender_pronto">Defender mi precio y vender pronto</option>
-                <option value="evaluar_compra">Negociar la compra de esta propiedad</option>
-                <option value="evaluar_patrimonio">Conocer el valor de mi patrimonio</option>
-                <option value="otro">Otro uso profesional o comercial</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="tpl-commercial-consents">
-            <label class="checkbox-field">
-              <input type="checkbox" id="tplConsentGenerate" checked required>
-              <span>Acepto usar estos datos para generar el informe y mostrarlos en su portada. <b class="req">*</b></span>
-            </label>
-            <label class="checkbox-field">
-              <input type="checkbox" id="tplConsentContact" checked>
-              <span>Quiero que un especialista de Tu Parcela Lista me contacte por WhatsApp para ayudarme con la venta o resolver dudas.</span>
-            </label>
-          </div>
-
-          <div id="tplCommFormError" class="field-error" hidden></div>
-
-          <div class="tpl-commercial-actions">
-            <button type="button" class="btn ghost" id="cancelTplCommercialBtn">Volver a mis resultados</button>
-            <button type="submit" class="btn primary tpl-submit-btn" id="submitTplCommercialBtn">
-              <span>✦</span> Generar mi Informe Profesional ➔
+<template id="successTemplate"><section class="success-screen"><div class="success-icon">✓</div><p class="eyebrow">Publicación guardada</p><h1>Recibimos tu propiedad</h1><p>La información quedó guardada localmente para esta etapa de pruebas.</p><strong class="success-code"></strong><a class="btn primary" href="../../index.html">Volver al inicio</a></section></template>
+<div aria-hidden="true" class="valuation-modal" hidden="" id="valuationModal">
+<div class="valuation-modal-backdrop" data-close-valuation=""></div>
+<section aria-labelledby="valuationModalTitle" aria-modal="true" class="valuation-modal-dialog" role="dialog">
+<button aria-label="Cerrar tasador" class="valuation-modal-close" data-close-valuation="" type="button">×</button>
+<div class="valuation-modal-brand"><span>✦</span><div><small>ASESOR DE PRECIO Y VENTA TPL</small><strong id="valuationModalTitle">Encontrando el valor de tu propiedad</strong></div></div>
+<div class="valuation-loading" id="valuationLoading">
+<div aria-hidden="true" class="valuation-orbit"><i></i><b></b><span>⌂</span></div>
+<div class="valuation-thinking">
+<p id="valuationThinkingText">Revisando ubicación y superficie…</p>
+<div class="valuation-thinking-bar"><i id="valuationThinkingBar"></i></div>
+<small>Estamos combinando los antecedentes de tu propiedad con la información disponible en Tu Parcela Lista.</small>
+</div>
+<div class="valuation-signals" id="valuationSignals"></div>
+</div>
+<div class="valuation-results" hidden="" id="valuationResults"></div>
+<div class="valuation-results valuation-error" hidden="" id="valuationModalError" role="alert"></div>
+</section>
+</div>
+<!-- Modal de Captura Comercial TPL Business (Tarea A-1) -->
+<div aria-hidden="true" class="valuation-modal" hidden="" id="tplCommercialModal">
+<div class="valuation-modal-backdrop" id="closeTplCommercialBackdrop"></div>
+<section aria-labelledby="tplCommercialTitle" aria-modal="true" class="valuation-modal-dialog tpl-commercial-dialog" role="dialog">
+<button aria-label="Cerrar ventana" class="valuation-modal-close" id="closeTplCommercialBtn" type="button">×</button>
+<div class="valuation-modal-brand"><span>✦</span><div><small>INFORMES PROFESIONALES TU PARCELA LISTA</small><strong id="tplCommercialTitle">Respalda y defiende tu precio</strong></div></div>
+<!-- Estado 0/1: Formulario de Captura -->
+<div id="tplCommercialFormView">
+<div class="tpl-commercial-summary">
+<p class="eyebrow">RESUMEN DE TU PROPIEDAD</p>
+<h4 id="tplCommLocation">Tu propiedad en valoración</h4>
+<div class="tpl-comm-metrics">
+<div><small>VALOR REFERENCIAL</small><strong id="tplCommPrice">$0</strong></div>
+<div><small>NIVEL DE CONFIANZA</small><strong id="tplCommConfidence">Alta</strong></div>
+</div>
+<p class="tpl-comm-note">Estás a un paso de obtener un Informe Profesional en PDF con el valor referencial, los principales factores de la propiedad y estrategias de venta.</p>
+</div>
+<form class="tpl-commercial-form" id="tplCommercialForm" novalidate="">
+<div class="form-grid">
+<label class="field">
+<span>Nombre y Apellido <b class="req">*</b></span>
+<input id="tplLeadName" placeholder="Ej. Juan Pérez González" required="" type="text"/>
+</label>
+<label class="field">
+<span>Correo electrónico (para enviarte el PDF) <b class="req">*</b></span>
+<input id="tplLeadEmail" placeholder="Ej. jperez@correo.com" required="" type="email"/>
+</label>
+<label class="field">
+<span>Teléfono / WhatsApp <b class="req">*</b></span>
+<input id="tplLeadPhone" placeholder="Ej. +56 9 1234 5678" required="" type="tel"/>
+</label>
+<label class="field">
+<span>¿Para qué usarás el informe? <small>(Opcional)</small></span>
+<select id="tplLeadGoal">
+<option value="">Selecciona una opción...</option>
+<option value="vender_pronto">Defender mi precio y vender pronto</option>
+<option value="evaluar_compra">Negociar la compra de esta propiedad</option>
+<option value="evaluar_patrimonio">Conocer el valor de mi patrimonio</option>
+<option value="otro">Otro uso profesional o comercial</option>
+</select>
+</label>
+</div>
+<div class="tpl-commercial-consents">
+<label class="checkbox-field">
+<input checked="" id="tplConsentGenerate" required="" type="checkbox"/>
+<span>Acepto usar estos datos para generar el informe y mostrarlos en su portada. <b class="req">*</b></span>
+</label>
+<label class="checkbox-field">
+<input checked="" id="tplConsentContact" type="checkbox"/>
+<span>Quiero que un especialista de Tu Parcela Lista me contacte por WhatsApp para ayudarme con la venta o resolver dudas.</span>
+</label>
+</div>
+<div class="field-error" hidden="" id="tplCommFormError"></div>
+<div class="tpl-commercial-actions">
+<button class="btn ghost" id="cancelTplCommercialBtn" type="button">Volver a mis resultados</button>
+<button class="btn primary tpl-submit-btn" id="submitTplCommercialBtn" type="submit">
+<span>✦</span> Generar mi Informe Profesional ➔
             </button>
-          </div>
-          <p class="tpl-comm-privacy-lock">🔒 Usaremos tus datos para generar el informe y, solo si lo autorizas, para contactarte.</p>
-        </form>
-      </div>
-
-      <!-- Estado 2: Cargando / Generando -->
-      <div id="tplCommercialLoadingView" class="valuation-loading" hidden>
-        <div class="valuation-orbit" aria-hidden="true"><i></i><b></b><span>🛡️</span></div>
-        <div class="valuation-thinking">
-          <p id="tplCommLoadingText">Preparando tu informe profesional…</p>
-          <div class="valuation-thinking-bar"><i style="width: 75%"></i></div>
-          <small>Estamos organizando el valor referencial, los factores principales y las estrategias de venta.</small>
-        </div>
-      </div>
-
-      <!-- Estado 3: Éxito / Transición -->
-      <div id="tplCommercialSuccessView" class="tpl-commercial-success" hidden>
-        <div class="success-icon" style="background:#176b4d;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;">✓</div>
-        <h3>¡Tu Informe Profesional está listo!</h3>
-        <p>Tu informe fue generado con la referencia <strong id="tplCommLeadRef">TPL-XXXX</strong>.</p><p id="tplCommSaveStatus" class="tpl-comm-note">Comprobando registro de la solicitud…</p>
-        <div class="tpl-success-box" style="background:#f4f8f6;border:1px solid #dbe7e1;padding:16px;border-radius:12px;margin:20px 0;text-align:left;">
-          <p style="margin:0 0 8px;font-weight:700;color:#173229;">¿Qué incluye tu informe?</p>
-          <ul style="margin:0;padding-left:20px;color:#52665e;font-size:0.9rem;line-height:1.5;">
-            <li>Valor referencial calculado para tu comuna y superficie.</li>
-            <li>Rango de precio y nivel de confianza técnica.</li>
-            <li>Código único de solicitud para identificar este informe.</li>
-          </ul>
-        </div>
-        <div class="tpl-commercial-actions" style="justify-content:center;">
-          <button type="button" class="btn primary" id="downloadTplReportActionBtn">
-            <span>⬇</span> Abrir o guardar mi Informe PDF
+</div>
+<p class="tpl-comm-privacy-lock">🔒 Usaremos tus datos para generar el informe y, solo si lo autorizas, para contactarte.</p>
+</form>
+</div>
+<!-- Estado 2: Cargando / Generando -->
+<div class="valuation-loading" hidden="" id="tplCommercialLoadingView">
+<div aria-hidden="true" class="valuation-orbit"><i></i><b></b><span>🛡️</span></div>
+<div class="valuation-thinking">
+<p id="tplCommLoadingText">Preparando tu informe profesional…</p>
+<div class="valuation-thinking-bar"><i style="width: 75%"></i></div>
+<small>Estamos organizando el valor referencial, los factores principales y las estrategias de venta.</small>
+</div>
+</div>
+<!-- Estado 3: Éxito / Transición -->
+<div class="tpl-commercial-success" hidden="" id="tplCommercialSuccessView">
+<div class="success-icon" style="background:#176b4d;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;">✓</div>
+<h3>¡Tu Informe Profesional está listo!</h3>
+<p>Tu informe fue generado con la referencia <strong id="tplCommLeadRef">TPL-XXXX</strong>.</p><p class="tpl-comm-note" id="tplCommSaveStatus">Comprobando registro de la solicitud…</p>
+<div class="tpl-success-box" style="background:#f4f8f6;border:1px solid #dbe7e1;padding:16px;border-radius:12px;margin:20px 0;text-align:left;">
+<p style="margin:0 0 8px;font-weight:700;color:#173229;">¿Qué incluye tu informe?</p>
+<ul style="margin:0;padding-left:20px;color:#52665e;font-size:0.9rem;line-height:1.5;">
+<li>Valor referencial calculado para tu comuna y superficie.</li>
+<li>Rango de precio y nivel de confianza técnica.</li>
+<li>Código único de solicitud para identificar este informe.</li>
+</ul>
+</div>
+<div class="tpl-commercial-actions" style="justify-content:center;">
+<button class="btn primary" id="downloadTplReportActionBtn" type="button">
+<span>⬇</span> Abrir o guardar mi Informe PDF
           </button>
-        </div>
-        <button type="button" class="btn ghost small" id="closeTplSuccessBtn" style="margin-top:12px;">Cerrar y volver a mi publicación</button>
-      </div>
-    </section>
-  </div>
-<script src="publicador-config.js?v=20260720-core1"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script><script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script><script defer src="../../js/core/event-bus.js?v=20260718-core22"></script><script defer src="../../js/core/property-model.js?v=20260718-core22"></script><script defer src="../../js/core/intelligence-engine.js?v=20260718-core22"></script><script defer src="../../js/core/redaccion/motor-redaccion.js?v=20260719-redaccion1"></script><script defer src="../../js/core/orchestrator.js?v=20260718-core22"></script><script defer src="tpl-land-engine.js?v=20260727-v1"></script><script defer src="valuation-premiums.js?v=20260723-1"></script><script defer src="house-valuation.js?v=20260723-house-v2"></script><script defer src="valuation-service.js?v=20260723-supabase-v1"></script><script defer src="photo-optimizer.js?v=20260718-photo1"></script><script defer src="crm-automation-engine.js?v=20260718-crm1"></script><script defer src="valuation-crm-service.js?v=20260727-crm-privacy1"></script><script defer src="integration-service.js?v=20260718-crm1"></script><script defer src="tpl-report-generator.js?v=20260727-a2-fix1"></script><script defer src="app.js?v=20260727-land-engine-v1"></script>
-
+</div>
+<button class="btn ghost small" id="closeTplSuccessBtn" style="margin-top:12px;" type="button">Cerrar y volver a mi publicación</button>
+</div>
+</section>
+</div>
+<script src="publicador-config.js?v=20260720-core1"></script><script crossorigin="" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script><script defer="" src="../../js/core/event-bus.js?v=20260718-core22"></script><script defer="" src="../../js/core/property-model.js?v=20260718-core22"></script><script defer="" src="../../js/core/intelligence-engine.js?v=20260718-core22"></script><script defer="" src="../../js/core/redaccion/motor-redaccion.js?v=20260719-redaccion1"></script><script defer="" src="../../js/core/orchestrator.js?v=20260718-core22"></script><script defer="" src="tpl-land-engine.js?v=20260727-v1"></script><script defer="" src="tpl-house-engine.js?v=20260727-v1"></script><script defer="" src="../../js/tpl-valuation-engine.js?v=20260727-v1"></script><script defer="" src="valuation-premiums.js?v=20260723-1"></script><script defer="" src="house-valuation.js?v=20260723-house-v2"></script><script defer="" src="valuation-service.js?v=20260723-supabase-v1"></script><script defer="" src="photo-optimizer.js?v=20260718-photo1"></script><script defer="" src="crm-automation-engine.js?v=20260718-crm1"></script><script defer="" src="valuation-crm-service.js?v=20260727-crm-privacy1"></script><script defer="" src="integration-service.js?v=20260718-crm1"></script><script defer="" src="tpl-report-generator.js?v=20260727-a2-fix1"></script><script defer="" src="app.js?v=20260727-land-engine-v1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../../js/db-api.js"></script>
 <script src="../../js/tpl-launch.js"></script>
-<script defer src="../../js/tpl-lead-advisor.js?v=20260720-2"></script>
-</body>
+<script defer="" src="../../js/tpl-lead-advisor.js?v=20260720-2"></script>
+<script defer="True" src="../../js/tpl-site-shell.js?v=20260728-2"></script><section aria-labelledby="tpl-publicar-title" class="tpl-seo-hub"><div class="tpl-seo-hub-inner"><h2 id="tpl-publicar-title">¿Dónde puedo publicar mi parcela para venderla?</h2><p>Tu Parcela Lista reúne en un solo proceso la preparación del anuncio, la recomendación orientativa de precio, el expediente comercial y la publicación. Sirve para propietarios y corredores que necesitan vender una parcela o campo por internet con información ordenada.</p><div class="tpl-seo-links"><a href="index.html">Publicar mi parcela</a><a href="tasador.html">Saber el valor de mi parcela</a><a href="tasador.html">Definir qué precio ponerle</a></div></div></section></body>
 </html>

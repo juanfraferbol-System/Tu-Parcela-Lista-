@@ -1,38 +1,35 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta name="robots" content="index,follow">
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+<meta content="index,follow" name="robots"/>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
   new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
   j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-WK4M33H4');</script>
-  <!-- End Google Tag Manager -->
-  
-  <meta charset="utf-8"/>
-  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Categoría | Tu Parcela Lista</title>
-  <meta name="description" content="Explora parcelas seleccionadas según tu estilo de vida, inversión y conexión con la naturaleza.">
-  <link rel="canonical" href="https://www.parcelalista.cl/categoria.html">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="es_CL">
-  <meta property="og:site_name" content="Tu Parcela Lista">
-  
-  <link href="image/favicon-512.png" rel="icon" sizes="32x32" type="image/png"/>
-  <link href="https://fonts.googleapis.com" rel="preconnect"/>
-  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-  
-  <!-- Estilos Core -->
-  <link href="css/styles.min.css?v=20260715-4" rel="stylesheet"/>
-  <link href="css/v2-base.css" rel="stylesheet"/>
-  <link href="css/v2-components.css" rel="stylesheet"/>
-  <link href="css/v2-responsive.css" rel="stylesheet"/>
-  <script src="https://kit.fontawesome.com/c167b36f7f.js" crossorigin="anonymous"></script>
+<!-- End Google Tag Manager -->
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Categoría | Tu Parcela Lista</title>
+<meta content="Explora parcelas seleccionadas según tu estilo de vida, inversión y conexión con la naturaleza." name="description"/>
+<link href="https://www.parcelalista.cl/categoria.html" rel="canonical"/>
+<meta content="website" property="og:type"/>
+<meta content="es_CL" property="og:locale"/>
+<meta content="Tu Parcela Lista" property="og:site_name"/>
+<link href="assets/logo-tu-parcela-lista.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&amp;family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<!-- Estilos Core -->
+<link href="css/styles.min.css?v=20260715-4" rel="stylesheet"/>
 
-  <style>
+
+
+<script crossorigin="anonymous" src="https://kit.fontawesome.com/c167b36f7f.js"></script>
+<style>
     /* Estilos específicos para la Landing de Categoría */
     .hero-categoria {
       position: relative;
@@ -140,72 +137,64 @@
       transform: translateY(-5px);
     }
   </style>
-<link rel="stylesheet" href="css/tpl-lead-advisor.css?v=20260720-2">
-  <script defer src="js/tpl-seo.js?v=20260722-1"></script>
-</head>
-
+<link href="css/tpl-lead-advisor.css?v=20260720-2" rel="stylesheet"/>
+<script defer="" src="js/tpl-seo.js?v=20260722-1"></script>
+</link></meta><link href="css/tpl-site-shell.css?v=20260728-2" rel="stylesheet"/></head>
 <body class="site-body">
-  <!-- Navbar (Mismo de index) -->
-  <header class="site-header" id="site-header" style="position: sticky; top:0; z-index: 1000; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-    <div class="header-content" style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
-      <a class="logo-link" href="index.html">
-        <img alt="Tu Parcela Lista" class="logo-img" src="image/Tpl_logo.png" style="height: 40px;"/>
-      </a>
-      <a href="index.html#parcelas" class="primary-action" style="padding: 10px 20px;">Ver catálogo completo</a>
-    </div>
-  </header>
-
-  <main id="categoria-content">
-    <!-- HERO DINAMICO -->
-    <section class="hero-categoria" id="hero-section">
-      <div class="hero-categoria-content">
-        <span class="badge" id="hero-para-quien">Para ti</span>
-        <h1 id="hero-title">Cargando...</h1>
-        <p id="hero-subtitle">Buscando las mejores parcelas para tu estilo.</p>
-      </div>
-    </section>
-
-    <!-- INFO CARDS DINAMICAS -->
-    <div class="info-grid">
-      <div class="info-card">
-        <h3><i class="fa-solid fa-compass" style="color:var(--accent);"></i> Actividades</h3>
-        <ul id="list-actividades"></ul>
-      </div>
-      <div class="info-card">
-        <h3><i class="fa-solid fa-star" style="color:var(--primary);"></i> Ventajas</h3>
-        <ul id="list-ventajas"></ul>
-      </div>
-      <div class="info-card" style="background: var(--surface);">
-        <h3><i class="fa-solid fa-circle-info" style="color:var(--secondary);"></i> A tener en cuenta</h3>
-        <p id="recomendacion-text" style="color:var(--text-muted); line-height: 1.5;"></p>
-        <div id="faq-container" style="margin-top: 20px;"></div>
-      </div>
-    </div>
-
-    <!-- RESULTADOS FILTRADOS -->
-    <section class="parcelas-section">
-      <h2>Parcelas Recomendadas</h2>
-      <p id="hero-description" style="color: var(--text-muted); font-size: 1.1rem; max-width: 800px;"></p>
-      
-      <div id="categoria-parcelas-grid" class="parcelas-grid">
-        <div style="text-align: center; padding: 40px; grid-column: 1/-1;">Analizando catálogo y calculando puntajes...</div>
-      </div>
-      
-      <div style="text-align: center; margin-top: 50px;">
-        <a href="index.html#cotizador" class="primary-action" id="btn-cta" style="padding: 15px 30px; font-size: 1.1rem;">Cotizar proyecto</a>
-      </div>
-    </section>
-  </main>
-
-  <footer style="background: var(--primary); color: white; padding: 40px 20px; text-align: center; margin-top: 50px;">
-    <p>&copy; 2026 Tu Parcela Lista. Todos los derechos reservados.</p>
-  </footer>
-
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/db-api.js?v=20260723-catalog-v2"></script>
-  <script src="js/categorias-estilo.js"></script>
-  <script src="js/categoria.js"></script>
-<script defer src="js/tpl-lead-advisor.js?v=20260720-2"></script>
-</body>
+<!-- Navbar (Mismo de index) -->
+<header class="site-header" id="site-header" style="position: sticky; top:0; z-index: 1000; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+<div class="header-content" style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+<a class="logo-link" href="index.html">
+<img alt="Tu Parcela Lista" class="logo-img" src="assets/logo-tu-parcela-lista.png" style="height: 40px;"/>
+</a>
+<a class="primary-action" href="index.html#parcelas" style="padding: 10px 20px;">Ver catálogo completo</a>
+</div>
+</header>
+<main id="categoria-content">
+<!-- HERO DINAMICO -->
+<section class="hero-categoria" id="hero-section">
+<div class="hero-categoria-content">
+<span class="badge" id="hero-para-quien">Para ti</span>
+<h1 id="hero-title">Cargando...</h1>
+<p id="hero-subtitle">Buscando las mejores parcelas para tu estilo.</p>
+</div>
+</section>
+<!-- INFO CARDS DINAMICAS -->
+<div class="info-grid">
+<div class="info-card">
+<h3><i class="fa-solid fa-compass" style="color:var(--accent);"></i> Actividades</h3>
+<ul id="list-actividades"></ul>
+</div>
+<div class="info-card">
+<h3><i class="fa-solid fa-star" style="color:var(--primary);"></i> Ventajas</h3>
+<ul id="list-ventajas"></ul>
+</div>
+<div class="info-card" style="background: var(--surface);">
+<h3><i class="fa-solid fa-circle-info" style="color:var(--secondary);"></i> A tener en cuenta</h3>
+<p id="recomendacion-text" style="color:var(--text-muted); line-height: 1.5;"></p>
+<div id="faq-container" style="margin-top: 20px;"></div>
+</div>
+</div>
+<!-- RESULTADOS FILTRADOS -->
+<section class="parcelas-section">
+<h2>Parcelas Recomendadas</h2>
+<p id="hero-description" style="color: var(--text-muted); font-size: 1.1rem; max-width: 800px;"></p>
+<div class="parcelas-grid" id="categoria-parcelas-grid">
+<div style="text-align: center; padding: 40px; grid-column: 1/-1;">Analizando catálogo y calculando puntajes...</div>
+</div>
+<div style="text-align: center; margin-top: 50px;">
+<a class="primary-action" href="index.html#cotizador" id="btn-cta" style="padding: 15px 30px; font-size: 1.1rem;">Cotizar proyecto</a>
+</div>
+</section>
+</main>
+<footer style="background: var(--primary); color: white; padding: 40px 20px; text-align: center; margin-top: 50px;">
+<p>© 2026 Tu Parcela Lista. Todos los derechos reservados.</p>
+</footer>
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/db-api.js?v=20260723-catalog-v2"></script>
+<script src="js/categorias-estilo.js"></script>
+<script src="js/categoria.js"></script>
+<script defer="" src="js/tpl-lead-advisor.js?v=20260720-2"></script>
+<script defer="True" src="js/tpl-site-shell.js?v=20260728-2"></script></body>
 </html>
